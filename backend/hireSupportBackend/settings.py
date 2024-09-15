@@ -15,13 +15,13 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-import cloudinary
-
-cloudinary.config(
-    cloud_name="os.environ.get('CLOUD_NAME')", 
-    api_key="os.environ.get('CLOUD_API_KEY')", 
-    api_secret="os.environ.get('CLOUD_API_SECRET')"
-)
+# # ? Wala pang use ito and pwede baguhin
+# import cloudinary
+# cloudinary.config(
+#     cloud_name="os.environ.get('CLOUD_NAME')", 
+#     api_key="os.environ.get('CLOUD_API_KEY')", 
+#     api_secret="os.environ.get('CLOUD_API_SECRET')"
+# )
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -45,6 +45,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+
+    'users',
+    'applicant',
+    'company',
+    'job'
 ]
 
 MIDDLEWARE = [
