@@ -5,20 +5,102 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --header: #ffffff;
+  --hover: #5352E9;
+  --fontcolor: #333333;
+
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #ffffff;
     --foreground: #ededed;
+    --header: #ffffff;
+    --hover: #5352E9;
+    --fontcolor: #333333;  
   }
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: Inter, sans-serif;
 }
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Inter, sans-serif;
+}
+
+li {
+  font-weight: 500;
+  font-family: "Inter", sans-serif;
+  display: inline-block;
+  margin-left: 5rem; /* 80px */
+}
+
+li a {
+  color: var(--fontcolor);
+  text-decoration: none;
+  transition: color 0.3s ease-in-out;
+  cursor: default;
+}
+
+li a:hover {
+  color: var(--hover);
+  cursor: pointer;
+}
+
+li a:active {
+  border-bottom: 4px solid;
+  color: var(--hover);
+}
+
+h1 {
+  font-weight: 700;
+  font-family: "Inter", sans-serif;
+  margin-bottom: 0.625rem; /* 10px */
+}
+
+h3 {
+  font-weight: 500;
+  font-family: InterVariable, sans-serif;
+}
+
+h3 a:hover {
+  color: var(--hover);
+  cursor: pointer;
+}
+
+input {
+  border-color: var(--hover); 
+  outline-color: var(--hover); 
+  width: 101%; 
+  padding: 0 8px;
+  border-radius: 0.4rem; /* 8px */
+
+}
+
+
+footer {
+  background: var(--fontcolor);
+  text-align: center;
+  padding: 10px 0;
+}
+
+
+/*---------------------------LOGIN----------------------------------*/
+
+.box-container {
+  justify-content: center;
+  height: 520px;
+  width: 624px;
+  border: 2px solid #D9D9D9;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1); /* Adds a soft shadow */
+  border-radius: 0.5rem; /* 8px */
+}
+
 
 @layer utilities {
   .text-balance {

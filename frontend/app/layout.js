@@ -1,18 +1,15 @@
 import localFont from "next/font/local";
 import "./styles/globals.css";
+import GeneralHeader from "./components/GeneralHeader";
+import GeneralFooter from "./components/GeneralFooter";
 
 
-const geistSans = localFont({
-  src: './assets/fonts/GeistVF.woff',  
-  variable: "--font-geist-sans",
+const Inter = localFont({
+  src: './assets/fonts/Inter.ttf',  
+  variable: "--font-inter",
   weight: "100 900",
 });
 
-const geistMono = localFont({
-  src: './assets/fonts/GeistMonoVF.woff',  
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
 
 // For search engine
 export const metadata = {
@@ -22,14 +19,15 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="icon" href="favicon.ico" />
-      </head>
+    <html lang="en">   
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${Inter.variable} ${Inter.variable} antialiased`}
       >
+        <GeneralHeader/>
+      
         {children}
+        <GeneralFooter/>
+        
       </body>
     </html>
   );
