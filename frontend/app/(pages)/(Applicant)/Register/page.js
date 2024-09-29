@@ -70,10 +70,10 @@ export default function Register() {
                         <div className="flex flex-col flex-grow">
                             <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-semibold">Sex</p>
                                     <div className="h-medium rounded-xs border-2 border-fontcolor h-10 flex">
-                                        <select className="text-fontcolor lg:w-auto mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-small sm:text-small xsm:text-small" id="sex" name="sex" required/*onChange={handleChange}*/>
-                                            <option  disabled selected hidden> Select Sex</option>
-                                            <option >Female</option>
-                                            <option >Male</option>   
+                                        <select className="valid:text-fontcolor invalid:text-placeholder lg:w-auto mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-small sm:text-small xsm:text-small " id="sex" name="sex" required/*onChange={handleChange}*/>
+                                            <option value=''disabled selected hidden> Select Sex</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Male">Male</option>   
                                         </select>
                                     </div>    
                                 </div>
@@ -94,10 +94,10 @@ export default function Register() {
                         <div className="flex flex-col flex-grow">
                                 <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-semibold">Country/Region</p>
                                         <div className="h-medium rounded-xs border-2 border-fontcolor h-10 flex">
-                                            <select className="text-fontcolor w-auto mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-small sm:text-small xsm:text-small" id="country" name="country" required/*onChange={handleChange}*/>
-                                                <option  disabled selected hidden>Select Country</option>
-                                                <option >Philippines</option>
-                                                <option >Europe</option>   
+                                            <select className="valid:text-fontcolor invalid:text-placeholder w-auto mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-small sm:text-small xsm:text-small" id="country" name="country" required/*onChange={handleChange}*/>
+                                                <option value='' disabled selected hidden>Select Country</option>
+                                                <option value='Philippines'>Philippines</option>
+                                                <option value='Europe'>Europe</option>   
                                             </select>
                                         </div>
                                 </div>
@@ -105,10 +105,10 @@ export default function Register() {
                                 <div className="flex flex-col flex-grow">
                                     <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-semibold">State/Province</p>
                                     <div className="h-medium rounded-xs border-2 border-fontcolor h-10 flex">
-                                        <select  className="text-fontcolor lg:text-medium mb:text-small sm:text-small xsm:text-small" id="state" name="state" required/*onChange={handleChange}*/>
-                                            <option disabled selected hidden>Select State</option>
-                                            <option >Metro Manila</option>
-                                            <option>Region 1</option>   
+                                        <select  className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-small sm:text-small xsm:text-small" id="state" name="state" required/*onChange={handleChange}*/>
+                                            <option value=''disabled selected hidden>Select State</option>
+                                            <option value='Metro Manila'>Metro Manila</option>
+                                            <option value='Pegion 1'>Region 1</option>   
                                         </select>
                                     </div>
                                 </div>
@@ -124,10 +124,10 @@ export default function Register() {
                         <div className="flex flex-col flex-grow">
                             <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-semibold">City/Municipality</p>
                                     <div className="h-medium rounded-xs border-2 border-fontcolor h-10 flex">
-                                        <select className="text-fontcolor lg:text-medium mb:text-small sm:text-small xsm:text-small" id="city" name="city" required/*onChange={handleChange}*/>
-                                            <option  disabled selected hidden>Select City</option>
-                                            <option >Quezon</option>
-                                            <option>Manila</option>   
+                                        <select className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-small sm:text-small xsm:text-small" id="city" name="city" required/*onChange={handleChange}*/>
+                                            <option value=''  disabled selected hidden>Select City</option>
+                                            <option value='Quezon'>Quezon</option>
+                                            <option value='Manila'>Manila</option>   
                                         </select>
                                     </div>
                                     
@@ -136,10 +136,10 @@ export default function Register() {
                                 <div className="flex flex-col flex-grow">
                                     <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-semibold">Barangay</p>
                                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                        <select className="text-fontcolor lg:text-medium mb:text-small sm:text-small xsm:text-small" id="barangay" name="barangay" required/*onChange={handleChange}*/>
-                                            <option  disabled selected hidden>Select Baranggay</option>
-                                            <option>Tandang Sora</option>
-                                            <option>Ermita</option>   
+                                        <select className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-small sm:text-small xsm:text-small" id="barangay" name="barangay" required/*onChange={handleChange}*/>
+                                            <option value='' disabled selected hidden>Select Baranggay</option>
+                                            <option value='Tandang Sora'>Tandang Sora</option>
+                                            <option value='Ermita'>Ermita</option>   
                                         </select>
                                         </div>
                                 </div>
@@ -157,12 +157,12 @@ export default function Register() {
                                     <input type="linkedin-link" id="state" name="linkedIn" placeholder="" required /*onChange={handleChange}*/></input>
                                 </div>
                             
-                             <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small pt-4 pb-1 font-semibold">Password</p>
+                             <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small pt-4 pb-1 text-fontcolor font-semibold">Password</p>
                                 <div className="h-medium rounded-xs border-2 border-fontcolor h-10 flex">
                                     <input type={showPassword ? 'text' : 'password'} id="password" name="password" placeholder="" required  onChange={handleChange} ></input>  
                                 </div>      
 
-                             <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small pt-4 pb-1 font-semibold">Confirm Password</p>
+                             <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small pt-4 pb-1 text-fontcolor font-semibold">Confirm Password</p>
                                 <div className="h-medium rounded-xs border-2 border-fontcolor h-10 flex">
                                     <input type={showPassword ? 'text' : 'password'} id="password" name="password" placeholder="" required  onChange={handleChange} ></input>  
                                 </div>   
@@ -170,7 +170,7 @@ export default function Register() {
                             {/*checkbox*/}
                             <div className="flex pt-12 pb-12">
                             <input type="checkbox"value="" id="agreement" className="flex items-start h-5 w-8 "/>
-                            <p className="text-small items-center justify-center ml-5"> By creating an account or signing in, you understand and agree to our Terms. You also acknowledge our <span className="font-medium"> <Link href="" className="underline">Terms & Condition</Link></span> and <span className="font-medium"> <Link href="" className="underline">Privacy Policy</Link></span></p>      
+                            <p className="text-fontcolor text-small items-center justify-center ml-5"> By creating an account or signing in, you understand and agree to our Terms. You also acknowledge our <span className="font-medium"> <Link href="" className="underline">Terms & Condition</Link></span> and <span className="font-medium"> <Link href="" className="underline">Privacy Policy</Link></span></p>      
                             </div>
                     
                     </div>
