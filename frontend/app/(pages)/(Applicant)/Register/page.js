@@ -70,7 +70,7 @@ export default function Register() {
                         <div className="flex flex-col flex-grow">
                             <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-semibold">Sex</p>
                                     <div className="h-medium rounded-xs border-2 border-fontcolor h-10 flex">
-                                        <select className="lg:w-auto mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-small sm:text-small xsm:text-small" id="sex" name="sex" required/*onChange={handleChange}*/>
+                                        <select className="text-fontcolor lg:w-auto mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-small sm:text-small xsm:text-small" id="sex" name="sex" required/*onChange={handleChange}*/>
                                             <option  disabled selected hidden> Select Sex</option>
                                             <option >Female</option>
                                             <option >Male</option>   
@@ -94,7 +94,7 @@ export default function Register() {
                         <div className="flex flex-col flex-grow">
                                 <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-semibold">Country/Region</p>
                                         <div className="h-medium rounded-xs border-2 border-fontcolor h-10 flex">
-                                            <select className="lg:w-auto mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-small sm:text-small xsm:text-small" id="sex" name="sex" required/*onChange={handleChange}*/>
+                                            <select className="text-fontcolor w-auto mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-small sm:text-small xsm:text-small" id="country" name="country" required/*onChange={handleChange}*/>
                                                 <option  disabled selected hidden>Select Country</option>
                                                 <option >Philippines</option>
                                                 <option >Europe</option>   
@@ -105,7 +105,7 @@ export default function Register() {
                                 <div className="flex flex-col flex-grow">
                                     <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-semibold">State/Province</p>
                                     <div className="h-medium rounded-xs border-2 border-fontcolor h-10 flex">
-                                        <select  className="text-font lg:text-medium mb:text-small sm:text-small xsm:text-small" id="city" name="city" required/*onChange={handleChange}*/>
+                                        <select  className="text-fontcolor lg:text-medium mb:text-small sm:text-small xsm:text-small" id="state" name="state" required/*onChange={handleChange}*/>
                                             <option disabled selected hidden>Select State</option>
                                             <option >Metro Manila</option>
                                             <option>Region 1</option>   
@@ -124,7 +124,7 @@ export default function Register() {
                         <div className="flex flex-col flex-grow">
                             <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-semibold">City/Municipality</p>
                                     <div className="h-medium rounded-xs border-2 border-fontcolor h-10 flex">
-                                        <select className="text-hover lg:text-medium mb:text-small sm:text-small xsm:text-small" id="city" name="city" required/*onChange={handleChange}*/>
+                                        <select className="text-fontcolor lg:text-medium mb:text-small sm:text-small xsm:text-small" id="city" name="city" required/*onChange={handleChange}*/>
                                             <option  disabled selected hidden>Select City</option>
                                             <option >Quezon</option>
                                             <option>Manila</option>   
@@ -136,7 +136,7 @@ export default function Register() {
                                 <div className="flex flex-col flex-grow">
                                     <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-semibold">Barangay</p>
                                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                        <select className="lg:text-medium mb:text-small sm:text-small xsm:text-small" id="barangay" name="barangay" required/*onChange={handleChange}*/>
+                                        <select className="text-fontcolor lg:text-medium mb:text-small sm:text-small xsm:text-small" id="barangay" name="barangay" required/*onChange={handleChange}*/>
                                             <option  disabled selected hidden>Select Baranggay</option>
                                             <option>Tandang Sora</option>
                                             <option>Ermita</option>   
