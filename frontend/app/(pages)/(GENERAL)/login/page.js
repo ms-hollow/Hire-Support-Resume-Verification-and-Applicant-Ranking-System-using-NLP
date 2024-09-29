@@ -32,7 +32,7 @@ export default function Login() {
                             <input type="text" id="email-address" name="email" placeholder="applicant@gmail.com" required ></input>
                         </div>
 
-                    <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small pt-4 pb-1 font-semibold">Password</p>
+                    <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small pt-4 text-fontcolor pb-1 font-semibold">Password</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor h-10 flex">
                             <input type={showPassword ? 'text' : 'password'} id="password" name="password" placeholder="" required  onChange={handleChange} ></input>  
                               
