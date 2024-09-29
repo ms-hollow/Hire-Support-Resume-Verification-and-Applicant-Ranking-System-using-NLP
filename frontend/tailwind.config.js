@@ -7,6 +7,12 @@ module.exports = {
   ],
   theme: {
     extend: {
+      screens: {
+        xsm: '375px',
+        sm: '480px',
+        mb: '768px',
+        lg: '1224px',
+      },
       height: {
         'header-height': '64px', // If the header is 64px high (16px padding + height)
         'content-height': 'calc(100vh - 64px)', // For the rest of the page content minus the header height
@@ -15,8 +21,10 @@ module.exports = {
         background: "var(--background)",
         foreground: "var(--foreground)",
         fontcolor: "var(--fontcolor)",
-        header: "var(--header)",
-        hover: "var(--hover)",
+        primary: "var(--primary)",
+        accent: "var(--accent)",
+        secondary: "var(--secondary)",
+        placeholder: "var(--placeholder)",
       },
       padding: {
         's': '22px',
@@ -24,7 +32,28 @@ module.exports = {
       },
       borderRadius: {
         'xs': '8px',
-      }
+      },
+      fontWeight: {
+        thin: 200,
+        light: 300,
+        normal: 400,
+        medium: 500,
+        semibold: 600,
+        bold: 700,
+        extrabold: 800,
+      },
+      fontSize:{
+        small: '0.75rem', /*12px*/
+        medium:'0.875rem', /*14px*/
+        large: '1rem', /*16px'*/
+        extralarge:'2rem', /*32px*/
+      },
+      height:{
+        medium: '48px',
+        large: '64px',
+        auto:'auto',   
+      },
+      overscrollBehavior: ['none', 'auto' ,'contain'],
     },
   },
   plugins: [],
