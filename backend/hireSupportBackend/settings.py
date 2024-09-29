@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'users',
     'applicant',
     'company',
-    'job'
+    'job',
+    'dashboard',
 ]
 
 MIDDLEWARE = [
@@ -112,6 +113,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Custom Model
+AUTH_USER_MODEL = 'users.User'
+
+# Custom Backend
+AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
