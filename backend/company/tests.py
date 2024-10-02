@@ -10,7 +10,7 @@ class CompanyModelTest(TestCase):
         )
         self.company = Company.objects.create(
             user=self.user,
-            company_name='Some Company',
+            company_name='ABC Corporation',
             industry = 'Tech',
             number_of_employees=60,
             hr_name='John Smith',
@@ -19,12 +19,11 @@ class CompanyModelTest(TestCase):
         )
 
     def test_company_fields(self):
-        print('Testing applicant fields:')
+        print('Testing COMPANY fields:')
         print(f'Company Name: {self.company.company_name}')
         print(f'Industry: {self.company.industry}')
         print(f'No. Employees: {self.company.number_of_employees}')
         print(f'HR Name: {self.company.hr_name}')
         print(f'Contact No: {self.company.contact_number}')
         print(f'Address: {self.company.company_address}')
-        print(self.company)
        
