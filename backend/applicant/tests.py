@@ -21,14 +21,14 @@ class ApplicantModelTest(TestCase):
         )
 
     def test_applicant_fields(self):
-        print('Testing applicant fields:')
+        print('Testing APPLICANT fields:')
         print(f'First Name: {self.applicant.first_name}')
         print(f'Last Name: {self.applicant.last_name}')
         print(f'Sex: {self.applicant.sex}')
         print(f'DOB: {self.applicant.date_of_birth}')
         print(f'Age: {self.applicant.age}')
         print(f'Contact No.: {self.applicant.contact_number}')
-        print(f'Contact No.: {self.applicant.present_address}')
-        (f'Contact No.: {self.applicant.linkedin_profile}')
-        print(self.applicant)
+        print(f'Contact Address.: {self.applicant.present_address}')
+        print(f'LinkedIn No.: {self.applicant.linkedin_profile}')
+        
        

@@ -1,6 +1,10 @@
 from django.db import models
 from users.models import User
 
+#! Note: Kapag may binago sa model, lagi i-migrate 
+#? Command: 
+#? python manage.py makemigrations
+#? python manage.py migrate
 
 class Applicant(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -9,11 +13,11 @@ class Applicant(models.Model):
     last_name = models.CharField(max_length=50)
     sex = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female'), ('Others', 'Others')])
     date_of_birth = models.DateField()
-    age = models.IntegerField()
-    contact_number = models.CharField(max_length=15)
+    age = models.PositiveIntegerField()
+    contact_number = models.PositiveIntegerField()
     present_address = models.CharField(max_length=50)
     linkedin_profile = models.URLField(blank=True, null=True)
-    # saved_jobs = models.ManyToManyField('JobHiring', blank=True)
+    saved_jobs = models.ManyToManyField(to='job.JobHiring')
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
