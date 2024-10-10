@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Dashboard</h2>
+
+<p>User: {{ request.user }}</p>  <!-- Debugging line to see the logged-in user -->
+<p>Is Applicant: {{ request.user.is_applicant }}</p>  <!-- Check if the user is an applicant -->
+<p>Is Company: {{ request.user.is_company }}</p>  <!-- Check if the user is a company -->
+
+{% if request.user.is_applicant %}
+<section> 
+    <h2>Applicant Dashboard</h2>
+</section>
+
+{% elif request.user.is_company %}
+<section> 
+    <h2>Company Dashboard</h2>
+</section>
+
+{% endif %}  
+{% endblock content %}
