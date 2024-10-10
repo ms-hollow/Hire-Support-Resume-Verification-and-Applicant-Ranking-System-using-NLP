@@ -1,0 +1,4 @@
+# lagay dito lahat ng tools and dependencies
+Django
+djangorestframework
+django-cors-headers
