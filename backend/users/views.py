@@ -6,6 +6,7 @@ from .form import RegisterUserForm
 from applicant.form import ApplicantProfileForm
 from applicant.models import Applicant
 from company.models import Company
+from company.form import CompanyProfileForm
 
 # Create your views here.
 
@@ -54,12 +55,11 @@ def register_company(request):
             print("Form is valid")
             user = form.save(commit=False)
             user.is_company = True
-            user.username = user.email  # Ensure the username is set correctly
+            user.username = user.email 
             user.save()  # Save the user instance
             Company.objects.create(user=user)  # Create an Applicant profile
-            messages.info(request, 'Your account has been created.')
-            print("User created:", user.email)  # Debug line to confirm user creation
-            return redirect('login')  # Redirect to the login page
+            messages.info(request, 'Your account has been created. Please complete your profile.')
+            return redirect('company_profile', user_id=user.id)  # Redirect to the profile completion page
         else:
             print("Form errors:", form.errors)  # Output errors for debugging
             messages.warning(request, 'Something went wrong: ' + str(form.errors))
@@ -70,7 +70,23 @@ def register_company(request):
         form = RegisterUserForm()
         
     return render(request, 'users/register_company.html', {'form': form})
-    
+
+def company_profile(request, user_id):
+    user = User.objects.get(id=user_id)
+    if request.method == 'POST':
+        profile_form = CompanyProfileForm(request.POST, instance=user.company)  
+        if profile_form.is_valid():
+            profile_form.save()  # Save the profile data
+            messages.info(request, 'Your profile has been completed.')
+            return redirect('login')  # Redirect to the login page
+    else:
+        profile_form = CompanyProfileForm()
+
+    return render(request, 'users/company_profile.html', {
+        'profile_form': profile_form,
+        'user': user
+    })
+
 def login_user(request):
     if request.method == 'POST':
         email = request.POST.get('email')

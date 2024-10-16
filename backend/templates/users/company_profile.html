@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Register Applicant{% endblock title %}
+{% block title %}Register Company{% endblock title %}
 
 {% block content %}
-<h2>Complete Your Profile - Applicant</h2>
+<h2>Complete Your Profile - Company</h2>
 <form method="POST">
     {% csrf_token %}
     {{ profile_form.as_p }}  <!-- Render the profile completion form -->
