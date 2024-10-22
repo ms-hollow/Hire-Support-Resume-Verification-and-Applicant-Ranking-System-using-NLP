@@ -1,0 +1,26 @@
+<form method="post">
+    {% csrf_token %}
+    <h2>Create Job Hiring</h2>
+    {{ job_form.as_p }}
+
+    <h3>Scoring Criteria</h3>
+    {{ scoring_formset.management_form }}  <!-- Required for formset management -->
+    {% for form in scoring_formset %}
+        <div class="scoring-criteria-form">
+            <div>
+                <label for="{{ form.criteria_name.id_for_label }}">Criteria Name:</label>
+                {{ form.criteria_name }}
+            </div>
+            <div>
+                <label for="{{ form.weight_percentage.id_for_label }}">Weight Percentage:</label>
+                {{ form.weight_percentage }}
+            </div>
+            <div>
+                <label for="{{ form.preference.id_for_label }}">Preference:</label>
+                {{ form.preference }}
+            </div>
+        </div>
+    {% endfor %}
+
+    <button type="submit">Submit</button>
+</form>

@@ -17,9 +17,9 @@ def register_applicant(request):
             if form.is_valid():
                 user = form.save(commit=False)
                 user.is_applicant = True
-                user.username = user.email
+                user.username = user.email  # Set the email as the username
                 user.save()
-                Applicant.objects.create(user=user)  # Create the Applicant profile
+                Applicant.objects.create(user=user)  # Create an empty Applicant profile
                 messages.info(request, 'Your account has been created. Please complete your profile.')
                 return redirect('applicant_profile', user_id=user.id)  # Redirect to the profile completion page
         else:
@@ -30,21 +30,35 @@ def register_applicant(request):
 
     return render(request, 'users/register_applicant.html', {'form': form})
 
+
 def applicant_profile(request, user_id):
     user = User.objects.get(id=user_id)
+    
     if request.method == 'POST':
-        profile_form = ApplicantProfileForm(request.POST, instance=user.applicant)  # Link to the Applicant profile
+        profile_form = ApplicantProfileForm(request.POST, instance=user.applicant)  # Linked to the Applicant profile
+        
         if profile_form.is_valid():
-            profile_form.save()  # Save the profile data
+            profile = profile_form.save(commit=False)
+
+            # Pass first_name and last_name from the Applicant form to the User model
+            user.first_name = profile_form.cleaned_data.get('first_name')
+            user.last_name = profile_form.cleaned_data.get('last_name')
+
+            # Save both models
+            user.save()  # Save the User model with first_name and last_name
+            profile.save()  # Save the Applicant profile
+
             messages.info(request, 'Your profile has been completed.')
-            return redirect('login')  # Redirect to the login page
+            return redirect('login')  # Redirect to login page after profile completion
+
     else:
-        profile_form = ApplicantProfileForm()
+        profile_form = ApplicantProfileForm(instance=user.applicant)  # Populate the form with existing data
 
     return render(request, 'users/applicant_profile.html', {
         'profile_form': profile_form,
         'user': user
     })
+
 
 def register_company(request):
     if request.method == 'POST':
@@ -64,7 +78,6 @@ def register_company(request):
             print("Form errors:", form.errors)  # Output errors for debugging
             messages.warning(request, 'Something went wrong: ' + str(form.errors))
             return render(request, 'users/register_company.html', {'form': form})  # Render the form again
-
 
     else:
         form = RegisterUserForm()

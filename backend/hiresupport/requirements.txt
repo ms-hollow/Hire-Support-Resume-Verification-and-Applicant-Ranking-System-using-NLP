@@ -2,3 +2,4 @@
 Django
 djangorestframework
 django-cors-headers
+pip install psycopg psycopg2 psycopg2-binary

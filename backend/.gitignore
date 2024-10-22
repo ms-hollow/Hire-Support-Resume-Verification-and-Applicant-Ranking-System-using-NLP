@@ -7,3 +7,6 @@ venv/
 __pycache__/
 *.pyc
 *.pyo
+
+# Ignore SQLite database file
+db.sqlite3

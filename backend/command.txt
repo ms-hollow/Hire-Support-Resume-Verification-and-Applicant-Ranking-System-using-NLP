@@ -8,3 +8,5 @@ python manage.py runserver
 # If there are changes sa model, do the following:
 python manage.py makemigrations
 python manage.py migrate
+
+
