@@ -9,12 +9,27 @@
 
 {% if request.user.is_applicant %}
 <section> 
-    <h2>Applicant Dashboard</h2>
+    <div class="p-5 mb-4 bg-light rounded-3">
+        <div class="container-flud py-5">
+            <h1 class="display-5 fw-bold">Welcome to Hire Support</h1>
+            <p class="col-md-8 fs-4">Applicant Dashboard</p>
+        </div>
+    </div>
+    <a href="{% url 'view-applicant-profile' request.user.applicant.pk %}">View Applicant Profile</a>
 </section>
 
 {% elif request.user.is_company %}
 <section> 
-    <h2>Company Dashboard</h2>
+    <div class="p-5 mb-4 bg-light rounded-3">
+        <div class="container-flud py-5">
+            <h1 class="display-5 fw-bold">Welcome to Hire Support</h1>
+            <p class="col-md-8 fs-4">Company Dashboard</p>
+        </div>
+    </div>
+    <p>Ready to create a new job hiring? Click the link below:</p>
+    <a href="{% url 'create_job_hiring' %}">Create Job Hiring</a> 
+    <a href="{% url 'view-company-profile' request.user.company.pk %}">View Company Profile</a>
+
 </section>
 
 {% endif %}  

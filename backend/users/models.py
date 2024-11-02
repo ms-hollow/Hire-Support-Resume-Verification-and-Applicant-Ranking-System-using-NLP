@@ -11,3 +11,5 @@ class User(AbstractUser):
     is_company = models.BooleanField(default=False) # kung company ba si user
     is_applicant = models.BooleanField(default=False) # kung applicant ba si user
 
+    has_applicant_acc = models.BooleanField(default=False)
+    has_company_acc = models.BooleanField(default=False)

@@ -15,12 +15,19 @@ class JobHiringForm(forms.ModelForm):
             'job_description', 
             'experience_level', 
             'qualifications', 
+            'schedule',
             'salary', 
             'benefits', 
             'verification_option', 
             'application_deadline', 
             'status'
         ]
+
+    def __init__(self, *args, **kwargs):
+        company = kwargs.pop('company', None)  # Extract the company from kwargs
+        super(JobHiringForm, self).__init__(*args, **kwargs)
+        if company:
+            self.instance.company = company
 
 class ScoringCriteriaForm(forms.ModelForm):
     class Meta:

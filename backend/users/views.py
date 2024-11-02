@@ -3,10 +3,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from .models import User
 from .form import RegisterUserForm
-from applicant.form import ApplicantProfileForm
 from applicant.models import Applicant
 from company.models import Company
-from company.form import CompanyProfileForm
 
 # Create your views here.
 
@@ -21,7 +19,11 @@ def register_applicant(request):
                 user.save()
                 Applicant.objects.create(user=user)  # Create an empty Applicant profile
                 messages.info(request, 'Your account has been created. Please complete your profile.')
-                return redirect('applicant_profile', user_id=user.id)  # Redirect to the profile completion page
+                # Automatically log the user in after registration
+                login(request, user)
+                
+                # Redirect to the profile completion page
+                return redirect('complete-applicant-profile')
         else:
             messages.warning(request, 'Something went wrong with your submission.')
 
@@ -30,91 +32,68 @@ def register_applicant(request):
 
     return render(request, 'users/register_applicant.html', {'form': form})
 
-
-def applicant_profile(request, user_id):
-    user = User.objects.get(id=user_id)
-    
-    if request.method == 'POST':
-        profile_form = ApplicantProfileForm(request.POST, instance=user.applicant)  # Linked to the Applicant profile
-        
-        if profile_form.is_valid():
-            profile = profile_form.save(commit=False)
-
-            # Pass first_name and last_name from the Applicant form to the User model
-            user.first_name = profile_form.cleaned_data.get('first_name')
-            user.last_name = profile_form.cleaned_data.get('last_name')
-
-            # Save both models
-            user.save()  # Save the User model with first_name and last_name
-            profile.save()  # Save the Applicant profile
-
-            messages.info(request, 'Your profile has been completed.')
-            return redirect('login')  # Redirect to login page after profile completion
-
-    else:
-        profile_form = ApplicantProfileForm(instance=user.applicant)  # Populate the form with existing data
-
-    return render(request, 'users/applicant_profile.html', {
-        'profile_form': profile_form,
-        'user': user
-    })
-
-
 def register_company(request):
     if request.method == 'POST':
-        print("Received POST request")
         form = RegisterUserForm(request.POST)
         
         if form.is_valid():
-            print("Form is valid")
+            # Create the user but don't save it to the database yet
             user = form.save(commit=False)
             user.is_company = True
-            user.username = user.email 
-            user.save()  # Save the user instance
-            Company.objects.create(user=user)  # Create an Applicant profile
+            user.username = user.email  # Set the email as the username
+            user.save()  # Save the user to the database
+            
+            # Create the company profile associated with this user
+            Company.objects.create(user=user)
             messages.info(request, 'Your account has been created. Please complete your profile.')
-            return redirect('company_profile', user_id=user.id)  # Redirect to the profile completion page
+            
+            # Automatically log the user in after registration
+            login(request, user)
+            
+            # Redirect to the profile completion page
+            return redirect('complete-company-profile')
+        
         else:
-            print("Form errors:", form.errors)  # Output errors for debugging
+            # Display form errors if there are any
             messages.warning(request, 'Something went wrong: ' + str(form.errors))
-            return render(request, 'users/register_company.html', {'form': form})  # Render the form again
+            return render(request, 'users/register_company.html', {'form': form})
 
     else:
         form = RegisterUserForm()
         
     return render(request, 'users/register_company.html', {'form': form})
 
-def company_profile(request, user_id):
-    user = User.objects.get(id=user_id)
-    if request.method == 'POST':
-        profile_form = CompanyProfileForm(request.POST, instance=user.company)  
-        if profile_form.is_valid():
-            profile_form.save()  # Save the profile data
-            messages.info(request, 'Your profile has been completed.')
-            return redirect('login')  # Redirect to the login page
-    else:
-        profile_form = CompanyProfileForm()
-
-    return render(request, 'users/company_profile.html', {
-        'profile_form': profile_form,
-        'user': user
-    })
 
 def login_user(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
 
+        # Check if the user exists in the Applicant database
+        try:
+            applicant = Applicant.objects.get(user__email=email)
+            user = applicant.user  # Get the related User object
+        except Applicant.DoesNotExist:
+            # Check if the user exists in the Company database
+            try:
+                company = Company.objects.get(user__email=email)
+                user = company.user  # Get the related User object
+            except Company.DoesNotExist:
+                messages.warning(request, "Username not found. Please ensure you've registered as either an Applicant or a Company.")
+                return redirect('login')
+
+        # If the user exists, authenticate
         user = authenticate(request, username=email, password=password)
+
         if user is not None and user.is_active:
             login(request, user)
             return redirect('dashboard')
         else:
-            messages.warning(request, 'Something went wrong')
+            messages.warning(request, 'The password you entered is incorrect. Please try again.')
             return redirect('login')
     else: 
         return render(request, 'users/login.html')
-    
+
 def logout_user(request):
     logout(request)
     messages.info(request, 'Your session has ended')

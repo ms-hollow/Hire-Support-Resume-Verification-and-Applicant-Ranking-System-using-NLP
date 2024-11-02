@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="my-4">Applicant Profile</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ applicant.applicant_name }}</h5>
+            <p class="card-text"><strong>Sex:</strong> {{ applicant.sex }}</p>
+            <p class="card-text"><strong>Date Of Birth</strong> {{ applicant.date_of_birth }}</p>
+            <p class="card-text"><strong>Age:</strong> {{ applicant.age }}</p>
+            <p class="card-text"><strong>Contact Number:</strong> {{ applicant.contact_number }}</p>
+            <p class="card-text"><strong>Present Address:</strong> {{ applicant.present_address }}</p>
+            <p class="card-text"><strong>LinkedIn_Profile:</strong> {{ applicant.linkedin_profile }}</p>
+        </div>
+    </div>
+    <!-- <a href="{% url 'complete-company-profile' %}" class="btn btn-primary mt-3">Edit Profile</a> -->
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+</div>
+{% endblock content %}
