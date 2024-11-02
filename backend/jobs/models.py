@@ -1,8 +1,5 @@
 from django.db import models
-from applicant.models import Applicant
 from company.models import Company
-
-# Create your models here.
 
 #* Notes: Hindi pa automatically nare-retrieve ang company name will find a way paano gagawin don
 #TODO: Job Application
@@ -20,10 +17,11 @@ class JobHiring(models.Model):
     experience_level = models.CharField(max_length=20, choices=[('Internship','Internship'), ('Entry-level', 'Entry-level'), ('Associate', 'Associate'), 
                                                                 ('Mid-level','Mid-level'), ('Senior', 'Senior'), ('Lead', 'Lead'), ('Manager', 'Manager')])
     qualifications = models.CharField(max_length=300)
-    salary = models.PositiveIntegerField()
+    schedule = models.CharField(max_length=300)
+    salary = models.CharField(max_length=300)
     benefits = models.CharField(max_length=300)
 
-    verification_option = models.CharField(max_length=300)
+    verification_option = models.CharField(max_length=300, blank=True, null=True)
     creation_date = models.DateField(auto_now_add=True)
     application_deadline = models.DateField()
     status = models.CharField(max_length=10, choices=[('Draft', 'Draft'), ('Open', 'Open'), ('Active', 'Active'), ('Closed', 'Closed')])
@@ -45,8 +43,8 @@ class JobHiring(models.Model):
 #Represents the criteria used to evaluate applicants for a specific job posting. This model stores details about each scoring criterion, such as its name, weight, and preference.
 class ScoringCriteria(models.Model):
     job_hiring = models.ForeignKey(JobHiring, related_name='scoring_criteria', on_delete=models.CASCADE)
-    criteria_name = models.CharField(max_length=100)
-    weight_percentage = models.DecimalField(max_digits=5, decimal_places=2)
+    criteria_name = models.CharField(max_length=100, blank=True, null=True)
+    weight_percentage = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     preference = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
@@ -55,7 +53,7 @@ class ScoringCriteria(models.Model):
 class JobApplication(models.Model):
     job_application_id = models.AutoField(primary_key=True)  # PK
     job_hiring = models.ForeignKey(JobHiring, on_delete=models.CASCADE)  # FK to JobHiring
-    applicant = models.ForeignKey(Applicant, on_delete=models.CASCADE)  # FK to Applicant (Assumed model exists)
+    applicant = models.ForeignKey('applicant.Applicant', on_delete=models.CASCADE)  # string reference # FK to Applicant 
     
     # Applicant details
     email = models.EmailField()
