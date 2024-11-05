@@ -1,26 +1,126 @@
-<form method="post">
-    {% csrf_token %}
-    <h2>Create Job Hiring</h2>
-    {{ job_form.as_p }}
+{% extends "base.html" %}
 
-    <h3>Scoring Criteria</h3>
-    {{ scoring_formset.management_form }}  <!-- Required for formset management -->
-    {% for form in scoring_formset %}
-        <div class="scoring-criteria-form">
-            <div>
-                <label for="{{ form.criteria_name.id_for_label }}">Criteria Name:</label>
-                {{ form.criteria_name }}
-            </div>
-            <div>
-                <label for="{{ form.weight_percentage.id_for_label }}">Weight Percentage:</label>
-                {{ form.weight_percentage }}
-            </div>
-            <div>
-                <label for="{{ form.preference.id_for_label }}">Preference:</label>
-                {{ form.preference }}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mx-auto" style="width: 40rem;">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Complete Company Profile</h5>
+                <form method="POST">
+                    {% csrf_token %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Company Name: </label>
+                        {{ company_name }}
+                    </div> 
+                
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Job Title</label>
+                        {% render_field job_form.job_title class="form-control" %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Job Industry</label>
+                        {% render_field job_form.job_industry class="form-control" %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Job Description</label>
+                        {% render_field job_form.job_description class="form-control" %}
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Work Location</label>
+                        {% render_field job_form.work_location class="form-control" %}
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Work Setup</label>
+                        {% render_field job_form.work_setup class="form-control" %}
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Employment Type</label>
+                        {% render_field job_form.employment_type class="form-control" %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Qualifications</label>
+                        {% render_field job_form.qualifications class="form-control" %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Schedule</label>
+                        {% render_field job_form.schedule class="form-control" %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="salary" class="form-label">Salary</label>
+                        {% render_field job_form.salary class="form-control" %}
+                    </div>
+                    
+
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Frequency</label>
+                        {% render_field job_form.frequency class="form-control" %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Benefits</label>
+                        {% render_field job_form.benefits class="form-control" %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Experience Level</label>
+                        {% render_field job_form.experience_level class="form-control" %}
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">No. of Positions</label>
+                        {% render_field job_form.num_positions class="form-control" %}
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Verification Option</label>
+                        {% render_field job_form.verification_option class="form-control" %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Application Deadline</label>
+                        {% render_field job_form.application_deadline class="form-control" %}
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Required Documents</label>
+                        {% render_field job_form.required_documents class="form-control" %}
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Status</label>
+                        {% render_field job_form.status class="form-control" %}
+                    </div>
+
+                    {{ scoring_formset.management_form }}  <!-- Required for formset management -->
+
+                    <h3>Scoring Criteria</h3>
+                    {% for form in scoring_formset %}
+                        <div class="scoring-criteria-form">
+                            {{ form.as_p }}  <!-- Render each scoring criteria form -->
+                        </div>
+                    {% endfor %}
+                    
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+                
             </div>
         </div>
-    {% endfor %}
+    </div>
+</div>
 
-    <button type="submit">Submit</button>
-</form>
+{% endblock content %}

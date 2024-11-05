@@ -16,4 +16,4 @@ class Applicant(models.Model):
     saved_jobs = models.ManyToManyField('jobs.JobHiring', related_name='saved_by', blank=True)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.applicant_name}"
