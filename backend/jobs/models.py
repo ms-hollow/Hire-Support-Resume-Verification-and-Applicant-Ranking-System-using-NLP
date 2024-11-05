@@ -1,30 +1,32 @@
 from django.db import models
 from company.models import Company
 
-#* Notes: Hindi pa automatically nare-retrieve ang company name will find a way paano gagawin don
 #TODO: Job Application
 
 class JobHiring(models.Model):
     job_hiring_id = models.AutoField(primary_key=True) #PK
     company = models.ForeignKey(Company, on_delete=models.CASCADE) #FK
-    job_industry = models.CharField(max_length=50)
-    job_title = models.CharField(max_length=100)
-    work_location = models.CharField(max_length=100)
-    work_setup = models.CharField(max_length=20, choices=[('Onsite', 'Onsite'), ('Remote', 'Remote'), ('Hybrid', 'Hybrid')])
-    employment_type = models.CharField(max_length=20, choices=[('Full-time', 'Full-time'), ('Part-time', 'Part-time'), ('Contract', 'Contract'), ('Internship', 'Internship')])
-    num_positions = models.PositiveIntegerField()
+    job_title = models.CharField(max_length=100, null=True, blank=False)
+    job_industry = models.CharField(max_length=50, null=True, blank=False)
     job_description = models.TextField()
-    experience_level = models.CharField(max_length=20, choices=[('Internship','Internship'), ('Entry-level', 'Entry-level'), ('Associate', 'Associate'), 
-                                                                ('Mid-level','Mid-level'), ('Senior', 'Senior'), ('Lead', 'Lead'), ('Manager', 'Manager')])
-    qualifications = models.CharField(max_length=300)
+    
+    work_location = models.CharField(max_length=100, null=True, blank=False)
+    work_setup = models.CharField(max_length=20, choices=[('Onsite', 'Onsite'), ('Remote', 'Remote'), ('Hybrid', 'Hybrid')], null=True, blank=False)
+    employment_type = models.CharField(max_length=20, choices=[('Full-time', 'Full-time'), ('Part-time', 'Part-time'), ('Contract', 'Contract'), ('Internship', 'Internship')], null=True, blank=False)
+    qualifications = models.TextField()
     schedule = models.CharField(max_length=300)
-    salary = models.CharField(max_length=300)
-    benefits = models.CharField(max_length=300)
-
-    verification_option = models.CharField(max_length=300, blank=True, null=True)
+    salary = models.CharField(max_length=20, null=True, blank=True)
+    frequency = models.CharField(max_length=20, choices=[('Weekly','Weekly'), ('Bi-Weekly','Bi-Weekly'), ('Semi-Monthly','Semi-Monthly'), ('Monthly','Monthly'), ('Annual','Annual'), ('Daily','Daily')], null=True, blank=False)
+    benefits = models.CharField(max_length=300, null=True, blank=False)
+    experience_level = models.CharField(max_length=20, choices=[('Internship','Internship'), ('Entry-level', 'Entry-level'), ('Associate', 'Associate'), 
+                                                                ('Mid-level','Mid-level'), ('Senior', 'Senior'), ('Lead', 'Lead'), ('Manager', 'Manager')], null=True, blank=False)
+    num_positions = models.PositiveIntegerField()
+    verification_option = models.CharField(max_length=300, choices=[('Score Unverified Credential Fully','Score Unverified Credential Fully'), ('Score Unverified Credential 50%','Score Unverified Credential 50%'), ('Ignore Unverified Credentials','Ignore Unverified Credentials')], null=True, blank=False)
     creation_date = models.DateField(auto_now_add=True)
+    required_documents = models.CharField(max_length=500, null=True, blank=False)
     application_deadline = models.DateField()
-    status = models.CharField(max_length=10, choices=[('Draft', 'Draft'), ('Open', 'Open'), ('Active', 'Active'), ('Closed', 'Closed')])
+    status = models.CharField(max_length=10, choices=[('Draft', 'Draft'), ('Open', 'Open'), ('Active', 'Active'), ('Closed', 'Closed')], null=True, blank=False)
+    note = models.TextField(max_length=300, null=True, blank=True)
 
     def get_scoring_criteria(self):
         criteria_list = []

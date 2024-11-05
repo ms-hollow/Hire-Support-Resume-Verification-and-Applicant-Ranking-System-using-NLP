@@ -4,24 +4,7 @@ from jobs.models import JobHiring, ScoringCriteria
 class JobHiringForm(forms.ModelForm):  
     class Meta:
         model = JobHiring
-        fields = [
-            'company', 
-            'job_industry', 
-            'job_title', 
-            'work_location', 
-            'work_setup', 
-            'employment_type', 
-            'num_positions', 
-            'job_description', 
-            'experience_level', 
-            'qualifications', 
-            'schedule',
-            'salary', 
-            'benefits', 
-            'verification_option', 
-            'application_deadline', 
-            'status'
-        ]
+        exclude = ('company', 'creation_date',) 
 
     def __init__(self, *args, **kwargs):
         company = kwargs.pop('company', None)  # Extract the company from kwargs
