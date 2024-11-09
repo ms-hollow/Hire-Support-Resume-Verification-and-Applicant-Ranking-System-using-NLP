@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'widget_tweaks',
     'users',
     'applicant',
@@ -44,6 +45,12 @@ INSTALLED_APPS = [
     'jobs',
     'dashboard',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',  # This enables token authentication
+    ]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -142,3 +149,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Use custom model
 AUTH_USER_MODEL = 'users.User'
 AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+#! MUST BE REMOVE AFTER TESTING
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
+CSRF_COOKIE_HTTPONLY = False
