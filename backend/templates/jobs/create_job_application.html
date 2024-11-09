@@ -1,0 +1,12 @@
+<form action="{% url 'create_job_application' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="resume">Upload Resume:</label>
+    <input type="file" name="documents[][document_file]" multiple>  <!-- Multiple files -->
+    <input type="text" name="documents[][document_type]" value="Resume" hidden>
+
+    <label for="education">Upload Educational Document:</label>
+    <input type="file" name="documents[][document_file]" multiple>  <!-- Multiple files -->
+    <input type="text" name="documents[][document_type]" value="Educational Document" hidden>
+
+    <button type="submit">Submit</button>
+</form>
