@@ -8,6 +8,8 @@ urlpatterns = [
     path('hirings/edit/<int:pk>/', views.edit_job_hiring, name='edit_job_hiring'),
     path('hirings/delete/<int:pk>', views.delete_job_hiring, name='delete_job_hiring'),
     path('hirings/search/', views.search_job_hiring_list, name='search_job_hiring_list'),
+    path('hirings/search_job/', views.search_job, name='search_job'),
+    path('hirings/recent-search/', views.show_recent_searches, name='show_recent_searches'),
     
     path('applications/', views.job_application_list, name='job_application_list'), # list of all job applications
     path('applications/<int:pk>', views.job_application_details, name='job_application_details'),

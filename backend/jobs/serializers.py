@@ -102,9 +102,9 @@ class JobApplicationSerializer(serializers.ModelSerializer):
         return job_application
     
     def update(self, instance, validated_data):
-        documents_data = validated_data.pop('documents', [])
+        documents_data = validated_data.pop('documents', []) 
 
-        # Update fields on the JobApplication instance
+        # Update fields on the Job Application 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -112,7 +112,7 @@ class JobApplicationSerializer(serializers.ModelSerializer):
         # Update related documents
         if documents_data:
             instance.documents.all().delete()  # Optional: delete previous documents
-            for document_data in documents_data:
+            for document_data in documents_data: # Add new documents
                 JobApplicationDocument.objects.create(job_application=instance, **document_data)
 
         return instance

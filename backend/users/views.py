@@ -8,7 +8,6 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import login, logout
 from .serializers import UserRegistrationSerializer, UserLoginSerializer
 
-
 User = get_user_model() # kukunin yung user na currently naka-login sa app
 
 class RegisterUserView(APIView):
