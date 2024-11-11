@@ -4,8 +4,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import JobHiringSerializer, JobApplicationSerializer
-from .models import JobHiring, JobApplication, JobApplicationDocument
+from .models import JobHiring, JobApplication, JobApplicationDocument, RecentSearch
 from django.views.decorators.csrf import csrf_exempt
+from django.db import transaction
+from django.utils import timezone
+from datetime import timedelta
 
 #* Create Job Hiring
 @api_view(['POST'])
@@ -66,40 +69,127 @@ def job_hiring_details(request, pk):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def search_job_hiring_list(request):
-    company_name = request.query_params.get('company_name', '')
-    job_hirings = JobHiring.objects.filter(company__company_name__icontains=company_name)
+    company = request.user.company # request kung sino company ang naka login
+    job_title = request.query_params.get('job_title', '')
+    
+    job_hirings = JobHiring.objects.filter(company=company) # filter yung job hirings created by the company
+    if job_title:
+        job_hirings = job_hirings.filter(title__icontains=job_title)
+
     serializer = JobHiringSerializer(job_hirings, many=True)
     return Response(serializer.data)
+
+#* Search Job Hiring [APPLICANT]
+@api_view(['GET'])
+def search_job(request):
+    job_title = request.query_params.get('job_title', '')
+    job_industry = request.query_params.get('job_industry', '')
+    work_location = request.query_params.get('work_location', '')
+    creation_date = request.query_params.get('creation_date', '')
+    work_setup = request.query_params.get('work_setup', '')
+    employment_type = request.query_params.get('employment_type', '')
+    salary = request.query_params.get('salary', '')
+    experience_level = request.query_params.get('experience_level', '')
+
+    job_hirings = JobHiring.objects.all()
+
+    if job_title:
+        job_hirings = job_hirings.filter(title__icontains=job_title)
+    
+    if job_industry:
+        job_hirings = job_hirings.filter(industry__icontains=job_industry)
+    
+    if work_location:
+        job_hirings = job_hirings.filter(location__icontains=work_location)
+
+    if creation_date:
+        if creation_date == 'last_24_hours':
+            job_hirings = job_hirings.filter(created_at__gte=timezone.now() - timedelta(days=1))
+        elif creation_date == 'last_7_days':
+            job_hirings = job_hirings.filter(created_at__gte=timezone.now() - timedelta(days=7))
+        elif creation_date == 'last_30_days':
+            job_hirings = job_hirings.filter(created_at__gte=timezone.now() - timedelta(days=30))
+    
+    if work_setup:
+        job_hirings = job_hirings.filter(work_setup__icontains=work_setup)
+
+    if employment_type:
+        job_hirings = job_hirings.filter(employment_type__icontains=employment_type)
+
+    if salary:
+        job_hirings = job_hirings.filter(salary__gte=salary)
+
+    if experience_level:
+        job_hirings = job_hirings.filter(experience_level__icontains=experience_level)
+
+    # Save the search filters and the job hiring results to the database
+    if request.user.is_authenticated:
+        recent_search = RecentSearch.objects.create(
+            user=request.user,
+            job_title=job_title,
+            job_industry=job_industry,
+            work_location=work_location,
+            creation_date=creation_date,
+            work_setup=work_setup,
+            employment_type=employment_type,
+            salary=salary,
+            experience_level=experience_level
+        )
+
+        # Save the matching job hirings (if any) to the recent search
+        recent_search.job_hirings.set(job_hirings)
+
+    # Serialize and return the filtered job listings
+    serializer = JobHiringSerializer(job_hirings, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def show_recent_searches(request):
+    recent_searches = RecentSearch.objects.filter(user=request.user).order_by('-created_at')
+    
+    result_data = []
+    for recent_search in recent_searches:
+        filters = recent_search.get_search_filters()  # Get saved filters
+        job_hirings = recent_search.job_hirings.all()  # Get the job hirings that were part of the search
+
+        # Serialize job hirings for response
+        job_hirings_serializer = JobHiringSerializer(job_hirings, many=True)
+
+        result_data.append({
+            "filters": filters,
+            "job_hirings": job_hirings_serializer.data
+        })
+
+    return Response(result_data)
+
 
 #* Create Job Application
 @csrf_exempt #! Remove kapag tapos na sa testing
 @api_view(['POST'])
 def create_job_application(request):
     if request.method == 'POST':
-        # Extract main data, removing document fields
-        document_types = request.data.getlist('document_type[]')
-        document_files = request.FILES.getlist('document_file[]')
-
-        # Create the job application
+        # Get non-file data
         data = request.data.copy()
-        data.pop('document_type', None)
-        data.pop('document_file', None)
-
-        # Validate and save main job application data
-        serializer = JobApplicationSerializer(data=data)
-        if serializer.is_valid():
-            job_application = serializer.save()
-
-            # Manually create the documents if files exist
-            for document_type, document_file in zip(document_types, document_files):
-                JobApplicationDocument.objects.create(
-                    job_application=job_application,
-                    document_type=document_type,
-                    document_file=document_file
-                )
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
         
+        # Remove files-related fields from data to avoid issues with validation
+        document_types = data.pop('document_type', [])
+        document_files = request.FILES.getlist('document_file')
+
+        serializer = JobApplicationSerializer(data=data)
+        
+        if serializer.is_valid():
+            with transaction.atomic():  # Optional, to ensure all-or-nothing saving
+                job_application = serializer.save()
+                
+                # Save each file with corresponding document type
+                for doc_type, doc_file in zip(document_types, document_files):
+                    JobApplicationDocument.objects.create(
+                        job_application=job_application,
+                        document_type=doc_type,
+                        document_file=doc_file
+                    )
+                
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #* Delete Job Application

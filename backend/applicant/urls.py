@@ -4,5 +4,5 @@ from .views import complete_applicant_profile, view_applicant_profile, edit_appl
 urlpatterns = [
     path('profile/', complete_applicant_profile, name='complete-applicant-profile'),
     path('profile/edit/', edit_applicant_profile, name='edit-applicant-profile'),  
-    path('view/<int:pk>/', view_applicant_profile, name='view-applicant-profile'),  
+    path('profile/view/<int:pk>/', view_applicant_profile, name='view-applicant-profile'),  
 ]

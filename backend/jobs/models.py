@@ -1,5 +1,6 @@
 from django.db import models
 from company.models import Company
+from users.models import User
 
 class JobHiring(models.Model): 
     job_hiring_id = models.AutoField(primary_key=True) #PK
@@ -88,3 +89,29 @@ class JobApplicationDocument(models.Model):
     def __str__(self):
         return self.document_type
 
+class RecentSearch(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    job_title = models.CharField(max_length=255, blank=True, null=True)
+    job_industry = models.CharField(max_length=255, blank=True, null=True)
+    work_location = models.CharField(max_length=255, blank=True, null=True)
+    creation_date = models.CharField(max_length=50, blank=True, null=True)
+    work_setup = models.CharField(max_length=50, blank=True, null=True)
+    employment_type = models.CharField(max_length=50, blank=True, null=True)
+    salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    experience_level = models.CharField(max_length=50, blank=True, null=True)
+    job_hirings = models.ManyToManyField(JobHiring, blank=True) # Store the actual job hirings
+
+    def __str__(self):
+        return f"Recent searches"
+    
+    def get_search_filters(self):
+        return {
+            "job_title": self.job_title,
+            "job_industry": self.job_industry,
+            "work_location": self.work_location,
+            "creation_date": self.creation_date,
+            "work_setup": self.work_setup,
+            "employment_type": self.employment_type,
+            "salary": self.salary,
+            "experience_level": self.experience_level,
+        }
