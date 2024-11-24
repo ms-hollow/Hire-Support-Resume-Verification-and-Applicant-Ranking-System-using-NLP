@@ -42,7 +42,6 @@ li {
   color: var(--fontcolor);
   font-weight: 500;
   font-family: "Inter", sans-serif;
-  display: inline-block;
 }
 
 li:hover{
@@ -73,6 +72,7 @@ h3:hover{
 input, select {
   border-color: var(--primary); 
   outline-color: var(--primary); 
+  color:var(--fontcolor);
   width: 100%; 
   padding: 0 8px;
   border-radius: 0.4rem; /* 8px */
@@ -145,9 +145,28 @@ footer {
   height: auto;
   width: 399px;
   border: 1px solid#D9D9D9;
-  box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.1);
   border-radius: 0.5rem; /* 8px */
 }
+
+.job-listing-box:hover {
+  justify-content: center;
+  height: auto;
+  width: 399px;
+  border: 1px solid#D9D9D9;
+  box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem; /* 8px */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;  /* Hide scrollbar */
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* For IE and Edge */
+  scrollbar-width: none; /* For Firefox */
+}
+
+
 
 @layer utilities {
   .text-balance {

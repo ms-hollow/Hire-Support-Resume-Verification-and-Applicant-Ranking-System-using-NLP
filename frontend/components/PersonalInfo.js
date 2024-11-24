@@ -12,19 +12,19 @@ const PersonalInfo = () => {
                             <div className="flex flex-col flex-grow">
                                 <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">First Name</p>
                                     <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                        <input type="text" id="first-name" name="firstName" placeholder="" required /*onChange={handleChange}*/></input>
+                                        <input type="text" id="first_name" name="firstName" placeholder="" required /*onChange={handleChange}*/></input>
                                     </div>
                                     </div>
                                     <div className="flex flex-col flex-grow">
                                         <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Last Name</p>
                                             <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                                <input type="text" id="last-name" name="lastName" placeholder="" required /*onChange={handleChange}*/></input>
+                                                <input type="text" id="last_name" name="lastName" placeholder="" required /*onChange={handleChange}*/></input>
                                             </div>
                                     </div>
                                     <div className="flex flex-col lg:w-14 mb:flex-grow">
                                         <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">M.I.</p>
                                             <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                                <input type="text" id="mi" name="middleName" placeholder="" required /*onChange={handleChange}*/></input>
+                                                <input type="text" id="middle-name" name="middle_name" placeholder="" required /*onChange={handleChange}*/></input>
                                             </div>
                                     </div>
                         </div>
@@ -38,7 +38,7 @@ const PersonalInfo = () => {
                                     <div className="flex flex-col flex-grow">
                                         <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Contact No.</p>
                                             <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                                <input type="text" id="contact-number" name="contactNum" placeholder="" required /*onChange={handleChange}*/></input>
+                                                <input type="text" id="contact-number" name="contact_number" placeholder="" required /*onChange={handleChange}*/></input>
                                             </div>
                                     </div>
                         </div>
@@ -56,13 +56,13 @@ const PersonalInfo = () => {
                                     <div className="flex flex-col flex-grow">
                                         <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Date of Birth</p>
                                             <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                                <input type="text" id="birth-date" name="birthDate" placeholder="" required /*onChange={handleChange}*/></input>
+                                                <input type="text" id="birth-date" name="date_of_birth" placeholder="" required /*onChange={handleChange}*/></input>
                                             </div>
                                     </div>
                                     <div className="flex flex-col flex-grow">
                                         <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Age</p>
                                             <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                                <input type="text" id="contact-number" name="contactNum" placeholder="" required /*onChange={handleChange}*/></input>
+                                                <input type="text" id="age" name="age" placeholder="" required /*onChange={handleChange}*/></input>
                                             </div>
                                     </div>
                         </div>
@@ -136,7 +136,7 @@ const PersonalInfo = () => {
                                     
                                 <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-medium pt-5">LinkedIn Profile Link</p>
                                     <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                        <input type="linkedin-link" id="state" name="linkedIn" placeholder="" required /*onChange={handleChange}*/></input>
+                                        <input type="linkedin-link" id="linkedin" name="linkedin_profile" placeholder="" required /*onChange={handleChange}*/></input>
                                     </div>
                           
                         </div>
