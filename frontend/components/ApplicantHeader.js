@@ -10,7 +10,7 @@ const ApplicantHeader = () => {
   };
 
   return (
-    <header className="fixed top-0 w-full bg-background h-16 lg:px-20 mb:px-20 py-5 flex items-center justify-between sm:px-8 z-50">
+    <header className="fixed top-0 w-full bg-background h-16 lg:px-20 mb:px-20 py-5 flex items-center justify-between sm:px-8  xsm:px-8 z-50">
       <div className="flex items-center">
         <div className="logo mr-4">
           <Image 
@@ -23,7 +23,7 @@ const ApplicantHeader = () => {
 
         <ul className="hidden md:flex space-x-10">
           <li><Link href="/APPLICANT/ApplicantHome">Home</Link></li>
-          <li><Link href="/APPLICANT/JobApplication">Job Application</Link></li>
+          <li><Link href="/APPLICANT/MyJobs"> My Jobs</Link></li>
           <li><Link href="/APPLICANT/Settings">Settings</Link></li>
         </ul>
 
@@ -35,7 +35,7 @@ const ApplicantHeader = () => {
       <div className="flex items-center gap-5">
         <button className="pt-1">
           <Image 
-            src="/Notification Icon.png" 
+            src="/Notification Icon.svg" 
             width={39} 
             height={30} 
             alt="Notification Icon" 
@@ -70,7 +70,7 @@ const ApplicantHeader = () => {
           {/* Menu Links */}
           <ul className="flex flex-col items-start p-6 space-y-4">
               <li><Link href="/APPLICANT/ApplicantHome" onClick={toggleMenu}>Home</Link></li>
-              <li><Link href="/APPLICANT/JobApplication" onClick={toggleMenu}>Job Application</Link></li>
+              <li><Link href="/APPLICANT/MyJobs" onClick={toggleMenu}>My Jobs</Link></li>
               <li><Link href="/APPLICANT/Settings" onClick={toggleMenu}>Settings</Link></li>
           </ul>
       </div>

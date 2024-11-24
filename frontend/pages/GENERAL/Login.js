@@ -64,7 +64,7 @@ export default function Login() {
                     />
                     <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-center font-medium flex-grow">Continue with Google</p>
                 </button>
-                <p className="text-xsmall text-fontcolor pt-4 pb-1 font-medium">Don’t have an account? <span className="font-semibold"><Link href="/APPLICANT/ApplicantRegister" className='underline' >Register</Link></span></p> 
+                <p className="text-xsmall text-fontcolor pt-4 pb-1 font-medium">Don’t have an account? <span className="font-semibold"><Link href="/GENERAL/Register" className='underline' >Register</Link></span></p> 
             </div> 
         </div>
         <GeneralFooter/>

@@ -1,4 +1,5 @@
 import ApplicantHeader from '@/components/ApplicantHeader';
+import GeneralFooter from '@/components/GeneralFooter';
 import JobListings from '@/components/JobListings';
 import Image from 'next/image';
 import { useState } from "react";
@@ -20,7 +21,7 @@ export default function ApplicantHome() {
     return (
     <div>
     <ApplicantHeader/>
-      <div  className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:p-20 sm:p-20 xsm:p-20 lg:p-20 mx-auto"> 
+      <div  className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 sm:px-20 xsm:px-20 lg:px-20 mx-auto"> 
         <div>
           <p>Hi, Name</p>  
         </div>
@@ -28,10 +29,10 @@ export default function ApplicantHome() {
         {/* Search*/} 
         <div className="pt-5 flex-wrap w-full">
             <div className="flex lg:flex-row gap-5 pb-5 mb:flex-row sm:flex-col xsm:flex-col">
-                  <div className="relative h-medium rounded-xs border-2 border-fontcolor flex flex-grow items-center">
+                  <div className="relative h-medium rounded-xs border-2 border-fontcolor justify-center flex flex-grow items-center">
                       <div className="absolute left-3">
                         <Image 
-                          src="/Search Icon.png" 
+                          src="/Search Icon.svg" 
                           width={26} 
                           height={24}
                           alt="Search Icon"
@@ -48,10 +49,10 @@ export default function ApplicantHome() {
                             <option value="Computer Science">Computer Science</option>  
                         </select>
                   </div>
-                  <div className="relative h-medium rounded-xs border-2 border-fontcolor flex flex-grow items-center">
+                  <div className="relative h-medium rounded-xs border-2 border-fontcolor justify-center flex flex-grow items-center">
                       <div className="absolute left-3">
                         <Image 
-                          src="/Location Icon.png" 
+                          src="/Location Icon.svg" 
                           width={24} 
                           height={24}
                           alt="Search Icon"
@@ -120,19 +121,9 @@ export default function ApplicantHome() {
 
         <div className='flex flex-row pt-4'>
           <JobListings/>
-
-
         </div>
-
-
-
-
-
-
-
-
-
       </div>
+       
     </div>
       
     );
