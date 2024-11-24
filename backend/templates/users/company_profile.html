@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Register Company{% endblock title %}
+
+{% block content %}
+<h2>Complete Your Profile - Company</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ profile_form.as_p }}  <!-- Render the profile completion form -->
+    <input type="hidden" name="user_id" value="{{ user.id }}">  
+    <button type="submit" name="step2">Complete Profile</button>
+</form>
+{% endblock content %}

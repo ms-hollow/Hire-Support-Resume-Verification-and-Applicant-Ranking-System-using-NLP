@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mx-auto" style="width: 40rem;">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Complete Company Profile</h5>
+                <form method="POST">
+                    {% csrf_token %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Company Name</label>
+                        {% render_field form.company_name class="form-control" %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Industry</label>
+                        {% render_field form.industry class="form-control" %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">No. of Employees</label>
+                        {% render_field form.number_of_employees class="form-control" %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">HR Name</label>
+                        {% render_field form.hr_name class="form-control" %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Contact No.</label>
+                        {% render_field form.contact_number class="form-control" %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleInputEmail1" class="form-label">Company Address</label>
+                        {% render_field form.company_address class="form-control" %}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock content %}

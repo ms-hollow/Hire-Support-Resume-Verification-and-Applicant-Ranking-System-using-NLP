@@ -1,0 +1,13 @@
+# local env files
+.env
+.venv
+venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore SQLite database file
+db.sqlite3
+
