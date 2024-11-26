@@ -1,0 +1,175 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --primary: #5352E9;
+  --fontcolor: #333333;
+  --accent:#FA3B3B;
+  --secondary:#E3F1EE;
+  --placeholder:#CDCDCD;
+
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ffffff;
+    --foreground: #ededed;
+    --primary: #5352E9;
+    --fontcolor: #333333; 
+    --accent:#FA3B3B;
+    --secondary:#E3F1EE;
+    --placeholder:#CDCDCD;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Inter, sans-serif;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Inter, sans-serif;
+}
+
+
+
+li {
+  color: var(--fontcolor);
+  font-weight: 500;
+  font-family: "Inter", sans-serif;
+}
+
+li:hover{
+  color: var(--primary);
+  transition: color 0.3s ease-in-out;
+}
+
+
+h1 {
+  font-weight: 700;
+  font-family: "Inter", sans-serif;
+  margin-bottom: 0.625rem; /* 10px */
+}
+
+h3 {
+  font-weight: 700;
+  font-family: InterVariable, sans-serif;
+  color: var(--fontcolor);
+
+}
+
+h3:hover{
+  font-weight: 00;
+  color: var(--primary);
+  border-bottom: none;
+}
+
+input, select {
+  border-color: var(--primary); 
+  outline-color: var(--primary); 
+  color:var(--fontcolor);
+  width: 100%; 
+  padding: 0 8px;
+  border-radius: 0.4rem; /* 8px */
+}
+
+
+input::placeholder {
+  font-size: 13px;
+}
+
+
+footer {
+  background: var(--fontcolor);
+  text-align: center;
+  padding: 10px 0;
+}
+
+.section {
+  display: none;
+}
+
+/* Show the targeted section */
+.section:target {
+  display: block;
+}
+
+
+/*---------------------------LOGIN----------------------------------*/
+
+.button1 {
+  color: var(--background);
+  background:var(--primary);
+  border-radius: 0.4rem; /* 8px */
+  justify-content: center;
+  height: 35px;
+  padding: 0.625rem;
+}
+
+.button2 {
+  color: var(--fontcolor);
+  background:var(--secondary);
+  border-radius: 0.4rem; /* 8px */
+  justify-content: center;
+  height: 35px;
+  padding: 0.625rem; 
+}
+
+.button1:hover {
+  background:var(--primary);
+  box-shadow: 0 2px 5px rgba(51, 51, 51, 1);
+}
+
+.button2:hover {
+  background:var(--secondary);
+  box-shadow: 0 2px 5px rgba(51, 51, 51, .5);
+}
+
+.box-container {
+  justify-content: center;
+  height: auto;
+  width: 479px;
+  border: 1px solid#D9D9D9;
+  box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem; /* 8px */
+}
+
+/*---------------------------APPLICANT HOME----------------------------------*/
+.job-listing-box {
+  justify-content: center;
+  height: auto;
+  width: 399px;
+  border: 1px solid#D9D9D9;
+  border-radius: 0.5rem; /* 8px */
+}
+
+.job-listing-box:hover {
+  justify-content: center;
+  height: auto;
+  width: 399px;
+  border: 1px solid#D9D9D9;
+  box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem; /* 8px */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;  /* Hide scrollbar */
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* For IE and Edge */
+  scrollbar-width: none; /* For Firefox */
+}
+
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
