@@ -1,12 +1,16 @@
 from rest_framework.views import APIView # APIView used for creating class-based views to handle HTTP requests like registration, login, and logout easily.
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status,serializers
 from django.contrib.auth import get_user_model
-from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import login, logout
-from .serializers import UserRegistrationSerializer, UserLoginSerializer
+from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate
+
 
 User = get_user_model() # kukunin yung user na currently naka-login sa app
 
@@ -20,14 +24,67 @@ class RegisterUserView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginUserView(APIView):
-    def post(self, request):
+    # def post(self, request, *args, **kwargs):
+    #     # Use the login serializer
+    #     serializer = UserLoginSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         user = serializer.validated_data['user']
+            
+    #         # Generate JWT tokens
+    #         refresh = RefreshToken.for_user(user)
+    #         access_token = str(refresh.access_token)
+    #         refresh_token = str(refresh)
+
+    #         # Determine the user's role (applicant or company)
+    #         user_role = 'company' if user.is_company else 'applicant' if user.is_applicant else 'unknown'
+
+    #         return Response({
+    #             'access': access_token,
+    #             'refresh': refresh_token,
+    #             'role': user_role,  # Return the role (applicant or company)
+    #         }, status=status.HTTP_200_OK)
+    #     else:
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')  # Extract email from the request data
+
+        # Check if the email exists in the database
+        if not User.objects.filter(email=email).exists():
+            return Response({'error': 'Email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Use the login serializer to validate credentials
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
-            login(request, user)
-            return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+            refresh_token = str(refresh)
+
+            # Determine the user's role (applicant or company)
+            user_role = 'company' if user.is_company else 'applicant' if user.is_applicant else 'unknown'
+
+            return Response({
+                'access': access_token,
+                'refresh': refresh_token,
+                'role': user_role,  # Return the role (applicant or company)
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
     
+
+# Customizing the JWT serializer to include user data in the response
+class CustomTokenObtainPairSerializer(serializers.Serializer):
+    def validate(self, attrs):
+        # You can add additional data to the JWT token, like user info
+        validated_data = super().validate(attrs)
+        return validated_data
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
 class LogoutUserView(APIView):
     def post(self, request):
         logout(request)
@@ -51,3 +108,10 @@ def change_password(request):
     user.save()
 
     return Response({"message": "Password changed successfully."}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # Ensure the user is authenticated
+def user_list(request):
+    users = User.objects.all()  # Get all users
+    serializer = UserSerializer(users, many=True)  
+    return Response(serializer.data)
