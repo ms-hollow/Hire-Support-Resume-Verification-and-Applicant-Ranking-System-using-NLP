@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import JobHiringSerializer, JobApplicationSerializer
 from .models import JobHiring, JobApplication, JobApplicationDocument, RecentSearch
-from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
 from django.utils import timezone
 from datetime import timedelta
@@ -164,7 +163,6 @@ def show_recent_searches(request):
 
 
 #* Create Job Application
-@csrf_exempt #! Remove kapag tapos na sa testing
 @api_view(['POST'])
 def create_job_application(request):
     if request.method == 'POST':
@@ -193,7 +191,6 @@ def create_job_application(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #* Delete Job Application
-@csrf_exempt #! Remove kapag tapos na sa testing
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_job_application(request, pk):
