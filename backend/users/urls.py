@@ -9,3 +9,10 @@ urlpatterns = [
     path('user-list/', user_list, name='user_list'),
     path('google-login/', google_login, name='google-login'),
 ]
+
+
+#TODO for forgt password
+#* 1 - Submit email form
+#* 2 - Email sent success message
+#* 3 - Link to Reset form email
+#* 4 - password change successfully
