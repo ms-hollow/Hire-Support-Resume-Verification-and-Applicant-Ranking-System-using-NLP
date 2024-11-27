@@ -9,7 +9,7 @@ from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserSe
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate
+import requests
 
 
 User = get_user_model() # kukunin yung user na currently naka-login sa app
@@ -24,27 +24,6 @@ class RegisterUserView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginUserView(APIView):
-    # def post(self, request, *args, **kwargs):
-    #     # Use the login serializer
-    #     serializer = UserLoginSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         user = serializer.validated_data['user']
-            
-    #         # Generate JWT tokens
-    #         refresh = RefreshToken.for_user(user)
-    #         access_token = str(refresh.access_token)
-    #         refresh_token = str(refresh)
-
-    #         # Determine the user's role (applicant or company)
-    #         user_role = 'company' if user.is_company else 'applicant' if user.is_applicant else 'unknown'
-
-    #         return Response({
-    #             'access': access_token,
-    #             'refresh': refresh_token,
-    #             'role': user_role,  # Return the role (applicant or company)
-    #         }, status=status.HTTP_200_OK)
-    #     else:
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')  # Extract email from the request data
 
@@ -115,3 +94,39 @@ def user_list(request):
     users = User.objects.all()  # Get all users
     serializer = UserSerializer(users, many=True)  
     return Response(serializer.data)
+
+@api_view(['POST'])
+def google_login(request):
+    token = request.data.get('token')
+    if not token:
+        return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Verify the token with Google
+    google_verify_url = f"https://oauth2.googleapis.com/tokeninfo?id_token={token}"
+    response = requests.get(google_verify_url)
+    if response.status_code != 200:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    user_info = response.json()
+    email = user_info.get('email')
+
+    # Check if a user with the email exists
+    User = get_user_model()
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        # User not found; send a 404 response
+        return Response({'error': 'User not found. Please register.'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        # Catch unexpected errors
+        print(f"An error occurred: {e}")
+        return Response({'error': 'An unexpected error occurred.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # Generate JWT tokens for the user
+    refresh = RefreshToken.for_user(user)
+
+    return Response({
+        'access': str(refresh.access_token),
+        'refresh': str(refresh),
+        'email': email,
+    }, status=status.HTTP_200_OK)

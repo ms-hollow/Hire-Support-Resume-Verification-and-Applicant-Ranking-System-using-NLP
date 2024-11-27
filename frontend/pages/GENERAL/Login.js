@@ -5,13 +5,13 @@ import {FiEye, FiEyeOff } from 'react-icons/fi'; /*npm install react-icons*/
 import GeneralHeader from '@/components/GeneralHeader';
 import GeneralFooter from '@/components/GeneralFooter';
 /*import { useRouter } from 'next/router';*/
-import axios from 'axios'; // Import Axios for making HTTP requests
+import axios from 'axios'; //npm install axios
+import { GoogleLogin } from '@react-oauth/google'; //npm install react-google-login
+//npm install next-auth
 
 //TODO
 /**
  ** Setup Forgot Password
- ** Setup Next Auth for sign in using google acc
- ** Status: Installed na ang Next Auth need nalang i-configure
  */
 
 export default function Login() {
@@ -84,6 +84,44 @@ export default function Login() {
             [e.target.name]: e.target.value,
         });
    };
+
+   const handleSuccess = async (credentialResponse) => {
+        try {
+            const { credential } = credentialResponse;
+
+            // Send the Google token to the Django backend
+            const response = await axios.post('http://127.0.0.1:8000/users/google-login/', {
+                token: credential,
+            });
+
+            // Handle a successful login
+            if (response.status === 200) {
+                localStorage.setItem('access_token', response.data.access);
+                localStorage.setItem('refresh_token', response.data.refresh);
+                window.location.replace('/APPLICANT/ApplicantHome');
+            }
+        } catch (error) {
+            // Axios catches non-2xx responses here
+            if (error.response) {
+                const { status } = error.response;
+                if (status === 404) {
+                    // Redirect to the register/login route
+                    window.location.replace('/GENERAL/Register');
+                } else if (status === 400) {
+                    setError('Invalid token. Please try again.');
+                } else {
+                    setError('An unexpected error occurred.');
+                }
+            } else {
+                setError('Network error. Please try again later.');
+            }
+        }
+    };
+
+
+    const handleError = () => {
+        console.error('Google Login Failed');
+    };
     
     return (
       <div>
@@ -123,7 +161,7 @@ export default function Login() {
                     <p className="bg-white px-4 text-gray-600 relative z-10">or</p>
                 </div>
                 
-                <button className="button2 flex items-center w-full p-5">
+                 {/* <button className="button2 flex items-center w-full p-5">
                     <Image 
                         src="/google.png" 
                         width={25} 
@@ -132,10 +170,12 @@ export default function Login() {
                         className="mr-2" // Space between image and text
                     />
                     <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-center font-medium flex-grow">Continue with Google</p>
-                </button>
+                </button> */}
 
-               
-
+                <div className='flex justify-center w-full px-5'>
+                    <GoogleLogin onSuccess={handleSuccess} onError={handleError} size='large'/>
+                </div>
+                  
                 <p className="text-xsmall text-fontcolor pt-4 pb-1 font-medium">Don’t have an account? <span className="font-semibold"><Link href="/GENERAL/Register" className='underline' >Register</Link></span></p> 
             </div> 
         </div>
