@@ -84,7 +84,6 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -104,7 +103,12 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",  # Next.js frontend
 ]
 
-# CORS_ALLOW_ALL_ORIGINS = True  # Allow requests from any origin (development)
+CORS_ALLOW_ALL_ORIGINS = True  # Allow requests from any origin (development)
+
+# COOP header
+# CORS_ALLOW_HEADERS = [
+#     'COOP', 'cross-origin-opener-policy',
+# ]
 
 TEMPLATES = [
     {
@@ -202,6 +206,7 @@ LOGOUT_REDIRECT_URL = '/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-#! MUST BE REMOVE AFTER TESTING
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
-CSRF_COOKIE_HTTPONLY = False
+# #! MUST BE REMOVE AFTER TESTING
+# CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
+# CSRF_COOKIE_HTTPONLY = False
+

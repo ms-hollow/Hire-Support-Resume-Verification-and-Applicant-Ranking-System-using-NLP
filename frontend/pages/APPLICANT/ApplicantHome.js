@@ -16,8 +16,6 @@ export default function ApplicantHome() {
     setSelectedSalary(event.target.value);  // Update selected salary
   };
   
-  
-  
     return (
     <div>
     <ApplicantHeader/>
