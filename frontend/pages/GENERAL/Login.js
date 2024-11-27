@@ -10,9 +10,8 @@ import { GoogleLogin } from '@react-oauth/google'; //npm install react-google-lo
 //npm install next-auth
 
 //TODO
-/**
- ** Setup Forgot Password
- */
+//* Setup Forgot Password
+//* Toast Notif
 
 export default function Login() {
 
@@ -57,7 +56,7 @@ export default function Login() {
             localStorage.setItem('refresh_token', response.data.refresh);
         
             const userRole = response.data.role;  // 'company' or 'applicant'
-            console.log(userRole);
+            // console.log(userRole);
         
             // Redirect based on the user's role
             if (userRole === 'company') {

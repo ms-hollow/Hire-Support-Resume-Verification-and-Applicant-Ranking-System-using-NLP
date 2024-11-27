@@ -23,6 +23,7 @@ class RegisterUserView(APIView):
             return Response({"message": "Registration successful"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+#* JWT Based Authentication
 class LoginUserView(APIView):
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')  # Extract email from the request data
@@ -38,6 +39,7 @@ class LoginUserView(APIView):
             
             # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
+            refresh.payload['email'] = user.email
             access_token = str(refresh.access_token)
             refresh_token = str(refresh)
 
@@ -48,16 +50,14 @@ class LoginUserView(APIView):
                 'access': access_token,
                 'refresh': refresh_token,
                 'role': user_role,  # Return the role (applicant or company)
-            }, status=status.HTTP_200_OK)
+                'email': user.email # Include the email in the response
+            }, status=status.HTTP_200_OK) 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-    
-
 # Customizing the JWT serializer to include user data in the response
 class CustomTokenObtainPairSerializer(serializers.Serializer):
     def validate(self, attrs):
-        # You can add additional data to the JWT token, like user info
         validated_data = super().validate(attrs)
         return validated_data
 
@@ -130,3 +130,6 @@ def google_login(request):
         'refresh': str(refresh),
         'email': email,
     }, status=status.HTTP_200_OK)
+
+#TODO
+#* Setup Backend to Register
