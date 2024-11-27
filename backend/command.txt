@@ -9,4 +9,5 @@ python manage.py runserver
 python manage.py makemigrations
 python manage.py migrate
 
-
+# To install all the tools and dependencies
+pip install -r requirements.txt
