@@ -16,20 +16,20 @@ export default function LandingPage() {
       
       <GeneralHeader />
 
-      <section id='Home' className="section">
-        <p>This is Landing Page</p>   
+      <section id='Home' className="section ">
+        <p className="text-fontcolor">This is Landing Page</p>   
       </section>
 
       <section id='AboutUs' className="section">
-        <p>This is About Us</p>   
+        <p className="text-fontcolor">This is About Us</p>   
       </section>
 
       <section id='FAQS'className="section" >
-        <p>This is FAQS</p>   
+        <p className="text-fontcolor">This is FAQS</p>   
       </section>
 
       <section id='ContactUs' className="section">
-        <p>This is Contact Us</p>   
+        <p className="text-fontcolor">This is Contact Us</p>   
       </section>
 
       <footer>

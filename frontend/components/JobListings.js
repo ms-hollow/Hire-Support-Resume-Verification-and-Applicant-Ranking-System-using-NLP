@@ -30,9 +30,9 @@ const JobListings = () => {
                     </button>
                 </div>
 
-                <p className="font-semibold text-large mt-2">Job Title</p>
-                <p className="font-thin text-xsmall">Company</p>
-                <p className="font-thin text-xsmall">Job Industry</p>
+                <p className="font-semibold text-fontcolor text-large mt-2">Job Title</p>
+                <p className="font-thin text-fontcolor text-xsmall">Company</p>
+                <p className="font-thin text-fontcolor text-xsmall">Job Industry</p>
 
                 <div className="flex flex-row mt-2">
                     <Image 
@@ -41,7 +41,7 @@ const JobListings = () => {
                         height={20}
                         alt="Location Icon"
                     />
-                    <p id='work_location' className="ml-1.5 font-thin text-xsmall pl-px">Location</p>
+                    <p id='work_location' className="ml-1.5 font-thin text-fontcolor text-xsmall pl-px">Location</p>
                 </div>
 
                 <div className="flex flex-row mt-2 pl-px">
@@ -51,7 +51,7 @@ const JobListings = () => {
                         height={20}
                         alt="Work Setup Icon"
                     />
-                    <p id='work_setup' className="ml-2 font-thin text-xsmall pl-px">Work Setup</p>
+                    <p id='work_setup' className="ml-2 font-thin text-fontcolor text-xsmall pl-px">Work Setup</p>
                 </div>
 
                 <div className="flex flex-row mt-2">
@@ -61,7 +61,7 @@ const JobListings = () => {
                         height={20}
                         alt="Schedule Icon"
                     />
-                    <p id='schedule' className="ml-2 font-thin text-xsmall pl-1">Schedule</p>
+                    <p id='schedule' className="ml-2 font-thin text-fontcolor text-xsmall pl-1">Schedule</p>
                 </div>
 
                 <div className="flex flex-row mt-2">
@@ -71,7 +71,7 @@ const JobListings = () => {
                         height={20}
                         alt="Salary Icon"
                     />
-                    <p id='salary' className="ml-2 font-thin text-xsmall pl-px">Salary</p>
+                    <p id='salary' className="ml-2 font-thin text-fontcolor text-xsmall pl-px">Salary</p>
                 </div>
 
                 <div className="flex flex-col mt-2">
@@ -100,9 +100,9 @@ const JobListings = () => {
                             />
                         </button>
                 </div>
-                <p className="font-semibold text-large mt-2">Job Title</p>
-                <p className="font-thin text-xsmall">Company</p>
-                <p className="font-thin text-xsmall">Job Industry</p>
+                <p className="font-semibold text-fontcolor text-large mt-2">Job Title</p>
+                <p className="font-thin text-fontcolor text-xsmall">Company</p>
+                <p className="font-thin text-fontcolor text-xsmall">Job Industry</p>
 
                 <div className="flex flex-row mt-2">
                     <Image 
@@ -111,7 +111,7 @@ const JobListings = () => {
                         height={20}
                         alt="Location Icon"
                     />
-                    <p id='work_location' className="ml-1.5 font-thin text-xsmall pl-px">Location</p>
+                    <p id='work_location' className="ml-1.5 font-thin text-fontcolor text-xsmall pl-px">Location</p>
                 </div>
 
                 <div className="flex flex-row mt-2 pl-px">
@@ -121,7 +121,7 @@ const JobListings = () => {
                         height={20}
                         alt="Work Setup Icon"
                     />
-                    <p id='work_setup' className="ml-2 font-thin text-xsmall pl-px">Work Setup</p>
+                    <p id='work_setup' className="ml-2 font-thin text-fontcolor text-xsmall pl-px">Work Setup</p>
                 </div>
 
                 <div className="flex flex-row mt-2">
@@ -131,7 +131,7 @@ const JobListings = () => {
                         height={20}
                         alt="Schedule Icon"
                     />
-                    <p id='schedule' className="ml-2 font-thin text-xsmall pl-1">Schedule</p>
+                    <p id='schedule' className="ml-2 font-thin text-fontcolor text-xsmall pl-1">Schedule</p>
                 </div>
 
                 <div className="flex flex-row mt-2">
@@ -141,7 +141,7 @@ const JobListings = () => {
                         height={20}
                         alt="Salary Icon"
                     />
-                    <p id='salary' className="ml-2 font-thin text-xsmall pl-px">Salary</p>
+                    <p id='salary' className="ml-2 font-thin text-fontcolor text-xsmall pl-px">Salary</p>
                 </div>
 
                 <div className="flex flex-col mt-2">
@@ -170,9 +170,9 @@ const JobListings = () => {
                         />
                     </button>
                 </div>
-                <p className="font-semibold text-large mt-2">Job Title</p>
-                <p className="font-thin text-xsmall">Company</p>
-                <p className="font-thin text-xsmall">Job Industry</p>
+                <p className="font-semibold text-fontcolor text-large mt-2">Job Title</p>
+                <p className="font-thin text-fontcolor text-xsmall">Company</p>
+                <p className="font-thin text-fontcolor text-xsmall">Job Industry</p>
 
                 <div className="flex flex-row mt-2">
                     <Image 
@@ -181,7 +181,7 @@ const JobListings = () => {
                         height={20}
                         alt="Location Icon"
                     />
-                    <p id='work_location' className="ml-1.5 font-thin text-xsmall pl-px">Location</p>
+                    <p id='work_location' className="ml-1.5 font-thin text-fontcolor text-xsmall pl-px">Location</p>
                 </div>
 
                 <div className="flex flex-row mt-2 pl-px">
@@ -191,7 +191,7 @@ const JobListings = () => {
                         height={20}
                         alt="Work Setup Icon"
                     />
-                    <p id='work_setup' className="ml-2 font-thin text-xsmall pl-px">Work Setup</p>
+                    <p id='work_setup' className="ml-2 font-thin text-fontcolor text-xsmall pl-px">Work Setup</p>
                 </div>
 
                 <div className="flex flex-row mt-2">
@@ -201,7 +201,7 @@ const JobListings = () => {
                         height={20}
                         alt="Schedule Icon"
                     />
-                    <p id='schedule' className="ml-2 font-thin text-xsmall pl-1">Schedule</p>
+                    <p id='schedule' className="ml-2 font-thin text-fontcolor text-xsmall pl-1">Schedule</p>
                 </div>
 
                 <div className="flex flex-row mt-2">
@@ -211,7 +211,7 @@ const JobListings = () => {
                         height={20}
                         alt="Salary Icon"
                     />
-                    <p id='salary' className="ml-2 font-thin text-xsmall pl-px">Salary</p>
+                    <p id='salary' className="ml-2 font-thin text-fontcolor text-xsmall pl-px">Salary</p>
                 </div>
 
                 <div className="flex flex-col mt-2">
