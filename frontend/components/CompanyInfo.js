@@ -2,32 +2,40 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from 'next/image';
 
-const PersonalInfo = () => {
+const CompanyInfo = () => {
   
     return ( 
   
         <div>
                 <form>
+                        <div className="flex gap-5 pb-5">
+                            <div className="flex flex-col flex-grow">
+                                <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Company Name</p>
+                                    <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+                                        <input type="text" id="company-name" name="CompanyName" placeholder="" required /*onChange={handleChange}*/></input>
+                                    </div>
+                             </div>
+                                  
+                        </div>
                         <div className="flex lg:flex-row sm:flex-col gap-5 pb-5">
                             <div className="flex flex-col flex-grow">
-                                <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">First Name</p>
+                                <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Industry/Sector</p>
+                                        <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+                                            <select className="valid:text-fontcolor invalid:text-placeholder lg:text-small mb:text-xsmall sm:text-xsmall xsm:text-xsmall" id="city" name="city" required/*onChange={handleChange}*/>
+                                                <option value=''  disabled selected hidden>Select Sector</option>
+                                                <option value='IT'>IT</option>
+                                                <option value='Computer Science'>Computer Science</option>   
+                                            </select>
+                                        </div>
+                            </div>
+                            <div className="flex flex-col flex-grow">
+                                <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">No. of Employees</p>
                                     <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                        <input type="text" id="first_name" name="firstName" placeholder="" required /*onChange={handleChange}*/></input>
+                                        <input type="text" id="employee-number" name="employNum" placeholder="" required /*onChange={handleChange}*/></input>
                                     </div>
-                                    </div>
-                                    <div className="flex flex-col flex-grow">
-                                        <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Last Name</p>
-                                            <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                                <input type="text" id="last_name" name="lastName" placeholder="" required /*onChange={handleChange}*/></input>
-                                            </div>
-                                    </div>
-                                    <div className="flex flex-col lg:w-14 mb:flex-grow">
-                                        <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">M.I.</p>
-                                            <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                                <input type="text" id="middle-name" name="middle_name" placeholder="" required /*onChange={handleChange}*/></input>
-                                            </div>
-                                    </div>
+                            </div>
                         </div>
+
                         <div className="flex lg:flex-row sm:flex-col gap-5 pb-5">
                             <div className="flex flex-col flex-grow">
                                 <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Email Address</p>
@@ -42,30 +50,7 @@ const PersonalInfo = () => {
                                             </div>
                                     </div>
                         </div>
-                        <div className="flex lg:flex-row sm:flex-col flex-grow gap-5 pb-5">
-                            <div className="flex flex-col flex-grow">
-                                <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Sex</p>
-                                        <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                            <select className="valid:text-fontcolor invalid:text-placeholder lg:w-auto mb:w-full sm:w-full xsm:w-full lg:text-small mb:text-xsmall sm:text-xsmall xsm:text-xsmall " id="sex" name="sex" required/*onChange={handleChange}*/>
-                                                <option value=''disabled selected hidden> Select Sex</option>
-                                                <option value="Female">Female</option>
-                                                <option value="Male">Male</option>   
-                                            </select>
-                                        </div>    
-                                    </div>
-                                    <div className="flex flex-col flex-grow">
-                                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Date of Birth</p>
-                                            <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                                <input type="text" id="birth-date" name="date_of_birth" placeholder="" required /*onChange={handleChange}*/></input>
-                                            </div>
-                                    </div>
-                                    <div className="flex flex-col flex-grow">
-                                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Age</p>
-                                            <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                                <input type="text" id="age" name="age" placeholder="" required /*onChange={handleChange}*/></input>
-                                            </div>
-                                    </div>
-                        </div>
+                       
                         <div className="flex lg:flex-row sm:flex-col flex-grow gap-5 pb-5">
                                 <div className="flex flex-col flex-grow">
                                     <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Region</p>
@@ -143,11 +128,7 @@ const PersonalInfo = () => {
                             
                         <div className="flex justify-end">
                             <Link href="/APPLICANT/ApplicantHome"> 
-<<<<<<< HEAD
-                                <button className="button1 mt-5 flex items-center justify-center">
-=======
                                 <button className="button1 mt-5 flex items-center justify-center"> 
->>>>>>> laica
                                     <div className="flex items-center space-x-2">
                                         <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-small font-medium text-center">Register</p>
                                         <Image 
@@ -170,8 +151,4 @@ const PersonalInfo = () => {
      );
 }
  
-<<<<<<< HEAD
-export default PersonalInfo;
-=======
-export default PersonalInfo;
->>>>>>> laica
+export default CompanyInfo;
