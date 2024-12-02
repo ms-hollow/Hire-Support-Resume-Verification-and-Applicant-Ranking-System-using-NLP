@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-<<<<<<< HEAD
 
     # third party
     'rest_framework',
@@ -53,10 +52,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     
     # app
-=======
-    'rest_framework',
-    'widget_tweaks',
->>>>>>> laica
     'users',
     'applicant',
     'company',
@@ -102,7 +97,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'hiresupport.urls'
-<<<<<<< HEAD
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Next.js frontend
@@ -115,8 +109,6 @@ CORS_ALLOW_ALL_ORIGINS = True  # Allow requests from any origin (development)
 # CORS_ALLOW_HEADERS = [
 #     'COOP', 'cross-origin-opener-policy',
 # ]
-=======
->>>>>>> laica
 
 TEMPLATES = [
     {
@@ -202,7 +194,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Use custom model
 AUTH_USER_MODEL = 'users.User'
-<<<<<<< HEAD
 AUTHENTICATION_BACKENDS = (
     'users.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
@@ -219,6 +210,3 @@ MEDIA_URL = '/media/'
 # CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
 # CSRF_COOKIE_HTTPONLY = False
 
-=======
-AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
->>>>>>> laica

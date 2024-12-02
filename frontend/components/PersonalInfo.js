@@ -143,11 +143,7 @@ const PersonalInfo = () => {
                             
                         <div className="flex justify-end">
                             <Link href="/APPLICANT/ApplicantHome"> 
-<<<<<<< HEAD
-                                <button className="button1 mt-5 flex items-center justify-center">
-=======
                                 <button className="button1 mt-5 flex items-center justify-center"> 
->>>>>>> laica
                                     <div className="flex items-center space-x-2">
                                         <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-small font-medium text-center">Register</p>
                                         <Image 
@@ -170,8 +166,4 @@ const PersonalInfo = () => {
      );
 }
  
-<<<<<<< HEAD
 export default PersonalInfo;
-=======
-export default PersonalInfo;
->>>>>>> laica
