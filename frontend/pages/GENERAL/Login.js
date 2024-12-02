@@ -37,7 +37,7 @@ export default function Login() {
                             <input type={showPassword ? 'text' : 'password'} id="password" name="password" placeholder="" required  onChange={handleChange} ></input>  
                         </div>
                         
-                    <Link href=""> 
+                    <Link href="/GENERAL/ForgotPassword"> 
                         <p className="text-xsmall text-accent pt-4 pb-8 font-medium text-right">Forgot password?</p> 
                     </Link> 
 
