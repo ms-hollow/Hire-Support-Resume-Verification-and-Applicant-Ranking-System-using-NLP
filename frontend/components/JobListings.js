@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from 'next/image';
+import GeneralFooter from "./GeneralFooter";
 
 const JobListings = () => {
 
@@ -12,7 +13,7 @@ const JobListings = () => {
     return (
         <div className="flex flex-col">
             {/*Job listing 1*/}
-            <div className="job-listing-box flex flex-col p-4 mb-4">
+            <div className="job-listing-box flex flex-col p-4 mb-4 mx-auto">
                 <div className="flex flex-row justify-between items-center">
                     <Image 
                         src="/Logo.png" 
@@ -32,7 +33,7 @@ const JobListings = () => {
 
                 <p className="font-semibold text-fontcolor text-large mt-2">Job Title</p>
                 <p className="font-thin text-fontcolor text-xsmall">Company</p>
-                <p className="font-thin text-fontcolor text-xsmall">Job Industry</p>
+                <p className="font-thin text-fontcolor text-xsmall">Job Industry <span className="font-thin text-fontcolor text-xsmall"> (JavaScript, React)</span></p>
 
                 <div className="flex flex-row mt-2">
                     <Image 
@@ -102,7 +103,7 @@ const JobListings = () => {
                 </div>
                 <p className="font-semibold text-fontcolor text-large mt-2">Job Title</p>
                 <p className="font-thin text-fontcolor text-xsmall">Company</p>
-                <p className="font-thin text-fontcolor text-xsmall">Job Industry</p>
+                <p className="font-thin text-fontcolor text-xsmall">Job Industry  <span className="font-thin text-fontcolor text-xsmall"> (JavaScript, React)</span></p>
 
                 <div className="flex flex-row mt-2">
                     <Image 
@@ -172,7 +173,7 @@ const JobListings = () => {
                 </div>
                 <p className="font-semibold text-fontcolor text-large mt-2">Job Title</p>
                 <p className="font-thin text-fontcolor text-xsmall">Company</p>
-                <p className="font-thin text-fontcolor text-xsmall">Job Industry</p>
+                <p className="font-thin text-fontcolor text-xsmall">Job Industry <span className="font-thin text-fontcolor text-xsmall"> (JavaScript, React)</span></p>
 
                 <div className="flex flex-row mt-2">
                     <Image 
@@ -230,6 +231,7 @@ const JobListingsWrapper = () => {
     return (
         <div className="flex overflow-y-auto border border-none hide-scrollbar p-1 h-[calc(100vh-150px)]">
             <JobListings />
+            <GeneralFooter/>
         </div>
     );
 };
