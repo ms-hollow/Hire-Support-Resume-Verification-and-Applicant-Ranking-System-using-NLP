@@ -4,6 +4,7 @@ import Link from "next/link";
 import {FiEye, FiEyeOff } from 'react-icons/fi'; /*npm install react-icons*/
 import GeneralHeader from '@/components/GeneralHeader';
 import GeneralFooter from '@/components/GeneralFooter';
+<<<<<<< HEAD
 /*import { useRouter } from 'next/router';*/
 import axios from 'axios'; //npm install axios
 import { GoogleLogin } from '@react-oauth/google'; //npm install react-google-login
@@ -120,6 +121,21 @@ export default function Login() {
 
     const handleError = () => {
         console.error('Google Login Failed');
+=======
+
+
+/*import { useRouter } from 'next/router';*/
+
+export default function Login() {
+
+   /* const{ router } = useRouter()*/
+    const [showPassword, setShowPassword] = useState(false);
+    const [hasTyped, setHasTyped] = useState(false);
+
+    const handleChange = (e) => {
+        setHasTyped(e.target.value.length > 0);
+        
+>>>>>>> laica
     };
     
     return (
@@ -132,11 +148,16 @@ export default function Login() {
                 <form>
                     <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Email address</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+<<<<<<< HEAD
                             <input type="text" id="email" name="email" placeholder="applicant@gmail.com" required onChange={handleChange}/>
+=======
+                            <input type="text" id="email-address" name="email" placeholder="applicant@gmail.com" required ></input>
+>>>>>>> laica
                         </div>
 
                     <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall pt-4 text-fontcolor pb-1 font-medium">Password</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+<<<<<<< HEAD
                             <input type={showPassword ? 'text' : 'password'} id="password" name="password" placeholder="" required  onChange={handleChange}/>
                         </div>
 
@@ -152,6 +173,20 @@ export default function Login() {
                     <button className="button1 flex items-center w-full p-5" onClick={handleSubmit}>
                         <p className="lg:text-medium mb:text-medium sm:text-xxsmall xsm:text-xxsmall text-center">Sign in</p>
                     </button>  
+=======
+                            <input type={showPassword ? 'text' : 'password'} id="password" name="password" placeholder="" required  onChange={handleChange} ></input>  
+                        </div>
+                        
+                    <Link href="/GENERAL/ForgotPassword"> 
+                        <p className="text-xsmall text-accent pt-4 pb-8 font-medium text-right">Forgot password?</p> 
+                    </Link> 
+
+                    <Link href="/APPLICANT/ApplicantHome">
+                        <button className="button1 flex items-center w-full p-5">
+                            <p className="lg:text-medium mb:text-medium sm:text-xxsmall xsm:text-xxsmall text-center">Sign in</p>
+                        </button>
+                    </Link>   
+>>>>>>> laica
                 </form>
                   
 
@@ -160,7 +195,11 @@ export default function Login() {
                     <p className="bg-white px-4 text-gray-600 relative z-10">or</p>
                 </div>
                 
+<<<<<<< HEAD
                  {/* <button className="button2 flex items-center w-full p-5">
+=======
+                <button className="button2 flex items-center w-full p-5">
+>>>>>>> laica
                     <Image 
                         src="/google.png" 
                         width={25} 
@@ -169,12 +208,16 @@ export default function Login() {
                         className="mr-2" // Space between image and text
                     />
                     <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-center font-medium flex-grow">Continue with Google</p>
+<<<<<<< HEAD
                 </button> */}
 
                 <div className='flex justify-center w-full px-5'>
                     <GoogleLogin onSuccess={handleSuccess} onError={handleError} size='large'/>
                 </div>
                   
+=======
+                </button>
+>>>>>>> laica
                 <p className="text-xsmall text-fontcolor pt-4 pb-1 font-medium">Don’t have an account? <span className="font-semibold"><Link href="/GENERAL/Register" className='underline' >Register</Link></span></p> 
             </div> 
         </div>

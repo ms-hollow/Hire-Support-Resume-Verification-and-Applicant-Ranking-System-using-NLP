@@ -40,13 +40,18 @@ class JobHiring(models.Model):
         return criteria_list
     
     def __str__(self):
+<<<<<<< HEAD
         return f"{self.job_title} at {self.company.company_name}"
+=======
+        return self.job_title
+>>>>>>> laica
     
 #Represents the criteria used to evaluate applicants for a specific job posting. This model stores details about each scoring criterion, such as its name, weight, and preference.
 class ScoringCriteria(models.Model):
     job_hiring = models.ForeignKey(JobHiring, related_name='scoring_criteria', on_delete=models.CASCADE)
     criteria_name = models.CharField(max_length=100, blank=True, null=True)
     weight_percentage = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+<<<<<<< HEAD
     preference = models.JSONField(null=True, blank=True)
 
     def __str__(self):
@@ -115,3 +120,52 @@ class RecentSearch(models.Model):
             "salary": self.salary,
             "experience_level": self.experience_level,
         }
+=======
+    preference = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.criteria_name} for {self.job_hiring.job_title}"
+    
+class JobApplication(models.Model):
+    job_application_id = models.AutoField(primary_key=True)  # PK
+    job_hiring = models.ForeignKey(JobHiring, on_delete=models.CASCADE)  # FK to JobHiring
+    applicant = models.ForeignKey('applicant.Applicant', on_delete=models.CASCADE)  # string reference # FK to Applicant 
+    
+    # Applicant details
+    email = models.EmailField()
+    first_name = models.CharField(max_length=50, blank=True, null=True)
+    middle_name = models.CharField(max_length=50, blank=True, null=True)
+    last_name = models.CharField(max_length=50, blank=True, null=True)
+    
+    # Documents
+    resume = models.FileField(upload_to='resumes/')
+    educational_documents = models.FileField(upload_to='education_docs/', blank=True, null=True)
+    experience_documents = models.FileField(upload_to='experience_docs/', blank=True, null=True)
+    additional_documents = models.FileField(upload_to='additional_docs/', blank=True, null=True)
+    
+    # Application status and scores
+    application_date = models.DateField(auto_now_add=True)
+    application_status = models.CharField(max_length=20, choices=[('Pending', 'Pending'), ('Shortlisted', 'Shortlisted'), 
+                                                                  ('Rejected', 'Rejected'), ('Accepted', 'Accepted')])
+    scores = models.JSONField(blank=True, null=True)  # To store calculated scores per criteria
+    verification_result = models.JSONField(blank=True, null=True)  # Store verification results
+    
+    # Methods to calculate and update scores
+    def calculate_scores(self):
+        # Fetch the criteria from job_hiring
+        criteria = self.job_hiring.get_scoring_criteria()
+        
+        # Implement score calculation based on the criteria and applicant details
+        score_data = {}
+        for criterion in criteria:
+            score_data[criterion['name']] = 0  # Placeholder for actual scoring logic
+        
+        # Store the calculated scores
+        self.scores = score_data
+        self.save()
+    
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} application for {self.job_hiring.job_title}"
+
+
+>>>>>>> laica
