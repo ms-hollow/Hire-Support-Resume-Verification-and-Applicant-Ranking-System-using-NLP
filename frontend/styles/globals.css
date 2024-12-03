@@ -175,20 +175,7 @@ footer {
 }
 
 /*---------------------------SAVED JOBS----------------------------------*/
-.apply-now-container {
-  width: 95px;
-  height: 40px;
-  background-color: #5352E9;
-  border-radius: 8px;
-  box-shadow: 0px 2px 0px #000000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #ffffff;
-  font-size: 14px;
-  font-weight: semibold;
-  cursor: pointer;
-}
+
 
 #hover-line-MyJobs {
   transition-property: left;
@@ -196,18 +183,5 @@ footer {
   transition-timing-function: ease-in-out;
 }
 
+
 /*---------------------------APPLIED JOBS----------------------------------*/
-.view-application-container {
-  width: 120px;
-  height: 40px;
-  background-color: #5352E9;
-  border-radius: 8px;
-  box-shadow: 0px 2px 0px #000000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #FFFFFF;
-  font-size: 14px;
-  font-weight: semibold; 
-  cursor: pointer;
-  }
