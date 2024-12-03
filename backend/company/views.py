@@ -1,62 +1,41 @@
-from django.shortcuts import render, redirect
-from django.contrib import messages
+from django.shortcuts import get_object_or_404
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from .models import Company
-from .form import CompanyProfileForm
-from users.models import User
+from .serializers import CompanyProfileFormSerializer
 
-# Create your views here.
+@api_view(['POST'])
+@permission_classes([IsAuthenticated]) 
 def complete_company_profile(request):
-    company = Company.objects.get(user=request.user)
-    
-    if request.method == 'POST':
-        form = CompanyProfileForm(request.POST, instance=company)
-        
-        # Check if the form is valid
-        if form.is_valid():
-            contact_number = form.cleaned_data.get('contact_number')
-            valid = True  # A flag to track if all validations pass
-            
-            # Check if the contact number starts with '9'
-            if not contact_number.startswith('9'):
-                messages.warning(request, "Please enter a valid Philippine contact number")
-                valid = False
-            
-            # Check if the contact number has at least 9 digits
-            if len(contact_number) < 9:
-                messages.warning(request, "Contact number must contain at least 9 digits.")
-                valid = False
-            
-            if valid:
-                # Concatenate the country code
-                contact_number = '+63 ' + contact_number
-                
-                # Save the form and user data
-                var = form.save(commit=False)
-                var.contact_number = contact_number  # Set the modified contact number
-                user = User.objects.get(id=request.user.id)
-                user.has_company_acc = True
-                var.save()
-                user.save()
-                messages.info(request, 'Your account has been created.')
-                return redirect('dashboard')
-        
-        else:
-            # Handle form errors and display them
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.warning(request, f"{field}: {error}")
+    company = get_object_or_404(Company, user=request.user)
+
+    serializer = CompanyProfileFormSerializer(company, data=request.data)
+
+    if serializer.is_valid():
+        serializer.save()
+        request.user.has_company_acc = True
+        request.user.save()
+        return Response({"message": "Your profile has been created."}, status=200)
     else:
-        form = CompanyProfileForm(instance=company)
+        return Response(serializer.errors, status=400)
     
-    # Return the form for both POST and GET requests
-    context = {'form': form}
-    return render(request, 'company/complete_company_profile.html', context)
-
-
-# view company profile
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def view_company_profile(request, pk):
-    company = Company.objects.get(pk=pk)
-    context = {'company':company}
-    return render(request, 'company/view_company_profile.html', context)
+    company = get_object_or_404(Company, pk=pk)
+    serializer = CompanyProfileFormSerializer(company)
+    return Response(serializer.data, status=200)
 
-#TODO edit company profile
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def edit_company_profile(request):
+    company = get_object_or_404(Company, user=request.user)
+    serializer = CompanyProfileFormSerializer(company, data=request.data)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)

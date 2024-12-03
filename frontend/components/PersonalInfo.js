@@ -2,27 +2,27 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from 'next/image';
 
-const PersonalInfo = () => {
+const PersonalInfo = ({ showRegisterButton }) => {
   
     return ( 
   
         <div>
-                <form>
+                <form >
                         <div className="flex lg:flex-row sm:flex-col gap-5 pb-5">
                             <div className="flex flex-col flex-grow">
-                                <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">First Name</p>
+                                <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">First Name</p>
                                     <div className="h-medium rounded-xs border-2 border-fontcolor flex">
                                         <input type="text" id="first_name" name="firstName" placeholder="" required /*onChange={handleChange}*/></input>
                                     </div>
                                     </div>
                                     <div className="flex flex-col flex-grow">
-                                        <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Last Name</p>
+                                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Last Name</p>
                                             <div className="h-medium rounded-xs border-2 border-fontcolor flex">
                                                 <input type="text" id="last_name" name="lastName" placeholder="" required /*onChange={handleChange}*/></input>
                                             </div>
                                     </div>
                                     <div className="flex flex-col lg:w-14 mb:flex-grow">
-                                        <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">M.I.</p>
+                                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">M.I.</p>
                                             <div className="h-medium rounded-xs border-2 border-fontcolor flex">
                                                 <input type="text" id="middle-name" name="middle_name" placeholder="" required /*onChange={handleChange}*/></input>
                                             </div>
@@ -30,13 +30,13 @@ const PersonalInfo = () => {
                         </div>
                         <div className="flex lg:flex-row sm:flex-col gap-5 pb-5">
                             <div className="flex flex-col flex-grow">
-                                <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Email Address</p>
+                                <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Email Address</p>
                                     <div className="h-medium rounded-xs border-2 border-fontcolor flex">
                                         <input type="text" id="email-address" name="email" placeholder="applicant@gmail.com" required /*onChange={handleChange}*/></input>
                                     </div>
                                     </div>
                                     <div className="flex flex-col flex-grow">
-                                        <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Contact No.</p>
+                                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Contact No.</p>
                                             <div className="h-medium rounded-xs border-2 border-fontcolor flex">
                                                 <input type="text" id="contact-number" name="contact_number" placeholder="" required /*onChange={handleChange}*/></input>
                                             </div>
@@ -142,23 +142,24 @@ const PersonalInfo = () => {
                         </div>
                             
                         <div className="flex justify-end">
-                            <Link href="/APPLICANT/ApplicantHome"> 
-                                <button className="button1 mt-5 flex items-center justify-center"> 
-                                    <div className="flex items-center space-x-2">
-                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-small font-medium text-center">Register</p>
-                                        <Image 
-                                            src="/Arrow Right.svg" 
-                                            width={23} 
-                                            height={10} 
-                                            alt="Notification Icon" 
+                            {showRegisterButton && (
+                                <Link href="/APPLICANT/ApplicantHome">
+                                    <button className="button1 mt-5 flex items-center justify-center">
+                                        <div className="flex items-center space-x-2">
+                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-small font-medium text-center">
+                                            Register
+                                        </p>
+                                        <Image
+                                            src="/Arrow Right.svg"
+                                            width={23}
+                                            height={10}
+                                            alt="Notification Icon"
                                         />
-                                    </div>
-                                </button>
-                            </Link>
-                               
-                            </div>
-                            
-                           
+                                        </div>
+                                    </button>
+                                </Link>
+                            )}
+                        </div>        
                 </form>     
            
         </div>

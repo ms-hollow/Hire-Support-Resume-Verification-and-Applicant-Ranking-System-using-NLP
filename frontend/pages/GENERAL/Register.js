@@ -235,7 +235,7 @@ export default function Register() {
                                   </div>
                               ) : (
                                   // Display the PersonalInfo component
-                                  <PersonalInfo/>
+                                  <PersonalInfo showRegisterButton={true} />
                               )}
                       
                               
@@ -252,4 +252,3 @@ export default function Register() {
         </div>
     );
 }
-

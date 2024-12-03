@@ -1,7 +1,8 @@
 from django.urls import path
-from . import views
+from .views import complete_company_profile, view_company_profile, edit_company_profile
 
 urlpatterns = [
-    path('complete-company-profile/', views.complete_company_profile, name='complete-company-profile'),
-    path('view-company-profile/<int:pk>/', views.view_company_profile, name='view-company-profile')
+    path('profile/', complete_company_profile, name='complete-company-profile'),
+    path('profile/edit/', edit_company_profile, name='edit-applicant-profile'),
+    path('profile/view/<int:pk>/', view_company_profile, name='view-company-profile'),
 ]

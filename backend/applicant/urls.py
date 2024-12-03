@@ -1,7 +1,8 @@
 from django.urls import path
-from . import views
+from .views import complete_applicant_profile, view_applicant_profile, edit_applicant_profile
 
 urlpatterns = [
-    path('complete-applicant-profile/', views.complete_applicant_profile, name='complete-applicant-profile'),
-    path('view-applicant-profile/<int:pk>/', views.view_applicant_profile, name='view-applicant-profile'),
+    path('profile/', complete_applicant_profile, name='complete-applicant-profile'),
+    path('profile/edit/', edit_applicant_profile, name='edit-applicant-profile'),  
+    path('profile/view/<int:pk>/', view_applicant_profile, name='view-applicant-profile'),  
 ]
