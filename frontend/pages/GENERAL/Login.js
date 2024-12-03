@@ -4,46 +4,61 @@ import Link from "next/link";
 import { FiEye, FiEyeOff } from 'react-icons/fi'; /*npm install react-icons*/
 import GeneralHeader from '@/components/GeneralHeader';
 import GeneralFooter from '@/components/GeneralFooter';
+/*import { useRouter } from 'next/router';*/
 import axios from 'axios'; //npm install axios
+import { GoogleLogin } from '@react-oauth/google'; //npm install react-google-login
+//npm install next-auth
 
-//TODO 1. Ayusin Google Auth 2. Setup forgot password
+//TODO
+//* Setup Forgot Password
+//* Toast Notif
 
 export default function Login() {
-    const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState('');
-    const [formData, setFormData] = useState({
-        email: '', password: ''
-    });
 
-    // Submit login form for regular login
-    const handleSubmit = async (e) => {
-        e.preventDefault(); // Prevent the default form submission
-        try {
+   const [showPassword, setShowPassword] = useState(false);
+   const [error, setError] = useState('');
+
+   const [formData, setFormData] = useState({
+        email: '', password: ''
+   });
+
+   const handleSubmit = async (e) => {
+       e.preventDefault(); // Prevent the default form submission
+       try {
+            // Log the form data to make sure it's correct
+            console.log(formData);
+        
+            // Check if the form is empty
             if (!formData.email || !formData.password) {
                 setError('Please fill in the fields.');
                 return;
             }
-
+        
             // Validate email format (basic regex)
-            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA0-9]{2,}$/;
+            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
             if (!emailRegex.test(formData.email)) {
                 setError('Please enter a valid email address.');
-                return;
+                return; // Stop further processing
             }
-
+        
+            // Send POST request to Django backend to authenticate the user
             const response = await axios.post('http://127.0.0.1:8000/users/login/', formData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
-
+        
             // Handle successful login
+            console.log('Login success', response.data);
+        
+            // Store JWT tokens in localStorage 
             localStorage.setItem('access_token', response.data.access);
             localStorage.setItem('refresh_token', response.data.refresh);
-
+        
             const userRole = response.data.role;  // 'company' or 'applicant'
-
-            // Redirect based on user role
+            // console.log(userRole);
+        
+            // Redirect based on the user's role
             if (userRole === 'company') {
                 window.location.href = '/GENERAL/Register'; //! Company Home
             } else if (userRole === 'applicant') {
@@ -51,9 +66,9 @@ export default function Login() {
             }
         } catch (err) {
             console.log('Error details:', err.response);
-
+        
             if (err.response && err.response.status === 404) {
-                setError(err.response.data.error || 'Email does not exist');
+                setError(err.response.data.error || 'Email does not exist'); // Use the server's error message
             } else if (err.response && err.response.status === 400) {
                 setError('Invalid email or password');
             } else {
