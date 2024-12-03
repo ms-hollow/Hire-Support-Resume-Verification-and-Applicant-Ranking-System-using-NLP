@@ -37,6 +37,32 @@
         "Design server-side architecture.",
         "Integrate data storage solutions."
       ]
+    },
+    {
+      "job_title": " UI Designer",
+      "company_name": "PurpleBug",
+      "job_industry": "Technology (Figma, Adobe Illustrator)",
+      "location": "Makati",
+      "work_setup": "Hybrid",
+      "schedule": "10 AM - 6 PM",
+      "salary": "$100,000 - $140,000",
+      "job_description": [
+        "Execute high-quality design tasks for various digital assets such as digital ads, landing pages, and websites.",
+        "Understand client's brand guidelines, analyze existing design assets to inform design decisions and optimize performance."
+      ]
+    },
+    {
+      "job_title": " UX Designer",
+      "company_name": "PurpleBug",
+      "job_industry": "Technology (Figma, Adobe Illustrator)",
+      "location": "Taguig",
+      "work_setup": "On-site",
+      "schedule": "10 AM - 6 PM",
+      "salary": "$10,000 - $40,000",
+      "job_description": [
+        "Execute high-quality design tasks for various digital assets such as digital ads, landing pages, and websites.",
+        "Understand client's brand guidelines, analyze existing design assets to inform design decisions and optimize performance."
+      ]
     }
   ]
   

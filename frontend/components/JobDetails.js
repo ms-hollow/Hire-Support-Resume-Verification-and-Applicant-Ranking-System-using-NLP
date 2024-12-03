@@ -1,6 +1,4 @@
 import Image from 'next/image';
-
-
 const JobDetails = () => {
     return (
         <div className="flex flex-col h-full"> 
