@@ -5,8 +5,8 @@ import JobListings from '@/components/JobListings';
 import Image from 'next/image';
 import { useState } from "react";
 
+
 export default function ApplicantHome() {
- 
     return (
     <div>
     <ApplicantHeader/>
