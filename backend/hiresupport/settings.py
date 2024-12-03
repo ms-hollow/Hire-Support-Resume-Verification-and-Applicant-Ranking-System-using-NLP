@@ -73,7 +73,6 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7), # Time for refresh token expiry
 }
 
-
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "SCOPE": [

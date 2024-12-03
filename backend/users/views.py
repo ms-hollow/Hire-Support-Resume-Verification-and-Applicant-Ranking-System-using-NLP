@@ -115,20 +115,19 @@ def google_login(request):
     try:
         user = User.objects.get(email=email)
     except User.DoesNotExist:
-        # User not found; send a 404 response
         return Response({'error': 'User not found. Please register.'}, status=status.HTTP_404_NOT_FOUND)
-    except Exception as e:
-        # Catch unexpected errors
-        print(f"An error occurred: {e}")
-        return Response({'error': 'An unexpected error occurred.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # Generate JWT tokens for the user
     refresh = RefreshToken.for_user(user)
+
+    # Determine the user's role
+    user_role = 'company' if user.is_company else 'applicant' if user.is_applicant else 'unknown'
 
     return Response({
         'access': str(refresh.access_token),
         'refresh': str(refresh),
         'email': email,
+        'role': user_role,  # Include the role in the response
     }, status=status.HTTP_200_OK)
 
 #TODO
