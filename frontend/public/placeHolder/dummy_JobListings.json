@@ -1,0 +1,68 @@
+[
+    {
+      "job_title": "Software Engineer",
+      "company_name": "Google",
+      "job_industry": "Technology (JavaScript, React)",
+      "location": "San Francisco",
+      "work_setup": "Hybrid",
+      "schedule": "9 AM - 5 PM",
+      "salary": "$90,000 - $120,000",
+      "job_description": [
+        "Develop scalable web applications.",
+        "Collaborate with cross-functional teams."
+      ]
+    },
+    {
+      "job_title": "Frontend Developer",
+      "company_name": "Facebook",
+      "job_industry": "Technology (React, TypeScript)",
+      "location": "Remote",
+      "work_setup": "Remote",
+      "schedule": "Flexible",
+      "salary": "$80,000 - $100,000",
+      "job_description": [
+        "Build and maintain the user interface. ",
+        "Optimize web pages for performance."
+      ]
+    },
+    {
+      "job_title": "Backend Developer",
+      "company_name": "Amazon",
+      "job_industry": "Technology (Node.js, AWS)",
+      "location": "Seattle",
+      "work_setup": "On-site",
+      "schedule": "10 AM - 6 PM",
+      "salary": "$100,000 - $140,000",
+      "job_description": [
+        "Design server-side architecture.",
+        "Integrate data storage solutions."
+      ]
+    },
+    {
+      "job_title": " UI Designer",
+      "company_name": "PurpleBug",
+      "job_industry": "Technology (Figma, Adobe Illustrator)",
+      "location": "Makati",
+      "work_setup": "Hybrid",
+      "schedule": "10 AM - 6 PM",
+      "salary": "$100,000 - $140,000",
+      "job_description": [
+        "Execute high-quality design tasks for various digital assets such as digital ads, landing pages, and websites.",
+        "Understand client's brand guidelines, analyze existing design assets to inform design decisions and optimize performance."
+      ]
+    },
+    {
+      "job_title": " UX Designer",
+      "company_name": "PurpleBug",
+      "job_industry": "Technology (Figma, Adobe Illustrator)",
+      "location": "Taguig",
+      "work_setup": "On-site",
+      "schedule": "10 AM - 6 PM",
+      "salary": "$10,000 - $40,000",
+      "job_description": [
+        "Execute high-quality design tasks for various digital assets such as digital ads, landing pages, and websites.",
+        "Understand client's brand guidelines, analyze existing design assets to inform design decisions and optimize performance."
+      ]
+    }
+  ]
+  

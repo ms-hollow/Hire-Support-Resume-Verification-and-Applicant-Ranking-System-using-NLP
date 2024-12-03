@@ -1,16 +1,21 @@
 import { useState } from "react";
 import Link from "next/link";
-import Image from 'next/image';
+import Image from "next/image";
 
 const ApplicantHeader = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const toggleMenu = () => {
-    setIsOpen(!isOpen);
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
   };
 
   return (
-    <header className="fixed top-0 w-full bg-background h-16 lg:px-20 mb:px-20 py-5 flex items-center justify-between sm:px-8  xsm:px-8 z-50">
+    <header className="fixed top-0 w-full bg-background h-16 lg:px-20 mb:px-20 py-5 flex items-center justify-between sm:px-8 xsm:px-8 z-50">
       <div className="flex items-center">
         <div className="logo mr-4">
           <Image 
@@ -23,16 +28,18 @@ const ApplicantHeader = () => {
 
         <ul className="hidden md:flex space-x-10">
           <li><Link href="/APPLICANT/ApplicantHome">Home</Link></li>
-          <li><Link href="/APPLICANT/MyJobs"> My Jobs</Link></li>
+          <li><Link href="/APPLICANT/MyJobs">My Jobs</Link></li>
           <li><Link href="/APPLICANT/Settings">Settings</Link></li>
         </ul>
 
+        {/* Hamburger Menu Button */}
         <button className="text-3xl focus:outline-none text-primary md:hidden ml-4" onClick={toggleMenu}>
           ☰
         </button>
       </div>
 
       <div className="flex items-center gap-5">
+        {/* Notification Icon */}
         <button className="pt-1">
           <Image 
             src="/Notification Icon.svg" 
@@ -42,39 +49,55 @@ const ApplicantHeader = () => {
           />
         </button>
 
-        <button>
-          <Image 
-            src="/Profile Icon.png" 
-            width={28} 
-            height={25} 
-            alt="Profile Icon"  
-          />
-        </button>
+        {/* Profile Dropdown */}
+        <div className="relative">
+          <button
+            onClick={toggleDropdown}
+            className="flex items-center focus:outline-none"
+          >
+            <Image
+              src="/Profile Icon.png"
+              width={28}
+              height={25}
+              alt="Profile Icon"
+            />
+          </button>
 
-   
+          {/* Dropdown Menu */}
+          {isDropdownOpen && (
+           <div className="absolute right-0 mt-2 w-48 bg-background shadow-md transition-all duration-300"> 
+           <ul>
+             <li className= "px-4 py-3 hover:bg-primary hover:text-background cursor-pointer transition-all duration-300"><Link href="/APPLICANT/ApplicantProfile" onClick={toggleDropdown}>Profile</Link></li>
+             <li className="px-4 py-3 hover:bg-primary hover:text-background cursor-pointer transition-all duration-300">Settings</li>
+             <li className="px-4 py-3 hover:bg-primary hover:text-background cursor-pointer transition-all duration-300"><Link href="/GENERAL/Login" onClick={toggleDropdown}>Logout</Link></li>
+           </ul>
+         </div>
+          )}
+        </div>
+
+        {/* Company Site Link */}
         <div className="hidden md:block">
-          <Link href="/GENERAL/Login">
-            <h3>Company Site</h3>
-          </Link>
+          <Link href="/GENERAL/Login"><h3>Company Site</h3></Link>
         </div>
       </div>
 
       {/* Hamburger Menu */}
-      <div className={`fixed z-50 top-0 left-0 w-52 bg-background h-screen md:hidden shadow-[0px_0px_4px_rgba(0,0,0,0.1)] transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div
+        className={`fixed z-50 top-0 left-0 w-52 bg-background h-screen md:hidden shadow-[0px_0px_4px_rgba(0,0,0,0.1)] transition-transform duration-300 ease-in-out ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold ml-2">Hire Support</h3>
-              <button className="text-3xl text-primary focus:outline-none" onClick={toggleMenu}>
-                ☰
-              </button>
+          <h3 className="text-lg font-semibold ml-2">Hire Support</h3>
+          <button className="text-3xl text-primary focus:outline-none" onClick={toggleMenu}>
+            ☰
+          </button>
         </div>
-          {/* Menu Links */}
-          <ul className="flex flex-col items-start p-6 space-y-4">
-              <li><Link href="/APPLICANT/ApplicantHome" onClick={toggleMenu}>Home</Link></li>
-              <li><Link href="/APPLICANT/MyJobs" onClick={toggleMenu}>My Jobs</Link></li>
-              <li><Link href="/APPLICANT/Settings" onClick={toggleMenu}>Settings</Link></li>
-          </ul>
-      </div>
 
+        <ul className="flex flex-col items-start">
+          <li className="py-2 hover:bg-primary hover:text-background cursor-pointer transition-all duration-300 w-full"><Link href="/APPLICANT/ApplicantHome" onClick={toggleMenu} className="block px-4 py-2"> <p className="pl-2">Home</p></Link></li>
+          <li className="py-2 hover:bg-primary hover:text-background cursor-pointer transition-all duration-300 w-full"><Link href="/APPLICANT/MyJobs" onClick={toggleMenu} className="block px-4 py-2"> <p className="pl-2">My Jobs</p></Link></li>
+          <li className="py-2 hover:bg-primary hover:text-background cursor-pointer transition-all duration-300 w-full"><Link href="/APPLICANT/Settings" onClick={toggleMenu} className="block px-4 py-2"><p className="pl-2">Settings </p></Link></li>
+        </ul>
+
+      </div>
     </header>
   );
 };

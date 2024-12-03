@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -55,6 +54,7 @@ h1 {
   font-family: "Inter", sans-serif;
   margin-bottom: 0.625rem; /* 10px */
 }
+
 
 h3 {
   font-weight: 700;

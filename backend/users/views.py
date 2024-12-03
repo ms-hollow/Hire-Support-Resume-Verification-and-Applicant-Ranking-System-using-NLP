@@ -1,100 +1,135 @@
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
-from .models import User
-from .form import RegisterUserForm
-from applicant.models import Applicant
-from company.models import Company
+from rest_framework.views import APIView # APIView used for creating class-based views to handle HTTP requests like registration, login, and logout easily.
+from rest_framework.response import Response
+from rest_framework import status,serializers
+from django.contrib.auth import get_user_model
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import login, logout
+from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-# Create your views here.
+from rest_framework_simplejwt.tokens import RefreshToken
+import requests
 
-def register_applicant(request):
-    if request.method == 'POST':
-        if 'step1' in request.POST:  # Handling step 1 (registration)
-            form = RegisterUserForm(request.POST)
-            if form.is_valid():
-                user = form.save(commit=False)
-                user.is_applicant = True
-                user.username = user.email  # Set the email as the username
-                user.save()
-                Applicant.objects.create(user=user)  # Create an empty Applicant profile
-                messages.info(request, 'Your account has been created. Please complete your profile.')
-                # Automatically log the user in after registration
-                login(request, user)
-                
-                # Redirect to the profile completion page
-                return redirect('complete-applicant-profile')
-        else:
-            messages.warning(request, 'Something went wrong with your submission.')
 
-    else:
-        form = RegisterUserForm()
+User = get_user_model() # kukunin yung user na currently naka-login sa app
 
-    return render(request, 'users/register_applicant.html', {'form': form})
-
-def register_company(request):
-    if request.method == 'POST':
-        form = RegisterUserForm(request.POST)
-        
-        if form.is_valid():
-            # Create the user but don't save it to the database yet
-            user = form.save(commit=False)
-            user.is_company = True
-            user.username = user.email  # Set the email as the username
-            user.save()  # Save the user to the database
-            
-            # Create the company profile associated with this user
-            Company.objects.create(user=user)
-            messages.info(request, 'Your account has been created. Please complete your profile.')
-            
-            # Automatically log the user in after registration
+class RegisterUserView(APIView):
+    def post(self, request):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
             login(request, user)
+            return Response({"message": "Registration successful"}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#* JWT Based Authentication
+class LoginUserView(APIView):
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')  # Extract email from the request data
+
+        # Check if the email exists in the database
+        if not User.objects.filter(email=email).exists():
+            return Response({'error': 'Email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Use the login serializer to validate credentials
+        serializer = UserLoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data['user']
             
-            # Redirect to the profile completion page
-            return redirect('complete-company-profile')
-        
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            refresh.payload['email'] = user.email
+            access_token = str(refresh.access_token)
+            refresh_token = str(refresh)
+
+            # Determine the user's role (applicant or company)
+            user_role = 'company' if user.is_company else 'applicant' if user.is_applicant else 'unknown'
+
+            return Response({
+                'access': access_token,
+                'refresh': refresh_token,
+                'role': user_role,  # Return the role (applicant or company)
+                'email': user.email # Include the email in the response
+            }, status=status.HTTP_200_OK) 
         else:
-            # Display form errors if there are any
-            messages.warning(request, 'Something went wrong: ' + str(form.errors))
-            return render(request, 'users/register_company.html', {'form': form})
-
-    else:
-        form = RegisterUserForm()
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-    return render(request, 'users/register_company.html', {'form': form})
+# Customizing the JWT serializer to include user data in the response
+class CustomTokenObtainPairSerializer(serializers.Serializer):
+    def validate(self, attrs):
+        validated_data = super().validate(attrs)
+        return validated_data
 
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
-def login_user(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
+class LogoutUserView(APIView):
+    def post(self, request):
+        logout(request)
+        return Response({"message": "Logged out successfully"}, status=status.HTTP_200_OK)
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])  # Ensure the user is authenticated
+def change_password(request):
+    user = request.user  # Get the currently authenticated user
+    current_password = request.data.get('current_password')
+    new_password = request.data.get('new_password')
+    confirm_password = request.data.get('confirm_password')
 
-        # Check if the user exists in the Applicant database
-        try:
-            applicant = Applicant.objects.get(user__email=email)
-            user = applicant.user  # Get the related User object
-        except Applicant.DoesNotExist:
-            # Check if the user exists in the Company database
-            try:
-                company = Company.objects.get(user__email=email)
-                user = company.user  # Get the related User object
-            except Company.DoesNotExist:
-                messages.warning(request, "Username not found. Please ensure you've registered as either an Applicant or a Company.")
-                return redirect('login')
+    if not user.check_password(current_password):
+        return Response({"error": "Current password is incorrect."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # If the user exists, authenticate
-        user = authenticate(request, username=email, password=password)
+    if new_password != confirm_password:
+        return Response({"error": "New passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if user is not None and user.is_active:
-            login(request, user)
-            return redirect('dashboard')
-        else:
-            messages.warning(request, 'The password you entered is incorrect. Please try again.')
-            return redirect('login')
-    else: 
-        return render(request, 'users/login.html')
+    user.set_password(new_password)
+    user.save()
 
-def logout_user(request):
-    logout(request)
-    messages.info(request, 'Your session has ended')
-    return redirect('login')
+    return Response({"message": "Password changed successfully."}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])  # Ensure the user is authenticated
+def user_list(request):
+    users = User.objects.all()  # Get all users
+    serializer = UserSerializer(users, many=True)  
+    return Response(serializer.data)
+
+@api_view(['POST'])
+def google_login(request):
+    token = request.data.get('token')
+    if not token:
+        return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Verify the token with Google
+    google_verify_url = f"https://oauth2.googleapis.com/tokeninfo?id_token={token}"
+    response = requests.get(google_verify_url)
+    if response.status_code != 200:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    user_info = response.json()
+    email = user_info.get('email')
+
+    # Check if a user with the email exists
+    User = get_user_model()
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        # User not found; send a 404 response
+        return Response({'error': 'User not found. Please register.'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        # Catch unexpected errors
+        print(f"An error occurred: {e}")
+        return Response({'error': 'An unexpected error occurred.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # Generate JWT tokens for the user
+    refresh = RefreshToken.for_user(user)
+
+    return Response({
+        'access': str(refresh.access_token),
+        'refresh': str(refresh),
+        'email': email,
+    }, status=status.HTTP_200_OK)
+
+#TODO
+#* Setup Backend to Register
