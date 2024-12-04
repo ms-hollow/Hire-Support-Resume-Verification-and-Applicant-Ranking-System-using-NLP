@@ -16,11 +16,26 @@ User = get_user_model() # kukunin yung user na currently naka-login sa app
 
 class RegisterUserView(APIView):
     def post(self, request):
+        # Check if the email already exists in the database
+        email = request.data.get('email')
+        if User.objects.filter(email=email).exists():
+            return Response({'email': ['This email is already registered.']}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Proceed with registration if email is unique
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            login(request, user)
-            return Response({"message": "Registration successful"}, status=status.HTTP_201_CREATED)
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            access_token = refresh.access_token
+
+            # Return the tokens in the response
+            return Response({
+                "message": "Registration successful",
+                "access_token": str(access_token),
+                "refresh_token": str(refresh),
+            }, status=status.HTTP_201_CREATED)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #* JWT Based Authentication
@@ -89,7 +104,6 @@ def change_password(request):
     return Response({"message": "Password changed successfully."}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])  # Ensure the user is authenticated
 def user_list(request):
     users = User.objects.all()  # Get all users
     serializer = UserSerializer(users, many=True)  
@@ -130,5 +144,18 @@ def google_login(request):
         'role': user_role,  # Include the role in the response
     }, status=status.HTTP_200_OK)
 
+@api_view(['POST'])
+def check_email(request):
+    email = request.data.get('email', None)
+    
+    if not email:
+        return Response({'error': 'Email is required'}, status=400)
+    
+    # Check if the email already exists in the database
+    if User.objects.filter(email=email).exists():
+        return Response({'error': 'Email is already registered'}, status=409)
+    else:
+        return Response({'message': 'Email is available'}, status=200)
+    
 #TODO
 #* Setup Backend to Register
