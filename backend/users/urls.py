@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RegisterUserView, LoginUserView, LogoutUserView, change_password, user_list, google_login, check_email
+from .views import RegisterUserView, LoginUserView, LogoutUserView, change_password, user_list, check_email, google_login
 
 urlpatterns = [
     path('register/', RegisterUserView.as_view(), name='register-user'),
@@ -10,7 +10,6 @@ urlpatterns = [
     path('google-login/', google_login, name='google-login'),
     path('check-email/', check_email, name='check_email'),
 ]
-
 
 #TODO for forgt password
 #* 1 - Submit email form

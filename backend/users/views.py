@@ -7,7 +7,6 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import login, logout
 from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-
 from rest_framework_simplejwt.tokens import RefreshToken
 import requests
 
@@ -110,6 +109,55 @@ def user_list(request):
     return Response(serializer.data)
 
 @api_view(['POST'])
+def check_email(request):
+    email = request.data.get('email', None)
+    
+    if not email:
+        return Response({'error': 'Email is required'}, status=400)
+    
+    # Check if the email already exists in the database
+    if User.objects.filter(email=email).exists():
+        return Response({'error': 'Email is already registered'}, status=409)
+    else:
+        return Response({'message': 'Email is available'}, status=200)
+
+# @api_view(['POST'])
+# def google_login(request):
+#     token = request.data.get('token')
+#     if not token:
+#         return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+#     # Verify the token with Google
+#     google_verify_url = f"https://oauth2.googleapis.com/tokeninfo?id_token={token}"
+#     response = requests.get(google_verify_url)
+#     if response.status_code != 200:
+#         return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+    
+#     user_info = response.json()
+#     email = user_info.get('email')
+
+#     # Check if a user with the email exists
+#     User = get_user_model()
+#     try:
+#         user = User.objects.get(email=email)
+#     except User.DoesNotExist:
+#         # User not found; send a 404 response
+#         return Response({'error': 'User not found. Please register.'}, status=status.HTTP_404_NOT_FOUND)
+#     except Exception as e:
+#         # Catch unexpected errors
+#         print(f"An error occurred: {e}")
+#         return Response({'error': 'An unexpected error occurred.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#     # Generate JWT tokens for the user
+#     refresh = RefreshToken.for_user(user)
+
+#     return Response({
+#         'access': str(refresh.access_token),
+#         'refresh': str(refresh),
+#         'email': email,
+#     }, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
 def google_login(request):
     token = request.data.get('token')
     if not token:
@@ -124,38 +172,36 @@ def google_login(request):
     user_info = response.json()
     email = user_info.get('email')
 
+    print(f"Google login successful. User email: {email}")  # Print the email from the token
+
     # Check if a user with the email exists
     User = get_user_model()
     try:
         user = User.objects.get(email=email)
     except User.DoesNotExist:
         return Response({'error': 'User not found. Please register.'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return Response({'error': 'An unexpected error occurred.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # Print user details for debugging
+    # print(f"User found: {user}")  # Print the entire user object
+    # print(f"User is_company: {user.is_company}")  # Print whether the user is a company
+    # print(f"User is_applicant: {user.is_applicant}")  # Print whether the user is an applicant
 
     # Generate JWT tokens for the user
     refresh = RefreshToken.for_user(user)
 
-    # Determine the user's role
-    user_role = 'company' if user.is_company else 'applicant' if user.is_applicant else 'unknown'
-
+    # Return the response with user data
     return Response({
         'access': str(refresh.access_token),
         'refresh': str(refresh),
         'email': email,
-        'role': user_role,  # Include the role in the response
+        'is_company': user.is_company,
+        'is_applicant': user.is_applicant,
     }, status=status.HTTP_200_OK)
 
-@api_view(['POST'])
-def check_email(request):
-    email = request.data.get('email', None)
-    
-    if not email:
-        return Response({'error': 'Email is required'}, status=400)
-    
-    # Check if the email already exists in the database
-    if User.objects.filter(email=email).exists():
-        return Response({'error': 'Email is already registered'}, status=409)
-    else:
-        return Response({'message': 'Email is available'}, status=200)
-    
+
+
 #TODO
 #* Setup Backend to Register

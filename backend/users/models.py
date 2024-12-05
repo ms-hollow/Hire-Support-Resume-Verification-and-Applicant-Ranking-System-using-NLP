@@ -8,3 +8,5 @@ class User(AbstractUser):
 
     has_applicant_acc = models.BooleanField(default=False)
     has_company_acc = models.BooleanField(default=False)
+
+    google_id = models.CharField(max_length=255, unique=True, blank=True, null=True) 
