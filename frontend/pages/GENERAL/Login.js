@@ -7,7 +7,6 @@ import GeneralFooter from '@/components/GeneralFooter';
 /*import { useRouter } from 'next/router';*/
 import axios from 'axios'; //npm install axios
 import { GoogleLogin } from '@react-oauth/google'; //npm install react-google-login
-//npm install next-auth
 
 //TODO
 //* Setup Forgot Password
@@ -17,7 +16,7 @@ export default function Login() {
 
    const [showPassword, setShowPassword] = useState(false);
    const [error, setError] = useState('');
-
+   
    const [formData, setFormData] = useState({
         email: '', password: ''
    });
@@ -77,6 +76,58 @@ export default function Login() {
         }
     };
 
+    const handleSuccess = async (credentialResponse) => {
+        try {
+            const { credential } = credentialResponse;
+
+            // Send the Google token to the Django backend
+            const response = await axios.post('http://127.0.0.1:8000/users/google-login/', {
+                token: credential,
+            });
+
+            // Handle a successful login
+            if (response.status === 200) {
+                localStorage.setItem('access_token', response.data.access);
+                localStorage.setItem('refresh_token', response.data.refresh);
+                // Access user data from the response
+                const { email, is_company, is_applicant } = response.data;
+
+                console.log('User data:', {
+                    email,
+                    is_company,
+                    is_applicant,
+                });
+
+                if (is_company) {
+                    window.location.replace('/APPLICANT/ApplicantHome'); //! Change to Company Home
+                } else if (is_applicant) {
+                    window.location.replace('/APPLICANT/MyJobs'); //! Change to Applicant Home
+                } else {
+                    console.error('User does not have a valid role');
+                }
+            }
+
+        } catch (error) {
+            // Axios catches non-2xx responses here
+            if (error.response) {
+                const { status } = error.response;
+                if (status === 404) {
+                    window.location.replace('/GENERAL/Register');
+                } else if (status === 400) {
+                    setError('Invalid token. Please try again.');
+                } else {
+                    setError('An unexpected error occurred.');
+                }
+            } else {
+                setError('Network error. Please try again later.');
+            }
+        }
+    };
+
+    const handleError = () => {
+        console.error('Google Login Failed');
+    };
+
     // Handle form input changes
     const handleChange = (e) => {
         setFormData({
@@ -134,7 +185,8 @@ export default function Login() {
                         <p className="bg-white px-4 text-gray-600 relative z-10">or</p>
                     </div>
 
-                    <button className="button2 flex items-center w-full p-5">
+                    {/* TODO */}
+                    {/* <button onClick={handleGoogleLogin} className="button2 flex items-center w-full p-5">
                         <Image
                             src="/google.png"
                             width={25}
@@ -143,7 +195,11 @@ export default function Login() {
                             className="mr-2"
                         />
                         <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-center font-medium flex-grow">Continue with Google</p>
-                    </button>
+                    </button> */}
+
+                    <div className='flex justify-center w-full px-5'>
+                        <GoogleLogin onSuccess={handleSuccess} onError={handleError} size='large'/>
+                    </div>
                 
                     <p className="text-xsmall text-fontcolor pt-4 pb-1 font-medium">Don’t have an account? <span className="font-semibold"><Link href="/GENERAL/Register" className='underline' >Register</Link></span></p>
                 </div>

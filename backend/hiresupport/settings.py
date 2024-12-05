@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'social_django',
     
     # app
     'users',
@@ -196,11 +197,11 @@ AUTH_USER_MODEL = 'users.User'
 AUTHENTICATION_BACKENDS = (
     'users.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend'
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-LOGIN_DIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_DIRECT_URL = "/GENERAL/Login"
+LOGOUT_REDIRECT_URL = '/APPLICANT/ApplicantHome'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
