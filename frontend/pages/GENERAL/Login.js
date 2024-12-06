@@ -147,7 +147,7 @@ export default function Login() {
                         <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Email address</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
                             <input 
-                                type="text" 
+                                type="email" 
                                 id="email" 
                                 name="email" 
                                 placeholder="applicant@gmail.com" 

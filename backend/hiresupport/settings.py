@@ -98,18 +98,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'hiresupport.urls'
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Next.js frontend
-    "http://127.0.0.1:3000",  # Next.js frontend
-]
-
-CORS_ALLOW_ALL_ORIGINS = True  # Allow requests from any origin (development)
-
-# COOP header
-# CORS_ALLOW_HEADERS = [
-#     'COOP', 'cross-origin-opener-policy',
-# ]
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -201,12 +189,39 @@ AUTHENTICATION_BACKENDS = (
 )
 
 LOGIN_DIRECT_URL = "/GENERAL/Login"
-LOGOUT_REDIRECT_URL = '/APPLICANT/ApplicantHome'
+LOGOUT_REDIRECT_URL = '/' 
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-# #! MUST BE REMOVE AFTER TESTING
-# CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
-# CSRF_COOKIE_HTTPONLY = False
+# CSRF Settings
+CSRF_COOKIE_NAME = 'csrftoken'
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_DOMAIN = 'localhost'  # For cross-origin access
+CSRF_COOKIE_PATH = '/'  # Ensure accessible globally
+CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access
+CSRF_COOKIE_SAMESITE = 'Lax'  # Or 'None' for different origins
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Next.js frontend
+    "http://localhost:8000"
+]
+
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8000']
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',  # Add your frontend origin here
+]
+CORS_ALLOW_ALL_ORIGINS = True  # Allow requests from any origin (development)
+
+# COOP header
+# CORS_ALLOW_HEADERS = [
+#     'COOP', 'cross-origin-opener-policy',
+# ]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Gmail's SMTP server
+EMAIL_PORT = 587  # TLS port
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER ='hs.testdev1@gmail.com'
+EMAIL_HOST_PASSWORD ='rzvnkbejhgaoqfjj'
+#rzvn kbej hgao qfjj
