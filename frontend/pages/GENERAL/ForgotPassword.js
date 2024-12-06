@@ -1,19 +1,85 @@
 import Image from 'next/image';
 import Link from "next/link";
 import { FiEye, FiEyeOff } from 'react-icons/fi';
-import { useState } from 'react';
+import { useState, useEffect  } from 'react';
 import GeneralHeader from '@/components/GeneralHeader';
 import GeneralFooter from '@/components/GeneralFooter';
 import PersonalInfo from '@/components/PersonalInfo';
+import axios from 'axios';
+import { useRouter } from 'next/router';
 
+//TODO
 
 export default function ForgotPassword() {
+
+    const router = useRouter();
+    const { uidb64, token } = router.query;  
+
     const [step, setStep] = useState(1); // Tracks the current step
     const [showPassword, setShowPassword] = useState(false);
     const [hasTyped, setHasTyped] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [showPersonalInfo, setShowPersonalInfo] = useState(false);
 
+    const [emailAddress, setEmailAddress] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    const handleEmailChange = (e) => {
+        setEmailAddress(e.target.value); 
+    };
+    
+    const getEmail = async (e) => {
+        e.preventDefault(); // Prevent form submission and page reload
+
+        console.log('Email Address Submitted:', emailAddress);
+        // Validate email
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        
+        if (!emailAddress) {
+            console.log('Please input an email address.');
+            return;
+        }
+        
+        if (!emailRegex.test(emailAddress)) {
+            console.log('Invalid email address. Please input a valid email address.');
+            return;
+        }
+        
+        try {
+            // Check if the email exists in the backend
+            const emailCheckResponse = await axios.post('http://127.0.0.1:8000/users/auth-email/', { email: emailAddress });
+            console.log("Email exists:", emailCheckResponse.data);
+            // If email exists, proceed with password reset request
+            
+            if (emailCheckResponse.data.exists) {
+                const response = await axios.post('http://127.0.0.1:8000/users/password_reset/', 
+                    { email: emailAddress },
+                    {
+                        headers: {
+                            'X-CSRFToken': csrfToken,  // Attach CSRF token to the request headers
+                        }
+                    }
+                );
+                console.log("Password reset email sent:", response.data);
+            } else {
+                console.log("Email not found.");
+            }
+
+        } catch (error) {
+            if (error.response) {
+                if (error.response.status === 404) {
+                    console.log('Account Not Found.');
+                } else {
+                    console.log('An unexpected server error occurred. Please try again.');
+                }
+            } else {
+                console.log('Network error. Please check your connection and try again.');
+            }
+        }
+    };
+    
+    
     const handleChange = (e) => {
         setHasTyped(e.target.value.length > 0);
     };
@@ -41,7 +107,7 @@ export default function ForgotPassword() {
                     <div className="box-container px-8 py-5">     
                         {step === 1 && (
                             // Step 1: Enter your email to reset password.
-                            <form>
+                            <form onSubmit={getEmail}>
                                 <div className="flex flex-col items-center mt-8">
                                     <div className="flex justify-center  h-full mb-5">
                                         <Image 
@@ -57,10 +123,10 @@ export default function ForgotPassword() {
   
                                 <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Email Address</p>
                                 <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                    <input type="text" id="email-address" name="email" placeholder="applicant@gmail.com" required></input>
+                                    <input type="email" id="email-address" name="email" placeholder="applicant@gmail.com" onChange={handleEmailChange} required></input>
                                 </div>
 
-                                <button className="button1 mt-10  w-full flex items-center justify-center" onClick={handleNextStep}> 
+                                <button className="button1 mt-10  w-full flex items-center justify-center"> 
                                     <div className="flex items-center ">
                                         <p className="lg:text-medium mb:text-medium sm:text-xxsmal xsm:text-xsmall font-medium text-background">Continue</p>
                                     </div>
@@ -76,10 +142,8 @@ export default function ForgotPassword() {
                                         />
                                         <Link href="/GENERAL/Login"> <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center text-fontcolor">Return to login</p> </Link>
                                     </div>
-                                </div>
 
- 
-                             
+                                </div>
                             </form>
                         )}
 
@@ -97,11 +161,6 @@ export default function ForgotPassword() {
                                     </div>
                                     <h1 className="lg:text-extralarge mb:text-large sm:text-large text-primary mb-0">Set your new password</h1>
                                     <p className="font-medium lg:text-xsmall mb:text-xsmall sm:text-xsmall pb-5 text-fontcolor">Password should be different from your previous password.</p>
-                                </div>
-
-                                <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Current Password</p>
-                                <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                    <input type={showPassword ? 'text' : 'password'} id="current-password" name="current-password" required onChange={handleChange} />
                                 </div>
                                 
                                 <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pt-4 pb-1 font-medium"> New Password</p>
@@ -131,10 +190,6 @@ export default function ForgotPassword() {
                                         <Link href="/GENERAL/Login"> <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center text-fontcolor">Return to login</p> </Link>
                                     </div>
                                 </div>
-                                
-
-                             
-
                             </form>
                         )}
 

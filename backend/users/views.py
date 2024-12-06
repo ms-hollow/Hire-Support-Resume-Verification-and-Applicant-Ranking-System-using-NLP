@@ -9,7 +9,15 @@ from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserSe
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 import requests
-
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.contrib.auth.models import User
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+from django.contrib.sites.shortcuts import get_current_site
+from django.conf import settings
 
 User = get_user_model() # kukunin yung user na currently naka-login sa app
 
@@ -118,44 +126,24 @@ def check_email(request):
     # Check if the email already exists in the database
     if User.objects.filter(email=email).exists():
         return Response({'error': 'Email is already registered'}, status=409)
+    elif not User.objects.filter(email=email).exists():
+        return Response({'error': 'Email does not exist'}, status=status.HTTP_404_NOT_FOUND)
     else:
         return Response({'message': 'Email is available'}, status=200)
-
-# @api_view(['POST'])
-# def google_login(request):
-#     token = request.data.get('token')
-#     if not token:
-#         return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
     
-#     # Verify the token with Google
-#     google_verify_url = f"https://oauth2.googleapis.com/tokeninfo?id_token={token}"
-#     response = requests.get(google_verify_url)
-#     if response.status_code != 200:
-#         return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['POST'])
+def auth_email(request):
+    email = request.data.get('email', None)
     
-#     user_info = response.json()
-#     email = user_info.get('email')
+    if not email:
+        return Response({'error': 'Email is required'}, status=400)
+    
+    # Check if the email already exists in the database
+    if User.objects.filter(email=email).exists():
+        return Response({'Account Found'}, status=200)
+    elif not User.objects.filter(email=email).exists():
+        return Response({'error': 'Email does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-#     # Check if a user with the email exists
-#     User = get_user_model()
-#     try:
-#         user = User.objects.get(email=email)
-#     except User.DoesNotExist:
-#         # User not found; send a 404 response
-#         return Response({'error': 'User not found. Please register.'}, status=status.HTTP_404_NOT_FOUND)
-#     except Exception as e:
-#         # Catch unexpected errors
-#         print(f"An error occurred: {e}")
-#         return Response({'error': 'An unexpected error occurred.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-#     # Generate JWT tokens for the user
-#     refresh = RefreshToken.for_user(user)
-
-#     return Response({
-#         'access': str(refresh.access_token),
-#         'refresh': str(refresh),
-#         'email': email,
-#     }, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def google_login(request):
@@ -185,9 +173,9 @@ def google_login(request):
         return Response({'error': 'An unexpected error occurred.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # Print user details for debugging
-    # print(f"User found: {user}")  # Print the entire user object
-    # print(f"User is_company: {user.is_company}")  # Print whether the user is a company
-    # print(f"User is_applicant: {user.is_applicant}")  # Print whether the user is an applicant
+    # print(f"User found: {user}")  
+    # print(f"User is_company: {user.is_company}")  
+    # print(f"User is_applicant: {user.is_applicant}")  
 
     # Generate JWT tokens for the user
     refresh = RefreshToken.for_user(user)
@@ -201,7 +189,5 @@ def google_login(request):
         'is_applicant': user.is_applicant,
     }, status=status.HTTP_200_OK)
 
-
-
-#TODO
-#* Setup Backend to Register
+def test_csrf(request):
+    return render(request, 'users/test_csrf.html')
