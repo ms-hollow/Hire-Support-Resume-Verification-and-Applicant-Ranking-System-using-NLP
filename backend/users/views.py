@@ -126,8 +126,6 @@ def check_email(request):
     # Check if the email already exists in the database
     if User.objects.filter(email=email).exists():
         return Response({'error': 'Email is already registered'}, status=409)
-    elif not User.objects.filter(email=email).exists():
-        return Response({'error': 'Email does not exist'}, status=status.HTTP_404_NOT_FOUND)
     else:
         return Response({'message': 'Email is available'}, status=200)
     
