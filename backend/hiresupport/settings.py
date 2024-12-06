@@ -31,6 +31,8 @@ DEBUG = os.environ.get("DEBUG", "FALSE").lower() == "TRUE"
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 
+#* SECRET_KEY, DEBUG, ALLOWED_HOSTS, and DATABASE_URL are in Render environment variables.
+
 # Application definition
 
 SITE_ID=1
