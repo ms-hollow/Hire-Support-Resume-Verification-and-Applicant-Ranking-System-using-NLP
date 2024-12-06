@@ -41,7 +41,7 @@ export default function Login() {
             }
         
             // Send POST request to Django backend to authenticate the user
-            const response = await axios.post('http://127.0.0.1:8000/users/login/', formData, {
+            const response = await axios.post('https://hire-support-resume-verification-and.onrender.com/users/login/', formData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -81,7 +81,7 @@ export default function Login() {
             const { credential } = credentialResponse;
 
             // Send the Google token to the Django backend
-            const response = await axios.post('http://127.0.0.1:8000/users/google-login/', {
+            const response = await axios.post('https://hire-support-resume-verification-and.onrender.com/users/google-login/', {
                 token: credential,
             });
 
