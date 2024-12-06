@@ -21,14 +21,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qag)3q_0s4)lvuu&*==pah^t1c6*0i)#tmfc%!l33)s&0g38p7'
+# SECRET_KEY = 'django-insecure-qag)3q_0s4)lvuu&*==pah^t1c6*0i)#tmfc%!l33)s&0g38p7'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-# DEBUG = os.environ.get("DEBUG", "FALSE").lower() == "TRUE" 
+# DEBUG = True
+DEBUG = os.environ.get("DEBUG", "FALSE").lower() == "TRUE" 
 
-ALLOWED_HOSTS = []
-# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOST").split(" ")
+# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOST").split(" ")
 
 # Application definition
 
@@ -141,7 +142,8 @@ DATABASES = {
 #     }
 # }
 
-DATABASES['default'] = dj_database_url.parse('postgresql://hiresupport_django_render_user:wpEtnqpwXq3xm9ItPLtOrInGpVVYdmOW@dpg-ct99m89opnds73e5vvg0-a.oregon-postgres.render.com/hiresupport_django_render') 
+database_url = os.environ.get("DATABASE_URL")
+DATABASES['default'] = dj_database_url.parse(database_url) 
 # postgresql://hiresupport_django_render_user:wpEtnqpwXq3xm9ItPLtOrInGpVVYdmOW@dpg-ct99m89opnds73e5vvg0-a.oregon-postgres.render.com/hiresupport_django_render
 
 # Password validation
