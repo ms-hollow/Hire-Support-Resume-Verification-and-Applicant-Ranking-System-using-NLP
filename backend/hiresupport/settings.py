@@ -29,7 +29,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG", "FALSE").lower() == "TRUE" 
 
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOST").split(" ")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 
 # Application definition
 
@@ -145,7 +145,7 @@ DATABASES = {
 database_url = os.environ.get("DATABASE_URL")
 DATABASES['default'] = dj_database_url.parse(database_url) 
 # postgresql://hiresupport_django_render_user:wpEtnqpwXq3xm9ItPLtOrInGpVVYdmOW@dpg-ct99m89opnds73e5vvg0-a.oregon-postgres.render.com/hiresupport_django_render
-
+# DATABASES['default'] = dj_database_url.parse('postgresql://hiresupport_django_render_user:wpEtnqpwXq3xm9ItPLtOrInGpVVYdmOW@dpg-ct99m89opnds73e5vvg0-a.oregon-postgres.render.com/hiresupport_django_render') 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
