@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import AuthContext from "@/pages/context/AuthContext";
+import { useRouter } from 'next/router';
 
 const ApplicantHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const { logoutUser } = useContext(AuthContext);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -69,7 +73,7 @@ const ApplicantHeader = () => {
            <ul>
              <li className= "px-4 py-3 hover:bg-primary hover:text-background cursor-pointer transition-all duration-300"><Link href="/APPLICANT/ApplicantProfile" onClick={toggleDropdown}>Profile</Link></li>
              <li className="px-4 py-3 hover:bg-primary hover:text-background cursor-pointer transition-all duration-300">Settings</li>
-             <li className="px-4 py-3 hover:bg-primary hover:text-background cursor-pointer transition-all duration-300"><Link href="/GENERAL/Login" onClick={toggleDropdown}>Logout</Link></li>
+             <li className="px-4 py-3 hover:bg-primary hover:text-background cursor-pointer transition-all duration-300"><button onClick={logoutUser}>Logout</button></li>
            </ul>
          </div>
           )}

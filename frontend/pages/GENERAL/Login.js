@@ -1,140 +1,16 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import Image from 'next/image';
 import Link from "next/link";
 import { FiEye, FiEyeOff } from 'react-icons/fi'; /*npm install react-icons*/
 import GeneralHeader from '@/components/GeneralHeader';
 import GeneralFooter from '@/components/GeneralFooter';
-/*import { useRouter } from 'next/router';*/
-import axios from 'axios'; //npm install axios
-import { GoogleLogin } from '@react-oauth/google'; //npm install react-google-login
-
-//TODO
-//* Setup Forgot Password
-//* Toast Notif
+import { GoogleLogin } from '@react-oauth/google'; //npm install react-google-login 
+import AuthContext from '../context/AuthContext';
 
 export default function Login() {
 
-   const [showPassword, setShowPassword] = useState(false);
-   const [error, setError] = useState('');
-   
-   const [formData, setFormData] = useState({
-        email: '', password: ''
-   });
-
-   const handleSubmit = async (e) => {
-       e.preventDefault(); // Prevent the default form submission
-       try {
-            // Log the form data to make sure it's correct
-            console.log(formData);
-        
-            // Check if the form is empty
-            if (!formData.email || !formData.password) {
-                setError('Please fill in the fields.');
-                return;
-            }
-        
-            // Validate email format (basic regex)
-            const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-            if (!emailRegex.test(formData.email)) {
-                setError('Please enter a valid email address.');
-                return; // Stop further processing
-            }
-        
-            // Send POST request to Django backend to authenticate the user
-            const response = await axios.post('https://hire-support-resume-verification-and.onrender.com/users/login/', formData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-        
-            // Handle successful login
-            console.log('Login success', response.data);
-        
-            // Store JWT tokens in localStorage 
-            localStorage.setItem('access_token', response.data.access);
-            localStorage.setItem('refresh_token', response.data.refresh);
-        
-            const userRole = response.data.role;  // 'company' or 'applicant'
-            // console.log(userRole);
-        
-            // Redirect based on the user's role
-            if (userRole === 'company') {
-                window.location.href = '/GENERAL/Register'; //! Company Home
-            } else if (userRole === 'applicant') {
-                window.location.href = '/APPLICANT/ApplicantHome';
-            }
-        } catch (err) {
-            console.log('Error details:', err.response);
-        
-            if (err.response && err.response.status === 404) {
-                setError(err.response.data.error || 'Email does not exist'); // Use the server's error message
-            } else if (err.response && err.response.status === 400) {
-                setError('Invalid email or password');
-            } else {
-                setError('An unexpected error occurred');
-            }
-        }
-    };
-
-    const handleSuccess = async (credentialResponse) => {
-        try {
-            const { credential } = credentialResponse;
-
-            // Send the Google token to the Django backend
-            const response = await axios.post('https://hire-support-resume-verification-and.onrender.com/users/google-login/', {
-                token: credential,
-            });
-
-            // Handle a successful login
-            if (response.status === 200) {
-                localStorage.setItem('access_token', response.data.access);
-                localStorage.setItem('refresh_token', response.data.refresh);
-                // Access user data from the response
-                const { email, is_company, is_applicant } = response.data;
-
-                console.log('User data:', {
-                    email,
-                    is_company,
-                    is_applicant,
-                });
-
-                if (is_company) {
-                    window.location.replace('/APPLICANT/ApplicantHome'); //! Change to Company Home
-                } else if (is_applicant) {
-                    window.location.replace('/APPLICANT/MyJobs'); //! Change to Applicant Home
-                } else {
-                    console.error('User does not have a valid role');
-                }
-            }
-
-        } catch (error) {
-            // Axios catches non-2xx responses here
-            if (error.response) {
-                const { status } = error.response;
-                if (status === 404) {
-                    window.location.replace('/GENERAL/Register');
-                } else if (status === 400) {
-                    setError('Invalid token. Please try again.');
-                } else {
-                    setError('An unexpected error occurred.');
-                }
-            } else {
-                setError('Network error. Please try again later.');
-            }
-        }
-    };
-
-    const handleError = () => {
-        console.error('Google Login Failed');
-    };
-
-    // Handle form input changes
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-    };
+    const [showPassword, setShowPassword] = useState(false);
+    const { loginUser, loginWithGoogle } = useContext(AuthContext);    
 
     return (
         <div>
@@ -143,16 +19,15 @@ export default function Login() {
                 <div className="box-container px-8 py-5 ">
                     <h1 className="lg:text-extralarge mb:text-large sm:text-large text-primary">Sign in</h1>
 
-                    <form>
+                    <form onSubmit={loginUser}>
                         <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Email address</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
                             <input 
                                 type="email" 
-                                id="email" 
-                                name="email" 
+                                id="username" 
+                                name="username" 
                                 placeholder="applicant@gmail.com" 
                                 required 
-                                onChange={handleChange} 
                             />
                         </div>
 
@@ -164,18 +39,16 @@ export default function Login() {
                                 name="password" 
                                 placeholder="" 
                                 required 
-                                onChange={handleChange} 
                             />
                         </div>
 
                         <div className='flex col-span-2'>
-                            {error && <div className="text-xsmall text-accent pt-4 pb-8 font-medium">{error}</div>}
                             <Link href="/GENERAL/ForgotPassword" className="ml-auto">
                                 <p className="text-xsmall text-accent pt-4 pb-8 font-medium">Forgot password?</p>
                             </Link>
                         </div>
 
-                        <button className="button1 flex items-center w-full p-5" onClick={handleSubmit}>
+                        <button className="button1 flex items-center w-full p-5">
                             <p className="lg:text-medium mb:text-medium sm:text-xxsmall xsm:text-xxsmall text-center">Sign in</p>
                         </button>
                     </form>
@@ -198,7 +71,11 @@ export default function Login() {
                     </button> */}
 
                     <div className='flex justify-center w-full px-5'>
-                        <GoogleLogin onSuccess={handleSuccess} onError={handleError} size='large'/>
+                        <GoogleLogin 
+                            onSuccess={loginWithGoogle}
+                            onError={() => alert('Google login failed!')} 
+                            size='large'
+                        />
                     </div>
                 
                     <p className="text-xsmall text-fontcolor pt-4 pb-1 font-medium">Don’t have an account? <span className="font-semibold"><Link href="/GENERAL/Register" className='underline' >Register</Link></span></p>

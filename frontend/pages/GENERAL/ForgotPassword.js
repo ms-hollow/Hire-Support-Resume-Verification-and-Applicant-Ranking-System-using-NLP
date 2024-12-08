@@ -7,6 +7,7 @@ import GeneralFooter from '@/components/GeneralFooter';
 import PersonalInfo from '@/components/PersonalInfo';
 import axios from 'axios';
 import { useRouter } from 'next/router';
+import Cookies from 'js-cookie';
 
 //TODO
 
@@ -28,7 +29,7 @@ export default function ForgotPassword() {
     const handleEmailChange = (e) => {
         setEmailAddress(e.target.value); 
     };
-    
+
     const getEmail = async (e) => {
         e.preventDefault(); // Prevent form submission and page reload
 
@@ -48,23 +49,10 @@ export default function ForgotPassword() {
         
         try {
             // Check if the email exists in the backend
-            const emailCheckResponse = await axios.post('http://127.0.0.1:8000/users/auth-email/', { email: emailAddress });
+            const emailCheckResponse = await axios.post('http://127.0.0.1:8000/users/auth-email/', { email: emailAddress },  );
             console.log("Email exists:", emailCheckResponse.data);
-            // If email exists, proceed with password reset request
-            
-            if (emailCheckResponse.data.exists) {
-                const response = await axios.post('http://127.0.0.1:8000/users/password_reset/', 
-                    { email: emailAddress },
-                    {
-                        headers: {
-                            'X-CSRFToken': csrfToken,  // Attach CSRF token to the request headers
-                        }
-                    }
-                );
-                console.log("Password reset email sent:", response.data);
-            } else {
-                console.log("Email not found.");
-            }
+
+           
 
         } catch (error) {
             if (error.response) {
@@ -76,6 +64,33 @@ export default function ForgotPassword() {
             } else {
                 console.log('Network error. Please check your connection and try again.');
             }
+        }
+         // Retrieve the CSRF token from cookies
+    
+    };
+    
+    const handlePasswordReset = async (emailAddress) => {
+        const csrfToken = Cookies.get('csrftoken');
+    
+        if (!csrfToken) {
+            console.log('CSRF token is missing!');
+            return;
+        }
+    
+        try {
+            const response = await axios.post(
+                'http://127.0.0.1:8000/users/password_reset/',
+                { email: emailAddress },
+                {
+                    headers: {
+                        'X-CSRFToken': csrfToken,  // Attach CSRF token to the header
+                    },
+                    withCredentials: true,  // Make sure cookies are sent with the request
+                }
+            );
+            console.log('Password reset request sent:', response.data);
+        } catch (error) {
+            console.error('Error during password reset:', error.response ? error.response.data : error.message);
         }
     };
     
