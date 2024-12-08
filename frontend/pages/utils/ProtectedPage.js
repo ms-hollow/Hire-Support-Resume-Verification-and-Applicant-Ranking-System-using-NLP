@@ -1,9 +1,9 @@
-import { useAuth } from '../contexts/AuthContext';
+import { useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import AuthContext from '../context/AuthContext';
 
 const ProtectedPage = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, loading } = useContext(AuthContext); 
   const router = useRouter();
 
   // Redirect if not authenticated
@@ -13,7 +13,6 @@ const ProtectedPage = ({ children }) => {
     }
   }, [user, loading, router]);
 
-  // Show a loading spinner while checking authentication status
   if (loading) {
     return <div>Loading...</div>;
   }
