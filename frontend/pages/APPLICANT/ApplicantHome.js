@@ -3,12 +3,13 @@ import GeneralFooter from '@/components/GeneralFooter';
 import JobDetails from '@/components/JobDetails';
 import JobListings from '@/components/JobListings';
 import Image from 'next/image';
-
+import ProtectedPage from '../utils/ProtectedPage'; //? Checks if authenticated ba si user
 
 export default function ApplicantHome() {
 
   return (
     <div>
+      <ProtectedPage> {/* lagi lagay ito sa page */}
       <ApplicantHeader />
       <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 mx-auto">
         <div>
@@ -135,6 +136,7 @@ export default function ApplicantHome() {
           <JobDetails />
         </div>
       </div>
+      </ProtectedPage>
     </div>
   );
 }

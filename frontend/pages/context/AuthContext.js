@@ -9,31 +9,29 @@ export default AuthContext;
 export const AuthProvider = ({children}) => {
     const [authTokens, setAuthTokens] = useState(() => {
         if (typeof window !== 'undefined') {
-          const tokens = localStorage.getItem('authTokens');
-          return tokens ? JSON.parse(tokens) : null;
+            const tokens = localStorage.getItem('authTokens');
+            return tokens ? JSON.parse(tokens) : null;
         }
         return null;
-      });
+    });
 
     const [user, setUser] = useState(() => {
-    if (typeof window !== 'undefined') {
-        const tokens = localStorage.getItem('authTokens');
-        return tokens ? jwt.decode(tokens) : null;
-    }
-    return null;
+        if (typeof window !== 'undefined') {
+            const tokens = localStorage.getItem('authTokens');
+            return tokens ? jwt.decode(tokens.access) : null;
+        }
+        return null;
     });
-      
-    const [loading, setLoading] = useState(true);
 
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
 
     const loginUser = async (e) => {
         e.preventDefault();
-        
-        // Kunin value sa Login form
+
         const email = e.target.username.value;
         const password = e.target.password.value;
-        
+
         // Email Validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
@@ -43,94 +41,61 @@ export const AuthProvider = ({children}) => {
 
         let response = await fetch('http://127.0.0.1:8000/users/token/', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: email,
-                password: password,
-            }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: email, password: password }),
         });
-    
+
         let data = await response.json();
-    
-        // Check for response status and handle errors
+
         if (response.status === 200) {
-            setAuthTokens(data);  // Save the tokens
-    
+            setAuthTokens(data);
             const decodedToken = jwt.decode(data.access);
-            // console.log("Decoded Token:", decodedToken);
-    
-            setUser(decodedToken);  // Save user data
-            localStorage.setItem("authTokens", JSON.stringify(data));  // Store tokens locally
-    
+            setUser(decodedToken);
+            localStorage.setItem("authTokens", JSON.stringify(data));
+
             // Redirect based on user role
             const userRole = decodedToken.is_company ? "company" : decodedToken.is_applicant ? "applicant" : "unknown";
-            // console.log(userRole);
-
             if (userRole === "company") {
-                router.push("/GENERAL/Register");
+                router.push("/GENERAL/Register"); //! Palitan ng company home
             } else if (userRole === "applicant") {
-                router.push("/APPLICANT/ApplicantHome");
+                router.push("/APPLICANT/ApplicantHome"); //! Palitan ng applicant home
             }
         } else {
-            // Handle backend errors (email, password, etc.)
-            if (response.status === 400) {
-                alert(data.error || 'Invalid credentials');
-            } else if (response.status === 404) {
-                alert(data.error || 'Email does not exist');
-            } else {
-                alert("Something went wrong!");
-            }
+            alert(data.error || 'Invalid credentials');
         }
     };
-    
+
     const loginWithGoogle = async (response) => {
         try {
-            // Send the Google token to the Django backend
             const tokenResponse = await fetch('http://127.0.0.1:8000/users/google-login/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ token: response.credential }),
             });
-            
-            const data = await tokenResponse.json();
-            console.log("Access Token: ", data.access);
-    
-            if (tokenResponse.status === 200) {  // Check tokenResponse.status here
-                setAuthTokens(data);
-                
-                const decodedToken = jwt.decode(data.access);
-                console.log("Decoded Token:", decodedToken);
-    
-                setUser(decodedToken);
-                localStorage.setItem("authTokens", JSON.stringify(decodedToken));
-    
-                // Check if there's a role in the decoded token
-                const userRole = decodedToken.is_company
-                    ? "company"
-                    : decodedToken.is_applicant
-                    ? "applicant"
-                    : "unknown";
-    
-                console.log(userRole);
 
-                // Redirect based on the user's role
+            const data = await tokenResponse.json();
+
+            if (tokenResponse.status === 200) {
+                setAuthTokens(data);
+                const decodedToken = jwt.decode(data.access);
+                setUser(decodedToken);
+                localStorage.setItem("authTokens", JSON.stringify(data));
+
+                const userRole = decodedToken.is_company ? "company" : decodedToken.is_applicant ? "applicant" : "unknown";
+
                 if (userRole === "company") {
                     router.push("/GENERAL/Register");
                 } else if (userRole === "applicant") {
                     router.push("/APPLICANT/ApplicantHome");
                 }
             } else {
-                alert("Invalid Email or Password!");
+                alert("Invalid Email!");
             }
         } catch (error) {
             console.error('Google login error:', error);
         }
-    }
-    
+    };
+
     const logoutUser = () => {
         console.log('Logging out...');
         setAuthTokens(null);
@@ -142,59 +107,54 @@ export const AuthProvider = ({children}) => {
     };
 
     const updateToken = async () => {
-        if (!authTokens) {
-          return;
-        }
+        if (!authTokens) return;
+
         const response = await fetch('http://127.0.0.1:8000/users/token/refresh/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ refresh: authTokens?.refresh }),
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh: authTokens.refresh }),
         });
-    
+
         const data = await response.json();
-    
+
         if (response.status === 200) {
-          setAuthTokens(data);
-          setUser(jwt_decode(data.access));
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('authTokens', JSON.stringify(data));
-          }
+            setAuthTokens(data);
+            setUser(jwt.decode(data.access));
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('authTokens', JSON.stringify(data));
+            }
         } else {
-          logoutUser();
+            logoutUser();
         }
-    
-        if (loading) {
-          setLoading(false);
-        }
+
+        if (loading) setLoading(false);
     };
 
     useEffect(() => {
         if (loading) {
-          updateToken();
-        }
-    
-        const interval = setInterval(() => {
-          if (authTokens) {
             updateToken();
-          }
+        }
+
+        const interval = setInterval(() => {
+            if (authTokens) {
+                updateToken();
+            }
         }, 1000 * 60 * 4); // Every 4 minutes
+
         return () => clearInterval(interval);
-      }, [authTokens, loading]);
-    
-        const contextData = {
+    }, [authTokens, loading]);
+
+    const contextData = {
         user,
         authTokens,
         loginUser,
         loginWithGoogle,
         logoutUser,
-        };
+    };
 
     return (
         <AuthContext.Provider value={contextData}>
-            {children} 
+            {children}
         </AuthContext.Provider>
-        );
-}
-
+    );
+};

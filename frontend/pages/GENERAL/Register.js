@@ -5,7 +5,8 @@ import { useState } from 'react';
 import GeneralHeader from '@/components/GeneralHeader';
 import GeneralFooter from '@/components/GeneralFooter';
 import PersonalInfo from '@/components/PersonalInfo';
-import axios from 'axios'; //npm install axios
+import jwt from 'jsonwebtoken';
+import { useRouter } from 'next/router';
 
 //TODO 1. Change routes 2. Setup show password
 
@@ -19,6 +20,8 @@ export default function Register() {
     const [emailAddress, setEmailAddress] = useState('');
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
+
+    const router = useRouter();
 
     const handleCheckboxChange = () => {
         setIsChecked(!isChecked);
@@ -56,9 +59,7 @@ export default function Register() {
         setEmailAddress(e.target.value); 
     };
 
-    const getEmail = async () =>{
-        console.log('Email Address Submitted:', emailAddress);
-    
+    const getEmail = async () => {
         // Validate email
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     
@@ -73,36 +74,47 @@ export default function Register() {
         }
     
         try {
-            const emailCheckResponse = await axios.post('http://127.0.0.1:8000/users/check-email/', {
-                email: emailAddress,
+            const emailCheckResponse = await fetch('http://127.0.0.1:8000/users/check-email/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: emailAddress }), // Convert the email to JSON format
             });
     
-            // If the email already exists, notify the user and reset the email field
-            if (emailCheckResponse.data.exists) {
+            // Check if the response status is 409 Conflict (email already exists)
+            if (emailCheckResponse.status === 409) {
                 console.log('This email is already registered. Please use a different email.');
                 setEmailAddress(''); // Clear the email input so user can re-enter
-                return; 
+                return;
             }
     
-            // Check if the checkbox is checked
-            if (!isChecked) {
-                console.log('You must check the checkbox.');
-                return; // Prevent further execution
-            } else {
-                handleNextStep(); // Proceed to the next step
-            }
-        } catch (error) {
-            if (error.response) {
-                if (error.response.status === 409) {
+            // If the response is successful (status 200), parse the response data
+            if (emailCheckResponse.ok) {
+                const responseData = await emailCheckResponse.json(); // Parse the response as JSON
+    
+                // If the server indicates the email exists, notify the user
+                if (responseData.exists) {
                     console.log('This email is already registered. Please use a different email.');
+                    setEmailAddress(''); // Clear the email input
+                    return;
+                }
+    
+                // Check if the checkbox is checked
+                if (!isChecked) {
+                    console.log('You must check the checkbox.');
+                    return; // Prevent further execution
                 } else {
-                    console.log('An unexpected server error occurred. Please try again.');
+                    handleNextStep(); // Proceed to the next step
                 }
             } else {
-                console.log('Network error. Please check your connection and try again.');
+                console.log('Error checking email. Please try again.');
             }
+        } catch (error) {
+            console.log('Network error. Please check your connection and try again.');
         }
     }
+    
     
     const handlePassword = (e) => {
         setPassword(e.target.value);
@@ -128,10 +140,10 @@ export default function Register() {
         }
         
         if(password != confirmPassword){
-            console.log("Your passwords don't match. Please make sure both passwords are the same.");
+            alert("Your passwords don't match. Please make sure both passwords are the same.");
         }
-        handleSubmit();
-        handleNextStep();
+        handleSubmit(); // Handle Submit will register the user
+        handleNextStep(); // Proceed to next step: Profile Form
     }
 
     const handleSubmit = async () => {
@@ -147,35 +159,77 @@ export default function Register() {
            
             // console.log('form data:', user); //? Test
             
-            const response = await axios.post('https://hire-support-resume-verification-and.onrender.com/users/register/', userData, {
+            const response = await fetch('http://127.0.0.1:8000/users/register/', {
+                method: 'POST',
                 headers: {
-                  'Content-Type': 'application/json',  
+                    'Content-Type': 'application/json', 
                 },
-            })
-            localStorage.setItem('access_token', response.data.access);
-            localStorage.setItem('refresh_token', response.data.refresh);
+                body: user, // Send the JSON string as the body of the request
+            });
+
+            const data = await response.json();
+            if (response.status === 200) {    
+                localStorage.setItem("authTokens", JSON.stringify(data));
+            }
+    
         } catch (error){
             console.error('Error during registration:', error);
         }
     }
-    
-    const handleLogin = () => {
-        if (isApplcant) {
-            window.location.href = '/GENERAL/Login'; //! Change to Applicant Profile
-            // console.log('Status is Applicant', isApplcant); //? Test
-            console.log('You are now registered!');
-        } else if (isCompany) {
-            window.location.href = '/APPLICANT/ApplicantHome'; //! Change to Company Profile
-            // console.log('Status is Company', isCompany); 
-            console.log('You are now registered!');
+
+    // Handle login if the user decided to proceed filling out profile details
+    const handleLogin = async () => {
+
+        let response = await fetch('http://127.0.0.1:8000/users/token/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: emailAddress, password: password }),
+        });
+
+        let data = await response.json();
+
+        if (response.status === 200) {
+            const decodedToken = jwt.decode(data.access);
+            localStorage.setItem("authTokens", JSON.stringify(data));
+
+            // Redirect based on user role
+            const userRole = decodedToken.is_company ? "company" : decodedToken.is_applicant ? "applicant" : "unknown";
+            // console.log(userRole)
+            if (userRole === "company") {
+                router.push("/GENERAL/Register"); //! Change to company profile
+            } else if (userRole === "applicant") {
+                router.push("/APPLICANT/ApplicantHome"); //! Change to applicant profile
+            }
+        } else {
+            alert(data.error || 'Invalid credentials');
         }
     }
 
-    const handleSkip = () => {
-        if (isApplcant) {
-            window.location.href = '/GENERAL/Login'; //! Change to Applicant Home
-        } else if (isCompany) {
-            window.location.href = '/APPLICANT/ApplicantHome'; //! Change to Company Home
+    // Handle skip if the user decided to skip filling out profile details
+    const handleSkip = async () => {
+        let response = await fetch('http://127.0.0.1:8000/users/token/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: emailAddress, password: password }),
+        });
+
+        let data = await response.json();
+
+        if (response.status === 200) {
+            const decodedToken = jwt.decode(data.access);
+            localStorage.setItem("authTokens", JSON.stringify(data));
+
+            // Redirect based on user role
+            const userRole = decodedToken.is_company ? "company" : decodedToken.is_applicant ? "applicant" : "unknown";
+            // console.log(userRole)
+
+            if (userRole === "company") {
+                router.push("/GENERAL/Login"); //! Change to company home
+            } else if (userRole === "applicant") {
+                router.push("/APPLICANT/ApplicantHome"); //! Change to applicant home
+            }
+        } else {
+            alert(data.error || 'Invalid credentials');
         }
     }
 
