@@ -87,9 +87,11 @@ class RegisterUserView(APIView):
             refresh = RefreshToken.for_user(user)
             access_token = refresh.access_token
 
+            access_token['is_company'] = user.is_company
+            access_token['is_applicant'] = user.is_applicant
+
             # Return the tokens in the response
             return Response({
-                "message": "Registration successful",
                 "access_token": str(access_token),
                 "refresh_token": str(refresh),
             }, status=status.HTTP_201_CREATED)
