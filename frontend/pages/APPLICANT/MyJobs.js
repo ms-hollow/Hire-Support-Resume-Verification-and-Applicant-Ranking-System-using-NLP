@@ -10,39 +10,51 @@ export default function MyJobs() {
   return (
     <div>
       <><ApplicantHeader />
+      <div className="py-20">
+        <div className="fixed text-primary md:px-20 sm:px-8 xsm:px-8">
+            <b className="text-lg">My Jobs</b>
+        </div>
 
-      <div className="text-primary lg:pt-36 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-10 sm:px-10 xsm:px-10 lg:px-10 mx-auto"><b>My Jobs</b></div>
-
-      <div className="relative flex justify-between items-center lg:pt-18 mb:pt-12 xsm:pt-12 sm:pt-12 lg:px-80 mb:px-80 sm:px-80 xsm:px-80 sm:l-50% mx-auto">
-            {/* yung naghohover na underline */}
-            <div 
-            className="absolute bottom-[-5px] w-[44%] h-[5px] bg-[#5352e9] transition-all duration-300 ease-in-out" 
-            id="hover-line-MyJobs" 
-            style={{ left: activeTab === 'saved' ? '5%' : activeTab === 'applied' ? '51%' : '0%' }}
-            />
-
+        <div className="flex justify-between w-[50%] relative z-10 pt-8 py-3 lg:mx-80 lg:w-[50%] md:w-[53%] md:mx-40 sm:w-[60%] sm:mx-20 xsm:w-[65%] xsm:mx-12">
             {/* Saved */}
             <p 
-            className="text-fontcolor font-normal cursor-pointer relative top-[-10px] hover:text-primary sm:-px-20"
-            onClick={() => setActiveTab('saved')}
-            >Saved</p>
+                className={`text-fontcolor font-normal cursor-pointer px-10 ${activeTab === 'saved' ? 'text-primary' : ''}`}
+                onClick={() => setActiveTab('saved')}
+                >Saved</p>
 
             {/* Applied */}
             <p 
-            className="text-fontcolor hover:text-primary font-normal cursor-pointer relative top-[-10px]"
-            onClick={() => setActiveTab('applied')}
-            >Applied</p>
-      </div>
-    {/* yung static na underline */}
-      <div className="mt-0.25 h-[1px] bg-[#5352E9] w-[90%] mx-auto"></div>
+                className={`text-fontcolor font-normal cursor-pointer ${activeTab === 'applied' ? 'text-primary' : ''}`}
+                onClick={() => setActiveTab('applied')}
+                >Applied</p>
+        </div>
+        {/* static underline */}
+        <div className="relative lg:w-[88%] lg:mx-20 md:w-[80%] md:mx-20 sm:w-[87%] sm:mx-8 xsm:w-[84%] xsm:mx-8">
+            <div className="mt-0.25 h-[1px] bg-primary"></div>
+        </div>
+        {/* dynamic underline */}
+        <div className="relative lg:w-[88%] lg:mx-20 md:w-[80%] md:mx-20 sm:w-[87%] sm:mx-8 xsm:w-[84%] xsm:mx-8">
+            <div 
+            className="absolute bottom-0 h-[5px] bg-primary transition-all duration-300 ease-in-out"
+            style={{
+                width: '50%',
+                left: activeTab === 'saved' ? '0%' : '50%'
+            }}
+            />
+        </div>
 
-      <div className='flex flex-row pt-4 '>
+        <div className='fixed flex flex-row pt-4 '>
             <div id="saved-jobs" style={{ display: activeTab === 'saved' ? 'block' : 'none' }}>
             <SavedJobs />
             </div>
             <div id="applied-jobs" style={{ display: activeTab === 'applied' ? 'block' : 'none' }}>
             <AppliedJobs />
             </div>
+      </div>
+
+
+
+    
       </div>
       <GeneralFooter /></>
     </div>

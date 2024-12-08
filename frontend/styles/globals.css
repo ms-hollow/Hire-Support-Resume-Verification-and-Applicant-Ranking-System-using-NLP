@@ -185,3 +185,11 @@ footer {
 
 
 /*---------------------------APPLIED JOBS----------------------------------*/
+.sm-box-container {
+  justify-content: center;
+  height: auto;
+  width: 400px;
+  border: 1px solid#D9D9D9;
+  box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem; /* 8px */
+}

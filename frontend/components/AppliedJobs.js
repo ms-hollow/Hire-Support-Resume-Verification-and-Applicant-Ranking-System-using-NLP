@@ -8,7 +8,7 @@ const AppliedJobs = () => {
     return (
         <div className="flex flex-col">
                 {/* Applied Job #1 */}
-                <div className="flex flex-col items-center justify-center pt-6 mx-80 w-[50vw]">
+                <div className="flex flex-col items-center justify-center pt-6 lg:mx-80 md:mx-[12.5rem] sm:mx-[9rem] w-[50vw]">
                     <div className="justify-center items-center box-container px-8 py-5">
                         <div className="flex items-center justify-between -mt-4">
                             <Image src="/Logo.png" width={30} height={30} alt="Company Logo" />
