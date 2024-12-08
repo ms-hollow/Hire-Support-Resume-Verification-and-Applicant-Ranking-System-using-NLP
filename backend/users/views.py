@@ -23,6 +23,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator
 from django.contrib.auth.hashers import check_password
+from rest_framework_simplejwt.views import TokenRefreshView
 
 User = get_user_model() # kukunin yung user na currently naka-login sa app
 
@@ -71,6 +72,14 @@ class MyTokenObtainPairView(TokenObtainPairView):
         if serializer.is_valid():
             return Response(serializer.validated_data, status=200)
         return Response({'error': 'Invalid credentials'}, status=400)
+    
+class MyTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        refresh_token = request.data.get('refresh')  # Get the refresh token from the request
+        if refresh_token:
+            response.data['refresh'] = refresh_token  # Add it back to the response
+        return response
 
 class RegisterUserView(APIView):
     def post(self, request):

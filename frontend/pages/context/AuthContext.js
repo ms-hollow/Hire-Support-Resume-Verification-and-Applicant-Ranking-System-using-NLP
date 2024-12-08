@@ -9,19 +9,22 @@ export default AuthContext;
 export const AuthProvider = ({children}) => {
     const [authTokens, setAuthTokens] = useState(() => {
         if (typeof window !== 'undefined') {
-            const tokens = localStorage.getItem('authTokens');
-            return tokens ? JSON.parse(tokens) : null;
+          const tokens = localStorage.getItem('authTokens');
+          return tokens ? JSON.parse(tokens) : null;
         }
         return null;
-    });
-
-    const [user, setUser] = useState(() => {
+      });
+    
+      const [user, setUser] = useState(() => {
         if (typeof window !== 'undefined') {
-            const tokens = localStorage.getItem('authTokens');
-            return tokens ? jwt.decode(tokens.access) : null;
+          const tokens = localStorage.getItem('authTokens');
+          if (tokens) {
+            const decodedToken = jwt.decode(tokens.access);
+            return decodedToken ? decodedToken : null;
+          }
         }
         return null;
-    });
+      });
 
     const [loading, setLoading] = useState(true);
     const router = useRouter();
@@ -97,7 +100,7 @@ export const AuthProvider = ({children}) => {
     };
 
     const logoutUser = () => {
-        console.log('Logging out...');
+        // console.log('Logging out...');
         setAuthTokens(null);
         setUser(null);
         if (typeof window !== 'undefined') {
@@ -106,25 +109,28 @@ export const AuthProvider = ({children}) => {
         router.push('/GENERAL/Login'); // Redirect to login after logout
     };
 
+
     const updateToken = async () => {
         if (!authTokens) return;
+
+        // console.log("Before update, authTokens:", authTokens);
 
         const response = await fetch('http://127.0.0.1:8000/users/token/refresh/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refresh: authTokens.refresh }),
+            body:JSON.stringify({'refresh':authTokens?.refresh})
         });
 
         const data = await response.json();
 
         if (response.status === 200) {
-            setAuthTokens(data);
-            setUser(jwt.decode(data.access));
-            if (typeof window !== 'undefined') {
-                localStorage.setItem('authTokens', JSON.stringify(data));
-            }
+            setAuthTokens(data); // Schedule state update
+            setUser(jwt.decode(data.access)); // Decode and set user state
+            localStorage.setItem('authTokens', JSON.stringify(data)); // Store in localStorage
+            // console.log("Tokens received from refresh:", data); // Logs the response tokens
         } else {
             logoutUser();
+            // console.log("Failed");
         }
 
         if (loading) setLoading(false);
@@ -140,9 +146,10 @@ export const AuthProvider = ({children}) => {
                 updateToken();
             }
         }, 1000 * 60 * 4); // Every 4 minutes
-
+        // * 60 * 5
         return () => clearInterval(interval);
     }, [authTokens, loading]);
+    
 
     const contextData = {
         user,
@@ -154,7 +161,7 @@ export const AuthProvider = ({children}) => {
 
     return (
         <AuthContext.Provider value={contextData}>
-            {children}
+            {loading ? null : children}
         </AuthContext.Provider>
     );
 };

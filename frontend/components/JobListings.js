@@ -1,11 +1,63 @@
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import Link from "next/link";
 import Image from 'next/image';
 import GeneralFooter from "./GeneralFooter";
 // import jobListings from '@/public/placeHolder/dummy_JobListings.json';
 
-const JobListings = ({ jobListings }) => {
+import AuthContext from "@/pages/context/AuthContext";
 
+const JobListings = () => {
+
+    let {authTokens} = useContext(AuthContext);
+    const [jobListings, setJobListings] = useState([]);
+   
+    useEffect(()=> {
+        getJobs()
+    }, [])
+
+    let getJobs = async () => {
+
+        let response = await fetch('http://127.0.0.1:8000/job/job-hirings/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + String(authTokens.access),
+            },
+        });
+        
+        let data = await response.json();
+    
+        if (response.status === 200) {
+            // Extract the properties you need from the fetched data
+            const filteredJobs = data.map((job) => ({
+                job_id: job.job_hiring_id,
+                job_title: job.job_title,
+                company_name: job.company_name,
+                job_industry: job.job_industry,
+                job_description: job.job_description || "No description available",
+                salary: job.salary 
+                ? `${job.salary.min} - ${job.salary.max}` 
+                : "Not specified",
+                schedule: job.schedule,
+                location: job.work_location,
+                work_setup: job.work_setup,
+            }));
+    
+            setJobListings(filteredJobs); // Set the filtered data
+            console.log(filteredJobs);
+        } else {
+            console.error("Failed to fetch job listings");
+        }
+    };
+    
+    //TODO
+    const handleJobClick = (id) => {
+        // Handle the job click and use the `id`
+        console.log("Job ID clicked:", id);
+        // You can navigate to a detailed page or open a modal using the id
+    };
+
+    //TODO
     const [isSaved, setIsSaved] = useState(false);
     const toggleSave = () => {
         setIsSaved(!isSaved);
@@ -15,13 +67,12 @@ const JobListings = ({ jobListings }) => {
         return <p>No job listings available.</p>;
     }
 
-    
     return (
         <div className="flex flex-col">
             {/* Job listings */}
             {jobListings.length > 0 ? (
                 jobListings.map((job, index) => (
-                    <div key={index} className="job-listing-box flex flex-col p-4 mb-4 mx-auto">
+                    <div key={index} onClick={() => handleJobClick(job.job_id)} className="job-listing-box flex flex-col p-4 mb-4 mx-auto">
                         <div className="flex flex-row justify-between items-center">
                             <Image 
                                 src="/Logo.png" 
@@ -84,13 +135,16 @@ const JobListings = ({ jobListings }) => {
                         </div>
 
                         <div className="flex flex-col mt-2">
-                            <ul id='job_description' className="list-disc list-inside">
+                            <p id="job_description" className="text-xsmall text-fontcolor">
+                                {job.job_description}
+                            </p>
+                            {/* <ul id='job_description' className="list-disc list-inside">
                                 {job.job_description.map((desc, i) => (
                                     <li key={i} className="text-xsmall hover:text-fontcolor">
                                         {desc}
                                     </li>
                                 ))}
-                            </ul>
+                            </ul> */}
                         </div>
                     </div>
                 ))
