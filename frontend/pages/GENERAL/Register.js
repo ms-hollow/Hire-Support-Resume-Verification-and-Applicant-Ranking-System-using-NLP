@@ -168,9 +168,8 @@ export default function Register() {
             });
 
             const data = await response.json();
-            if (response.status === 200) {    
-                localStorage.setItem("authTokens", JSON.stringify(data));
-            }
+            // console.log('Setting authTokens:', JSON.stringify(data));
+            localStorage.setItem("authTokens", JSON.stringify(data));
     
         } catch (error){
             console.error('Error during registration:', error);
