@@ -6,9 +6,10 @@ import Image from 'next/image';
 import { useState, useEffect, useContext } from "react";
 import jwt from 'jsonwebtoken';
 import AuthContext from '../context/AuthContext';
+import { useRouter } from 'next/router';
 
 export default function ApplicantHome() {
- 
+      
   return (
     <div>
       <ApplicantHeader />

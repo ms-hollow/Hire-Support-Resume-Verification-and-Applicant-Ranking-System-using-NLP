@@ -44,7 +44,7 @@ const JobListings = () => {
             }));
     
             setJobListings(filteredJobs); // Set the filtered data
-            console.log(filteredJobs);
+            // console.log(filteredJobs);
         } else {
             console.error("Failed to fetch job listings");
         }
