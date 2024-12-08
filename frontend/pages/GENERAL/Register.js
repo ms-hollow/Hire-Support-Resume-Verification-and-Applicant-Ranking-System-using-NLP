@@ -73,7 +73,7 @@ export default function Register() {
         }
     
         try {
-            const emailCheckResponse = await axios.post('https://hire-support-resume-verification-and.onrender.com/users/check-email/', {
+            const emailCheckResponse = await axios.post('http://127.0.0.1:8000/users/check-email/', {
                 email: emailAddress,
             });
     

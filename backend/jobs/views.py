@@ -49,9 +49,12 @@ def delete_job_hiring(request, pk):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def job_hiring_list(request):
-    job_hirings = JobHiring.objects.all()
-    serializer = JobHiringSerializer(job_hirings, many=True)
+    job_listings = JobHiring.objects.all()
+    if not job_listings:
+        return Response({"message": "No job listings found"}, status=404)
+    serializer = JobHiringSerializer(job_listings, many=True)
     return Response(serializer.data)
+    
 
 #* View job hiring details
 @api_view(['GET'])
