@@ -1,18 +1,18 @@
 import { useState, useContext, useEffect } from "react";
-import Link from "next/link";
 import Image from 'next/image';
 import GeneralFooter from "./GeneralFooter";
-// import jobListings from '@/public/placeHolder/dummy_JobListings.json';
+import { useRouter } from 'next/router';
+import Link from 'next/link'; 
 
 import AuthContext from "@/pages/context/AuthContext";
 
-const JobListings = () => {
+const JobListings = ({ authToken}) => {
 
-    let {authTokens} = useContext(AuthContext);
     const [jobListings, setJobListings] = useState([]);
-   
+    const router = useRouter();
+
     useEffect(()=> {
-        getJobs()
+        getJobs();
     }, [])
 
     let getJobs = async () => {
@@ -21,7 +21,7 @@ const JobListings = () => {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + String(authTokens.access),
+                'Authorization': 'Bearer ' + String(authToken),
             },
         });
         
@@ -36,7 +36,7 @@ const JobListings = () => {
                 job_industry: job.job_industry,
                 job_description: job.job_description || "No description available",
                 salary: job.salary 
-                ? `${job.salary.min} - ${job.salary.max}` 
+                ? `Php ${job.salary.min} - ${job.salary.max}` 
                 : "Not specified",
                 schedule: job.schedule,
                 location: job.work_location,
@@ -51,10 +51,11 @@ const JobListings = () => {
     };
     
     //TODO
-    const handleJobClick = (id) => {
-        // Handle the job click and use the `id`
-        console.log("Job ID clicked:", id);
-        // You can navigate to a detailed page or open a modal using the id
+    const handleJobClick = (jobId) => {
+        router.push({
+            pathname: router.pathname, // Stay on the same page
+            query: { jobId },  // Add job_id to the URL
+        }, undefined, { shallow: true });
     };
 
     //TODO
@@ -63,6 +64,7 @@ const JobListings = () => {
         setIsSaved(!isSaved);
     };
 
+    //TODO Frontend Team: Change this to preloader
     if (!Array.isArray(jobListings)) {
         return <p>No job listings available.</p>;
     }
@@ -71,8 +73,8 @@ const JobListings = () => {
         <div className="flex flex-col">
             {/* Job listings */}
             {jobListings.length > 0 ? (
-                jobListings.map((job, index) => (
-                    <div key={index} onClick={() => handleJobClick(job.job_id)} className="job-listing-box flex flex-col p-4 mb-4 mx-auto">
+                jobListings.map((job) => (
+                    <div key={job.job_id} onClick={() => handleJobClick(job.job_id)} className="job-listing-box flex flex-col p-4 mb-4 mx-auto">
                         <div className="flex flex-row justify-between items-center">
                             <Image 
                                 src="/Logo.png" 
@@ -156,9 +158,11 @@ const JobListings = () => {
 };
 
 const JobListingsWrapper = () => {
+    const { authTokens } = useContext(AuthContext);
+
     return (
         <div className="flex overflow-y-auto border border-none hide-scrollbar p-1 h-[calc(100vh-150px)]">
-            <JobListings />
+            <JobListings authToken={authTokens.access}  />
             <GeneralFooter/>
         </div>
     );

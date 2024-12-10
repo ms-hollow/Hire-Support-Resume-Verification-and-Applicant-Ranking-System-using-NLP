@@ -9,8 +9,33 @@ import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
 
 export default function ApplicantHome() {
-      
+
+  let {authTokens} = useContext(AuthContext);
+  const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Only run this after component is mounted to avoid mismatch between server/client render
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Redirect if authToken is not available, but do it only after mounting
+  useEffect(() => {
+    if (isMounted && !authTokens) {
+      router.push("/GENERAL/Login");
+    }
+  }, [authTokens, isMounted, router]);
+
+  if (!isMounted) {
+    return null; 
+  }
+
+  if (!authTokens) {
+    return null; 
+  }
+
   return (
+    <>
     <div>
       <ApplicantHeader />
       <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 mx-auto">
@@ -134,11 +159,11 @@ export default function ApplicantHome() {
         </div>
 
         <div className="flex flex-row pt-4 gap-2 pb-16">
-          <JobListings /> {/* Pass jobListings as prop */}
-          <JobDetails />
+          <JobListings authToken={authTokens.access} />
+          <JobDetails authToken={authTokens.access} /> 
         </div>
       </div>
-      
     </div>
+    </>
   );
 }
