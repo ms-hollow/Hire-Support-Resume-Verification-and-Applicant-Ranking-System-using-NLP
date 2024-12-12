@@ -19,7 +19,7 @@ const JobListings = ({ authToken }) => {
 
     let getJobs = async () => {
 
-        let response = await fetch('http://127.0.0.1:8000/job/job-hirings/', {
+        let response = await fetch('https://hire-support-resume-verification-and.onrender.com/job/job-hirings/', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
