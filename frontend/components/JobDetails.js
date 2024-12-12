@@ -1,11 +1,9 @@
 import Image from 'next/image';
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useCallback } from "react";
 import AuthContext from "@/pages/context/AuthContext";
 import { useRouter } from 'next/router';
 
-//TODO: pending task Application Requirements
 //TODO: Optimize load ng data
-//TODO: is saved?
 
 const JobDetails = ({ authToken }) => {
 
@@ -13,96 +11,173 @@ const JobDetails = ({ authToken }) => {
     const { jobId } = router.query;
     const [jobDetails, setJobDetails] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
 
-    useEffect(() => {
+    useEffect(() => { 
         if (jobId) {
-        fetchJobDetails(Number(jobId)); // Trigger fetch when jobId changes
+            fetchJobDetails(Number(jobId)); // Trigger fetch when jobId changes
+            checkIfSaved();
         }
     }, [jobId]);
 
-    const fetchJobDetails = async (id) => {
+    const fetchJobDetails = useCallback(async (id) => {
         setLoading(true);
         setJobDetails(null); // Clear previous job details while loading
+    
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/job/hirings/${id}/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`,
+                },
+            });
+    
+            if (response.status === 200) {
+                const data = await response.json();
+                setJobDetails(data);
+    
+                // Format salary
+                const formattedSalary = data.salary
+                    ? `Php ${data.salary.min} - ${data.salary.max}`
+                    : "Not specified";
+    
+                // Format dates
+                const formatDate = (dateString, format = "short") => {
+                    const date = new Date(dateString);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const year = date.getFullYear();
+    
+                    if (format === "long") {
+                        const months = [
+                            "January", "February", "March", "April", "May", "June",
+                            "July", "August", "September", "October", "November", "December"
+                        ];
+                        const month = months[date.getMonth()];
+                        return `${month} ${day}, ${year}`;
+                    } else {
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        return `${month}/${day}/${year}`;
+                    }
+                };
+    
+                // Check and format the dates and salary
+                if (data) {
+                    if (data.creation_date && data.application_deadline) {
+                        const datePosted = formatDate(data.creation_date, "short");
+                        const deadline = formatDate(data.application_deadline, "long");
+    
+                        setJobDetails((prevDetails) => ({
+                            ...prevDetails,
+                            creation_date: datePosted,
+                            application_deadline: deadline,
+                            salary: formattedSalary,
+                        }));
+                    }
+                }
+            } else {
+                console.error('Failed to fetch job details');
+            }
+        } catch (error) {
+            console.error('Error fetching job details:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+    
+
+    const checkIfSaved = useCallback(async () => {
+        if (!jobId) return;
 
         try {
-        const response = await fetch(`http://127.0.0.1:8000/job/hirings/${id}/`,{
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`,
-            },
-            }
-        );
+            const response = await fetch('http://127.0.0.1:8000/applicant/saved-jobs/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`, 
+                },
+            });
 
-        if (response.status === 200) {
-            const data = await response.json();
-            setJobDetails(data);
-            console.log("Fetched job details:", data);
-
-            const formatDate = (dateString, format = "short") => {
-                const date = new Date(dateString);
-                const day = String(date.getDate()).padStart(2, '0'); 
-                const year = date.getFullYear();
-
-                if (format === "long") {
-                    const months = [
-                        "January", "February", "March", "April", "May", "June",
-                        "July", "August", "September", "October", "November", "December"
-                    ];
-                    const month = months[date.getMonth()];  // Get full month name
-                    return `${month} ${day}, ${year}`;
-                } else {
-                    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-                    return `${month}/${day}/${year}`; 
-                }
-            };
-
-            // Check and format the dates and salary
-            if (jobDetails) {
-                if (jobDetails.creation_date && jobDetails.application_deadline) {
-                    const datePosted = formatDate(jobDetails.creation_date, "short");
-                    const deadline = formatDate(jobDetails.application_deadline, "long");
-
-                    setJobDetails((prevDetails) => ({
-                        ...prevDetails,
-                        creation_date: datePosted,
-                        application_deadline: deadline,
-                    }));
-
-                    // console.log(datePosted, deadline);
-                } else {
-                    console.log("Job details not yet loaded.");
-                }
-
-                // Format salary
-                const formattedSalary = jobDetails.salary
-                    ? `Php ${jobDetails.salary.min} - ${jobDetails.salary.max}`
-                    : "Not specified";
-
-                setJobDetails((prevDetails) => ({
-                    ...prevDetails,
-                    formattedSalary: formattedSalary,
-                }));
-
-                // console.log(formattedSalary);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch saved jobs: ${response.status}`);
             }
 
-        } else {
-            console.error('Failed to fetch job details');
-        }
+            const savedJobs = await response.json();
+            // localStorage.setItem('savedJobs', JSON.stringify(savedJobs));
+            // console.log('Saved Jobs:', savedJobs);
+
+            if (Array.isArray(savedJobs)) {
+                // Check if the current job id is saved by comparing job_hiring_id
+                const jobIsSaved = savedJobs.some((job) => String(job.job_hiring_id) === jobId);
+
+                // console.log('Is Job Saved:', jobIsSaved);
+                if (jobIsSaved) {
+                    setIsSaved(true);  
+                } else {
+                    setIsSaved(false); 
+                }
+            }
         } catch (error) {
-        console.error('Error fetching job details:', error);
-        } finally {
-        setLoading(false);
+            console.error("Failed to check saved jobs status:", error);
         }
-    };
+    }, [jobId]);
+    
+    const handleSaveJob = useCallback(async () => {
+        if (!jobId) return;
+        try {
+            const savedJobs = await fetch(`http://127.0.0.1:8000/applicant/save-job/${jobId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`, 
+                },
+            });
+    
+            if (savedJobs.ok) {
+                setIsSaved(true);
+                alert("Job saved successfully!");
 
+                // Update localStorage with the saved job
+                // const savedJobsFromStorage = JSON.parse(localStorage.getItem('savedJobs')) || [];
+                // localStorage.setItem('savedJobs', JSON.stringify([...savedJobsFromStorage, jobId]));
+            } else {
+                console.error(`Job already saved, Failed to save job: ${savedJobs.status}`);
+            }
+
+        } catch (error) {
+            console.error("Failed to save job:", error);
+        }
+    }, [jobId]);
+
+    // Unsave job
+    const handleUnsaveJob = useCallback(async () => {
+        if (!jobId) return;
+        try {
+            await fetch(`http://127.0.0.1:8000/applicant/unsave-job/${jobId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`,
+                },
+            });
+            setIsSaved(false);
+            alert("Job unsaved successfully!");
+
+            // Remove from localStorage
+            // const savedJobsFromStorage = JSON.parse(localStorage.getItem('savedJobs')) || [];
+            // const updatedSavedJobs = savedJobsFromStorage.filter(job => job !== jobId);
+            // localStorage.setItem('savedJobs', JSON.stringify(updatedSavedJobs));
+        } catch (error) {
+            console.error("Failed to unsave job:", error);
+        }
+    }, [jobId]);
+    
     if (loading) {
-        return <p>Loading job details...</p>;
+        return <p className='text-fontcolor'>Loading job details...</p>;
     }
 
     if (!jobDetails) {
-        return <p>No job details available.</p>;
+        return <p className='text-fontcolor'>Please Select Job</p>;
     }
 
     return (
@@ -123,7 +198,7 @@ const JobDetails = ({ authToken }) => {
                 </div>
 
                 <p className="font-thin text-fontcolor text-xsmall">{jobDetails.company_name}</p>
-                <p className="font-thin text-fontcolor text-xsmall">{jobDetails.job_industry}</p>
+                <p className="font-thin text-fontcolor text-xsmall">{jobDetails.job_industry} ({jobDetails.experience_level})</p>
                 <div className="flex flex-row mt-2">
                     <div className="flex flex-row">
                         <Image 
@@ -160,7 +235,7 @@ const JobDetails = ({ authToken }) => {
                         height={20} 
                         alt="Salary Icon" 
                     />
-                    <p className="ml-2 font-thin text-xsmall pl-px text-fontcolor">{jobDetails.formattedSalary}</p>
+                    <p className="ml-2 font-thin text-xsmall pl-px text-fontcolor">{jobDetails.salary}</p>
                 </div>
 
                 <div className="flex mt-4 gap-8">
@@ -168,9 +243,14 @@ const JobDetails = ({ authToken }) => {
                         <a href="/APPLICANT/JobApplication"className="lg:text-medium font-medium">Apply</a>
                     </button>
 
-                    <button type="button" className="button2 flex items-center justify-center">
-                        <a href="/APPLICANT/MyJobs" className="lg:text-medium font-medium">Save</a>
+                    <button 
+                        onClick={isSaved ? handleUnsaveJob : handleSaveJob} 
+                        type="button" 
+                        className="button2 flex items-center justify-center lg:text-medium font-medium"
+                    >
+                        {isSaved ? 'Unsave' : 'Save'}
                     </button>
+
                 </div>
             </div>
 
@@ -190,22 +270,32 @@ const JobDetails = ({ authToken }) => {
 
                 {/*Application Requirements*/} 
                 <p className="font-semibold text-xsmall text-fontcolor ">Application Requirements </p>
-                <p id='AppliReq' className="font-thin text-xsmall text-fontcolor pb-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Amet tincidunt et turpis habitasse ultrices condimentum velit. At nulla eu urna cras sed odio mauris vivamus erat. Elit mi massa nisl enim. Tristique massa sit est in senectus amet, ut nullam. Amet consectetur netus duis diam. Consectetur pellentesque non eget nisl, pretium, ultrices. Tortor dignissim pretium aliquet nunc, pulvinar. Faucibus tincidunt odio tincidunt massa lobortis aliquam venenatis neque. Tortor porttitor parturient sagittis non faucibus faucibus tincidunt ut aliquam. Egestas sed massa enim tempor at orci dignissim id. Sed metus mi leo rutrum felis. </p>
+                <p id='AppliReq' className="font-thin text-xsmall text-fontcolor pb-3"> 
+                    {jobDetails.required_documents ? (
+                        <>
+                            {Object.entries(jobDetails.required_documents).map(([key, value]) => (
+                                <span key={key}>
+                                    • {value}
+                                    <br />
+                                </span>
+                            ))}
+                        </>
+                    ) : (
+                        "No benefits information available."
+                    )}
+                </p>
 
                 {/* Benefit*/} 
                 <p className="font-semibold text-xsmall text-fontcolor "> Benefits </p>
                 <p id="Benefits" className="font-thin text-xsmall text-fontcolor pb-3">
                     {jobDetails.benefits ? (
                         <>
-                            {jobDetails.benefits.health && (
-                                <span><strong>Health:</strong> {jobDetails.benefits.health}</span>
-                            )}
-                            {jobDetails.benefits.vacation_days && (
-                                <>
+                            {Object.entries(jobDetails.benefits).map(([key, value]) => (
+                                <span key={key}>
+                                    <strong>{key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}:</strong> {value}
                                     <br />
-                                    <span><strong>Vacation Days:</strong> {jobDetails.benefits.vacation_days}</span>
-                                </>
-                            )}
+                                </span>
+                            ))}
                         </>
                     ) : (
                         "No benefits information available."
