@@ -42,7 +42,7 @@ export const AuthProvider = ({children}) => {
             return;
         }
 
-        let response = await fetch('http://127.0.0.1:8000/users/token/', {
+        let response = await fetch('https://hire-support-resume-verification-and.onrender.com/users/token/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: email, password: password }),
@@ -70,7 +70,7 @@ export const AuthProvider = ({children}) => {
 
     const loginWithGoogle = async (response) => {
         try {
-            const tokenResponse = await fetch('http://127.0.0.1:8000/users/google-login/', {
+            const tokenResponse = await fetch('https://hire-support-resume-verification-and.onrender.com/users/google-login/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ token: response.credential }),
@@ -116,7 +116,7 @@ export const AuthProvider = ({children}) => {
 
         // console.log("Before update, authTokens:", authTokens);
 
-        const response = await fetch('http://127.0.0.1:8000/users/token/refresh/', {
+        const response = await fetch('https://hire-support-resume-verification-and.onrender.com/users/token/refresh/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body:JSON.stringify({'refresh':authTokens?.refresh})
