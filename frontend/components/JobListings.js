@@ -1,14 +1,16 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useCallback } from "react";
 import Image from 'next/image';
 import GeneralFooter from "./GeneralFooter";
 import { useRouter } from 'next/router';
 import Link from 'next/link'; 
-
 import AuthContext from "@/pages/context/AuthContext";
+
+//TODO Frontend Team: Change this to preloader
 
 const JobListings = ({ authToken}) => {
 
     const [jobListings, setJobListings] = useState([]);
+    const [selectedJobId, setSelectedJobId] = useState(null);
     const router = useRouter();
 
     useEffect(()=> {
@@ -50,8 +52,8 @@ const JobListings = ({ authToken}) => {
         }
     };
     
-    //TODO
     const handleJobClick = (jobId) => {
+        setSelectedJobId(jobId);
         router.push({
             pathname: router.pathname, // Stay on the same page
             query: { jobId },  // Add job_id to the URL
@@ -63,8 +65,8 @@ const JobListings = ({ authToken}) => {
     const toggleSave = () => {
         setIsSaved(!isSaved);
     };
+    
 
-    //TODO Frontend Team: Change this to preloader
     if (!Array.isArray(jobListings)) {
         return <p>No job listings available.</p>;
     }

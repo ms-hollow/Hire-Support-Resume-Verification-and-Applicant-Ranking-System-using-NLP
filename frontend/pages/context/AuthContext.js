@@ -105,6 +105,7 @@ export const AuthProvider = ({children}) => {
         setUser(null);
         if (typeof window !== 'undefined') {
             localStorage.removeItem('authTokens');
+            localStorage.removeItem('savedJobs');
         }
         router.push('/GENERAL/Login'); // Redirect to login after logout
     };
