@@ -22,15 +22,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qag)3q_0s4)lvuu&*==pah^t1c6*0i)#tmfc%!l33)s&0g38p7' #? For Local Development
-# SECRET_KEY = os.environ.get("SECRET_KEY") #? For Local Deployment
+# SECRET_KEY = 'django-insecure-qag)3q_0s4)lvuu&*==pah^t1c6*0i)#tmfc%!l33)s&0g38p7' #? For Local Development
+SECRET_KEY = os.environ.get("SECRET_KEY") #? For  Web Deployment
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True #? For Local Development
-# DEBUG = os.environ.get("DEBUG", "FALSE").lower() == "TRUE" #? For Local Deployment
+# DEBUG = True #? For Local Development
+DEBUG = os.environ.get("DEBUG", "FALSE").lower() == "TRUE" #? For Web Deployment
 
-ALLOWED_HOSTS = [] #? For Local Development
-# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ") #? For Local Deployment
+# ALLOWED_HOSTS = [] #? For Local Development
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ") #? For Web Deployment
 
 #* SECRET_KEY, DEBUG, ALLOWED_HOSTS, and DATABASE_URL are in Render environment variables.
 
