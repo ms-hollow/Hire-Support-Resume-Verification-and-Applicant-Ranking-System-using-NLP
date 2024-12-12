@@ -1,15 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback, useContext } from "react";
 import Image from "next/image";
 import ApplicantHeader from "@/components/ApplicantHeader";
 import PersonalInfo from "@/components/PersonalInfo";
 import GeneralFooter from "@/components/GeneralFooter";
+import AuthContext from "../context/AuthContext";
+import { useRouter } from 'next/router';
 
 export default function ApplicantProfile() {
+
+  let {authTokens} = useContext(AuthContext);
+  const router = useRouter();
   const [isEditable, setIsEditable] = useState(false);
 
   const toggleEdit = () => {
     setIsEditable(!isEditable);
   };
+
+  useEffect(()=> {
+    if (!authTokens){
+      router.push("/GENERAL/Login");
+    }
+  }, [])
+
 
   return (
     <div >
@@ -38,7 +50,7 @@ export default function ApplicantProfile() {
            {/* Hindi pa naka read0nly yung fields */}
 
           <div className="flex flex-col items-center">
-            <PersonalInfo showRegisterButton={false} isEditable={isEditable} />
+            <PersonalInfo showRegisterButton={false} isEditable={isEditable}/>
             {isEditable && (
               <button onClick={() => alert("Updated successfully!")} className="button1 flex items-center justify-center">
                  <p className="lg:text-medium font-medium">Update</p>

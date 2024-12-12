@@ -8,6 +8,8 @@ import jwt from 'jsonwebtoken';
 import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
 
+//TODO Search
+
 export default function ApplicantHome() {
 
   let {authTokens} = useContext(AuthContext);

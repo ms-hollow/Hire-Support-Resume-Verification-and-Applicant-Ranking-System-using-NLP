@@ -7,7 +7,7 @@ import AuthContext from "@/pages/context/AuthContext";
 
 //TODO Frontend Team: Change this to preloader
 
-const JobListings = ({ authToken}) => {
+const JobListings = ({ authToken }) => {
 
     const [jobListings, setJobListings] = useState([]);
     const [selectedJobId, setSelectedJobId] = useState(null);
@@ -161,7 +161,6 @@ const JobListings = ({ authToken}) => {
 
 const JobListingsWrapper = () => {
     const { authTokens } = useContext(AuthContext);
-
     return (
         <div className="flex overflow-y-auto border border-none hide-scrollbar p-1 h-[calc(100vh-150px)]">
             <JobListings authToken={authTokens.access}  />
