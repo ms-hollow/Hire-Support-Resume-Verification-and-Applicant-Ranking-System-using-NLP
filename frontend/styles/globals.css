@@ -193,3 +193,30 @@ footer {
   box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.1);
   border-radius: 0.5rem; /* 8px */
 }
+
+/*---------------------------NOTIFICATIONS----------------------------------*/
+.chevron-icon {
+  filter: invert(80%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(100%);
+  margin-top: -10px;
+  margin-bottom: 10px;
+  margin-right: 10px;
+ 
+}
+.chevron-icon1 {
+  filter: invert(20%) sepia(100%) saturate(5000%) hue-rotate(230deg) brightness(90%) contrast(100%);
+  margin-top: -10px;
+  margin-bottom: 10px;
+  
+}
+.delete-icon {
+  margin-bottom: 20px;
+}
+
+.notification-container{
+  justify-content: center;
+  height: auto;
+  width: 859px;
+  border: 1px solid#D9D9D9;
+  box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem; /* 8px */
+}

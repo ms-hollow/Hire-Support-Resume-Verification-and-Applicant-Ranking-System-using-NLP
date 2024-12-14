@@ -50,12 +50,8 @@ export default function MyJobs() {
             <div id="applied-jobs" style={{ display: activeTab === 'applied' ? 'block' : 'none' }}>
             <AppliedJobs />
             </div>
-      </div>
-
-
-
-    
-      </div>
+          </div>
+        </div>
       <GeneralFooter /></>
     </div>
   );
