@@ -51,3 +51,4 @@ class UserLoginSerializer(serializers.Serializer):
         # Return the authenticated user in the data
         data['user'] = user
         return data
+

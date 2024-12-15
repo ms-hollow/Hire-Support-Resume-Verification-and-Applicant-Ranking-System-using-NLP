@@ -5,34 +5,240 @@ import { useState } from 'react';
 import GeneralHeader from '@/components/GeneralHeader';
 import GeneralFooter from '@/components/GeneralFooter';
 import PersonalInfo from '@/components/PersonalInfo';
+import jwt from 'jsonwebtoken';
+import { useRouter } from 'next/router';
 
-
+//TODO 1. Change routes 2. Setup show password
 
 export default function Register() {
     const [step, setStep] = useState(0); // Tracks the current step
     const [showPassword, setShowPassword] = useState(false);
-    const [hasTyped, setHasTyped] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
-    const [showPersonalInfo, setShowPersonalInfo] = useState(false);
 
-    const handleChange = (e) => {
-        setHasTyped(e.target.value.length > 0);
-    };
+    const [isCompany, setCompany] = useState(false);
+    const [isApplcant, setApplicant] = useState(false);
+    const [emailAddress, setEmailAddress] = useState('');
+    const [password, setPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+
+    const router = useRouter();
 
     const handleCheckboxChange = () => {
         setIsChecked(!isChecked);
     };
 
+    const setRole = (role) => {
+        if (!role) {
+            alert('Please select a role');
+            return;
+        }
+        
+        let newIsCompany = false;
+        let newIsApplicant = false;
+    
+        if (role === 'company') {
+            newIsCompany = true;
+            newIsApplicant = false;
+            handleNextStep();
+        } else if (role === 'applicant') {
+            newIsCompany = false;
+            newIsApplicant = true;
+            handleNextStep();
+        }
+    
+        setCompany(newIsCompany);
+        setApplicant(newIsApplicant);
+    
+        //? Test
+        // console.log('Selected role:', role);
+        // console.log('Is Applicant?', newIsApplicant);
+        // console.log('Is Company?', newIsCompany);
+    }
+
+    const handleEmailChange = (e) => {
+        setEmailAddress(e.target.value); 
+    };
+
+    const getEmail = async () => {
+        // Validate email
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    
+        if (!emailAddress) {
+            console.log('Please input an email address.');
+            return;
+        }
+    
+        if (!emailRegex.test(emailAddress)) {
+            console.log('Invalid email address. Please input a valid email address.');
+            return;
+        }
+    
+        try {
+            const emailCheckResponse = await fetch('https://hire-support-resume-verification-and.onrender.com/users/check-email/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: emailAddress }), // Convert the email to JSON format
+            });
+    
+            // Check if the response status is 409 Conflict (email already exists)
+            if (emailCheckResponse.status === 409) {
+                console.log('This email is already registered. Please use a different email.');
+                setEmailAddress(''); // Clear the email input so user can re-enter
+                return;
+            }
+    
+            // If the response is successful (status 200), parse the response data
+            if (emailCheckResponse.ok) {
+                const responseData = await emailCheckResponse.json(); // Parse the response as JSON
+    
+                // If the server indicates the email exists, notify the user
+                if (responseData.exists) {
+                    console.log('This email is already registered. Please use a different email.');
+                    setEmailAddress(''); // Clear the email input
+                    return;
+                }
+    
+                // Check if the checkbox is checked
+                if (!isChecked) {
+                    console.log('You must check the checkbox.');
+                    return; // Prevent further execution
+                } else {
+                    handleNextStep(); // Proceed to the next step
+                }
+            } else {
+                console.log('Error checking email. Please try again.');
+            }
+        } catch (error) {
+            console.log('Network error. Please check your connection and try again.');
+        }
+    }
+    
+    
+    const handlePassword = (e) => {
+        setPassword(e.target.value);
+        setConfirmPassword(e.target.value);
+    }
+
+    const getPassword = () => {
+        
+        //? Test
+        // console.log("Password: ", password);
+        // console.log("Confirm Password: ", confirmPassword);
+
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+        if (!password || !confirmPassword) {
+            console.log('Please input password.');
+            return
+        } 
+
+        if (passwordRegex.test(password) > 8) {
+            alert('Password must be at least 8 characters long, include a number, an uppercase letter, and a special character.');
+            return;
+        }
+        
+        if(password != confirmPassword){
+            alert("Your passwords don't match. Please make sure both passwords are the same.");
+        }
+        handleSubmit(); // Handle Submit will register the user
+        handleNextStep(); // Proceed to next step: Profile Form
+    }
+
+    const handleSubmit = async () => {
+        try {
+            const userData = {
+                email: emailAddress,
+                password: password,
+                is_company: isCompany,
+                is_applicant: isApplcant
+            };
+            
+            const user = JSON.stringify(userData); // Convert the object to a JSON string
+           
+            // console.log('form data:', user); //? Test
+            
+            const response = await fetch('https://hire-support-resume-verification-and.onrender.com/users/register/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json', 
+                },
+                body: user, // Send the JSON string as the body of the request
+            });
+
+            const data = await response.json();
+            // console.log('Setting authTokens:', JSON.stringify(data));
+            localStorage.setItem("authTokens", JSON.stringify(data));
+    
+        } catch (error){
+            console.error('Error during registration:', error);
+        }
+    }
+
+    // Handle login if the user decided to proceed filling out profile details
+    const handleLogin = async () => {
+
+        let response = await fetch('https://hire-support-resume-verification-and.onrender.com/users/token/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: emailAddress, password: password }),
+        });
+
+        let data = await response.json();
+
+        if (response.status === 200) {
+            const decodedToken = jwt.decode(data.access);
+            localStorage.setItem("authTokens", JSON.stringify(data));
+
+            // Redirect based on user role
+            const userRole = decodedToken.is_company ? "company" : decodedToken.is_applicant ? "applicant" : "unknown";
+            // console.log(userRole)
+            if (userRole === "company") {
+                router.push("/GENERAL/Register"); //! Change to company profile
+            } else if (userRole === "applicant") {
+                router.push("/APPLICANT/ApplicantHome"); //! Change to applicant profile
+            }
+        } else {
+            alert(data.error || 'Invalid credentials');
+        }
+    }
+
+    // Handle skip if the user decided to skip filling out profile details
+    const handleSkip = async () => {
+        let response = await fetch('https://hire-support-resume-verification-and.onrender.com/users/token/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: emailAddress, password: password }),
+        });
+
+        let data = await response.json();
+
+        if (response.status === 200) {
+            const decodedToken = jwt.decode(data.access);
+            localStorage.setItem("authTokens", JSON.stringify(data));
+
+            // Redirect based on user role
+            const userRole = decodedToken.is_company ? "company" : decodedToken.is_applicant ? "applicant" : "unknown";
+            // console.log(userRole)
+
+            if (userRole === "company") {
+                router.push("/GENERAL/Login"); //! Change to company home
+            } else if (userRole === "applicant") {
+                router.push("/APPLICANT/ApplicantHome"); //! Change to applicant home
+            }
+        } else {
+            alert(data.error || 'Invalid credentials');
+        }
+    }
+
     const handleNextStep = () => {
+        // Increment the step if role is selected
         setStep(prevStep => prevStep + 1);
     };
 
     const handlePreviousStep = () => {
         setStep(prevStep => prevStep - 1); // Move to the previous step
-    };
-
-    const handleShowPersonalInfo = () => {
-        setShowPersonalInfo(true);
     };
 
     return (
@@ -59,7 +265,7 @@ export default function Register() {
                         <div className="flex flex-col items-center mt-5 mb-5 space-y-4">
 
                               {/* PAGPINILI ITO YUNG SA REG FORM AY CompanyInfo */}
-                            <button className="button1 h-[40px] flex items-center px-6 py-3" onClick={handleNextStep}>
+                            <button className="button1 h-[40px] flex items-center px-6 py-3" onClick={() => setRole('company')} >
                                 <div className="flex items-center space-x-4">
                                     <Image
                                         src="/Company Icon.svg"
@@ -72,7 +278,7 @@ export default function Register() {
                             </button>
 
                              {/* PAGPINILI ITO YUNG SA REG FORM AY PersonalInfo */}
-                            <button className="button1 flex items-center px-6 py-3" onClick={handleNextStep}>
+                            <button id='applicant' className="button1 flex items-center px-6 py-3" onClick={() => setRole('applicant')} >
                                 <div className="flex items-center space-x-4">
                                     <Image
                                         src="/Applicant Icon.svg"
@@ -97,11 +303,9 @@ export default function Register() {
                         <div className="flex items-center justify-between">
                             <h1 className="lg:text-extralarge mb:text-large sm:text-large text-primary">Register</h1>
                             {step === 3 && (
-                                <Link href="/APPLICANT/ApplicantHome">
-                                    <button className="text-primary font-medium lg:text-medium mb:text-medium sm:text-xxsmall">
-                                        Skip
-                                    </button>
-                                </Link>
+                                <button onClick={handleSkip} className="text-primary font-medium lg:text-medium mb:text-medium sm:text-xxsmall">
+                                    Skip
+                                </button>
                             )}
                         </div>
 
@@ -119,15 +323,15 @@ export default function Register() {
 
                         {/* Step 1: Register Email */}
                         {step === 1 && (
-                            <form>
+                            <form onSubmit={getEmail}>
                             <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Email Address</p>
                             <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                <input type="text" id="email-address" name="email" placeholder="applicant@gmail.com" required></input>
+                                <input type="text" id="email" name="email" placeholder="applicant@gmail.com" onChange={handleEmailChange} required></input>
                             </div>
 
                             {/*checkbox*/}
                             <div className="flex pt-8 pb-1">
-                                <input type="checkbox"value="" id="agreement" className="flex items-start h-5 w-8 "/>
+                                <input type="checkbox"value="" id="agreement" className="flex items-start h-5 w-8 " onChange={handleCheckboxChange}/>
                                 <p className="text-fontcolor text-xsmall items-center justify-center ml-4"> By creating an account or signing in, you understand and agree to our Terms. By using our platform, you acknowledge that you have read, understood, and agree to our <span className="font-medium"> <Link href="" className="underline">Terms & Condition</Link></span> and <span className="font-medium"> <Link href="" className="underline">Privacy Policy</Link></span> that outlines how we collect, use, and protect your personal information.</p>      
                             </div>
 
@@ -144,7 +348,7 @@ export default function Register() {
                                        </div>
                                 </button>
 
-                                 <button type="button" className="button1 flex items-center justify-center" onClick={handleNextStep}>
+                                 <button type="button" className="button1 flex items-center justify-center" onClick={getEmail}>
                                        <div className="flex items-center space-x-2">
                                            <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Continue</p>
                                            <Image 
@@ -167,12 +371,12 @@ export default function Register() {
                            <form>
                            <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Password</p>
                                <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                   <input type={showPassword ? 'text' : 'password'} id="password" name="password" required onChange={handleChange} />
+                                   <input type={showPassword ? 'text' : 'password'} id="password" name="password" onChange={handlePassword} />
                                </div>
 
                                <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall pt-4 pb-1 text-fontcolor font-medium">Confirm Password</p>
                                <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                   <input type={showPassword ? 'text' : 'password'} id="confirm-password" name="confirmPassword" required onChange={handleChange} />
+                                   <input type={showPassword ? 'text' : 'password'} id="confirm-password" name="confirmPassword" onChange={handlePassword} />
                                </div>
                                
 
@@ -189,7 +393,7 @@ export default function Register() {
                                        </div>
                                    </button>
 
-                                   <button type="button" className="button1 flex items-center justify-center" onClick={handleNextStep}>
+                                   <button type="button" className="button1 flex items-center justify-center" onClick={getPassword}>
                                        <div className="flex items-center space-x-2">
                                            <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Continue</p>
                                            <Image 
@@ -212,13 +416,12 @@ export default function Register() {
                         {/* Step 3: Review */}
                         {step === 3 && (
                               <div>          
-                              {!showPersonalInfo ? (
                                   <div>
                                       <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
                                           Would you like to fill out Personal Information Forms?
                                       </p>
                                       <div className="flex justify-end">
-                                          <button className="button1 mt-7 flex items-center justify-center" onClick={handleShowPersonalInfo}>
+                                          <button className="button1 mt-7 flex items-center justify-center" onClick={handleLogin}>
                                               <div className="flex items-center space-x-2">
                                                   <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
                                                       Yes
@@ -233,13 +436,7 @@ export default function Register() {
                                           </button>
                                       </div>
                                   </div>
-                              ) : (
-                                  // Display the PersonalInfo component
-                                  <PersonalInfo showRegisterButton={true} />
-                              )}
-                      
-                              
-                          
+                             
                               <p className="text-xsmall text-fontcolor pt-4 pb-1 font-medium">
                                   Already have an account? <span className="font-semibold"><Link href="/GENERAL/Login" className='underline'>Sign in</Link></span>
                               </p>
