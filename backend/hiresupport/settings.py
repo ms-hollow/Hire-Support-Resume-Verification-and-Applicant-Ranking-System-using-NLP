@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
+import dj_database_url
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +22,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qag)3q_0s4)lvuu&*==pah^t1c6*0i)#tmfc%!l33)s&0g38p7'
+# SECRET_KEY = 'django-insecure-qag)3q_0s4)lvuu&*==pah^t1c6*0i)#tmfc%!l33)s&0g38p7' #? For Local Development
+SECRET_KEY = os.environ.get("SECRET_KEY") #? For  Web Deployment
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True #? For Local Development
+DEBUG = os.environ.get("DEBUG", "FALSE").lower() == "TRUE" #? For Web Deployment
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = [] #? For Local Development
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ") #? For Web Deployment
+
+#* SECRET_KEY, DEBUG, ALLOWED_HOSTS, and DATABASE_URL are in Render environment variables.
 
 # Application definition
 
@@ -40,16 +47,18 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # third party
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'widget_tweaks',
-    'corsheaders',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'social_django',
+    'rest_framework_simplejwt.token_blacklist',
     
     # app
     'users',
@@ -63,16 +72,50 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',  # This enables token authentication DRF
         'rest_framework_simplejwt.authentication.JWTAuthentication', # This enables JWT authentication
-    ]
+    ], 
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
 }
 
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60), # Time for access token expiry
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7), # Time for refresh token expiry
-}
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=90),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True, #? TRUE Para hindi na magamit ulit yung refresh token
+    "UPDATE_LAST_LOGIN": False,
 
+    "ALGORITHM": "HS256",
+    "VERIFYING_KEY": "",
+    "AUDIENCE": None,
+    "ISSUER": None,
+    "JSON_ENCODER": None,
+    "JWK_URL": None,
+    "LEEWAY": 0,
+
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+
+    "JTI_CLAIM": "jti",
+
+    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+
+    "TOKEN_OBTAIN_SERIALIZER": "users.serializers.MyTokenObtainPairView",
+    "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
+    "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
+    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
+    "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
+    "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
+}
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
@@ -85,9 +128,9 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -97,18 +140,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'hiresupport.urls'
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Next.js frontend
-    "http://127.0.0.1:3000",  # Next.js frontend
-]
-
-CORS_ALLOW_ALL_ORIGINS = True  # Allow requests from any origin (development)
-
-# COOP header
-# CORS_ALLOW_HEADERS = [
-#     'COOP', 'cross-origin-opener-policy',
-# ]
 
 TEMPLATES = [
     {
@@ -132,25 +163,28 @@ WSGI_APPLICATION = 'hiresupport.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'main', 
-        'USER': 'postgres',  
-        'PASSWORD': 'admin',
-        'HOST': 'localhost',  
-        'PORT': '', 
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'main', 
+#         'USER': 'postgres',  
+#         'PASSWORD': 'admin',
+#         'HOST': 'localhost',  
+#         'PORT': '', 
+#     }
+# }
 
+# database_url = os.environ.get("DATABASE_URL")
+# DATABASES['default'] = dj_database_url.parse(database_url)  
+# postgresql://hiresupport_django_render_user:wpEtnqpwXq3xm9ItPLtOrInGpVVYdmOW@dpg-ct99m89opnds73e5vvg0-a.oregon-postgres.render.com/hiresupport_django_render
+DATABASES['default'] = dj_database_url.parse('postgresql://hiresupport_django_render_user:wpEtnqpwXq3xm9ItPLtOrInGpVVYdmOW@dpg-ct99m89opnds73e5vvg0-a.oregon-postgres.render.com/hiresupport_django_render') #? For Local Development 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -197,16 +231,53 @@ AUTH_USER_MODEL = 'users.User'
 AUTHENTICATION_BACKENDS = (
     'users.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend'
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-LOGIN_DIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_DIRECT_URL = "/GENERAL/Login"
+LOGOUT_REDIRECT_URL = '/' 
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-# #! MUST BE REMOVE AFTER TESTING
-# CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
-# CSRF_COOKIE_HTTPONLY = False
+# CSRF Settings
+CSRF_COOKIE_NAME = 'csrftoken'
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_DOMAIN = '.localhost'  # For cross-origin access
+CSRF_COOKIE_PATH = '/'  # Ensure accessible globally
+CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access
+CSRF_COOKIE_SAMESITE = 'Lax'  # Or 'None' for different origins
+CORS_ALLOW_CREDENTIALS = True
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    "http://127.0.0.1:3000",
+]
+
+# Ensure the CSRF token can be trusted from your frontend
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+]
+
+CORS_ALLOW_ALL_ORIGINS = True  # Allow requests from any origin (development)
+
+CORS_ALLOW_HEADERS = [
+    "Authorization",
+    "Content-Type",
+    "X-CSRFToken",
+    "Accept",
+    "Origin",
+    "User-Agent",
+    "DNT",
+    "Cache-Control",
+    "X-Requested-With",
+]
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Gmail's SMTP server
+EMAIL_PORT = 587  # TLS port
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER ='hs.testdev1@gmail.com'
+EMAIL_HOST_PASSWORD ='rzvnkbejhgaoqfjj'
+#rzvn kbej hgao qfjj

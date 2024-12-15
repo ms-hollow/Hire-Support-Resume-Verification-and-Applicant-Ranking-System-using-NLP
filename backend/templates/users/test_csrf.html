@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Test CSRF</title>
+</head>
+<body>
+    <form method="POST" action="">
+        {% csrf_token %}
+        <button type="submit">Test CSRF</button>
+    </form>
+    <!-- <h1>CSRF Test</h1>
+    <script>
+        console.log('CSRF Token from Meta:', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+        console.log('CSRF Token from Cookie:', document.cookie);  // Should show the csrftoken cookie if set
+    </script> -->
+</body>
+</html>

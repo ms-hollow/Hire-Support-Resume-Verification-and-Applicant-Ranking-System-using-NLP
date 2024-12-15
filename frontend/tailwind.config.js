@@ -8,10 +8,13 @@ module.exports = {
   theme: {
     extend: {
       screens: {
-        xsm: '375px',
+        xsm: '360px',
         sm: '480px',
         mb: '768px',
         lg: '1224px',
+      },
+      transitionProperty: {
+        transform: "transform",
       },
       height: {
         'header-height': '64px', // If the header is 64px high (16px padding + height)
