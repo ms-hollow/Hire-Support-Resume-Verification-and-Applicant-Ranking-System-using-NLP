@@ -18,6 +18,10 @@ export default function ApplicantProfile() {
     setIsEditable(!isEditable);
   };
 
+  const handleUpdateComplete = () => {
+    setIsEditable(false);
+  };
+
   useEffect(()=> {
     if (!authTokens){
       router.push("/GENERAL/Login");
@@ -53,14 +57,10 @@ export default function ApplicantProfile() {
           {/* Hindi pa naka read0nly yung fields */}
 
           <div className="flex flex-col items-center">
-            <PersonalInfo showRegisterButton={false} isEditable={isEditable}/>
-            {isEditable && (
-              <button onClick={() => alert("Updated successfully!")} className="button1 flex items-center justify-center">
-                 <p className="lg:text-medium font-medium">Update</p>
-              </button>
-            )}
+              <PersonalInfo isEditable={isEditable}  onUpdateComplete={handleUpdateComplete} />
           </div>
-        </div></div>
+        </div>
+        </div>
       </div>
       <GeneralFooter/>
     </div>
