@@ -89,17 +89,21 @@ class RegisterUserView(APIView):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+            
             # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
             access_token = refresh.access_token
 
+            # Add custom claims to the access token
             access_token['is_company'] = user.is_company
             access_token['is_applicant'] = user.is_applicant
+            access_token['email'] = user.email
 
             # Return the tokens in the response
             return Response({
-                "access_token": str(access_token),
-                "refresh_token": str(refresh),
+                "access": str(access_token),
+                "refresh": str(refresh),
+                "email": user.email
             }, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -11,7 +11,6 @@ from .serializers import ApplicantProfileFormSerializer
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])  # Ensure the user is authenticated
 def complete_applicant_profile(request):
-    # Retrieve the applicant profile
     applicant = get_object_or_404(Applicant, user=request.user)
 
     # Use the serializer to validate and create the applicant profile
@@ -28,12 +27,15 @@ def complete_applicant_profile(request):
         return Response(serializer.errors, status=400)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])  # Ensure the user is authenticated
-def view_applicant_profile(request, pk):
-    # Use get_object_or_404 to handle cases where the applicant doesn't exist
-    applicant = get_object_or_404(Applicant, pk=pk)
-    serializer = ApplicantProfileFormSerializer(applicant)
-    return Response(serializer.data, status=200)  # Return serialized applicant data
+def view_applicant_profile(request):
+    applicant = get_object_or_404(Applicant, user=request.user)
+    serializer = ApplicantProfileFormSerializer(applicant)  
+    applicant_key = applicant.id
+
+    return Response({
+        'applicant_key': applicant_key,  
+        'profile_data': serializer.data  
+    }, status=200)
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])

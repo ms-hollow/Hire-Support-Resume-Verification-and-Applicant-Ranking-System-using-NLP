@@ -58,6 +58,7 @@ const JobListings = ({ authToken }) => {
 
   const getJobs = async () => {
     try {
+      // console.log("Token", authToken);
       const response = await fetch(
         "http://127.0.0.1:8000/job/job-hirings/",
         {

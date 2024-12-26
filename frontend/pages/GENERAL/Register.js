@@ -1,12 +1,13 @@
 import Image from 'next/image';
 import Link from "next/link";
 import { FiEye, FiEyeOff } from 'react-icons/fi';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import GeneralHeader from '@/components/GeneralHeader';
 import GeneralFooter from '@/components/GeneralFooter';
 import PersonalInfo from '@/components/PersonalInfo';
 import jwt from 'jsonwebtoken';
 import { useRouter } from 'next/router';
+import AuthContext from '../context/AuthContext'; 
 
 //TODO 1. Change routes 2. Setup show password
 
@@ -16,10 +17,12 @@ export default function Register() {
     const [isChecked, setIsChecked] = useState(false);
 
     const [isCompany, setCompany] = useState(false);
-    const [isApplcant, setApplicant] = useState(false);
+    const [isApplicant, setApplicant] = useState(false);
     const [emailAddress, setEmailAddress] = useState('');
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
+    const { registerUser } = useContext(AuthContext);
+    const { handleProceed, handleSkip, user, loading } = useContext(AuthContext);
 
     const router = useRouter();
 
@@ -123,10 +126,6 @@ export default function Register() {
 
     const getPassword = () => {
         
-        //? Test
-        // console.log("Password: ", password);
-        // console.log("Confirm Password: ", confirmPassword);
-
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
         if (!password || !confirmPassword) {
@@ -147,90 +146,14 @@ export default function Register() {
     }
 
     const handleSubmit = async () => {
-        try {
-            const userData = {
-                email: emailAddress,
-                password: password,
-                is_company: isCompany,
-                is_applicant: isApplcant
-            };
-            
-            const user = JSON.stringify(userData); // Convert the object to a JSON string
-           
-            // console.log('form data:', user); //? Test
-            
-            const response = await fetch('http://127.0.0.1:8000/users/register/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json', 
-                },
-                body: user, // Send the JSON string as the body of the request
-            });
-
-            const data = await response.json();
-            // console.log('Setting authTokens:', JSON.stringify(data));
-            localStorage.setItem("authTokens", JSON.stringify(data));
-    
-        } catch (error){
-            console.error('Error during registration:', error);
-        }
-    }
-
-    // Handle login if the user decided to proceed filling out profile details
-    const handleLogin = async () => {
-
-        let response = await fetch('http://127.0.0.1:8000/users/token/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: emailAddress, password: password }),
-        });
-
-        let data = await response.json();
-
-        if (response.status === 200) {
-            const decodedToken = jwt.decode(data.access);
-            localStorage.setItem("authTokens", JSON.stringify(data));
-
-            // Redirect based on user role
-            const userRole = decodedToken.is_company ? "company" : decodedToken.is_applicant ? "applicant" : "unknown";
-            // console.log(userRole)
-            if (userRole === "company") {
-                router.push("/GENERAL/Register"); //! Change to company profile
-            } else if (userRole === "applicant") {
-                router.push("/APPLICANT/ApplicantHome"); //! Change to applicant profile
-            }
-        } else {
-            alert(data.error || 'Invalid credentials');
-        }
-    }
-
-    // Handle skip if the user decided to skip filling out profile details
-    const handleSkip = async () => {
-        let response = await fetch('http://127.0.0.1:8000/users/token/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: emailAddress, password: password }),
-        });
-
-        let data = await response.json();
-
-        if (response.status === 200) {
-            const decodedToken = jwt.decode(data.access);
-            localStorage.setItem("authTokens", JSON.stringify(data));
-
-            // Redirect based on user role
-            const userRole = decodedToken.is_company ? "company" : decodedToken.is_applicant ? "applicant" : "unknown";
-            // console.log(userRole)
-
-            if (userRole === "company") {
-                router.push("/GENERAL/Login"); //! Change to company home
-            } else if (userRole === "applicant") {
-                router.push("/APPLICANT/ApplicantHome"); //! Change to applicant home
-            }
-        } else {
-            alert(data.error || 'Invalid credentials');
-        }
-    }
+        const userData = {
+            email: emailAddress,
+            password: password,
+            is_company: isCompany,
+            is_applicant: isApplicant,
+        };
+        registerUser(userData); 
+    };
 
     const handleNextStep = () => {
         // Increment the step if role is selected
@@ -240,6 +163,10 @@ export default function Register() {
     const handlePreviousStep = () => {
         setStep(prevStep => prevStep - 1); // Move to the previous step
     };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="pb-20">
@@ -421,7 +348,7 @@ export default function Register() {
                                           Would you like to fill out Personal Information Forms?
                                       </p>
                                       <div className="flex justify-end">
-                                          <button className="button1 mt-7 flex items-center justify-center" onClick={handleLogin}>
+                                          <button className="button1 mt-7 flex items-center justify-center"  onClick={handleProceed}>
                                               <div className="flex items-center space-x-2">
                                                   <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
                                                       Yes
