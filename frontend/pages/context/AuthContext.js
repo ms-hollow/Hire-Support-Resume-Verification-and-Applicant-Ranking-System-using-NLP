@@ -29,6 +29,69 @@ export const AuthProvider = ({children}) => {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
+    const registerUser = async (userData) => {
+        try {
+            const response = await fetch('http://127.0.0.1:8000/users/register/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData), 
+            });
+    
+            const data = await response.json();
+            
+            if (response.ok) {
+                // console.log('Registration successful:', data);
+                setAuthTokens(data);
+                
+                if (data.access) {
+                    const decodedToken = jwt.decode(data.access);
+                    // console.log('Decoded Token:', decodedToken); 
+                    
+                    if (decodedToken) {
+                        setUser(decodedToken); 
+                        localStorage.setItem("authTokens", JSON.stringify(data));
+                    } else {
+                        console.log('Failed to decode token');
+                    }
+                } else {
+                    console.log('Access token is missing');
+                }
+            } else {
+                console.log('Registration failed:', data.error);
+            }
+        } catch (error) {
+            console.error('Error during registration:', error);
+        }
+    };
+    
+    // Handle proceed to profile page if user decides to fill out profile details
+    const handleProceed = async () => {
+        if (authTokens) {
+            if (user.is_applicant) {
+                router.push("/APPLICANT/ApplicantProfile");
+            } else if (user.is_company) {
+                router.push("/GENERAL/Register"); //! Change and redirect to company profile
+            } else {
+                console.error("Unknown user role");
+            }
+        }
+    };
+
+    // Handle skip profile details if user wants to skip
+    const handleSkip = async () => {
+       if (authTokens) {
+            if (user.is_applicant) {
+                router.push("/APPLICANT/ApplicantHome");
+            } else if (user.is_company) {
+                router.push("/GENERAL/Login");  //! Change and redirect to company home 
+            } else {
+                console.error("Unknown user role");
+            }
+       }
+    };
+    
     const loginUser = async (e) => {
         e.preventDefault();
 
@@ -158,6 +221,9 @@ export const AuthProvider = ({children}) => {
         loginUser,
         loginWithGoogle,
         logoutUser,
+        registerUser,
+        handleProceed,
+        handleSkip
     };
 
     return (

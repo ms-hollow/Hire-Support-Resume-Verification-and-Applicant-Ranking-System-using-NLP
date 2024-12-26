@@ -9,6 +9,7 @@ import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
 
 //TODO Search
+//TODO Hindi pa gumagana yung CLOSE button sa mobile view ng Job Details
 
 export default function ApplicantHome() {
 
@@ -20,6 +21,7 @@ export default function ApplicantHome() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+  
 
   // Redirect if authToken is not available, but do it only after mounting
   useEffect(() => {
@@ -37,7 +39,6 @@ export default function ApplicantHome() {
   }
 
   return (
-    <>
     <div>
       <ApplicantHeader />
       <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 mx-auto">
@@ -160,12 +161,37 @@ export default function ApplicantHome() {
           </div>
         </div>
 
-        <div className="flex flex-row pt-4 gap-2 pb-16">
-          <JobListings authToken={authTokens.access} />
-          <JobDetails authToken={authTokens.access} /> 
+        {/* Job Listings and Details */}
+      
+        <div className="flex flex-col w-full pt-4 gap-2 pb-16">
+          {/* Job Listings */}
+          <div className="flex flex-row gap-2">
+            <JobListings
+              authToken={authTokens?.access} // Trigger to open job details
+            />
+            {/* Job Details for Desktop */}
+            <div className="hidden md:block flex-grow">
+              <JobDetails authToken={authTokens?.access} />
+            </div>
+          </div>
+
+          {/* Job Details for Mobile (Animated Drawer) */}
+          <div className={`fixed top-24 w-full h-full bg-background transition-transform duration-300 pr-16 z-20 mb:hidden flex items-start overscroll-x-none`}>
+             <button
+              onClick={() => {
+              }}
+              className="absolute -top-8 right-16 text-xl text-fontcolor"
+            >
+              ✖
+            </button>
+            {/* Job Details */}
+            <JobDetails authToken={authTokens?.access} />
+          </div>
         </div>
+
+         
+
       </div>
-    </div>
-    </>
+      </div>
   );
 }
