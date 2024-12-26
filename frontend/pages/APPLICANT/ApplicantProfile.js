@@ -5,11 +5,8 @@ import PersonalInfo from "@/components/PersonalInfo";
 import GeneralFooter from "@/components/GeneralFooter";
 import AuthContext from "../context/AuthContext";
 import { useRouter } from 'next/router';
-<<<<<<< HEAD
-=======
 
 {/* Hindi pa nakacomponent yung Edit Button */}
->>>>>>> laica
 
 export default function ApplicantProfile() {
 
