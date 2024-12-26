@@ -77,7 +77,7 @@ export default function Register() {
         }
     
         try {
-            const emailCheckResponse = await fetch('http://127.0.0.1:8000/users/check-email/', {
+            const emailCheckResponse = await fetch('https://hire-support-resume-verification-and.onrender.com/users/check-email/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
