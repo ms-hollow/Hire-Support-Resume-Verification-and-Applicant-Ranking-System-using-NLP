@@ -13,6 +13,8 @@ import os
 from pathlib import Path
 import dj_database_url
 from datetime import timedelta
+import dj_database_url
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,6 +50,7 @@ INSTALLED_APPS = [
 
     # third party
     'corsheaders',
+    'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
@@ -57,6 +60,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'social_django',
+    'rest_framework_simplejwt.token_blacklist',
     'social_django',
     'rest_framework_simplejwt.token_blacklist',
     
@@ -75,11 +80,50 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication', # This enables JWT authentication
     ], 
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
+    ], 
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
 }
 
 from datetime import timedelta
 
 SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=90),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True, #? TRUE Para hindi na magamit ulit yung refresh token
+    "UPDATE_LAST_LOGIN": False,
+
+    "ALGORITHM": "HS256",
+    "VERIFYING_KEY": "",
+    "AUDIENCE": None,
+    "ISSUER": None,
+    "JSON_ENCODER": None,
+    "JWK_URL": None,
+    "LEEWAY": 0,
+
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+
+    "JTI_CLAIM": "jti",
+
+    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+
+    "TOKEN_OBTAIN_SERIALIZER": "users.serializers.MyTokenObtainPairView",
+    "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
+    "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
+    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
+    "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
+    "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
+}
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=90),
     "ROTATE_REFRESH_TOKENS": False,
@@ -130,6 +174,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "django.middleware.common.CommonMiddleware",
@@ -171,6 +216,13 @@ DATABASES = {
     }
 }
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
@@ -181,7 +233,19 @@ DATABASES = {
 #         'PORT': '', 
 #     }
 # }
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'main', 
+#         'USER': 'postgres',  
+#         'PASSWORD': 'admin',
+#         'HOST': 'localhost',  
+#         'PORT': '', 
+#     }
+# }
 
+# database_url = os.environ.get("DATABASE_URL")
+# DATABASES['default'] = dj_database_url.parse(database_url)  
+# postgresql://hiresupport_django_render_user:wpEtnqpwXq3xm9ItPLtOrInGpVVYdmOW@dpg-ct99m89opnds73e5vvg0-a.oregon-postgres.render.com/hiresupport_django_render
+DATABASES['default'] = dj_database_url.parse('postgresql://hiresupport_django_render_user:wpEtnqpwXq3xm9ItPLtOrInGpVVYdmOW@dpg-ct99m89opnds73e5vvg0-a.oregon-postgres.render.com/hiresupport_django_render') #? For Local Development 
 # database_url = os.environ.get("DATABASE_URL")
 # DATABASES['default'] = dj_database_url.parse(database_url)  
 # postgresql://hiresupport_django_render_user:wpEtnqpwXq3xm9ItPLtOrInGpVVYdmOW@dpg-ct99m89opnds73e5vvg0-a.oregon-postgres.render.com/hiresupport_django_render
@@ -233,8 +297,11 @@ AUTHENTICATION_BACKENDS = (
     'users.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
+LOGIN_DIRECT_URL = "/GENERAL/Login"
+LOGOUT_REDIRECT_URL = '/' 
 LOGIN_DIRECT_URL = "/GENERAL/Login"
 LOGOUT_REDIRECT_URL = '/' 
 

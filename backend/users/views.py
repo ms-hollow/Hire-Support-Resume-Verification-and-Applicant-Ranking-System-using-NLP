@@ -78,8 +78,68 @@ class MyTokenRefreshView(TokenRefreshView):
             response.data['refresh'] = refresh_token  # Add it back to the response
         return response
 
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Add custom claims
+        token['email'] = user.email
+        token['is_company'] = user.is_company
+        token['is_applicant'] = user.is_applicant
+
+        return token
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('username', None)
+        password = request.data.get('password', None)
+
+        # Validate email format
+        if not email:
+            return Response({'error': 'Email is required'}, status=400)
+        
+        try:
+            EmailValidator()(email)
+        except ValidationError:
+            return Response({'error': 'Invalid email format'}, status=400)
+
+        # Check for missing password
+        if not password:
+            return Response({'error': 'Password is required'}, status=400)
+
+        # Check if the user exists
+        user = User.objects.filter(email=email).first()
+        if user is None:
+            return Response({'error': 'Email does not exist'}, status=404)
+
+        # Check if the password is correct
+        if not check_password(password, user.password):
+            return Response({'error': 'Invalid password'}, status=400)
+
+        # Generate JWT token if validation passes
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            return Response(serializer.validated_data, status=200)
+        return Response({'error': 'Invalid credentials'}, status=400)
+    
+class MyTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        refresh_token = request.data.get('refresh')  # Get the refresh token from the request
+        if refresh_token:
+            response.data['refresh'] = refresh_token  # Add it back to the response
+        return response
+
 class RegisterUserView(APIView):
     def post(self, request):
+        # Check if the email already exists in the database
+        email = request.data.get('email')
+        if User.objects.filter(email=email).exists():
+            return Response({'email': ['This email is already registered.']}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Proceed with registration if email is unique
         # Check if the email already exists in the database
         email = request.data.get('email')
         if User.objects.filter(email=email).exists():
@@ -92,12 +152,21 @@ class RegisterUserView(APIView):
             # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
             access_token = refresh.access_token
+            access_token = refresh.access_token
 
+            access_token['is_company'] = user.is_company
+            access_token['is_applicant'] = user.is_applicant
             access_token['is_company'] = user.is_company
             access_token['is_applicant'] = user.is_applicant
 
             # Return the tokens in the response
+            # Return the tokens in the response
             return Response({
+                "access_token": str(access_token),
+                "refresh_token": str(refresh),
+            }, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 "access_token": str(access_token),
                 "refresh_token": str(refresh),
             }, status=status.HTTP_201_CREATED)
@@ -161,6 +230,32 @@ def auth_email(request):
         return Response({'error': 'Email does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['POST'])
+def check_email(request):
+    email = request.data.get('email', None)
+    
+    if not email:
+        return Response({'error': 'Email is required'}, status=400)
+    
+    # Check if the email already exists in the database
+    if User.objects.filter(email=email).exists():
+        return Response({'error': 'Email is already registered'}, status=409)
+    else:
+        return Response({'message': 'Email is available'}, status=200)
+    
+@api_view(['POST'])
+def auth_email(request):
+    email = request.data.get('email', None)
+    
+    if not email:
+        return Response({'error': 'Email is required'}, status=400)
+    
+    # Check if the email exists in the database
+    if User.objects.filter(email=email).exists():
+        return Response({'message': 'Account Found'}, status=200)
+    else:
+        return Response({'error': 'Email does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
 def google_login(request):
     token = request.data.get('token')
     if not token:
@@ -174,6 +269,8 @@ def google_login(request):
     
     user_info = response.json()
     email = user_info.get('email')
+
+    print(f"Google login successful. User email: {email}")  # Print the email from the token
 
     print(f"Google login successful. User email: {email}")  # Print the email from the token
 
@@ -193,7 +290,18 @@ def google_login(request):
     print(f"User is_applicant: {user.is_applicant}")  
 
     # Generate JWT tokens for the user, including the roles
+    # Print user details for debugging
+    print(f"User found: {user}")  
+    print(f"User is_company: {user.is_company}")  
+    print(f"User is_applicant: {user.is_applicant}")  
+
+    # Generate JWT tokens for the user, including the roles
     refresh = RefreshToken.for_user(user)
+    access_token = refresh.access_token
+
+    # Manually add the roles to the token
+    access_token['is_company'] = user.is_company
+    access_token['is_applicant'] = user.is_applicant
     access_token = refresh.access_token
 
     # Manually add the roles to the token
@@ -201,14 +309,54 @@ def google_login(request):
     access_token['is_applicant'] = user.is_applicant
 
     # Return the response with user data, including roles
+    # Return the response with user data, including roles
     return Response({
+        'access': str(access_token),
         'access': str(access_token),
         'refresh': str(refresh),
         'email': email,
         'is_company': user.is_company,
         'is_applicant': user.is_applicant,
+        'is_company': user.is_company,
+        'is_applicant': user.is_applicant,
     }, status=status.HTTP_200_OK)
 
+def test_csrf(request):
+    return render(request, 'users/test_csrf.html')
+
+from django.middleware.csrf import get_token
+from django.views.decorators.csrf import csrf_protect
+
+@csrf_protect
+def get_csrf_token(request):
+    csrf_token = get_token(request)
+    return JsonResponse({'csrf_token': csrf_token})
+
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt
+class PasswordResetRequest(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"detail": "No user found with this email."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Generate password reset token and uid
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(user.pk.encode()).decode()
+        
+        # Send the reset email
+        reset_link = f'http://localhost:3000/users/password-reset/{uid}/{token}/'
+        send_mail(
+            'Password Reset Request',
+            f'Click the link to reset your password: {reset_link}',
+            'noreply@yourdomain.com',
+            [email],
+            fail_silently=False,
+        )
+
+        return Response({"detail": "Password reset email sent."}, status=status.HTTP_200_OK)
 def test_csrf(request):
     return render(request, 'users/test_csrf.html')
 

@@ -74,7 +74,11 @@ export default function Register() {
         }
     
         try {
+<<<<<<< HEAD
             const emailCheckResponse = await fetch('http://127.0.0.1:8000/users/check-email/', {
+=======
+            const emailCheckResponse = await fetch('https://hire-support-resume-verification-and.onrender.com/users/check-email/', {
+>>>>>>> laica
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -159,7 +163,11 @@ export default function Register() {
            
             // console.log('form data:', user); //? Test
             
+<<<<<<< HEAD
             const response = await fetch('http://127.0.0.1:8000/users/register/', {
+=======
+            const response = await fetch('https://hire-support-resume-verification-and.onrender.com/users/register/', {
+>>>>>>> laica
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json', 
@@ -179,7 +187,11 @@ export default function Register() {
     // Handle login if the user decided to proceed filling out profile details
     const handleLogin = async () => {
 
+<<<<<<< HEAD
         let response = await fetch('http://127.0.0.1:8000/users/token/', {
+=======
+        let response = await fetch('https://hire-support-resume-verification-and.onrender.com/users/token/', {
+>>>>>>> laica
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: emailAddress, password: password }),
@@ -206,7 +218,11 @@ export default function Register() {
 
     // Handle skip if the user decided to skip filling out profile details
     const handleSkip = async () => {
+<<<<<<< HEAD
         let response = await fetch('http://127.0.0.1:8000/users/token/', {
+=======
+        let response = await fetch('https://hire-support-resume-verification-and.onrender.com/users/token/', {
+>>>>>>> laica
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: emailAddress, password: password }),
