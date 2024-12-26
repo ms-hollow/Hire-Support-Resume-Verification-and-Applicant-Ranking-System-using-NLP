@@ -60,7 +60,7 @@ const JobListings = ({ authToken }) => {
     try {
       // console.log("Token", authToken);
       const response = await fetch(
-        "http://127.0.0.1:8000/job/job-hirings/",
+        "https://hire-support-resume-verification-and.onrender.com/job/job-hirings/",
         {
           method: "GET",
           headers: {
