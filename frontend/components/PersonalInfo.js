@@ -42,7 +42,7 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
         if (!token) return;  
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/applicant/profile/edit/', {
+            const response = await fetch('https://hire-support-resume-verification-and.onrender.com/applicant/profile/edit/', {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -74,7 +74,7 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
 
         const getApplicantProfile = async () => {
             try {
-                const response = await fetch('http://127.0.0.1:8000/applicant/profile/view/', {
+                const response = await fetch('https://hire-support-resume-verification-and.onrender.com/applicant/profile/view/', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
