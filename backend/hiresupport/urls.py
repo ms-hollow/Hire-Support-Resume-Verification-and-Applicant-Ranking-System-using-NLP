@@ -30,4 +30,5 @@ urlpatterns = [
     path('job/', include('jobs.urls')),
     path('api-token-auth/', obtain_auth_token),
     path('accounts/', include('allauth.urls')),
+    path('drive/', include('google_drive.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

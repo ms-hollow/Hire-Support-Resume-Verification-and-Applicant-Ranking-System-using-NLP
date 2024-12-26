@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'company',
     'jobs',
     'dashboard',
+    'google_drive',
 ]
 
 REST_FRAMEWORK = {
@@ -256,7 +257,7 @@ CORS_ALLOWED_ORIGINS = [
 
 # Ensure the CSRF token can be trusted from your frontend
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:3000',
+    'http://localhost:3000', 'http://127.0.0.1:8000'
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True  # Allow requests from any origin (development)
@@ -281,3 +282,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER ='hs.testdev1@gmail.com'
 EMAIL_HOST_PASSWORD ='rzvnkbejhgaoqfjj'
 #rzvn kbej hgao qfjj
+
+GOOGLE_CLIENT_SECRET_FILE = 'client_secret.json'
+GOOGLE_REDIRECT_URI = 'http://localhost:8000/oauth2callback/'
+GOOGLE_DRIVE_FOLDER_ID = '17eN9CdIVu7nGhZ8n1aUFxr3PTxUK0BOE'
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760
