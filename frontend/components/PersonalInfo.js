@@ -43,7 +43,7 @@ const PersonalInfo = ({ showRegisterButton }) => {
   
         <div>
                 <form >
-                        <div className="flex lg:flex-row sm:flex-col gap-5 pb-5">
+                        <div className="flex flex-row gap-5 pb-5">
                             <div className="flex flex-col flex-grow">
                                 <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">First Name</p>
                                     <div className="h-medium rounded-xs border-2 border-fontcolor flex">

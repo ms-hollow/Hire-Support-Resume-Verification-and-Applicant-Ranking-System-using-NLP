@@ -10,6 +10,7 @@ export default function  ApplicationSubmit () {
                     <h1 className="lg:text-xl mb:text-xl sm:text-large text-primary mb-2">Application Submitted</h1>
                     <p id='full-name' className="font-thin lg:text-medium mb:text-meduim sm:text-xsmall xsm:text-xsmall text-fontcolor mb-8">Hi, NAME</p> 
 
+                    <div className="flex items-center justify-center ">
                     <div className="box-container px-8 py-5 mx-auto">
                         <p className="font-semibold lg:text-large mb:text-large sm:text-xsmall text-primary">Your application has been submitted!</p>
 
@@ -54,14 +55,15 @@ export default function  ApplicationSubmit () {
                         </div>
 
                         <div className="flex items-center justify-center">
-                            <Link href="APPLICANT/ApplicantHome">
+                            <Link href="/APPLICANT/MyJobs">
                                 <p className="text-medium text-fontcolor pt-4 pb-8 font-semibold underline">
                                     View your applications on My jobs
                                 </p>
                             </Link>
                         </div>
               
-                    </div> 
+                    </div>
+                    </div>
                 </div>
             <GeneralFooter/>
         </div>
