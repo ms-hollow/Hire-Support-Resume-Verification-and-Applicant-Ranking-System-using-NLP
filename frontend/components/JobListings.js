@@ -43,30 +43,50 @@ const SkeletonLoader = () => {
 
         </div>
     </div>
-
   );
 };
 
 const JobListings = ({ authToken }) => {
-  const [jobListings, setJobListings] = useState([]);
-  const [loading, setLoading] = useState(true); // New state for loading
-  const router = useRouter();
+    const [jobListings, setJobListings] = useState([]);
+    const [selectedJobId, setSelectedJobId] = useState(null);
+    const router = useRouter();
 
-  useEffect(() => {
-    getJobs();
-  }, []);
+    useEffect(()=> {
+        getJobs();
+    }, [])
 
-  const getJobs = async () => {
-    try {
-      // console.log("Token", authToken);
-      const response = await fetch(
-        "http://127.0.0.1:8000/job/job-hirings/",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + String(authToken),
-          },
+    let getJobs = async () => {
+
+        let response = await fetch('https://hire-support-resume-verification-and.onrender.com/job/job-hirings/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + String(authToken),
+            },
+        });
+        
+        let data = await response.json();
+    
+        if (response.status === 200) {
+            // Extract the properties you need from the fetched data
+            const filteredJobs = data.map((job) => ({
+                job_id: job.job_hiring_id,
+                job_title: job.job_title,
+                company_name: job.company_name,
+                job_industry: job.job_industry,
+                job_description: job.job_description || "No description available",
+                salary: job.salary 
+                ? `Php ${job.salary.min} - ${job.salary.max}` 
+                : "Not specified",
+                schedule: job.schedule,
+                location: job.work_location,
+                work_setup: job.work_setup,
+            }));
+    
+            setJobListings(filteredJobs); // Set the filtered data
+            // console.log(filteredJobs);
+        } else {
+            console.error("Failed to fetch job listings");
         }
       );
 
