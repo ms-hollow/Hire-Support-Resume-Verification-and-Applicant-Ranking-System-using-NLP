@@ -5,7 +5,7 @@ import AuthContext from "@/pages/context/AuthContext";
 
 //! PENDING
 
-const PersonalInfo = ({ showRegisterButton }) => {
+const PersonalInfo = ({ isEditable, onUpdateComplete  }) => {
     const { authTokens } = useContext(AuthContext);
 
     const [formData, setFormData] = useState({
@@ -37,6 +37,10 @@ const PersonalInfo = ({ showRegisterButton }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log(formData);
+
+        if (onUpdateComplete) {
+            onUpdateComplete();
+          }
     };
 
     return ( 
@@ -177,22 +181,22 @@ const PersonalInfo = ({ showRegisterButton }) => {
                         </div>
                             
                         <div className="flex justify-end">
-                            {showRegisterButton && (
+                            {isEditable && (
                                 <button onClick={handleSubmit} className="button1 mt-5 flex items-center justify-center">
-                                    <div className="flex items-center space-x-2">
+                                <div className="flex items-center space-x-2">
                                     <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-small font-medium text-center">
-                                        Register
+                                    {isEditable ? "Update" : "Register"}
                                     </p>
                                     <Image
-                                        src="/Arrow Right.svg"
-                                        width={23}
-                                        height={10}
-                                        alt="Notification Icon"
+                                    src="/Arrow Right.svg"
+                                    width={23}
+                                    height={10}
+                                    alt="Notification Icon"
                                     />
-                                    </div>
-                            </button>
+                                </div>
+                                </button>
                             )}
-                        </div>        
+                        </div>
                 </form>     
         </div>
   
