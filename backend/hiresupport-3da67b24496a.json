@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "hiresupport",
+  "private_key_id": "3da67b24496a5b35345edb54aa5e54b6848fb321",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDAUVzSkyVOc6a2\nmJrM/S499jHoFGZVO5tp4r6bnk0jLWL0JdrxxO3P4T/IFqyhhoOz1rBbr/B2qZyW\nljfvjd/IqVGFjybJGGCEkZGXZKOEFwPKkawxdLaD7c/ckrC3Bbf6XBBiIce/U0Ss\nf37YaxVd1+p2Y9+Dd0atpney+TY19SAW+bMvIpwCkfw4NmjvS8sVBqa02f1hdpiW\nm8kS69TucvXwJn0rDKav8uZd5BNsdhXUKwcmXyyxy55+EWO4arq0EHcWgMfXYU1V\n9OOwgXgZu1RyKlI/iDCCI2dhyqStfsfpvXDO0+hvFUqlj11bccBrIvufMEXZ3S95\nLrbePWz3AgMBAAECggEAFGwPaU+1fyE01jWvqo5Fd3r0oxUXe3w67VbmBWxypduk\noxHUsCZzV8cu7gvKWn9dmPP2rPsqk89AZj/0F1IqLgrHh2FDgx3oPJZLWZeW7ZNB\nac9nnlDV2NNLZrwvsR/AVlZUabdLQ3vk0lSE9G0FSykp0qyZsuza6ocU4EJ/3owb\nrf5hcBTkuL21r7KJ1zRWpsad2qRJ7YxBXtia4tmNGTNjwwB9RnmXBUsVNrrDush1\n/hTRUG3n1YhXEkWXWH8hlPI/CB2SCFIiOa6P2ma70Ijtn75sUxZzHg1nHQyC++56\n9jxMNzTNVHTy5fvNs3+Gs7UKaoyGd/KAG6bLTd7nIQKBgQD63piZM17iC24AvtwA\nsZZlZ1nTX3r36C99MwOouydBiLsxTvmHgXQZk9hGA3S9WIjL8HrV/vC536tlQarA\n6xPMTs2FjhRbsRiiOn/McDJ8lh3iv8mzXJneKTRqqkOLMLBmsrLtycjtuZABtCVm\nKKrcQHEQT0gw36VfWUGJgMQvTwKBgQDEQDl+GHgj5T9C2+eOdT9fCmaK8W7Xscwp\nbMqa+uGv3asgrRWzgwmr+g/K+1u/6b1XYcIEq/XO4LxEtwSniCp97aR/m7nQHGtZ\nVBPZGRLw8mi2gmIjemI2OZ9dpDFKeBF99GOdAhyXigF+yWPxx6NTMB/HknP5pBSk\n9Tj37by92QKBgHDgl2jXZGnxGp3bQsJNJY6a4h/pZjsFjdiXi53wF8m07AVTs5L0\n/HhFvZpDE9Peci7RFXQUMdxwd34n/dyv6UiUbIUbWK2pEZxtFfO2yACmyuurv+Wk\nVNdRUvRrh9ipH7YV0cyMbowIYnNhyzIcOkS/+h+MjL7w4kf0sThdZ+ihAoGBAIiL\nHvVK1Rw0fqVoF14Y2bSoqdv2S2argB86YGUgNTKFinE7vCOgAnSzkZVq+dU3LdPE\nYpeZhXchChzNMeHWbaocVB2tHcVcYJxQUVb1iSY3ov+JC/sfRYHw6Z7fhKQJkjIO\nfdhaBcax8IRkXrN0cYCJtTLIBQUmUm7LZ42ozW9RAoGBALT6tO4tjFTZOi6tkxZG\nzbQnQLRFcTwjw741+So5YhdChIRZPMADzxNBbkAp4S228ulAunHV/dJXg2pEC7lN\nTJyFQZ3MHqQ14btuC28FwBe81dk4YxS1yoEPn6Yz+1SP2pVKGHxh2mKBop1YWOnC\nyIYTIbVm/QaizPRJh+XNiijQ\n-----END PRIVATE KEY-----\n",
+  "client_email": "service-hiresupport@hiresupport.iam.gserviceaccount.com",
+  "client_id": "116680333140443798834",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/service-hiresupport%40hiresupport.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
