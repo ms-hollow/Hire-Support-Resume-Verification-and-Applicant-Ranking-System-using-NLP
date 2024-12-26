@@ -1,43 +1,58 @@
+import { useState } from 'react';
 import ApplicantHeader from "@/components/ApplicantHeader";
 import SavedJobs from "@/components/SavedJobs";
 import AppliedJobs from "@/components/AppliedJobs";
+import GeneralFooter from '@/components/GeneralFooter';
 
-export default function  MyJobs () {
-    return ( 
-        <div>
-            <ApplicantHeader/>
-            <div className="text-primary lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 sm:px-20 xsm:px-20 lg:px-20 mx-auto"><b>My Jobs</b></div>
-            <div className="relative flex justify-between items-center lg:pt-10 mb:pt-24 xsm:pt-24 sm:pt-24 lg:px-80 mb:px-80 sm:px-80 xsm:px-80 mx-auto">
-                {/* Shared Underline */}
-                <div className="absolute bottom-[-5px] w-[44%] h-[5px] bg-[#5352e9] transition-all duration-300 ease-in-out" id="hover-line-MyJobs"></div>
-    
-                {/* Saved */}
-                <p className="text-black font-normal cursor-pointer relative top-[-10px] hover:text-primary" 
-                    onMouseEnter={() => document.getElementById('hover-line-MyJobs').style.left = '5%'}
-                    onMouseLeave={() => document.getElementById('hover-line-MyJobs').style.left = '5%'}
-                    onClick={() => {
-                        document.getElementById('hover-line-MyJobs').style.left = '5%';
-                        document.getElementById('saved-jobs').style.display = 'block';
-                        document.getElementById('applied-jobs').style.display = 'none';
-                    }}>Saved</p>
-                
-                {/* Applied */}
-                <p className="text-black hover:text-primary font-normal cursor-pointer relative top-[-10px]" 
-                    onMouseEnter={() => document.getElementById('hover-line-MyJobs').style.left = '51%'}
-                    onMouseLeave={() => document.getElementById('hover-line-MyJobs').style.left = '51%'}
-                    onClick={() => {
-                        document.getElementById('hover-line-MyJobs').style.left = '51%';
-                        document.getElementById('saved-jobs').style.display = 'none';
-                        document.getElementById('applied-jobs').style.display = 'block';
-                    }}>Applied</p>
-           </div>
+export default function MyJobs() {
+  const [activeTab, setActiveTab] = useState('saved');
 
-            <div className="mt-0.25 h-[1px] w-[1200px] bg-[#5352E9] mx-auto"></div>
-            <div className='flex flex-row pt-4'>
-            <div id="saved-jobs" style={{ display: "block" }}><SavedJobs /></div>
-            <div id="applied-jobs" style={{ display: "none" }}><AppliedJobs /></div>
-            </div>
+  return (
+    <div>
+      <><ApplicantHeader />
+      <div className="py-20">
+        <div className="fixed text-primary md:px-20 sm:px-8 xsm:px-8">
+            <b className="text-lg">My Jobs</b>
         </div>
-        
-     );
+
+        <div className="flex justify-between w-[50%] relative z-10 pt-8 py-3 lg:mx-80 lg:w-[50%] md:w-[53%] md:mx-40 sm:w-[60%] sm:mx-20 xsm:w-[65%] xsm:mx-12">
+            {/* Saved */}
+            <p 
+                className={`text-fontcolor font-normal cursor-pointer px-10 ${activeTab === 'saved' ? 'text-primary' : ''}`}
+                onClick={() => setActiveTab('saved')}
+                >Saved</p>
+
+            {/* Applied */}
+            <p 
+                className={`text-fontcolor font-normal cursor-pointer ${activeTab === 'applied' ? 'text-primary' : ''}`}
+                onClick={() => setActiveTab('applied')}
+                >Applied</p>
+        </div>
+        {/* static underline */}
+        <div className="relative lg:w-[88%] lg:mx-20 md:w-[80%] md:mx-20 sm:w-[87%] sm:mx-8 xsm:w-[84%] xsm:mx-8">
+            <div className="mt-0.25 h-[1px] bg-primary"></div>
+        </div>
+        {/* dynamic underline */}
+        <div className="relative lg:w-[88%] lg:mx-20 md:w-[80%] md:mx-20 sm:w-[87%] sm:mx-8 xsm:w-[84%] xsm:mx-8">
+            <div 
+            className="absolute bottom-0 h-[5px] bg-primary transition-all duration-300 ease-in-out"
+            style={{
+                width: '50%',
+                left: activeTab === 'saved' ? '0%' : '50%'
+            }}
+            />
+        </div>
+
+        <div className='fixed flex flex-row pt-4 '>
+            <div id="saved-jobs" style={{ display: activeTab === 'saved' ? 'block' : 'none' }}>
+            <SavedJobs />
+            </div>
+            <div id="applied-jobs" style={{ display: activeTab === 'applied' ? 'block' : 'none' }}>
+            <AppliedJobs />
+            </div>
+          </div>
+        </div>
+      <GeneralFooter /></>
+    </div>
+  );
 }

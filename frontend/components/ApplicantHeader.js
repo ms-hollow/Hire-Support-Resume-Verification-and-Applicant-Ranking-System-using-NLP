@@ -45,12 +45,14 @@ const ApplicantHeader = () => {
       <div className="flex items-center gap-5">
         {/* Notification Icon */}
         <button className="pt-1">
-          <Image 
-            src="/Notification Icon.svg" 
-            width={39} 
-            height={30} 
-            alt="Notification Icon" 
-          />
+          <Link href="/APPLICANT/Notifications" className="ml-auto">
+            <Image 
+              src="/Notification Icon.svg" 
+              width={39} 
+              height={30} 
+              alt="Notification Icon" 
+            />
+            </Link>
         </button>
 
         {/* Profile Dropdown */}

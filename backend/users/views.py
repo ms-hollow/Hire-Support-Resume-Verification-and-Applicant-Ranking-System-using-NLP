@@ -11,13 +11,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 import requests
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.template.loader import render_to_string
-from django.contrib.sites.shortcuts import get_current_site
-from django.conf import settings
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.core.exceptions import ValidationError
@@ -92,17 +89,21 @@ class RegisterUserView(APIView):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+            
             # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
             access_token = refresh.access_token
 
+            # Add custom claims to the access token
             access_token['is_company'] = user.is_company
             access_token['is_applicant'] = user.is_applicant
+            access_token['email'] = user.email
 
             # Return the tokens in the response
             return Response({
-                "access_token": str(access_token),
-                "refresh_token": str(refresh),
+                "access": str(access_token),
+                "refresh": str(refresh),
+                "email": user.email
             }, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
