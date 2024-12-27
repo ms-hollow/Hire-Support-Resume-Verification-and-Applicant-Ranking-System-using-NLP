@@ -1,8 +1,10 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useCallback } from "react";
 import Image from "next/image";
 import GeneralFooter from "./GeneralFooter";
 import { useRouter } from "next/router";
 import AuthContext from "@/pages/context/AuthContext";
+
+//TODO Polish save and unsave animation
 
 const SkeletonLoader = () => {
   return (
@@ -49,7 +51,8 @@ const SkeletonLoader = () => {
 
 const JobListings = ({ authToken }) => {
   const [jobListings, setJobListings] = useState([]);
-  const [loading, setLoading] = useState(true); // New state for loading
+  const [loading, setLoading] = useState(true); 
+  const [savedStatus, setSavedStatus] = useState({});
   const router = useRouter();
 
   useEffect(() => {
@@ -94,7 +97,7 @@ const JobListings = ({ authToken }) => {
     } catch (error) {
       console.error("Error fetching jobs:", error);
     } finally {
-      setLoading(false); // Turn off loading after fetching
+      setLoading(false); 
     }
   };
 
@@ -109,12 +112,99 @@ const JobListings = ({ authToken }) => {
     );
   };
 
-   //TODO
-   const [isSaved, setIsSaved] = useState(false);
-   const toggleSave = () => {
-       setIsSaved(!isSaved);
-   };
-   
+  const getSavedJobs = useCallback(async () => {
+    try {
+      const response = await fetch(
+        "https://hire-support-resume-verification-and.onrender.com/applicant/saved-jobs/",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      const savedJobs = await response.json();
+
+      if (response.status === 200) {
+        const savedJobsIds = savedJobs.map((job) => job.job_hiring_id);
+        const savedStatusObj = jobListings.reduce((acc, job) => {
+          acc[job.job_id] = savedJobsIds.includes(job.job_id);
+          return acc;
+        }, {});
+        setSavedStatus(savedStatusObj);
+      } else {
+        console.error("Failed to fetch saved jobs");
+      }
+    } catch (error) {
+      console.error("Error fetching saved jobs:", error);
+    }
+  }, [authToken, jobListings])
+
+  useEffect(() => {
+    getSavedJobs(); 
+    const intervalId = setInterval(getSavedJobs, 10000); // Refresh yung pag retrieve every 10 seconds
+
+    return () => clearInterval(intervalId); 
+  }, [getSavedJobs]); 
+
+  const handleSaveJob = useCallback(async (jobId) => {
+    try {
+      const savedJobs = await fetch(
+        `https://hire-support-resume-verification-and.onrender.com/applicant/save-job/${jobId}/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+
+      if (savedJobs.ok) {
+        setSavedStatus((prevState) => ({
+          ...prevState,
+          [jobId]: true,
+        }));
+        alert("Job saved successfully!");
+      } else {
+        console.error(`Failed to save job: ${savedJobs.status}`);
+      }
+    } catch (error) {
+      console.error("Failed to save job:", error);
+    }
+  }, [authToken]);
+
+  const handleUnsaveJob = useCallback(async (jobId) => {
+    try {
+      await fetch(
+        `https://hire-support-resume-verification-and.onrender.com/applicant/unsave-job/${jobId}/`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      setSavedStatus((prevState) => ({
+        ...prevState,
+        [jobId]: false,
+      }));
+      alert("Job unsaved successfully!");
+    } catch (error) {
+      console.error("Failed to unsave job:", error);
+    }
+  }, [authToken]);
+
+  const toggleSave = (jobId) => {
+    if (savedStatus[jobId]) {
+      handleUnsaveJob(jobId);
+    } else {
+      handleSaveJob(jobId);
+    }
+  };
 
    if (!Array.isArray(jobListings)) {
        return <p>No job listings available.</p>;
@@ -134,12 +224,17 @@ const JobListings = ({ authToken }) => {
             >
               <div className="flex flex-row justify-between items-center">
                 <Image src="/Logo.png" width={30} height={30} alt="Company Logo" />
-                <Image
-                  src="/Unsave Icon.svg"
-                  width={13}
-                  height={11}
-                  alt="Save Icon"
-                />
+                <button
+                  onClick={() => toggleSave(job.job_id)}
+                  className="ml-auto"
+                >
+                  <Image
+                    src={savedStatus[job.job_id] ? "/Save Icon.svg" : "/Unsave Icon.svg"}
+                    width={13}
+                    height={11}
+                    alt={savedStatus[job.job_id] ? "Save Icon" : "Unsave Icon"}
+                  />
+                </button>
               </div>
               <p className="font-semibold text-fontcolor text-large mt-2">{job.job_title}</p>
               <p className="font-thin text-fontcolor text-xsmall">{job.company_name}</p>
