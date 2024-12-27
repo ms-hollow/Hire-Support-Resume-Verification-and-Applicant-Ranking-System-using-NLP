@@ -28,11 +28,8 @@ export default function ApplicantProfile() {
     }
   }, [authTokens, router]);
 
-  if (!authTokens) {
-      return <div>Loading...</div>;
-  }
-
   return (
+    <>
     <div >
       <ApplicantHeader />
       <div className="lg:pt-28 mb:pt-24 xsm:pt-24  sm:pt-24 mb:px-20 lg:px-20  sm:px-8 xsm:px-8 pb-8 mx-auto">
@@ -67,5 +64,6 @@ export default function ApplicantProfile() {
       </div>
       <GeneralFooter/>
     </div>
+    </>
   );
 }
