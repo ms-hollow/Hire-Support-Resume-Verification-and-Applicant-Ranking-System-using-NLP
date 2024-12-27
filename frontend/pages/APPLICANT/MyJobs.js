@@ -1,11 +1,22 @@
-import { useState } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import ApplicantHeader from "@/components/ApplicantHeader";
 import SavedJobs from "@/components/SavedJobs";
 import AppliedJobs from "@/components/AppliedJobs";
 import GeneralFooter from '@/components/GeneralFooter';
+import AuthContext from '../context/AuthContext';
+import { useRouter } from 'next/router';
 
 export default function MyJobs() {
   const [activeTab, setActiveTab] = useState('saved');
+
+  let {authTokens} = useContext(AuthContext);
+  const router = useRouter();
+
+  useEffect(() => {
+      if (!authTokens) {
+          router.push('/GENERAL/Login');
+      }
+    }, [authTokens, router]);
 
   return (
     <div>
@@ -45,10 +56,10 @@ export default function MyJobs() {
 
         <div className='fixed flex flex-row pt-4 '>
             <div id="saved-jobs" style={{ display: activeTab === 'saved' ? 'block' : 'none' }}>
-            <SavedJobs />
+              <SavedJobs />
             </div>
             <div id="applied-jobs" style={{ display: activeTab === 'applied' ? 'block' : 'none' }}>
-            <AppliedJobs />
+              <AppliedJobs />
             </div>
           </div>
         </div>
