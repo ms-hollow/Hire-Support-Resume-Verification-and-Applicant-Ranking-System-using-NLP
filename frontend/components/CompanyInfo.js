@@ -2,23 +2,8 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from 'next/image';
 
-const CompanyInfo = ({ isEditable, onUpdateComplete  }) => {
-   
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log(formData);
-
-        if (onUpdateComplete) {
-            onUpdateComplete();
-          }
-    };
+const CompanyInfo = () => {
+  
     return ( 
   
         <div>
@@ -27,7 +12,7 @@ const CompanyInfo = ({ isEditable, onUpdateComplete  }) => {
                             <div className="flex flex-col flex-grow">
                                 <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Company Name</p>
                                     <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                        <input type="text" id="company-name" name="CompanyName" placeholder="" required onChange={handleChange} ></input>
+                                        <input type="text" id="company-name" name="CompanyName" placeholder="" required /*onChange={handleChange}*/></input>
                                     </div>
                              </div>
                                   
@@ -36,7 +21,7 @@ const CompanyInfo = ({ isEditable, onUpdateComplete  }) => {
                             <div className="flex flex-col flex-grow">
                                 <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Industry/Sector</p>
                                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                            <select className="valid:text-fontcolor invalid:text-placeholder lg:text-small mb:text-xsmall sm:text-xsmall xsm:text-xsmall" id="city" name="city" required onChange={handleChange}>
+                                            <select className="valid:text-fontcolor invalid:text-placeholder lg:text-small mb:text-xsmall sm:text-xsmall xsm:text-xsmall" id="city" name="city" required/*onChange={handleChange}*/>
                                                 <option value=''  disabled selected hidden>Select Sector</option>
                                                 <option value='IT'>IT</option>
                                                 <option value='Computer Science'>Computer Science</option>   
@@ -46,7 +31,7 @@ const CompanyInfo = ({ isEditable, onUpdateComplete  }) => {
                             <div className="flex flex-col flex-grow">
                                 <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">No. of Employees</p>
                                     <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                        <input type="text" id="employee-number" name="employNum" placeholder="" required  onChange={handleChange}></input>
+                                        <input type="text" id="employee-number" name="employNum" placeholder="" required /*onChange={handleChange}*/></input>
                                     </div>
                             </div>
                         </div>
@@ -142,22 +127,21 @@ const CompanyInfo = ({ isEditable, onUpdateComplete  }) => {
                         </div>
                             
                         <div className="flex justify-end">
-                            {isEditable && (
-                                <button onClick={handleSubmit} className="button1 mt-5 flex items-center justify-center">
-                                <div className="flex items-center space-x-2">
-                                    <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-small font-medium text-center">
-                                    {isEditable ? "Update" : "Register"}
-                                    </p>
-                                    <Image
-                                    src="/Arrow Right.svg"
-                                    width={23}
-                                    height={10}
-                                    alt="Notification Icon"
-                                    />
-                                </div>
+                            <Link href="/APPLICANT/ApplicantHome"> 
+                                <button className="button1 mt-5 flex items-center justify-center"> 
+                                    <div className="flex items-center space-x-2">
+                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-small font-medium text-center">Register</p>
+                                        <Image 
+                                            src="/Arrow Right.svg" 
+                                            width={23} 
+                                            height={10} 
+                                            alt="Notification Icon" 
+                                        />
+                                    </div>
                                 </button>
-                            )}
-                        </div>
+                            </Link>
+                               
+                            </div>
                             
                            
                 </form>     

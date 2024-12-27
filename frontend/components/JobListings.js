@@ -58,6 +58,7 @@ const JobListings = ({ authToken }) => {
 
   const getJobs = async () => {
     try {
+      // console.log("Token", authToken);
       const response = await fetch(
         "https://hire-support-resume-verification-and.onrender.com/job/job-hirings/",
         {
@@ -190,4 +191,3 @@ const JobListingsWrapper = () => {
 };
 
 export default JobListingsWrapper;
-

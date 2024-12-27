@@ -22,12 +22,15 @@ export default function ApplicantProfile() {
     setIsEditable(false);
   };
 
-  useEffect(()=> {
-    if (!authTokens){
-      router.push("/GENERAL/Login");
+  useEffect(() => {
+    if (!authTokens) {
+        router.push('/GENERAL/Login');
     }
-  }, [])
+  }, [authTokens, router]);
 
+  if (!authTokens) {
+      return <div>Loading...</div>;
+  }
 
   return (
     <div >
