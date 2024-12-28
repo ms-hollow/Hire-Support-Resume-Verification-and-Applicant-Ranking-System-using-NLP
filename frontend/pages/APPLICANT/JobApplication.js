@@ -2,22 +2,34 @@ import ApplicantHeader from "@/components/ApplicantHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import Link from "next/link";
 import Image from 'next/image';
-import { useState } from "react";
-
+import { useState, useEffect, useContext, useCallback } from "react";
+import AuthContext from '../context/AuthContext';
+import { useRouter } from 'next/router';
+import jwt from 'jsonwebtoken';
+import { useAddressMapping } from "@/pages/utils/AddressMapping";
+import { useJobContext } from "../context/JobContext";
 
 export default function JobApplication () {
 
+        let {authTokens} = useContext(AuthContext);
+        const { jobDetails } = useJobContext();
+        
+        const [loading, setLoading] = useState(false);
+        const router = useRouter();
+        const { jobId } = router.query;
+        const { convertAddressCodes } = useAddressMapping();
+
         const [formData, setFormData] = useState({
-            firstName: "Laica",
-            lastName:"Ygot",
-            middleName: "Dawal",
-            email: "applicant@email.com",
-            contact_number: "09123456789",
-            sex: "Female",
-            date_of_birth: "12/12/2000",
-            age: "21",
-            complete: "Metro Manila, Philippines",
-            linkedin_profile: "https://linkedin-profile-Laica-yg",
+            firstName: '',
+            lastName:'',
+            middleName: '',
+            email: '',
+            contact_number: '',
+            sex: '',
+            date_of_birth: '',
+            age: '',
+            complete: '',
+            linkedin_profile: '',
         });
     
         const [step, setStep] = useState(1);
@@ -49,13 +61,97 @@ export default function JobApplication () {
             alert("Edit button clicked - implement your logic here.");
         };
 
+        useEffect(() => {
+            if (!authTokens?.access) {
+                console.log("No access token found");
+                return;
+            }
+
+            const decodedToken = jwt.decode(authTokens.access);
+            // console.log("Decoded token:", decodedToken);
+            
+            if (!decodedToken) {
+                console.log("Invalid or expired token");
+                return;
+            }
+
+            const getApplicantInfo = async () => {
+                try {
+                    const res = await fetch('https://hire-support-resume-verification-and.onrender.com/applicant/profile/view/', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${authTokens.access}`,
+                            'Content-Type': 'application/json',
+                        },
+                    });
+    
+                    if (res.ok) {
+                        const data = await res.json();
+                        // console.log("API Response:", data);
+
+                    const profileData = data?.profile_data;
+                    // console.log(profileData);
+
+                    // Ensure that profile_data exists before trying to access the address components
+                    if (profileData) {
+                        
+                        const { city, province, region, barangay } = profileData;
+                        const addressNames = convertAddressCodes(region, province, city, barangay);
+                        // console.log("converted", addressNames);
+                        const completeAddress = `${profileData.present_address}, ${addressNames.barangayName}, ${addressNames.cityName}, ${addressNames.provinceName}, ${addressNames.regionName}`;
+                        // console.log("Complete Address:", completeAddress);
+
+                        setFormData({
+                            firstName: profileData.first_name,
+                            lastName: profileData.last_name,
+                            middleName: profileData.middle_name,
+                            email: decodedToken.email,
+                            contact_number: profileData.contact_number,
+                            sex: profileData.sex,
+                            date_of_birth: profileData.date_of_birth,
+                            age: profileData.age,
+                            complete: completeAddress,
+                            linkedin_profile: profileData.linkedin_profile,
+                        });
+                        
+                    } else {
+                        console.error("Profile data not found in the response.");
+                    }
+                    
+                    } else {
+                        console.error("Failed to fetch applicant info, status:", res.status);
+                    }
+                } catch (error) {
+                    console.error("Error fetching applicant info:", error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+    
+            getApplicantInfo();
+        }, [authTokens]);
+
+        const navigateToApplicantDocuments = () => {
+            router.push({
+                pathname: '/APPLICANT/ApplicantDocuments',
+                query: { jobId }, 
+            });
+        };
+            
+        if (loading) {
+            return <p>Loading...</p>;
+        }
+    
+        if (!jobDetails) {
+            return <p>No job details found.</p>;
+        }
 
     return ( 
         <div>
             <ApplicantHeader/>
                 <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 sm:px-8 xsm:px-8 lg:px-20 py-8 mx-auto">
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
-                    <p className="font-semibold text-primary text-large pb-1">Job Title</p>
+                    <p className="font-semibold text-primary text-large pb-1">{jobDetails.job_title || 'No job title available'}</p>
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">Company</p>
                     <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-8 font-bold underline"> See job hiring details</p>
                     
@@ -138,8 +234,7 @@ export default function JobApplication () {
                                 </button>
                                 
 
-                                <button type="button" className="button1 flex items-center justify-center">
-                                    <Link href="/APPLICANT/ApplicantDocuments" className="ml-auto">
+                                <button onClick={navigateToApplicantDocuments} type="button" className="button1 flex items-center justify-center">  
                                         <div className="flex items-center space-x-2">
                                             <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Continue</p>
                                             <Image 
@@ -149,16 +244,11 @@ export default function JobApplication () {
                                                 alt="Continue Icon" 
                                             />
                                         </div>
-                                    </Link>
-
                                 </button>
                             </div>
                 
                         </div>
                     </div>
-
-
-
                 </div>
             <GeneralFooter/>
         </div>

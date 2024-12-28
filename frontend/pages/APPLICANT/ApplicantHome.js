@@ -4,7 +4,6 @@ import JobDetails from '@/components/JobDetails';
 import JobListings from '@/components/JobListings';
 import Image from 'next/image';
 import { useState, useEffect, useContext } from "react";
-import jwt from 'jsonwebtoken';
 import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
 
@@ -16,12 +15,12 @@ export default function ApplicantHome() {
   let {authTokens} = useContext(AuthContext);
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
+  const [applicantName, setApplicantName] = useState('');
 
   // Only run this after component is mounted to avoid mismatch between server/client render
   useEffect(() => {
     setIsMounted(true);
   }, []);
-  
 
   // Redirect if authToken is not available, but do it only after mounting
   useEffect(() => {
@@ -30,12 +29,45 @@ export default function ApplicantHome() {
     }
   }, [authTokens, isMounted, router]);
 
-  if (!isMounted) {
-    return null; 
-  }
+  const getApplicant = async () => {
+    try {
+      const response = await fetch(
+        'https://hire-support-resume-verification-and.onrender.com/applicant/profile/view/',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${authTokens.access}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
-  if (!authTokens) {
-    return null; 
+      if (response.ok) {
+        const data = await response.json();
+        const profileData = data?.profile_data;
+        if (profileData) {
+          setApplicantName(profileData.first_name);
+        } else {
+          console.error('Profile data not found in response.');
+        }
+      } else {
+        console.error('Failed to fetch applicant profile:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching applicant profile:', error);
+    }
+  };
+
+  // Fetch applicant data after mounting
+  useEffect(() => {
+    if (authTokens) {
+      getApplicant();
+    }
+  }, [authTokens]);
+
+  // Render nothing if not mounted or no authTokens
+  if (!isMounted || !authTokens) {
+    return null;
   }
 
   return (
@@ -43,7 +75,7 @@ export default function ApplicantHome() {
       <ApplicantHeader />
       <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 mx-auto">
         <div>
-          <p className="text-fontcolor">Hi, Name</p>
+          <p className="text-fontcolor">Hi, {applicantName || 'Guest'}</p>
         </div>
 
         {/* Search */}
