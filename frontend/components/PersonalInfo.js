@@ -77,7 +77,6 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
     const [barangays, setBarangays] = useState([]);
 
     useEffect(() => {
-      
         fetch("https://psgc.gitlab.io/api/regions/")
             .then((res) => res.json())
             .then((data) => setRegions(data))
