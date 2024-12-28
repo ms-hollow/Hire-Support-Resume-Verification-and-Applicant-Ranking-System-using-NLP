@@ -15,6 +15,7 @@ export default function Register() {
     const [step, setStep] = useState(0); // Tracks the current step
     const [showPassword, setShowPassword] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const [isEditable] = useState(false);
 
     const [isCompany, setCompany] = useState(false);
     const [isApplicant, setApplicant] = useState(false);
@@ -384,7 +385,7 @@ export default function Register() {
                                   </div>
                               ) : (
                                   // Display the PersonalInfo component
-                                  <PersonalInfo/>
+                                  <PersonalInfo isEditable={!isEditable}/>
                               )}
                              
                               <p className="text-xsmall text-fontcolor pt-4 pb-1 font-medium">
