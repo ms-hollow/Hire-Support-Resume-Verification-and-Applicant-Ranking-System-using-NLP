@@ -18,7 +18,7 @@ export default function ApplicantDocument () {
     const [isWorkExpOpen, setIsWorkExpOpen] = useState(false);
     const [isSeminarOpen, setIsSeminarOpen] = useState(false);
     const [isAddOpen, setIsAddOpen] = useState(false);
-    const { jobDetails } = useJobContext();
+    const { job } = useJobContext();
     let {authTokens} = useContext(AuthContext);
     
     const router = useRouter();
@@ -93,7 +93,7 @@ export default function ApplicantDocument () {
             <ApplicantHeader/>
                 <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 sm:px-8 xsm:px-8 lg:px-20 py-8 mx-auto">
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
-                    <p className="font-semibold text-primary text-large pb-1">{jobDetails.job_title}</p>
+                    <p className="font-semibold text-primary text-large pb-1">{job.job_title}</p>
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">Company</p>
                     <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-8 font-bold underline"> See job hiring details</p>
                     
