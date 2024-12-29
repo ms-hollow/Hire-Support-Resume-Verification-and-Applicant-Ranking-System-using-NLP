@@ -1,6 +1,9 @@
 import "@/styles/globals.css";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from "./context/AuthContext";
+import { JobProvider } from "./context/JobContext";
+
+
 import { useRouter } from 'next/router';
 import ProtectedPage from './utils/ProtectedPage'; 
 
@@ -23,6 +26,7 @@ export default function App({ Component, pageProps }) {
   return (
     <GoogleOAuthProvider clientId={clientId}>
       <AuthProvider>
+        <JobProvider>
         {isNoAuthRequired ? (
           <Component {...pageProps} />
         ) : (
@@ -30,6 +34,7 @@ export default function App({ Component, pageProps }) {
             <Component {...pageProps} />
           </ProtectedPage>
         )}
+        </JobProvider>
       </AuthProvider>
     </GoogleOAuthProvider>
   );

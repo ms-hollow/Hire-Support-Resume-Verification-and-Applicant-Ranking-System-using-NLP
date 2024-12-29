@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { useState, useContext, useEffect, useCallback } from "react";
 import AuthContext from "@/pages/context/AuthContext";
 import { useRouter } from 'next/router';
+import { useJobContext } from "@/pages/context/JobContext";
 
 const SkeletonLoader = () => {
     return (
@@ -82,7 +83,7 @@ const JobDetails = ({ authToken }) => {
 
     const router = useRouter();
     const { jobId } = router.query;
-    const [jobDetails, setJobDetails] = useState(null);
+    const { jobDetails, setJobDetails } = useJobContext();
     const [loading, setLoading] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
 
@@ -244,6 +245,13 @@ const JobDetails = ({ authToken }) => {
             console.error("Failed to unsave job:", error);
         }
     }, [jobId]);
+
+    const navigateToJobApplication = () => {
+        router.push({
+            pathname: '/APPLICANT/JobApplication',
+            query: { jobId }, // Passing jobId in query
+        });
+    };
     
     if (loading) {
         return <SkeletonLoader/>;
@@ -312,8 +320,8 @@ const JobDetails = ({ authToken }) => {
                 </div>
 
                 <div className="flex mt-4 gap-8">
-                    <button type="button" className="button1 flex items-center justify-center">
-                        <a href="/APPLICANT/JobApplication"className="lg:text-medium font-medium">Apply</a>
+                    <button onClick={navigateToJobApplication} type="button" className="button1 flex items-center justify-center">
+                        <p className="lg:text-medium font-medium">Apply</p>
                     </button>
 
                     <button 
