@@ -6,18 +6,16 @@ import { useState, useEffect, useContext, useCallback } from "react";
 import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import jwt from 'jsonwebtoken';
-import { useAddressMapping } from "@/pages/utils/AddressMapping";
 import { useJobContext } from "../context/JobContext";
 
 export default function JobApplication () {
 
         let {authTokens} = useContext(AuthContext);
-        const { jobDetails } = useJobContext();
-        
+        const [jobDetails, setJobDetails] = useState(null);
         const [loading, setLoading] = useState(false);
         const router = useRouter();
         const { jobId } = router.query;
-        const { convertAddressCodes } = useAddressMapping();
+        const { setJob } = useJobContext();
 
         const [formData, setFormData] = useState({
             firstName: '',
@@ -66,15 +64,13 @@ export default function JobApplication () {
                 console.log("No access token found");
                 return;
             }
-
+        
             const decodedToken = jwt.decode(authTokens.access);
-            // console.log("Decoded token:", decodedToken);
-            
             if (!decodedToken) {
                 console.log("Invalid or expired token");
                 return;
             }
-
+        
             const getApplicantInfo = async () => {
                 try {
                     const res = await fetch('https://hire-support-resume-verification-and.onrender.com/applicant/profile/view/', {
@@ -84,40 +80,29 @@ export default function JobApplication () {
                             'Content-Type': 'application/json',
                         },
                     });
-    
+        
                     if (res.ok) {
                         const data = await res.json();
-                        // console.log("API Response:", data);
-
-                    const profileData = data?.profile_data;
-                    // console.log(profileData);
-
-                    // Ensure that profile_data exists before trying to access the address components
-                    if (profileData) {
-                        
-                        const { city, province, region, barangay } = profileData;
-                        const addressNames = convertAddressCodes(region, province, city, barangay);
-                        // console.log("converted", addressNames);
-                        const completeAddress = `${profileData.present_address}, ${addressNames.barangayName}, ${addressNames.cityName}, ${addressNames.provinceName}, ${addressNames.regionName}`;
-                        // console.log("Complete Address:", completeAddress);
-
-                        setFormData({
-                            firstName: profileData.first_name,
-                            lastName: profileData.last_name,
-                            middleName: profileData.middle_name,
-                            email: decodedToken.email,
-                            contact_number: profileData.contact_number,
-                            sex: profileData.sex,
-                            date_of_birth: profileData.date_of_birth,
-                            age: profileData.age,
-                            complete: completeAddress,
-                            linkedin_profile: profileData.linkedin_profile,
-                        });
-                        
-                    } else {
-                        console.error("Profile data not found in the response.");
-                    }
-                    
+                        const profileData = data?.profile_data;
+                        // console.log(profileData);
+                        if (profileData) {
+                            const completeAddress = `${profileData.present_address}, ${profileData.barangay}, ${profileData.city}, ${profileData.region}`;
+                            // console.log(completeAddress);
+                            setFormData({
+                                firstName: profileData.first_name,
+                                lastName: profileData.last_name,
+                                middleName: profileData.middle_name,
+                                email: decodedToken.email,
+                                contact_number: profileData.contact_number,
+                                sex: profileData.sex,
+                                date_of_birth: profileData.date_of_birth,
+                                age: profileData.age,
+                                complete: completeAddress,
+                                linkedin_profile: profileData.linkedin_profile,
+                            });
+                        } else {
+                            console.error("Profile data not found in the response.");
+                        }
                     } else {
                         console.error("Failed to fetch applicant info, status:", res.status);
                     }
@@ -127,17 +112,39 @@ export default function JobApplication () {
                     setLoading(false);
                 }
             };
-    
+        
             getApplicantInfo();
         }, [authTokens]);
 
-        const navigateToApplicantDocuments = () => {
-            router.push({
-                pathname: '/APPLICANT/ApplicantDocuments',
-                query: { jobId }, 
-            });
-        };
-            
+        useEffect(() => { 
+            if (jobId) {
+                fetchJobDetails(Number(jobId)); // Trigger fetch when jobId changes
+            }
+        }, [jobId]);
+        
+        const fetchJobDetails = useCallback(async (id) => {
+            setLoading(true);
+            try {
+                const response = await fetch(`https://hire-support-resume-verification-and.onrender.com/job/hirings/${id}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authTokens.access}`,
+                    },
+                });
+        
+                if (response.status === 200) {
+                    const data = await response.json();
+                    setJobDetails(data);
+                    setJob(data);
+                }
+            } catch (error) {
+                console.error('Error fetching job details:', error);
+            } finally {
+                setLoading(false);
+            }
+        }, [authTokens]);
+
         if (loading) {
             return <p>Loading...</p>;
         }
@@ -146,6 +153,13 @@ export default function JobApplication () {
             return <p>No job details found.</p>;
         }
 
+        const navigateToApplicantDocuments = () => {
+            router.push({
+                pathname: '/APPLICANT/ApplicantDocuments',
+                query: { jobId }, 
+            });
+        };
+    
     return ( 
         <div>
             <ApplicantHeader/>

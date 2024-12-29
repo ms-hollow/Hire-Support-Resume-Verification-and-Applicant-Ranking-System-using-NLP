@@ -2,7 +2,6 @@ import Image from 'next/image';
 import { useState, useContext, useEffect, useCallback } from "react";
 import AuthContext from "@/pages/context/AuthContext";
 import { useRouter } from 'next/router';
-import { useJobContext } from "@/pages/context/JobContext";
 
 const SkeletonLoader = () => {
     return (
@@ -83,7 +82,7 @@ const JobDetails = ({ authToken }) => {
 
     const router = useRouter();
     const { jobId } = router.query;
-    const { jobDetails, setJobDetails } = useJobContext();
+    const [jobDetails, setJobDetails] = useState(null);
     const [loading, setLoading] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
 

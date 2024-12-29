@@ -3,10 +3,10 @@ import { createContext, useState, useContext } from "react";
 const JobContext = createContext();
 
 export const JobProvider = ({ children }) => {
-    const [jobDetails, setJobDetails] = useState(null);
+    const [job, setJob] = useState(null);
 
     return (
-        <JobContext.Provider value={{ jobDetails, setJobDetails }}>
+        <JobContext.Provider value={{ job, setJob}}>
             {children}
         </JobContext.Provider>
     );
