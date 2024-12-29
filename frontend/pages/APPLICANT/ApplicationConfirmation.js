@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { useState } from "react";
 import ReviewApplication from "@/components/ReviewApplication";
 
-
 export default function ApplicationConfirmation () {
 
     const [isChecked, setIsChecked] = useState(false);
