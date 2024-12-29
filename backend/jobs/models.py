@@ -54,28 +54,14 @@ class ScoringCriteria(models.Model):
 
 class JobApplication(models.Model):
 
-    PENDING = 'Pending'
-    SHORTLISTED = 'Shortlisted'
-    ACCEPTED = 'Accepted'
-    REJECTED = 'Rejected'
-    CANCELLED = 'Cancelled'
-
-    STATUS_CHOICES = [
-        (PENDING, 'Pending'),
-        (SHORTLISTED, 'Shortlisted'),
-        (ACCEPTED, 'Accepted'),
-        (REJECTED, 'Rejected'),
-        (CANCELLED, 'Cancelled'),
-    ]
-    
     job_application_id = models.AutoField(primary_key=True)
     job_hiring = models.ForeignKey(JobHiring, on_delete=models.CASCADE)
     applicant = models.ForeignKey('applicant.Applicant', on_delete=models.CASCADE)  
     email = models.EmailField()  
     application_date = models.DateField(auto_now_add=True)
-    application_status = models.CharField(max_length=20, choices=STATUS_CHOICES,  default=PENDING)
-    scores = models.JSONField(blank=True, null=True)
-    verification_result = models.JSONField(blank=True, null=True)
+    application_status = models.CharField(max_length=20)
+    # scores = models.JSONField(blank=True, null=True)
+    # verification_result = models.JSONField(blank=True, null=True)
 
     def __str__(self):
         return f"Application for {self.job_hiring.job_title}"
