@@ -59,7 +59,7 @@ class JobApplication(models.Model):
     applicant = models.ForeignKey('applicant.Applicant', on_delete=models.CASCADE)  
     email = models.EmailField()  
     application_date = models.DateField(auto_now_add=True)
-    application_status = models.CharField(max_length=20)
+    application_status = models.CharField(max_length=20, default='draft')
     # scores = models.JSONField(blank=True, null=True)
     # verification_result = models.JSONField(blank=True, null=True)
 

@@ -6,166 +6,150 @@ import { useState, useEffect, useContext, useCallback } from "react";
 import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import jwt from 'jsonwebtoken';
-import { useJobContext } from "../context/JobContext";
 
 export default function JobApplication () {
 
-        let {authTokens} = useContext(AuthContext);
-        const [jobDetails, setJobDetails] = useState(null);
-        const [loading, setLoading] = useState(false);
-        const router = useRouter();
-        const { jobId } = router.query;
-        const { setJob } = useJobContext();
+    let {authTokens} = useContext(AuthContext);
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
+    const { jobId } = router.query;
 
-        const [formData, setFormData] = useState({
-            firstName: '',
-            lastName:'',
-            middleName: '',
-            email: '',
-            contact_number: '',
-            sex: '',
-            date_of_birth: '',
-            age: '',
-            complete: '',
-            linkedin_profile: '',
-        });
-    
-        const [step, setStep] = useState(1);
-    
-        const handleChange = (e) => {
-            const { name, value } = e.target;
-            const updatedData = { ...formData, [name]: value };
-            setFormData(updatedData);
-    
-            const fields = Object.keys(formData);
-            const filledFields = fields.filter((field) => formData[field] || updatedData[field]);
-            setStep(Math.min(filledFields.length, fields.length));
-        };
-    
-        const handleSubmit = async (e) => {
-            e.preventDefault();
-    
-            const response = await fetch("/api/submit-info", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName:'',
+        middleName: '',
+        email: '',
+        contact_number: '',
+        sex: '',
+        date_of_birth: '',
+        age: '',
+        complete: '',
+        linkedin_profile: '',
+    });
+
+    const [step, setStep] = useState(1);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        const updatedData = { ...formData, [name]: value };
+        setFormData(updatedData);
+
+        const fields = Object.keys(formData);
+        const filledFields = fields.filter((field) => formData[field] || updatedData[field]);
+        setStep(Math.min(filledFields.length, fields.length));
+    };
+
+    //TODO Send draft job application and get the job application ID
+
+    const savePersonalInfo = async (formData) => {
+        try {
+            const response = await fetch('/api/create-job-application/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify(formData),
             });
     
-            const result = await response.json();
-            alert(result.message);
-        };
+            if (response.ok) {
+                const data = await response.json();
+                sessionStorage.setItem('jobApplicationId', data.job_application_id);
+                const application_id = sessionStorage.getItem('jobApplicationId');
+                console.log(application_id);
+            } else {
+                console.error('Error saving personal info');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    const handleEdit = () => {
+        alert("Edit button clicked - implement your logic here.");
+    };
+
+    useEffect(() => {
+        if (!authTokens?.access) {
+            console.log("No access token found");
+            return;
+        }
     
-        const handleEdit = () => {
-            alert("Edit button clicked - implement your logic here.");
-        };
-
-        useEffect(() => {
-            if (!authTokens?.access) {
-                console.log("No access token found");
-                return;
-            }
-        
-            const decodedToken = jwt.decode(authTokens.access);
-            if (!decodedToken) {
-                console.log("Invalid or expired token");
-                return;
-            }
-        
-            const getApplicantInfo = async () => {
-                try {
-                    const res = await fetch('https://hire-support-resume-verification-and.onrender.com/applicant/profile/view/', {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${authTokens.access}`,
-                            'Content-Type': 'application/json',
-                        },
-                    });
-        
-                    if (res.ok) {
-                        const data = await res.json();
-                        const profileData = data?.profile_data;
-                        // console.log(profileData);
-                        if (profileData) {
-                            const completeAddress = `${profileData.present_address}, ${profileData.barangay}, ${profileData.city}, ${profileData.region}`;
-                            // console.log(completeAddress);
-                            setFormData({
-                                firstName: profileData.first_name,
-                                lastName: profileData.last_name,
-                                middleName: profileData.middle_name,
-                                email: decodedToken.email,
-                                contact_number: profileData.contact_number,
-                                sex: profileData.sex,
-                                date_of_birth: profileData.date_of_birth,
-                                age: profileData.age,
-                                complete: completeAddress,
-                                linkedin_profile: profileData.linkedin_profile,
-                            });
-                        } else {
-                            console.error("Profile data not found in the response.");
-                        }
-                    } else {
-                        console.error("Failed to fetch applicant info, status:", res.status);
-                    }
-                } catch (error) {
-                    console.error("Error fetching applicant info:", error);
-                } finally {
-                    setLoading(false);
-                }
-            };
-        
-            getApplicantInfo();
-        }, [authTokens]);
-
-        useEffect(() => { 
-            if (jobId) {
-                fetchJobDetails(Number(jobId)); // Trigger fetch when jobId changes
-            }
-        }, [jobId]);
-        
-        const fetchJobDetails = useCallback(async (id) => {
-            setLoading(true);
+        const decodedToken = jwt.decode(authTokens.access);
+        if (!decodedToken) {
+            console.log("Invalid or expired token");
+            return;
+        }
+    
+        const getApplicantInfo = async () => {
             try {
-                const response = await fetch(`https://hire-support-resume-verification-and.onrender.com/job/hirings/${id}/`, {
+                const res = await fetch('https://hire-support-resume-verification-and.onrender.com/applicant/profile/view/', {
                     method: 'GET',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${authTokens.access}`,
+                        'Content-Type': 'application/json',
                     },
                 });
-        
-                if (response.status === 200) {
-                    const data = await response.json();
-                    setJobDetails(data);
-                    setJob(data);
+    
+                if (res.ok) {
+                    const data = await res.json();
+                    const profileData = data?.profile_data;
+                    
+                    // console.log(profileData);
+                    if (profileData) {
+                        const completeAddress = `${profileData.present_address}, ${profileData.barangay}, ${profileData.city}, ${profileData.region}`;
+                        // console.log(completeAddress);
+                        setFormData({
+                            firstName: profileData.first_name,
+                            lastName: profileData.last_name,
+                            middleName: profileData.middle_name,
+                            email: decodedToken.email,
+                            contact_number: profileData.contact_number,
+                            sex: profileData.sex,
+                            date_of_birth: profileData.date_of_birth,
+                            age: profileData.age,
+                            complete: completeAddress,
+                            linkedin_profile: profileData.linkedin_profile,
+                        });
+                        
+                    } else {
+                        console.error("Profile data not found in the response.");
+                    }
+                } else {
+                    console.error("Failed to fetch applicant info, status:", res.status);
                 }
             } catch (error) {
-                console.error('Error fetching job details:', error);
+                console.error("Error fetching applicant info:", error);
             } finally {
                 setLoading(false);
             }
-        }, [authTokens]);
-
-        if (loading) {
-            return <p>Loading...</p>;
-        }
-    
-        if (!jobDetails) {
-            return <p>No job details found.</p>;
-        }
-
-        const navigateToApplicantDocuments = () => {
-            router.push({
-                pathname: '/APPLICANT/ApplicantDocuments',
-                query: { jobId }, 
-            });
         };
+    
+        getApplicantInfo();
+    }, [authTokens]);
+
+    const getTitleFromLocalStorage = () => {
+        const jobTitle = localStorage.getItem('job_title');
+        return jobTitle ? jobTitle : null; 
+    };
+
+    if (loading) {
+        return <p className="text-accent">Loading... (temporary) </p>;
+    } 
+
+    const navigateToApplicantDocuments = () => {
+        savePersonalInfo();
+        router.push({
+            pathname: '/APPLICANT/ApplicantDocuments',
+            query: { jobId }, 
+        });
+    };
     
     return ( 
         <div>
             <ApplicantHeader/>
                 <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 sm:px-8 xsm:px-8 lg:px-20 py-8 mx-auto">
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
-                    <p className="font-semibold text-primary text-large pb-1">{jobDetails.job_title || 'No job title available'}</p>
+                    <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">Company</p>
                     <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-8 font-bold underline"> See job hiring details</p>
                     

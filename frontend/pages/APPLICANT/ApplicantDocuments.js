@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { useState, useEffect, useContext, useCallback } from "react";
 import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
-import { useJobContext } from "../context/JobContext";
 
 //TODO Connect frontend to backend
 
@@ -18,9 +17,7 @@ export default function ApplicantDocument () {
     const [isWorkExpOpen, setIsWorkExpOpen] = useState(false);
     const [isSeminarOpen, setIsSeminarOpen] = useState(false);
     const [isAddOpen, setIsAddOpen] = useState(false);
-    const { job } = useJobContext();
-    let {authTokens} = useContext(AuthContext);
-    
+
     const router = useRouter();
     const { jobId } = router.query;
 
@@ -32,6 +29,18 @@ export default function ApplicantDocument () {
         seminarCertificate: { file: "", option: "upload" },
         additionalDocuments: { file: "", option: "upload" },
     });
+
+    const getTitleFromLocalStorage = () => {
+        const jobTitle = localStorage.getItem('job_title');
+        return jobTitle ? jobTitle : null; 
+    };
+
+    const goBack = () => {
+        router.push({
+            pathname: '/APPLICANT/JobApplication',
+            query: { jobId }, 
+        });
+    };
 
     const handleFileUpload = (e, document) => {
         const { files } = e.target;
@@ -81,19 +90,12 @@ export default function ApplicantDocument () {
         alert("Documents submitted successfully!");
     };
 
-    const goBack = () => {
-        router.push({
-            pathname: '/APPLICANT/JobApplication',
-            query: { jobId }, 
-        });
-    };
-
     return ( 
         <div>
             <ApplicantHeader/>
                 <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 sm:px-8 xsm:px-8 lg:px-20 py-8 mx-auto">
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
-                    <p className="font-semibold text-primary text-large pb-1">{job.job_title}</p>
+                    <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">Company</p>
                     <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-8 font-bold underline"> See job hiring details</p>
                     

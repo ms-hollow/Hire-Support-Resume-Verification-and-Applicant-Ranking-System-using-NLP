@@ -164,33 +164,29 @@ def show_recent_searches(request):
 
     return Response(result_data)
 
-
 #* Create Job Application
-@api_view(['POST'])
+@api_view(['POST', 'PATCH'])
 def create_job_application(request):
     if request.method == 'POST':
-        # Get non-file data
-        data = request.data.copy()
-        
-        # Remove files-related fields from data to avoid issues with validation
-        document_types = data.pop('document_type', [])
-        document_files = request.FILES.getlist('document_file')
-
-        serializer = JobApplicationSerializer(data=data)
-        
+        # Create a draft application
+        serializer = JobApplicationSerializer(data=request.data)
         if serializer.is_valid():
-            with transaction.atomic():  # Optional, to ensure all-or-nothing saving
-                job_application = serializer.save()
-                
-                # Save each file with corresponding document type
-                for doc_type, doc_file in zip(document_types, document_files):
-                    JobApplicationDocument.objects.create(
-                        job_application=job_application,
-                        document_type=doc_type,
-                        document_file=doc_file
-                    )
-                
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            job_application = serializer.save(application_status='draft')
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PATCH':
+        # Update the application
+        job_application_id = request.data.get('job_application_id')
+        try:
+            job_application = JobApplication.objects.get(pk=job_application_id)
+        except JobApplication.DoesNotExist:
+            return Response({'error': 'Job application not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = JobApplicationSerializer(job_application, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #* Delete Job Application
