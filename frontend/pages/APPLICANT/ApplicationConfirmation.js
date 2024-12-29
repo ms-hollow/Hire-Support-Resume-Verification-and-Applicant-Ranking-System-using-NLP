@@ -4,10 +4,13 @@ import Link from "next/link";
 import Image from 'next/image';
 import { useState } from "react";
 import ReviewApplication from "@/components/ReviewApplication";
+import { useRouter } from 'next/router';
 
 export default function ApplicationConfirmation () {
 
     const [isChecked, setIsChecked] = useState(false);
+    const router = useRouter();
+    const { jobId } = router.query;
 
     const handleCheckboxChange = (e) => {
         setIsChecked(e.target.checked);
@@ -19,6 +22,19 @@ export default function ApplicationConfirmation () {
         return;
         }
         alert("Application submitted successfully!");
+    };
+
+    const getJobIdFromLocalStorage = () => {
+        const jobId = localStorage.getItem('jobId');
+        return jobId ? jobId : null; // Return null if jobId doesn't exist
+    };
+
+    const goBack = () => {
+        const jobId = getJobIdFromLocalStorage();  // Retrieve jobId from localStorage
+        router.push({
+            pathname: '/APPLICANT/ApplicantDocuments',
+            query: { jobId }, 
+        });
     };
 
     return ( 
@@ -69,18 +85,16 @@ export default function ApplicationConfirmation () {
 
                             <div className="flex justify-between mt-1">
                                 
-                                <button type="button" className="button2 flex items-center justify-center">
-                                    <Link href="/APPLICANT/ApplicantDocuments" className="ml-auto">
-                                        <div className="flex items-center space-x-2">
-                                            <Image 
-                                                src="/Arrow Left.svg" 
-                                                width={23} 
-                                                height={10} 
-                                                alt="Back Icon" 
-                                            />
-                                            <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Back</p>
-                                        </div>
-                                    </Link>
+                                <button onClick={goBack} type="button" className="button2 flex items-center justify-center">
+                                    <div className="flex items-center space-x-2">
+                                        <Image 
+                                            src="/Arrow Left.svg" 
+                                            width={23} 
+                                            height={10} 
+                                            alt="Back Icon" 
+                                        />
+                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Back</p>
+                                    </div>
                                 </button>
                                 
 
