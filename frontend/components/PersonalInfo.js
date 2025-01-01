@@ -85,17 +85,21 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
 
     useEffect(() => {
         if (formData.region) {
-            if (formData.region === '130000000') {
+            if (formData.region === '130000000') { 
                 setProvinces([]); 
-                fetch(`https://psgc.gitlab.io/api/regions/${130000000}/cities-municipalities/`)
+                fetch(`https://psgc.gitlab.io/api/regions/${formData.region}/cities-municipalities/`)
                     .then((res) => res.json())
-                    .then((data) => setCities(data))
+                    .then((data) => {
+                        setCities(data);
+                        setFormData({ ...formData, province: '', city: '', barangay: '' }); 
+                    })
                     .catch((err) => console.error("Error fetching cities for NCR:", err));
             } else {
                 fetch(`https://psgc.gitlab.io/api/regions/${formData.region}/provinces/`)
                     .then((res) => res.json())
                     .then((data) => setProvinces(data))
                     .catch((err) => console.error("Error fetching provinces:", err));
+                setCities([]); 
             }
         } else {
             setProvinces([]);
@@ -103,18 +107,18 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
             setBarangays([]);
         }
     }, [formData.region]);
-
+    
     useEffect(() => {
-        if (formData.province) {
+        if (formData.province && formData.region !== '130000000') { 
             fetch(`https://psgc.gitlab.io/api/provinces/${formData.province}/cities-municipalities/`)
                 .then((res) => res.json())
                 .then((data) => setCities(data))
                 .catch((err) => console.error("Error fetching cities:", err));
-        } else {
+        } else if (formData.region !== '130000000') {
             setCities([]);
-            setBarangays([]);
         }
-    }, [formData.province]);
+    }, [formData.province, formData.region]);
+    
 
     useEffect(() => {
         if (formData.city) {
@@ -138,7 +142,13 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
         e.preventDefault();
         const token = authTokens?.access; 
         if (!token) return;  
-    
+ 
+        // Remove the province field if the region is NCR
+        const regiondata = { ...formData };
+        if (formData.region === '130000000') {
+            delete regiondata.province;
+        }
+
         try {
             const response = await fetch('https://hire-support-resume-verification-and.onrender.com/applicant/profile/edit/', {
                 method: 'PUT',
@@ -146,7 +156,7 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(regiondata),
             });
     
             if (response.ok) {
@@ -330,7 +340,7 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
                     <div className="flex flex-col flex-grow">
                         <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Province</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <select className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall" id="province" name="province" value={formData.province}  onChange={handleChange}   required={!formData.region || formData.region !== 'NCR'}  disabled={formData.region === 'NCR'} >
+                            <select className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall" id="province" name="province" value={formData.province}  onChange={handleChange}   required={formData.region !== '130000000'}  disabled={formData.region === '130000000'} >
                             <option value="" disabled selected hidden>Select Province</option>
                                 {provinces.map((province) => (
                                     <option key={province.code} value={province.code}>
