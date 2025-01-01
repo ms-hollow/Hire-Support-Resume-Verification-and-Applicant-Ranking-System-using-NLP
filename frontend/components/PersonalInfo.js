@@ -77,117 +77,68 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
     const [barangays, setBarangays] = useState([]);
 
     useEffect(() => {
-        // Fetch regions
-        const fetchRegions = async () => {
-            try {
-                const res = await fetch("https://psgc.gitlab.io/api/regions/");
-                const data = await res.json();
-                setRegions(data);
-            } catch (err) {
-                console.error("Error fetching regions:", err);
-            }
-        };
-        fetchRegions();
+        fetch("https://psgc.gitlab.io/api/regions/")
+            .then((res) => res.json())
+            .then((data) => setRegions(data))
+            .catch((err) => console.error("Error fetching regions:", err));
     }, []);
 
     useEffect(() => {
-        // Fetch provinces if region is selected
-        const fetchProvincesAndCities = async () => {
-            if (!formData.region) return;
-            
-            try {
-                if (formData.region === '130000000') {
-                    // If NCR, fetch cities directly
-                    setProvinces([]); 
-                    const resCities = await fetch(`https://psgc.gitlab.io/api/regions/${130000000}/cities-municipalities/`);
-                    const dataCities = await resCities.json();
-                    setCities(dataCities);
-                } else {
-                    // Otherwise fetch provinces and cities
-                    const resProvinces = await fetch(`https://psgc.gitlab.io/api/regions/${formData.region}/provinces/`);
-                    const dataProvinces = await resProvinces.json();
-                    setProvinces(dataProvinces);
-                    setCities([]); // Clear cities as they depend on the province
-                }
-            } catch (err) {
-                console.error("Error fetching provinces or cities:", err);
+        if (formData.region) {
+            if (formData.region === '130000000') {
+                setProvinces([]); 
+                fetch(`https://psgc.gitlab.io/api/regions/${130000000}/cities-municipalities/`)
+                    .then((res) => res.json())
+                    .then((data) => setCities(data))
+                    .catch((err) => console.error("Error fetching cities for NCR:", err));
+            } else {
+                fetch(`https://psgc.gitlab.io/api/regions/${formData.region}/provinces/`)
+                    .then((res) => res.json())
+                    .then((data) => setProvinces(data))
+                    .catch((err) => console.error("Error fetching provinces:", err));
             }
-        };
-        fetchProvincesAndCities();
+        } else {
+            setProvinces([]);
+            setCities([]);
+            setBarangays([]);
+        }
     }, [formData.region]);
 
     useEffect(() => {
-        // Fetch cities if province is selected
-        const fetchCitiesAndBarangays = async () => {
-            if (!formData.province) return;
-
-            try {
-                const resCities = await fetch(`https://psgc.gitlab.io/api/provinces/${formData.province}/cities-municipalities/`);
-                const dataCities = await resCities.json();
-                setCities(dataCities);
-                setBarangays([]); // Clear barangays as they depend on the city
-            } catch (err) {
-                console.error("Error fetching cities:", err);
-            }
-        };
-        fetchCitiesAndBarangays();
+        if (formData.province) {
+            fetch(`https://psgc.gitlab.io/api/provinces/${formData.province}/cities-municipalities/`)
+                .then((res) => res.json())
+                .then((data) => setCities(data))
+                .catch((err) => console.error("Error fetching cities:", err));
+        } else {
+            setCities([]);
+            setBarangays([]);
+        }
     }, [formData.province]);
 
     useEffect(() => {
-        // Fetch barangays if city is selected
-        const fetchBarangays = async () => {
-            if (!formData.city) return;
-
-            try {
-                const resBarangays = await fetch(`https://psgc.gitlab.io/api/cities-municipalities/${formData.city}/barangays/`);
-                const dataBarangays = await resBarangays.json();
-                setBarangays(dataBarangays);
-            } catch (err) {
-                console.error("Error fetching barangays:", err);
-            }
-        };
-        fetchBarangays();
+        if (formData.city) {
+            fetch(`https://psgc.gitlab.io/api/cities-municipalities/${formData.city}/barangays/`)
+                .then((res) => res.json())
+                .then((data) => setBarangays(data))
+                .catch((err) => console.error("Error fetching barangays:", err));
+        } else {
+            setBarangays([]);
+        }
     }, [formData.city]);
 
-    // Helper function to get the name by code
-    const getNameByCode = (code, dataset) => {
-        const item = dataset.find((entry) => entry.code === code);
-        return item ? item.name : "Unknown"; // Default to "Unknown" if not found
-    };
-
-    // Convert codes to names before saving
-    const convertAddressCodes = () => {
-        const regionName = getNameByCode(formData.region, regions);
-        const provinceName = getNameByCode(formData.province, provinces);
-        const cityName = getNameByCode(formData.city, cities);
-        const barangayName = getNameByCode(formData.barangay, barangays);
-
-        return {
-            regionName,
-            provinceName,
-            cityName,
-            barangayName,
-        };
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const addressNames = convertAddressCodes();
-
-        const dataToSave = {
-            ...formData,
-            region: addressNames.regionName,
-            province: addressNames.provinceName,
-            city: addressNames.cityName,
-            barangay: addressNames.barangayName,
-        };
-
-        console.log(dataToSave);
-
         const token = authTokens?.access; 
         if (!token) return;  
-
+    
         try {
             const response = await fetch('https://hire-support-resume-verification-and.onrender.com/applicant/profile/edit/', {
                 method: 'PUT',
@@ -195,12 +146,12 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(dataToSave), // Send the updated data with names
+                body: JSON.stringify(formData),
             });
-
+    
             if (response.ok) {
                 const data = await response.json();
-                // console.log("Profile updated:", data);
+                setFormData(data);
                 if (onUpdateComplete) {
                     onUpdateComplete();
                 }
@@ -211,12 +162,14 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
             console.error('Error updating profile:', error);
         }
     };
+    
 
     useEffect(() => {
         const token = authTokens?.access; 
         if (!token) return;
 
         const decodedToken = jwt.decode(token);
+        // console.log(decodedToken);
 
         const getApplicantProfile = async () => {
             try {
@@ -231,6 +184,7 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
                 if (response.ok) {
                     const data = await response.json();
                     const profileData = data.profile_data;
+                    // console.log(profileData);
                     setFormData({
                         first_name: profileData.first_name,
                         last_name: profileData.last_name,
@@ -248,6 +202,7 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
                         present_address: profileData.present_address, 
                         linkedin_profile: profileData.linkedin_profile,
                     });
+                    
                 } else {
                     console.error('Failed to fetch applicant profile');
                 }
@@ -257,15 +212,6 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
         };
         getApplicantProfile();
     }, [authTokens]);
-
-
-
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-    };
 
     return (
         <div>
@@ -444,12 +390,12 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
                         </div>  
                 </div>
                             
-                        <div className="flex justify-end">
+                    <div className="flex justify-end">
                             {isEditable && (
                                 <button onClick={handleSubmit} className="button1 mt-5 flex items-center justify-center">
                                 <div className="flex items-center space-x-2">
                                     <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-small font-medium text-center">
-                                    {isEditable ? "Update" : "Register"}
+                                    {isEditable ? "Continue" : "Register"}
                                     </p>
                                     <Image
                                     src="/Arrow Right.svg"
@@ -460,7 +406,7 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
                                 </div>
                                 </button>
                             )}
-                        </div>
+                    </div>
                 </form>     
         </div>
   
