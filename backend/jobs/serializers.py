@@ -116,3 +116,13 @@ class JobApplicationSerializer(serializers.ModelSerializer):
                 JobApplicationDocument.objects.create(job_application=instance, **document_data)
 
         return instance
+    
+    def validate(self, attrs):
+        if attrs.get('application_status') == 'completed':
+            required_fields = ['job_hiring', 'applicant', 'email', 'documents']
+            missing_fields = [field for field in required_fields if not attrs.get(field)]
+            if missing_fields:
+                raise serializers.ValidationError(
+                    {field: f"{field} is required for a completed application." for field in missing_fields}
+                )
+        return attrs

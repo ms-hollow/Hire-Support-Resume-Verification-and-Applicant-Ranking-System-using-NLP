@@ -65,7 +65,6 @@ INSTALLED_APPS = [
     'applicant',
     'company',
     'jobs',
-    'dashboard',
     'google_drive',
 ]
 

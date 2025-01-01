@@ -116,6 +116,7 @@ const JobDetails = ({ authToken }) => {
                 setJobDetails(data);
 
                 localStorage.setItem('job_title', data.job_title);
+                localStorage.setItem('company', data.company_name);
     
                 // Format salary
                 const formattedSalary = data.salary

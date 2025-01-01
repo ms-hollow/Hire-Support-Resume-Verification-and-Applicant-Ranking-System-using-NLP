@@ -27,6 +27,18 @@ export default function JobApplication () {
         linkedin_profile: '',
     });
 
+    const [draftJobApplication, setdraftJobApplication] = useState({
+        job_hiring_id: '',
+        fullName: '',
+        email: '',
+        contact_number: '',
+        address: '',
+        linkedin_profile:'',
+        application_date: '',
+        application_status: '',
+        documents: '',
+    });
+
     const [step, setStep] = useState(1);
 
     const handleChange = (e) => {
@@ -37,31 +49,6 @@ export default function JobApplication () {
         const fields = Object.keys(formData);
         const filledFields = fields.filter((field) => formData[field] || updatedData[field]);
         setStep(Math.min(filledFields.length, fields.length));
-    };
-
-    //TODO Send draft job application and get the job application ID
-
-    const savePersonalInfo = async (formData) => {
-        try {
-            const response = await fetch('/api/create-job-application/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-    
-            if (response.ok) {
-                const data = await response.json();
-                sessionStorage.setItem('jobApplicationId', data.job_application_id);
-                const application_id = sessionStorage.getItem('jobApplicationId');
-                console.log(application_id);
-            } else {
-                console.error('Error saving personal info');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
     };
 
     const handleEdit = () => {
@@ -94,10 +81,10 @@ export default function JobApplication () {
                     const data = await res.json();
                     const profileData = data?.profile_data;
                     
-                    // console.log(profileData);
                     if (profileData) {
                         const completeAddress = `${profileData.present_address}, ${profileData.barangay}, ${profileData.city}, ${profileData.region}`;
-                        // console.log(completeAddress);
+                        const fullName = `${profileData.first_name} ${profileData.middle_name} ${profileData.last_name}`;
+            
                         setFormData({
                             firstName: profileData.first_name,
                             lastName: profileData.last_name,
@@ -110,10 +97,23 @@ export default function JobApplication () {
                             complete: completeAddress,
                             linkedin_profile: profileData.linkedin_profile,
                         });
-                        
+    
+                        setdraftJobApplication({
+                            job_hiring_id: Number(jobId),
+                            userId: decodedToken.user_id,
+                            fullName: fullName,
+                            email: decodedToken.email,
+                            contact_number: profileData.contact_number,
+                            address: completeAddress,
+                            linkedin_profile: profileData.linkedin_profile,
+                            application_date: new Date().toISOString(),
+                            application_status: "draft",
+                            documents: [],
+                        });
                     } else {
                         console.error("Profile data not found in the response.");
                     }
+
                 } else {
                     console.error("Failed to fetch applicant info, status:", res.status);
                 }
@@ -123,7 +123,6 @@ export default function JobApplication () {
                 setLoading(false);
             }
         };
-    
         getApplicantInfo();
     }, [authTokens]);
 
@@ -131,13 +130,23 @@ export default function JobApplication () {
         const jobTitle = localStorage.getItem('job_title');
         return jobTitle ? jobTitle : null; 
     };
+    
+    const getCompanyFromLocalStorage = () => {
+        const company = localStorage.getItem('company');
+        return company ? company : null; 
+    };
 
     if (loading) {
         return <p className="text-accent">Loading... (temporary) </p>;
     } 
 
+    const saveDraft = () => {
+        localStorage.setItem('job_application_draft', JSON.stringify(draftJobApplication));
+        // console.log(draftJobApplication);
+    };
+
     const navigateToApplicantDocuments = () => {
-        savePersonalInfo();
+        saveDraft();
         router.push({
             pathname: '/APPLICANT/ApplicantDocuments',
             query: { jobId }, 
@@ -150,7 +159,7 @@ export default function JobApplication () {
                 <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 sm:px-8 xsm:px-8 lg:px-20 py-8 mx-auto">
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
                     <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>
-                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">Company</p>
+                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompanyFromLocalStorage() || 'No Job Company Available'}</p>
                     <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-8 font-bold underline"> See job hiring details</p>
                     
                     <div className="flex items-center justify-center ">
