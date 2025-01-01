@@ -35,7 +35,7 @@ export default function CreateJob() {
             </p>
 
             <form>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-semibold text-fontcolor mb-1">Job Title</label>
                   <input
@@ -56,7 +56,7 @@ export default function CreateJob() {
                   />
                 </div>
 
-                <div className="col-span-2">
+                <div className="col-span-2 gap-3">
                   <label className="block text-sm font-semibold text-fontcolor mb-1">Job Description</label>
                   <textarea
                     name="jobDescription"
@@ -65,7 +65,7 @@ export default function CreateJob() {
                   ></textarea>
                 </div>
 
-                <div className="flex space-x-4 col-span-2">
+                <div className="flex space-x-3 col-span-2">
                   <div className="w-1/3">
                     <label className="block text-sm font-semibold text-fontcolor mb-1">Company Name</label>
                     <input
@@ -103,7 +103,7 @@ export default function CreateJob() {
                   </div>
                 </div>
 
-                <div className="flex space-x-6 mt-4 col-span-2">
+                <div className="flex space-x-6 mt-1 col-span-2">
                   <div className="w-1/2">
                     <label className="block text-sm font-semibold text-fontcolor mb-1">Work Setup</label>
                     <select
@@ -141,9 +141,9 @@ export default function CreateJob() {
                 </div>
               </div>
 
-              <div className="py-4">
-                <p className="text-sm text-gray-600 pb-2">Schedule</p>
-                <div className="grid grid-cols-3 gap-4">
+              <div className="py-1">
+                <p className="text-sm font-semibold text-fontcolor pb-2">Schedule</p>
+                <div className="grid grid-cols-3 gap-1">
                   {["8 hrs shift", "12 hrs shift", "14 hrs shift", "Day shift", "Night shift", "Graveyard shift"].map(
                     (shift) => (
                       <button
@@ -158,7 +158,7 @@ export default function CreateJob() {
                 </div>
               </div>
 
-              <div className="py-4">
+              <div className="py-1">
                 <label className="block text-sm font-semibold text-fontcolor mb-1">Benefits</label>
                 <textarea
                   name="benefits"
@@ -219,7 +219,6 @@ export default function CreateJob() {
                       name="salaryFrequency"
                       className="border border-black p-2 rounded-md w-full text-sm text-gray-500"
                     >
-                      <option value="">Salary Frequency</option>
                       <option value="monthly">Monthly</option>
                       <option value="weekly">Weekly</option>
                       <option value="hourly">Hourly</option>
