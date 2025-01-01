@@ -30,14 +30,11 @@ export default function CreateJob() {
               </div>
             </div>
 
-            {/* Instructions */}
             <p className="font-medium lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor">
               Fill out all required job hiring details.
             </p>
 
-            {/* Job Creation Form */}
             <form>
-              {/* Job Details Section */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-fontcolor mb-1">Job Title</label>
@@ -68,7 +65,6 @@ export default function CreateJob() {
                   ></textarea>
                 </div>
 
-                {/* Company Info Section */}
                 <div className="flex space-x-4 col-span-2">
                   <div className="w-1/3">
                     <label className="block text-sm font-semibold text-fontcolor mb-1">Company Name</label>
@@ -107,7 +103,6 @@ export default function CreateJob() {
                   </div>
                 </div>
 
-                {/* Work Setup and Employment Type Section */}
                 <div className="flex space-x-6 mt-4 col-span-2">
                   <div className="w-1/2">
                     <label className="block text-sm font-semibold text-fontcolor mb-1">Work Setup</label>
@@ -146,7 +141,6 @@ export default function CreateJob() {
                 </div>
               </div>
 
-              {/* Schedule Section */}
               <div className="py-4">
                 <p className="text-sm text-gray-600 pb-2">Schedule</p>
                 <div className="grid grid-cols-3 gap-4">
@@ -164,7 +158,6 @@ export default function CreateJob() {
                 </div>
               </div>
 
-              {/* Benefits Section */}
               <div className="py-4">
                 <label className="block text-sm font-semibold text-fontcolor mb-1">Benefits</label>
                 <textarea
@@ -174,7 +167,6 @@ export default function CreateJob() {
                 ></textarea>
               </div>
 
-              {/* Additional Information Section */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-fontcolor mb-1">Experience Level</label>
@@ -200,7 +192,6 @@ export default function CreateJob() {
                   />
                 </div>
 
-                {/* Salary Section */}
                 <div className="flex space-x-4 mt-4 col-span-2">
                   <div className="w-1/3">
                     <label className="block text-sm font-semibold text-fontcolor mb-1">Salary Minimum</label>
@@ -237,7 +228,6 @@ export default function CreateJob() {
                 </div>
               </div>
 
-              {/* Submit Button */}
               <div className="flex justify-end mt-4">
                 <button type="button" className="button1 flex items-center justify-center">
                   <Link href="/COMPANY/CompanySettings" className="ml-auto">
@@ -260,7 +250,6 @@ export default function CreateJob() {
         </div>
       </div>
 
-      {/* Footer */}
       <GeneralFooter />
     </div>
   );
