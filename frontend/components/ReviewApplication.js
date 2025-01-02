@@ -1,20 +1,15 @@
 import Link from "next/link";
 import Image from 'next/image';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const ReviewApplication = ({showEditButtons = true}) => {
     
     const [formData, setFormData] = useState({
-        firstName: "Laica",
-        lastName:"Ygot",
-        middleName: "Dawal",
-        email: "applicant@email.com",
-        contact_number: "09123456789",
-        sex: "Female",
-        date_of_birth: "12/12/2000",
-        age: "21",
-        complete: "Metro Manila, Philippines",
-        linkedin_profile: "https://linkedin-profile-Laica-yg",
+        fullName: "",
+        email: "",
+        contact_number: "",
+        complete: "",
+        linkedin_profile: "",
     });
 
     const [documents, setDocuments] = useState({
@@ -26,6 +21,29 @@ const ReviewApplication = ({showEditButtons = true}) => {
         additional: "AdditionalDocument.pdf",
       });
 
+    const getApplication = async () => {  
+        const applicantData = localStorage.getItem('job_application_draft');
+        if (applicantData) {
+            
+            const data = JSON.parse(applicantData);
+    
+            setFormData({
+                fullName: data.fullName,
+                email: data.email,
+                contact_number: data.contact_number,
+                complete: data.address,
+                linkedin_profile: data.linkedin_profile,
+            });
+            
+            // console.log(data);
+        } else {
+            console.log('No draft found');
+        }
+    };
+    
+    useEffect(() => {
+        getApplication();
+    }, []);
 
 
     const [step, setStep] = useState(1);
@@ -80,7 +98,7 @@ const ReviewApplication = ({showEditButtons = true}) => {
                     <tbody>
                         <tr className="px-2 border-b border-[#F5F5F5]">
                             <td className="p-2 ">
-                                <p className="flex items-center pl-2 font-thin text-medium text-fontcolor pb-1">Full Name:<span id="" className=" pl-2 font-semibold text-medium text-fontcolor ">{formData.firstName} {formData.middleName} {formData.lastName}</span></p>
+                                <p className="flex items-center pl-2 font-thin text-medium text-fontcolor pb-1">Full Name:<span id="" className=" pl-2 font-semibold text-medium text-fontcolor ">{formData.fullName}</span></p>
                                 <p className="flex items-center pl-2 font-thin text-medium text-fontcolor pb-1">Email Address:<span className="pl-2 font-semibold text-medium text-fontcolor ">{formData.email}</span></p>
                                 <p className="flex items-center pl-2 font-thin text-medium text-fontcolor pb-1">Contact No.:<span id="" className="pl-2 font-semibold text-medium text-fontcolor ">{formData.contact_number}</span></p>
                                 <p className="flex items-center pl-2 font-thin text-medium text-fontcolor pb-1">Complete Address: <span id="" className="pl-2 font-semibold text-medium text-fontcolor">{formData.complete}</span></p>
@@ -152,11 +170,6 @@ const ReviewApplication = ({showEditButtons = true}) => {
                     </table>
                 </div>
             </section>
-
-            
-
-
-
         </div>
      );
 }

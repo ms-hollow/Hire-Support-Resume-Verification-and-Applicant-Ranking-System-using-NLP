@@ -75,7 +75,7 @@ export default function ApplicantHome() {
       <ApplicantHeader />
       <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 mx-auto">
         <div>
-          <p className="text-fontcolor">Hi, {applicantName || 'Guest'}</p>
+          <p className="text-fontcolor">Hi, {applicantName}</p>
         </div>
 
         {/* Search */}

@@ -164,34 +164,45 @@ def show_recent_searches(request):
 
     return Response(result_data)
 
-
 #* Create Job Application
 @api_view(['POST'])
 def create_job_application(request):
     if request.method == 'POST':
-        # Get non-file data
+        # Extract non-file data
         data = request.data.copy()
         
-        # Remove files-related fields from data to avoid issues with validation
+        # Get files and their types
         document_types = data.pop('document_type', [])
         document_files = request.FILES.getlist('document_file')
 
+        # Validate the application data
         serializer = JobApplicationSerializer(data=data)
-        
         if serializer.is_valid():
-            with transaction.atomic():  # Optional, to ensure all-or-nothing saving
-                job_application = serializer.save()
-                
-                # Save each file with corresponding document type
+            # Ensure all necessary fields are present before saving
+            required_fields = ['job_hiring', 'applicant', 'email', 'documents']
+            missing_fields = [field for field in required_fields if not serializer.validated_data.get(field)]
+            if missing_fields:
+                return Response(
+                    {field: f"{field} is required for a completed application." for field in missing_fields},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            
+            # Save the application and associated documents
+            with transaction.atomic():  # All-or-nothing save
+                job_application = serializer.save(application_status='completed')  # Mark as completed
+
+                # Save each file with its corresponding document type
                 for doc_type, doc_file in zip(document_types, document_files):
                     JobApplicationDocument.objects.create(
                         job_application=job_application,
                         document_type=doc_type,
                         document_file=doc_file
                     )
-                
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 #* Delete Job Application
 @api_view(['DELETE'])

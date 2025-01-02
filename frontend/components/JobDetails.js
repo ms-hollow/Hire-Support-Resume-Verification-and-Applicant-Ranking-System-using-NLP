@@ -2,7 +2,6 @@ import Image from 'next/image';
 import { useState, useContext, useEffect, useCallback } from "react";
 import AuthContext from "@/pages/context/AuthContext";
 import { useRouter } from 'next/router';
-import { useJobContext } from "@/pages/context/JobContext";
 
 const SkeletonLoader = () => {
     return (
@@ -83,16 +82,21 @@ const JobDetails = ({ authToken }) => {
 
     const router = useRouter();
     const { jobId } = router.query;
-    const { jobDetails, setJobDetails } = useJobContext();
+    const [jobDetails, setJobDetails] = useState(null);
     const [loading, setLoading] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
 
     useEffect(() => { 
         if (jobId) {
+            saveJobIdToLocalStorage(jobId);
             fetchJobDetails(Number(jobId)); // Trigger fetch when jobId changes
             checkIfSaved();
         }
     }, [jobId]);
+
+    const saveJobIdToLocalStorage = (jobId) => {
+        localStorage.setItem('jobId', jobId);
+    };
 
     const fetchJobDetails = useCallback(async (id) => {
         setLoading(true);
@@ -110,6 +114,9 @@ const JobDetails = ({ authToken }) => {
             if (response.status === 200) {
                 const data = await response.json();
                 setJobDetails(data);
+
+                localStorage.setItem('job_title', data.job_title);
+                localStorage.setItem('company', data.company_name);
     
                 // Format salary
                 const formattedSalary = data.salary
