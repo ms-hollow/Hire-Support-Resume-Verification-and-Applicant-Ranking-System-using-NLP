@@ -6,101 +6,85 @@ import { useState, useEffect, useContext, useCallback } from "react";
 import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import jwt from 'jsonwebtoken';
-import { useAddressMapping } from "@/pages/utils/AddressMapping";
-import { useJobContext } from "../context/JobContext";
 
 export default function JobApplication () {
 
-        let {authTokens} = useContext(AuthContext);
-        const { jobDetails } = useJobContext();
-        
-        const [loading, setLoading] = useState(false);
-        const router = useRouter();
-        const { jobId } = router.query;
-        const { convertAddressCodes } = useAddressMapping();
+    let {authTokens} = useContext(AuthContext);
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
+    const { jobId } = router.query;
 
-        const [formData, setFormData] = useState({
-            firstName: '',
-            lastName:'',
-            middleName: '',
-            email: '',
-            contact_number: '',
-            sex: '',
-            date_of_birth: '',
-            age: '',
-            complete: '',
-            linkedin_profile: '',
-        });
-    
-        const [step, setStep] = useState(1);
-    
-        const handleChange = (e) => {
-            const { name, value } = e.target;
-            const updatedData = { ...formData, [name]: value };
-            setFormData(updatedData);
-    
-            const fields = Object.keys(formData);
-            const filledFields = fields.filter((field) => formData[field] || updatedData[field]);
-            setStep(Math.min(filledFields.length, fields.length));
-        };
-    
-        const handleSubmit = async (e) => {
-            e.preventDefault();
-    
-            const response = await fetch("/api/submit-info", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
-            });
-    
-            const result = await response.json();
-            alert(result.message);
-        };
-    
-        const handleEdit = () => {
-            alert("Edit button clicked - implement your logic here.");
-        };
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName:'',
+        middleName: '',
+        email: '',
+        contact_number: '',
+        sex: '',
+        date_of_birth: '',
+        age: '',
+        complete: '',
+        linkedin_profile: '',
+    });
 
-        useEffect(() => {
-            if (!authTokens?.access) {
-                console.log("No access token found");
-                return;
-            }
+    const [draftJobApplication, setdraftJobApplication] = useState({
+        job_hiring_id: '',
+        fullName: '',
+        email: '',
+        contact_number: '',
+        address: '',
+        linkedin_profile:'',
+        application_date: '',
+        application_status: '',
+        documents: '',
+    });
 
-            const decodedToken = jwt.decode(authTokens.access);
-            // console.log("Decoded token:", decodedToken);
-            
-            if (!decodedToken) {
-                console.log("Invalid or expired token");
-                return;
-            }
+    const [step, setStep] = useState(1);
 
-            const getApplicantInfo = async () => {
-                try {
-                    const res = await fetch('https://hire-support-resume-verification-and.onrender.com/applicant/profile/view/', {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${authTokens.access}`,
-                            'Content-Type': 'application/json',
-                        },
-                    });
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        const updatedData = { ...formData, [name]: value };
+        setFormData(updatedData);
+
+        const fields = Object.keys(formData);
+        const filledFields = fields.filter((field) => formData[field] || updatedData[field]);
+        setStep(Math.min(filledFields.length, fields.length));
+    };
+
+    const handleEdit = () => {
+        alert("Edit button clicked - implement your logic here.");
+    };
+
+    useEffect(() => {
+        if (!authTokens?.access) {
+            console.log("No access token found");
+            return;
+        }
     
-                    if (res.ok) {
-                        const data = await res.json();
-                        // console.log("API Response:", data);
-
+        const decodedToken = jwt.decode(authTokens.access);
+        if (!decodedToken) {
+            console.log("Invalid or expired token");
+            return;
+        }
+    
+        const getApplicantInfo = async () => {
+            try {
+                const res = await fetch('https://hire-support-resume-verification-and.onrender.com/applicant/profile/view/', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authTokens.access}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+    
+                if (res.ok) {
+                    const data = await res.json();
                     const profileData = data?.profile_data;
-                    // console.log(profileData);
-
-                    // Ensure that profile_data exists before trying to access the address components
+                    
                     if (profileData) {
-                        
-                        const { city, province, region, barangay } = profileData;
-                        const addressNames = convertAddressCodes(region, province, city, barangay);
-                        // console.log("converted", addressNames);
-                        const completeAddress = `${profileData.present_address}, ${addressNames.barangayName}, ${addressNames.cityName}, ${addressNames.provinceName}, ${addressNames.regionName}`;
-                        // console.log("Complete Address:", completeAddress);
-
+                        const completeAddress = `${profileData.present_address}, ${profileData.barangay}, ${profileData.city}, ${profileData.region}`;
+                        const fullName = `${profileData.first_name} ${profileData.middle_name} ${profileData.last_name}`;
+            
                         setFormData({
                             firstName: profileData.first_name,
                             lastName: profileData.last_name,
@@ -113,46 +97,69 @@ export default function JobApplication () {
                             complete: completeAddress,
                             linkedin_profile: profileData.linkedin_profile,
                         });
-                        
+    
+                        setdraftJobApplication({
+                            job_hiring_id: Number(jobId),
+                            userId: decodedToken.user_id,
+                            fullName: fullName,
+                            email: decodedToken.email,
+                            contact_number: profileData.contact_number,
+                            address: completeAddress,
+                            linkedin_profile: profileData.linkedin_profile,
+                            application_date: new Date().toISOString(),
+                            application_status: "draft",
+                            documents: [],
+                        });
                     } else {
                         console.error("Profile data not found in the response.");
                     }
-                    
-                    } else {
-                        console.error("Failed to fetch applicant info, status:", res.status);
-                    }
-                } catch (error) {
-                    console.error("Error fetching applicant info:", error);
-                } finally {
-                    setLoading(false);
+
+                } else {
+                    console.error("Failed to fetch applicant info, status:", res.status);
                 }
-            };
-    
-            getApplicantInfo();
-        }, [authTokens]);
-
-        const navigateToApplicantDocuments = () => {
-            router.push({
-                pathname: '/APPLICANT/ApplicantDocuments',
-                query: { jobId }, 
-            });
+            } catch (error) {
+                console.error("Error fetching applicant info:", error);
+            } finally {
+                setLoading(false);
+            }
         };
-            
-        if (loading) {
-            return <p>Loading...</p>;
-        }
-    
-        if (!jobDetails) {
-            return <p>No job details found.</p>;
-        }
+        getApplicantInfo();
+    }, [authTokens]);
 
+    const getTitleFromLocalStorage = () => {
+        const jobTitle = localStorage.getItem('job_title');
+        return jobTitle ? jobTitle : null; 
+    };
+    
+    const getCompanyFromLocalStorage = () => {
+        const company = localStorage.getItem('company');
+        return company ? company : null; 
+    };
+
+    if (loading) {
+        return <p className="text-accent">Loading... (temporary) </p>;
+    } 
+
+    const saveDraft = () => {
+        localStorage.setItem('job_application_draft', JSON.stringify(draftJobApplication));
+        // console.log(draftJobApplication);
+    };
+
+    const navigateToApplicantDocuments = () => {
+        saveDraft();
+        router.push({
+            pathname: '/APPLICANT/ApplicantDocuments',
+            query: { jobId }, 
+        });
+    };
+    
     return ( 
         <div>
             <ApplicantHeader/>
                 <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 sm:px-8 xsm:px-8 lg:px-20 py-8 mx-auto">
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
-                    <p className="font-semibold text-primary text-large pb-1">{jobDetails.job_title || 'No job title available'}</p>
-                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">Company</p>
+                    <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>
+                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompanyFromLocalStorage() || 'No Job Company Available'}</p>
                     <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-8 font-bold underline"> See job hiring details</p>
                     
                     <div className="flex items-center justify-center ">

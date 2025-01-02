@@ -26,7 +26,6 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('company/', include('company.urls')),
     path('applicant/', include('applicant.urls')),
-    path('dashboard/', include('dashboard.urls')),
     path('job/', include('jobs.urls')),
     path('api-token-auth/', obtain_auth_token),
     path('accounts/', include('allauth.urls')),

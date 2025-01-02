@@ -2,12 +2,15 @@ import ApplicantHeader from "@/components/ApplicantHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import Link from "next/link";
 import Image from 'next/image';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReviewApplication from "@/components/ReviewApplication";
+import { useRouter } from 'next/router';
 
 export default function ApplicationConfirmation () {
 
     const [isChecked, setIsChecked] = useState(false);
+    const router = useRouter();
+    const { jobId } = router.query;
 
     const handleCheckboxChange = (e) => {
         setIsChecked(e.target.checked);
@@ -19,6 +22,31 @@ export default function ApplicationConfirmation () {
         return;
         }
         alert("Application submitted successfully!");
+        localStorage.removeItem('job_application_draft');
+    };    
+
+    const getJobIdFromLocalStorage = () => {
+        const jobId = localStorage.getItem('jobId');
+        return jobId ? jobId : null; // Return null if jobId doesn't exist
+    };
+
+    const getTitleFromLocalStorage = () => {
+        const jobTitle = localStorage.getItem('job_title');
+        return jobTitle ? jobTitle : null; 
+    };
+
+    const getCompanyFromLocalStorage = () => {
+        const company = localStorage.getItem('company');
+        return company ? company : null; 
+    };
+
+
+    const goBack = () => {
+        const jobId = getJobIdFromLocalStorage();  // Retrieve jobId from localStorage
+        router.push({
+            pathname: '/APPLICANT/ApplicantDocuments',
+            query: { jobId }, 
+        });
     };
 
     return ( 
@@ -26,8 +54,8 @@ export default function ApplicationConfirmation () {
             <ApplicantHeader/>
                 <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 sm:px-8 xsm:px-8 lg:px-20 py-8 mx-auto">
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
-                    <p className="font-semibold text-primary text-large pb-1">Job Title</p>
-                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">Company</p>
+                    <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>
+                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompanyFromLocalStorage() || 'No Job Company Available'}</p>
                     <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-8 font-bold underline"> See job hiring details</p>
                     
                     <div className="flex items-center justify-center">
@@ -69,18 +97,16 @@ export default function ApplicationConfirmation () {
 
                             <div className="flex justify-between mt-1">
                                 
-                                <button type="button" className="button2 flex items-center justify-center">
-                                    <Link href="/APPLICANT/ApplicantDocuments" className="ml-auto">
-                                        <div className="flex items-center space-x-2">
-                                            <Image 
-                                                src="/Arrow Left.svg" 
-                                                width={23} 
-                                                height={10} 
-                                                alt="Back Icon" 
-                                            />
-                                            <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Back</p>
-                                        </div>
-                                    </Link>
+                                <button onClick={goBack} type="button" className="button2 flex items-center justify-center">
+                                    <div className="flex items-center space-x-2">
+                                        <Image 
+                                            src="/Arrow Left.svg" 
+                                            width={23} 
+                                            height={10} 
+                                            alt="Back Icon" 
+                                        />
+                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Back</p>
+                                    </div>
                                 </button>
                                 
 
