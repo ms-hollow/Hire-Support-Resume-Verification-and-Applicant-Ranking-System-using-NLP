@@ -1,0 +1,254 @@
+[
+  {
+    "Id": 1,
+    "job_title": "Full Stack Developer",
+    "num_positions": "3",
+    "num_applicants": "150",
+    "status": "Complete",
+    "application_deadline": "12/15/2024",
+    "creation_date": "12/01/2024",
+    "company_name": "Microsoft",
+    "job_industry": "Technology (C#, .NET, Azure)",
+    "work_location": "Redmond",
+    "work_setup": "Hybrid",
+    "employment_type": "Full-time",
+    "experience_level": "Mid-level",
+    "frequency": "Monthly",
+    "schedule": "8 AM - 4 PM",
+    "salary": "$110,000 - $130,000",
+    "job_description": [
+      "Develop and maintain full-stack applications.",
+      "Implement cloud-based solutions on Azure."
+    ],
+    "qualifications": "Bachelor's degree in Computer Science.",
+    "required_documents":{
+      "resume": "Updated Resume",
+      "portfolio": "Portfolio of Work",
+      "cover_letter": "Cover Letter",
+      "transcript_of_records": "Transcript of Records",
+      "certifications": "Relevant Certifications"
+    }
+  },
+  {
+    "Id": 2,
+    "job_title": "Data Scientist",
+    "num_positions": "5",
+    "num_applicants": "250",
+    "status": "open",
+    "application_deadline": "11/30/2024",
+    "creation_date": "11/10/2024",
+    "company_name": "IBM",
+    "job_industry": "Technology (Python, Machine Learning)",
+    "work_location": "New York",
+    "work_setup": "Remote",
+    "employment_type": "Contract",
+    "experience_level": "Senior",
+    "frequency": "Annual",
+    "schedule": "9 AM - 6 PM",
+    "salary": "$120,000 - $150,000",
+    "job_description": [
+      "Analyze large datasets to derive actionable insights.",
+      "Build and deploy machine learning models."
+    ],
+    "qualifications": "Master's degree in Data Science.",
+    "required_documents":{
+      "resume": "Updated Resume",
+      "portfolio": "Portfolio of Work",
+      "cover_letter": "Cover Letter",
+      "transcript_of_records": "Transcript of Records",
+      "certifications": "Relevant Certifications"
+    }
+  },
+  {
+    "Id": 3,
+    "job_title": "Cybersecurity Analyst",
+    "num_positions": "2",
+    "num_applicants": "80",
+    "status": "Draft",
+    "application_deadline": "12/20/2024",
+    "creation_date": "12/05/2024",
+    "company_name": "Cisco",
+    "job_industry": "Technology (Cybersecurity, SIEM)",
+    "work_location": "San Jose",
+    "work_setup": "On-site",
+    "employment_type": "Full-time",
+    "experience_level": "Entry-level",
+    "frequency": "Monthly",
+    "schedule": "10 AM - 7 PM",
+    "salary": "$75,000 - $90,000",
+    "job_description": [
+      "Monitor network activity for security threats.",
+      "Develop incident response strategies."
+    ],
+    "qualifications": "Bachelor's degree in Information Security."
+  },
+  {
+    "Id": 4,
+    "job_title": "Product Manager",
+    "num_positions": "1",
+    "num_applicants": "50",
+    "status": "Closed",
+    "application_deadline": "11/25/2024",
+    "creation_date": "11/01/2024",
+    "company_name": "Slack",
+    "job_industry": "Technology (Agile, Scrum)",
+    "work_location": "San Francisco",
+    "work_setup": "Hybrid",
+    "employment_type": "Full-time",
+    "experience_level": "Senior",
+    "frequency": "Annual",
+    "schedule": "9 AM - 5 PM",
+    "salary": "$130,000 - $160,000",
+    "job_description": [
+      "Lead the product lifecycle from concept to launch.",
+      "Collaborate with engineering and design teams."
+    ],
+    "qualifications": "MBA preferred."
+  },
+  {
+    "Id": 5,
+    "job_title": "Graphic Designer",
+    "num_positions": "3",
+    "num_applicants": "100",
+    "status": "open",
+    "application_deadline": "11/20/2024",
+    "creation_date": "11/05/2024",
+    "company_name": "Adobe",
+    "job_industry": "Design (Photoshop, Illustrator)",
+    "work_location": "Remote",
+    "work_setup": "Remote",
+    "employment_type": "Part-time",
+    "experience_level": "Mid-level",
+    "frequency": "Monthly",
+    "schedule": "Flexible",
+    "salary": "$40,000 - $60,000",
+    "job_description": [
+      "Create high-quality graphics for marketing campaigns.",
+      "Collaborate with the marketing team on creative concepts."
+    ],
+    "qualifications": "Portfolio of previous work."
+  },
+  {
+    "Id": 6,
+    "job_title": "Mobile App Developer",
+    "num_positions": "4",
+    "num_applicants": "120",
+    "status": "open",
+    "application_deadline": "12/10/2024",
+    "creation_date": "11/15/2024",
+    "company_name": "Spotify",
+    "job_industry": "Technology (Swift, Kotlin)",
+    "work_location": "Remote",
+    "work_setup": "Remote",
+    "employment_type": "Full-time",
+    "experience_level": "Mid-level",
+    "frequency": "Annual",
+    "schedule": "9 AM - 5 PM",
+    "salary": "$100,000 - $130,000",
+    "job_description": [
+      "Develop and maintain mobile applications for iOS and Android.",
+      "Ensure seamless integration with backend services."
+    ],
+    "qualifications": "Proven experience in mobile development."
+  },
+  {
+    "Id": 7,
+    "job_title": "DevOps Engineer",
+    "num_positions": "3",
+    "num_applicants": "90",
+    "status": "Complete",
+    "application_deadline": "12/30/2024",
+    "creation_date": "12/01/2024",
+    "company_name": "Netflix",
+    "job_industry": "Technology (Docker, Kubernetes)",
+    "work_location": "Los Angeles",
+    "work_setup": "Hybrid",
+    "employment_type": "Full-time",
+    "experience_level": "Senior",
+    "frequency": "Annual",
+    "schedule": "Flexible",
+    "salary": "$120,000 - $150,000",
+    "job_description": [
+      "Implement CI/CD pipelines for software delivery.",
+      "Optimize cloud infrastructure for scalability."
+    ],
+    "qualifications": "Certification in DevOps tools preferred."
+  },
+  {
+    "Id": 8,
+    "job_title": "Marketing Manager",
+    "num_positions": "2",
+    "num_applicants": "60",
+    "status": "open",
+    "application_deadline": "11/29/2024",
+    "creation_date": "11/10/2024",
+    "company_name": "HubSpot",
+    "job_industry": "Marketing (SEO, Social Media)",
+    "work_location": "Boston",
+    "work_setup": "On-site",
+    "employment_type": "Full-time",
+    "experience_level": "Mid-level",
+    "frequency": "Monthly",
+    "schedule": "9 AM - 6 PM",
+    "salary": "$80,000 - $100,000",
+    "job_description": [
+      "Plan and execute marketing strategies.",
+      "Analyze campaign performance metrics."
+    ],
+    "qualifications": "Bachelor's degree in Marketing."
+  },
+
+  {
+    "Id": 9,
+    "job_title": "Cloud Architect",
+    "num_positions": "2",
+    "num_applicants": "70",
+    "status": "open",
+    "application_deadline": "12/25/2024",
+    "creation_date": "12/01/2024",
+    "company_name": "AWS",
+    "job_industry": "Technology (AWS, Terraform)",
+    "work_location": "Seattle",
+    "work_setup": "On-site",
+    "employment_type": "Full-time",
+    "experience_level": "Senior",
+    "frequency": "Annual",
+    "schedule": "10 AM - 6 PM",
+    "salary": "$140,000 - $180,000",
+    "job_description": [
+      "Design scalable cloud architectures.",
+      "Ensure cloud systems' security and compliance."
+    ],
+    "qualifications": "AWS Certified Solutions Architect.",
+    "required_documents":{
+      "resume": "Updated Resume",
+      "portfolio": "Portfolio of Work",
+      "cover_letter": "Cover Letter",
+      "transcript_of_records": "Transcript of Records",
+      "certifications": "Relevant Certifications"
+    }
+  },
+  {
+    "Id": 10,
+    "job_title": "Business Analyst",
+    "num_positions": "1",
+    "num_applicants": "50",
+    "status": "open",
+    "application_deadline": "11/20/2024",
+    "creation_date": "11/01/2024",
+    "company_name": "Deloitte",
+    "job_industry": "Consulting (Process Optimization, Analytics)",
+    "location": "Chicago",
+    "work_setup": "Hybrid",
+    "employment_type": "Full-time",
+    "experience_level": "Mid-level",
+    "frequency": "Monthly",
+    "schedule": "8 AM - 4 PM",
+    "salary": "$90,000 - $110,000",
+    "job_description": [
+      "Analyze business processes and recommend improvements.",
+      "Prepare detailed reports and presentations."
+    ],
+    "qualifications": "Entry Certificate in Business Analysis (ECBA)."
+  }
+]
