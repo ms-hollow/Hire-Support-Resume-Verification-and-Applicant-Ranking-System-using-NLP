@@ -29,6 +29,7 @@ module.exports = {
         accent: "var(--accent)",
         secondary: "var(--secondary)",
         placeholder: "var(--placeholder)",
+        complete:"var(--complete)",
       },
       padding: {
         's': '22px',

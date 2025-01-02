@@ -10,6 +10,7 @@
   --accent:#FA3B3B;
   --secondary:#E3F1EE;
   --placeholder:#CDCDCD;
+  --complete:#17AE1D;
 
 }
 
@@ -22,6 +23,7 @@
     --accent:#FA3B3B;
     --secondary:#E3F1EE;
     --placeholder:#CDCDCD;
+    --complete:#17AE1D;
   }
 }
 

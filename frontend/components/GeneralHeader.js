@@ -9,7 +9,7 @@ const GeneralHeader = () => {
   };
 
   return (
-    <header className="fixed top-0 w-full bg-background h-16 lg:px-20 mb:px-20 py-5 flex items-center justify-between sm:px-8">
+    <header className="fixed top-0 w-full bg-background h-16 lg:px-20 mb:px-20 py-5 flex items-center justify-between sm:px-8 z-50">
       <div className="flex items-center md:hidden absolute right-6">
           <Link href="/GENERAL/Login" className="mr-4">
             <h3>Sign in as Applicant</h3>
@@ -35,7 +35,7 @@ const GeneralHeader = () => {
 
       {/*Hamburger Menu */}
       <div
-        className={`w-full absolute right-0 bg-background md:hidden shadow-[0px_0px_4px_rgba(0,0,0,0.1)] transition-transform duration-300 ease-in-out transform ${
+        className={`w-full absolute right-0 bg-background md:hidden shadow-[0px_0px_4px_rgba(0,0,0,0.1)] transition-transform duration-300 ease-in-out transform z-50 ${
           isOpen ? 'translate-y-0' : '-translate-y-full'
         }`} style={{ top: isOpen ? '64px' : '0' }}
       >
