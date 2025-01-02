@@ -39,35 +39,49 @@ const SkeletonLoader = () => {
 };
 
 const ApplicantDetails = ({applicantId}) => {
-    const [individualApplicants, setindividualApplicants] = useState(null); 
-  
-    useEffect(() => {
+  const [individualApplicants, setindividualApplicants] = useState(null);
+  const [jobId, setJobId] = useState(null);
+
+  useEffect(() => {
       const fetchData = async () => {
         try {
           const currentApplicantId = applicantId || localStorage.getItem('selectedApplicantId');
+          const currentJobId = parseInt(localStorage.getItem('selectedJobId'));
           
           if (!currentApplicantId) {
-            console.error("No applicant ID provided");
+            setError("No applicant ID provided");
+            setLoading(false);
             return;
           }
   
           const res = await fetch('/placeHolder/dummy_ApplicantRanking.json');
           const json = await res.json();
-          const item = json.applicants.find(item => item.id === currentApplicantId);
+  
+          // First find the job entry
+          const jobData = json.find(job => job.jobId === currentJobId);
           
-          if (item) {
-            setindividualApplicants(item);
+          if (!jobData) {
+            setError("Job not found");
+            return;
+          }
+  
+          // Then find the applicant within that job's applicants
+          const applicant = jobData.applicants.find(item => item.id === currentApplicantId);
+          
+          if (applicant) {
+            setindividualApplicants(applicant);
           } else {
-            console.error("Applicant not found");
+            setError("Applicant not found");
           }
         } catch (error) {
-          console.error("Error fetching data:", error);
+          setError("Error fetching data: " + error.message);
+        }{
+        
         }
       };
   
       fetchData();
     }, [applicantId]);
-      
   
     if (!individualApplicants) {
       return <SkeletonLoader />;
@@ -143,12 +157,16 @@ const ApplicantDetailsWrapper = () => {
   const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
-
-    const storedApplicantId = localStorage.getItem('selectedApplicantId');
-    if (storedApplicantId) {
-      setSelectedApplicantId(storedApplicantId);
+    // Get the applicant ID from localStorage
+    const currentApplicantId = localStorage.getItem('selectedApplicantId');
+    if (currentApplicantId) {
+      setSelectedApplicantId(currentApplicantId);
     }
-  }, []);
+  }, []); // Empty dependency array means this runs once on mount
+
+  if (!selectedApplicantId) {
+    return <SkeletonLoader />;
+  }
 
   const handleChange = (event) => {
     const value = event.target.value;
