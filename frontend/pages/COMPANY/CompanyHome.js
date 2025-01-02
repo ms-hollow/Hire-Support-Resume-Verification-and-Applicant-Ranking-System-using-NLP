@@ -9,7 +9,7 @@ const getStatusClassName = (status) => {
   switch (status) {
     case "Complete":
       return "text-complete";
-    case "open":
+    case "Open":
       return "text-fontcolor";
     case "Draft":
       return "text-primary";

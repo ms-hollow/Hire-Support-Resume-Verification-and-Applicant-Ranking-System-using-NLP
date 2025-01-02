@@ -11,8 +11,12 @@ const Ranking = () => {
   const [rankingData, setRankingData] = useState([]);
   const [applicantRank, setApplicantRank] = useState([]);
   const [selectedApplicantId, setSelectedApplicantId] = useState(null);
+  const [jobId, setJobId] = useState(null);
 
   useEffect(() => {
+    const storedJobId = parseInt(localStorage.getItem('selectedJobId'));
+    setJobId(storedJobId);
+
     const fetchData = async () => {
       try {
         const res = await fetch("/placeHolder/dummy_ApplicantRanking.json");
@@ -20,17 +24,26 @@ const Ranking = () => {
           throw new Error("Failed to fetch data");
         }
         const data = await res.json();
-  
-        // Sort by score in descending order
-        const sortedData = data.applicants.sort((a, b) => b.Overall - a.Overall);
-        setRankingData(sortedData);
-        setApplicantRank(sortedData);
+        
+        // Find the ranking data for the specific job
+        const jobRankingData = data.find(job => job.jobId === storedJobId);
+        if (jobRankingData) {
+          // Sort by score in descending order
+          const sortedData = jobRankingData.applicants.sort((a, b) => b.Overall - a.Overall);
+          setRankingData(sortedData);
+          setApplicantRank(sortedData);
+        } else {
+          setRankingData([]);
+          setApplicantRank([]);
+        }
       } catch (error) {
-        console.error("Error fetching job details:", error);
+        console.error("Error fetching applicant rankings:", error);
       }
     };
-  
-    fetchData();
+
+    if (storedJobId) {
+      fetchData();
+    }
   }, []);
 
   const handleApplicantSelect = (applicantId) => {

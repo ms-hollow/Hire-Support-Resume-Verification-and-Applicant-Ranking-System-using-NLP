@@ -9,34 +9,47 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Le
 const IndividualScore = ({ applicantId }) => {
   const [indivScore, setindivScore] = useState(null);
   const [activeTab, setActiveTab] = useState('verified');
-
+  
   useEffect(() => {
     const fetchData = async () => {
-
       try {
         const currentApplicantId = applicantId || localStorage.getItem('selectedApplicantId');
+        const currentJobId = parseInt(localStorage.getItem('selectedJobId'));
         
         if (!currentApplicantId) {
-          console.error("No applicant ID provided");
+          setError("No applicant ID provided");
+          setLoading(false);
           return;
         }
 
         const res = await fetch('/placeHolder/dummy_ApplicantRanking.json');
         const json = await res.json();
-        const item = json.applicants.find(item => item.id === currentApplicantId);
 
-        if (item) {
-          setindivScore(item);
+        // First find the job entry
+        const jobData = json.find(job => job.jobId === currentJobId);
+        
+        if (!jobData) {
+          setError("Job not found");
+          return;
+        }
+
+        // Then find the applicant within that job's applicants
+        const applicant = jobData.applicants.find(item => item.id === currentApplicantId);
+        
+        if (applicant) {
+          setindivScore(applicant);
         } else {
-          console.error("Applicant not found");
+          setError("Applicant not found");
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        setError("Error fetching data: " + error.message);
+      }{
+      
       }
     };
 
-      fetchData();
-    }, [applicantId]);
+    fetchData();
+  }, [applicantId]);
 
     if (!indivScore) return <p>Loading...</p>;
 
