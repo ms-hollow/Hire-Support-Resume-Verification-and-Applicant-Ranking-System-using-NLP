@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const GeneralHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,13 +20,24 @@ const GeneralHeader = () => {
           </button>
       </div>
 
-      <div className="logo"> </div>
-        <ul className="hidden mb:flex lg:space-x-20 mb:space-x-16">
-          <li><a href="/#Home"onClick={toggleMenu}>Home</a></li>
-          <li><a href="/#AboutUs"onClick={toggleMenu}>About Us</a></li>
-          <li><a href="/#FAQS"onClick={toggleMenu}>FAQs</a></li>
-          <li><a href="/#ContactUs" onClick={toggleMenu}>Contact Us</a></li>
-        </ul>
+      <div className="flex items-center">
+          <div className="logo mr-4">
+                  <Image 
+                    src="/Logo.svg" 
+                    width={39} 
+                    height={30} 
+                    alt="Company Logo" 
+                  />
+          </div>
+
+          <ul className="justify-center items-center mt-1 hidden mb:flex lg:space-x-20 mb:space-x-16">
+            <li><a href="/#Home"onClick={toggleMenu}>Home</a></li>
+            <li><a href="/#AboutUs"onClick={toggleMenu}>About Us</a></li>
+            <li><a href="/#FAQS"onClick={toggleMenu}>FAQs</a></li>
+            <li><a href="/#ContactUs" onClick={toggleMenu}>Contact Us</a></li>
+          </ul>
+      </div>
+        
 
       <div className="ml-auto hidden md:block">
         <Link href="/GENERAL/Login">
