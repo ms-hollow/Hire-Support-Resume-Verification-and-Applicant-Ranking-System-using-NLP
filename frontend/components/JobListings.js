@@ -63,7 +63,7 @@ const JobListings = ({ authToken }) => {
     try {
       // console.log("Token", authToken);
       const response = await fetch(
-        "https://hire-support-resume-verification-and.onrender.com/job/job-hirings/",
+        "http://127.0.0.1:8000/job/job-hirings/",
         {
           method: "GET",
           headers: {
@@ -115,7 +115,7 @@ const JobListings = ({ authToken }) => {
   const getSavedJobs = useCallback(async () => {
     try {
       const response = await fetch(
-        "https://hire-support-resume-verification-and.onrender.com/applicant/saved-jobs/",
+        "http://127.0.0.1:8000/applicant/saved-jobs/",
         {
           method: "GET",
           headers: {
@@ -152,7 +152,7 @@ const JobListings = ({ authToken }) => {
   const handleSaveJob = useCallback(async (jobId) => {
     try {
       const savedJobs = await fetch(
-        `https://hire-support-resume-verification-and.onrender.com/applicant/save-job/${jobId}/`,
+        `http://127.0.0.1:8000/applicant/save-job/${jobId}/`,
         {
           method: "POST",
           headers: {
@@ -179,7 +179,7 @@ const JobListings = ({ authToken }) => {
   const handleUnsaveJob = useCallback(async (jobId) => {
     try {
       await fetch(
-        `https://hire-support-resume-verification-and.onrender.com/applicant/unsave-job/${jobId}/`,
+        `http://127.0.0.1:8000/applicant/unsave-job/${jobId}/`,
         {
           method: "DELETE",
           headers: {

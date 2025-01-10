@@ -6,6 +6,7 @@ import { useState, useEffect, useContext, useCallback } from "react";
 import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import jwt from 'jsonwebtoken';
+import { useAddressMapping } from "@/pages/utils/AddressMapping";
 
 export default function JobApplication () {
 
@@ -13,6 +14,7 @@ export default function JobApplication () {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     const { jobId } = router.query;
+    const { convertAddressCodes } = useAddressMapping();
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -56,35 +58,34 @@ export default function JobApplication () {
     };
 
     useEffect(() => {
-        if (!authTokens?.access) {
-            console.log("No access token found");
-            return;
-        }
-    
+        if (!authTokens?.access || !jobId || !convertAddressCodes) return;
+
         const decodedToken = jwt.decode(authTokens.access);
         if (!decodedToken) {
-            console.log("Invalid or expired token");
+            console.error("Invalid or expired token");
             return;
         }
-    
+
         const getApplicantInfo = async () => {
             try {
-                const res = await fetch('https://hire-support-resume-verification-and.onrender.com/applicant/profile/view/', {
+                const res = await fetch('http://127.0.0.1:8000/applicant/profile/view/', {
                     method: 'GET',
                     headers: {
-                        'Authorization': `Bearer ${authTokens.access}`,
+                        Authorization: `Bearer ${authTokens.access}`,
                         'Content-Type': 'application/json',
                     },
                 });
-    
+
                 if (res.ok) {
                     const data = await res.json();
                     const profileData = data?.profile_data;
-                    
+
                     if (profileData) {
-                        const completeAddress = `${profileData.present_address}, ${profileData.barangay}, ${profileData.city}, ${profileData.region}`;
+                        const { city, province, region, barangay } = profileData;
+                        const addressNames = convertAddressCodes(region, province, city, barangay);
+                        const completeAddress = `${profileData.present_address}, ${addressNames.barangayName || "Unknown"}, ${addressNames.cityName || "Unknown"}, ${addressNames.regionName || "Unknown"}`;
                         const fullName = `${profileData.first_name} ${profileData.middle_name} ${profileData.last_name}`;
-            
+
                         setFormData({
                             firstName: profileData.first_name,
                             lastName: profileData.last_name,
@@ -97,7 +98,7 @@ export default function JobApplication () {
                             complete: completeAddress,
                             linkedin_profile: profileData.linkedin_profile,
                         });
-    
+
                         setdraftJobApplication({
                             job_hiring_id: Number(jobId),
                             userId: decodedToken.user_id,
@@ -113,7 +114,6 @@ export default function JobApplication () {
                     } else {
                         console.error("Profile data not found in the response.");
                     }
-
                 } else {
                     console.error("Failed to fetch applicant info, status:", res.status);
                 }
@@ -124,7 +124,7 @@ export default function JobApplication () {
             }
         };
         getApplicantInfo();
-    }, [authTokens]);
+    }, [authTokens, jobId, convertAddressCodes]);
 
     const getTitleFromLocalStorage = () => {
         const jobTitle = localStorage.getItem('job_title');
@@ -139,14 +139,14 @@ export default function JobApplication () {
     if (loading) {
         return <p className="text-accent">Loading... (temporary) </p>;
     } 
-
+    
     const saveDraft = () => {
-        localStorage.setItem('job_application_draft', JSON.stringify(draftJobApplication));
+        localStorage.setItem('job_application_draft', JSON.stringify(draftJobApplication)); // save yung data as draft
         // console.log(draftJobApplication);
     };
 
     const navigateToApplicantDocuments = () => {
-        saveDraft();
+        // saveDraft();
         router.push({
             pathname: '/APPLICANT/ApplicantDocuments',
             query: { jobId }, 

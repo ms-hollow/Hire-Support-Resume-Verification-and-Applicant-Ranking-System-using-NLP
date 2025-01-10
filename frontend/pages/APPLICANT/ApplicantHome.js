@@ -32,7 +32,7 @@ export default function ApplicantHome() {
   const getApplicant = async () => {
     try {
       const response = await fetch(
-        'https://hire-support-resume-verification-and.onrender.com/applicant/profile/view/',
+        'http://127.0.0.1:8000/applicant/profile/view/',
         {
           method: 'GET',
           headers: {
