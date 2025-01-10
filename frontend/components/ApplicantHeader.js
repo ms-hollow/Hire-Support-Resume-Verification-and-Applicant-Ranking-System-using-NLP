@@ -23,21 +23,21 @@ const ApplicantHeader = () => {
       <div className="flex items-center">
         <div className="logo mr-4">
           <Image 
-            src="/Logo.png" 
-            width={39} 
+            src="/Logo.svg" 
+            width={45} 
             height={30} 
             alt="Company Logo" 
           />
         </div>
 
-        <ul className="hidden md:flex space-x-10">
+        <ul className="justify-center items-center mt-1 hidden md:flex space-x-10">
           <li><Link href="/APPLICANT/ApplicantHome">Home</Link></li>
           <li><Link href="/APPLICANT/MyJobs">My Jobs</Link></li>
           <li><Link href="/APPLICANT/Settings">Settings</Link></li>
         </ul>
 
         {/* Hamburger Menu Button */}
-        <button className="text-3xl focus:outline-none text-primary md:hidden ml-4" onClick={toggleMenu}>
+        <button className="text-3xl focus:outline-none text-primary md:hidden ml-4 mt-3" onClick={toggleMenu}>
           ☰
         </button>
       </div>
