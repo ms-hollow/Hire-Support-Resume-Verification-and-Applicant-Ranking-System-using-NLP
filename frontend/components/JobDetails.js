@@ -103,7 +103,7 @@ const JobDetails = ({ authToken }) => {
         setJobDetails(null); // Clear previous job details while loading
     
         try {
-            const response = await fetch(`https://hire-support-resume-verification-and.onrender.com/job/hirings/${id}/`, {
+            const response = await fetch(`http://127.0.0.1:8000/job/hirings/${id}/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -171,7 +171,7 @@ const JobDetails = ({ authToken }) => {
         if (!jobId) return;
 
         try {
-            const response = await fetch('https://hire-support-resume-verification-and.onrender.com/applicant/saved-jobs/', {
+            const response = await fetch('http://127.0.0.1:8000/applicant/saved-jobs/', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -206,7 +206,7 @@ const JobDetails = ({ authToken }) => {
     const handleSaveJob = useCallback(async () => {
         if (!jobId) return;
         try {
-            const savedJobs = await fetch(`https://hire-support-resume-verification-and.onrender.com/applicant/save-job/${jobId}/`, {
+            const savedJobs = await fetch(`http://127.0.0.1:8000/applicant/save-job/${jobId}/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -234,7 +234,7 @@ const JobDetails = ({ authToken }) => {
     const handleUnsaveJob = useCallback(async () => {
         if (!jobId) return;
         try {
-            await fetch(`https://hire-support-resume-verification-and.onrender.com/applicant/unsave-job/${jobId}/`, {
+            await fetch(`http://127.0.0.1:8000/applicant/unsave-job/${jobId}/`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

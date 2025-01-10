@@ -22,15 +22,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-qag)3q_0s4)lvuu&*==pah^t1c6*0i)#tmfc%!l33)s&0g38p7' #? For Local Development
-SECRET_KEY = os.environ.get("SECRET_KEY") #? For  Web Deployment
+SECRET_KEY = 'django-insecure-qag)3q_0s4)lvuu&*==pah^t1c6*0i)#tmfc%!l33)s&0g38p7' #? For Local Development
+# SECRET_KEY = os.environ.get("SECRET_KEY") #? For  Web Deployment
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True #? For Local Development
-DEBUG = os.environ.get("DEBUG", "FALSE").lower() == "TRUE" #? For Web Deployment
+DEBUG = True #? For Local Development
+# DEBUG = os.environ.get("DEBUG", "FALSE").lower() == "TRUE" #? For Web Deployment
 
-# ALLOWED_HOSTS = [] #? For Local Development
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ") #? For Web Deployment
+ALLOWED_HOSTS = [] #? For Local Development
+# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ") #? For Web Deployment
 
 #* SECRET_KEY, DEBUG, ALLOWED_HOSTS, and DATABASE_URL are in Render environment variables.
 
@@ -163,28 +163,28 @@ WSGI_APPLICATION = 'hiresupport.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'main', 
-#         'USER': 'postgres',  
-#         'PASSWORD': 'admin',
-#         'HOST': 'localhost',  
-#         'PORT': '', 
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'main', 
+        'USER': 'postgres',  
+        'PASSWORD': 'admin',
+        'HOST': 'localhost',  
+        'PORT': '', 
+    }
+}
+
 # database_url = os.environ.get("DATABASE_URL")
 # DATABASES['default'] = dj_database_url.parse(database_url)  
-# postgresql://hiresupport_django_render_user:wpEtnqpwXq3xm9ItPLtOrInGpVVYdmOW@dpg-ct99m89opnds73e5vvg0-a.oregon-postgres.render.com/hiresupport_django_render
-DATABASES['default'] = dj_database_url.parse('postgresql://hiresupport_django_render_user:wpEtnqpwXq3xm9ItPLtOrInGpVVYdmOW@dpg-ct99m89opnds73e5vvg0-a.oregon-postgres.render.com/hiresupport_django_render') #? For Local Development 
+# postgresql://hiresupport_database_user:lfrxuFLkOdChf1DmbxReY3TP0jY4Rj6k@dpg-ctvr3vjv2p9s739858pg-a.oregon-postgres.render.com/hiresupport_database
+# DATABASES['default'] = dj_database_url.parse('postgresql://hiresupport_database_user:lfrxuFLkOdChf1DmbxReY3TP0jY4Rj6k@dpg-ctvr3vjv2p9s739858pg-a.oregon-postgres.render.com/hiresupport_database') #? For Local Development 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 

@@ -30,7 +30,7 @@ export const useAddressMapping = () => {
 
     const getNameByCode = (code, dataset) => {
         const item = dataset.find((entry) => entry.code === code);
-        return item ? item.name : "Unknown";
+        return item ? item.name : "Loading";
     };
 
     const convertAddressCodes = (regionCode, provinceCode, cityCode, barangayCode) => {

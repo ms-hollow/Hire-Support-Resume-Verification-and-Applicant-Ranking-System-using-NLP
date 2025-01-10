@@ -17,7 +17,7 @@ const SavedJobs = () => {
   useEffect(() => {
     const fetchSavedJobs = async () => {
       try {
-        const res = await fetch('https://hire-support-resume-verification-and.onrender.com/applicant/saved-jobs/', {
+        const res = await fetch('http://127.0.0.1:8000/applicant/saved-jobs/', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ const SavedJobs = () => {
     // Function to fetch the job listings based on the job IDs
     const getJobs = async (jobHiringIds) => {
       try {
-        const response = await fetch('https://hire-support-resume-verification-and.onrender.com/job/job-hirings/', {
+        const response = await fetch('http://127.0.0.1:8000/job/job-hirings/', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -95,7 +95,7 @@ const SavedJobs = () => {
 
   const handleSaveJob = useCallback(async (jobId) => {
     try {
-      const savedJobs = await fetch(`https://hire-support-resume-verification-and.onrender.com/applicant/save-job/${jobId}/`, {
+      const savedJobs = await fetch(`http://127.0.0.1:8000/applicant/save-job/${jobId}/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -120,7 +120,7 @@ const SavedJobs = () => {
   // Handle unsave job
   const handleUnsaveJob = useCallback(async (jobId) => {
     try {
-      await fetch(`https://hire-support-resume-verification-and.onrender.com/applicant/unsave-job/${jobId}/`, {
+      await fetch(`http://127.0.0.1:8000/applicant/unsave-job/${jobId}/`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
