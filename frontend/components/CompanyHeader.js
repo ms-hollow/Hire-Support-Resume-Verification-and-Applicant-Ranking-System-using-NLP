@@ -23,21 +23,21 @@ const CompanyHeader = () => {
       <div className="flex items-center">
         <div className="logo mr-4">
           <Image 
-            src="/Logo.png" 
-            width={39} 
+            src="/Logo.svg" 
+            width={45} 
             height={30} 
             alt="Company Logo" 
           />
         </div>
 
-        <ul className="hidden md:flex space-x-10">
+        <ul className="justify-center items-center mt-1 hidden md:flex space-x-10">
           <li><Link href="/COMPANY/CompanyHome">Home</Link></li>
           <li><Link href="/COMPANY/CreateJob">Create Job</Link></li>
           <li><Link href="/COMPANY/ApplicantsSummary">Applicants Summary</Link></li>
         </ul>
 
         {/* Hamburger Menu Button */}
-        <button className="text-3xl focus:outline-none text-primary md:hidden ml-4" onClick={toggleMenu}>
+        <button className="text-3xl focus:outline-none text-primary md:hidden ml-4 mt-3" onClick={toggleMenu}>
           ☰
         </button>
       </div>
