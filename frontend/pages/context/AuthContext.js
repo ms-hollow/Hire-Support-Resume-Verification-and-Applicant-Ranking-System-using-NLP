@@ -72,7 +72,7 @@ export const AuthProvider = ({children}) => {
             if (user.is_applicant) {
                 router.push("/APPLICANT/ApplicantProfile");
             } else if (user.is_company) {
-                router.push("/GENERAL/Register"); //! Change and redirect to company profile
+                router.push("/COMPANY/CompanyProfile"); //! Change and redirect to company profile
             } else {
                 console.error("Unknown user role");
             }
@@ -85,7 +85,7 @@ export const AuthProvider = ({children}) => {
             if (user.is_applicant) {
                 router.push("/APPLICANT/ApplicantHome");
             } else if (user.is_company) {
-                router.push("/GENERAL/Login");  //! Change and redirect to company home 
+                router.push("/COMPANY/CompanyHome");  //! Change and redirect to company home 
             } else {
                 console.error("Unknown user role");
             }
@@ -122,7 +122,7 @@ export const AuthProvider = ({children}) => {
             // Redirect based on user role
             const userRole = decodedToken.is_company ? "company" : decodedToken.is_applicant ? "applicant" : "unknown";
             if (userRole === "company") {
-                router.push("/GENERAL/Register"); //! Palitan ng company home
+                router.push("/COMPANY/CompanyHome"); //! Palitan ng company home
             } else if (userRole === "applicant") {
                 router.push("/APPLICANT/ApplicantHome"); //! Palitan ng applicant home
             }
@@ -150,7 +150,7 @@ export const AuthProvider = ({children}) => {
                 const userRole = decodedToken.is_company ? "company" : decodedToken.is_applicant ? "applicant" : "unknown";
 
                 if (userRole === "company") {
-                    router.push("/GENERAL/Register");
+                    router.push("/COMPANY/CompanyHome");
                 } else if (userRole === "applicant") {
                     router.push("/APPLICANT/ApplicantHome");
                 }

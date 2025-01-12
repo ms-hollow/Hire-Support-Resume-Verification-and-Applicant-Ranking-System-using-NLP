@@ -20,6 +20,7 @@ export default function ApplicantDocument () {
 
     const router = useRouter();
     const { jobId } = router.query;
+    let {authTokens} = useContext(AuthContext);
 
     const [formData, setFormData] = useState({
         resume: { file: "", option: "upload" },
@@ -81,6 +82,13 @@ export default function ApplicantDocument () {
         }));
     };
 
+    //TODO 1. Retrieve the job application id 
+    //TODO 2. Map yon sa may database 
+    //TODO 3. Get yung uploaded documents
+    //TODO 4. Gamit yung retrieved job application, send ng PATCH request sa backend para iedit and isave ang documents sa may job application na yon
+
+    //TODO Note: Lagi dapat icheck if may changes kasi kapag nag edit sa APPLICATION CONFIRMATION, bumabalik lang sa page kung saan siya nag fill-up
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -93,6 +101,13 @@ export default function ApplicantDocument () {
         }
 
         alert("Documents submitted successfully!");
+    };
+
+    const navigateToApplicantConfirmation = () => {
+        router.push({
+            pathname: '/APPLICANT/ApplicationConfirmation',
+            query: { jobId },
+        });
     };
 
     return ( 
@@ -309,18 +324,16 @@ export default function ApplicantDocument () {
                                 </button>
                                 
 
-                                <button type="button" className="button1 flex items-center justify-center">
-                                    <Link href="/APPLICANT/ApplicationConfirmation" className="ml-auto">
-                                        <div className="flex items-center space-x-2">
-                                            <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Continue</p>
-                                            <Image 
-                                                src="/Arrow Right.svg" 
-                                                width={23} 
-                                                height={10} 
-                                                alt="Continue Icon" 
-                                            />
-                                        </div>
-                                    </Link>
+                                <button onClick={navigateToApplicantConfirmation} type="button" className="button1 flex items-center justify-center">
+                                    <div className="flex items-center space-x-2">
+                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Continue</p>
+                                        <Image 
+                                            src="/Arrow Right.svg" 
+                                            width={23} 
+                                            height={10} 
+                                            alt="Continue Icon" 
+                                        />
+                                    </div>
                                 </button>
                             </div>
                 

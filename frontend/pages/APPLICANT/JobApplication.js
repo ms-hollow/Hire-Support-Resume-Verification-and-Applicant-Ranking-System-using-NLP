@@ -31,11 +31,12 @@ export default function JobApplication () {
 
     const [draftJobApplication, setdraftJobApplication] = useState({
         job_hiring_id: '',
+        job_application_id: '',
         fullName: '',
         email: '',
         contact_number: '',
         address: '',
-        linkedin_profile:'',
+        linkedin_profile: '',
         application_date: '',
         application_status: '',
         documents: '',
@@ -138,21 +139,18 @@ export default function JobApplication () {
 
     if (loading) {
         return <p className="text-accent">Loading... (temporary) </p>;
-    } 
+    }
     
-    const saveDraft = () => {
-        localStorage.setItem('job_application_draft', JSON.stringify(draftJobApplication)); // save yung data as draft
-        // console.log(draftJobApplication);
-    };
-
     const navigateToApplicantDocuments = () => {
-        // saveDraft();
         router.push({
             pathname: '/APPLICANT/ApplicantDocuments',
-            query: { jobId }, 
+            query: { jobId },
         });
     };
-    
+
+    //TODO 1. Get lahat ng data and save it as draft sa database
+    //TODO 2. Save ang job application id
+
     return ( 
         <div>
             <ApplicantHeader/>

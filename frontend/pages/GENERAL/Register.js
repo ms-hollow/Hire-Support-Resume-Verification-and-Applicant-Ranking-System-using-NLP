@@ -5,11 +5,12 @@ import { useState, useContext } from 'react';
 import GeneralHeader from '@/components/GeneralHeader';
 import GeneralFooter from '@/components/GeneralFooter';
 import PersonalInfo from '@/components/PersonalInfo';
-import jwt from 'jsonwebtoken';
+import CompanyInfo from '@/components/CompanyInfo';
 import { useRouter } from 'next/router';
 import AuthContext from '../context/AuthContext'; 
 
 //TODO 1. Change routes 2. Setup show password
+//TODO Add CompanyInfo if company ang nag register
 
 export default function Register() {
     const [step, setStep] = useState(0); // Tracks the current step
@@ -25,6 +26,7 @@ export default function Register() {
     const { registerUser } = useContext(AuthContext);
     const { handleProceed, handleSkip, user, loading } = useContext(AuthContext);
     const [showPersonalInfo, setShowPersonalInfo] = useState(false);
+    const [showCompanyInfo, setCompanyInfo] = useState(false);
 
     const router = useRouter();
 
@@ -36,7 +38,8 @@ export default function Register() {
         if (isApplicant) {
             setShowPersonalInfo(true);
         } else if (isCompany) {
-            console.log('Company role detected. Redirecting to company-specific functionality.'); //! Change to company profile
+            setCompanyInfo(true);
+            // console.log('Company role detected. Redirecting to company-specific functionality.'); //! Change to company profile
         } else {
             console.log('No valid role detected.');
         }
