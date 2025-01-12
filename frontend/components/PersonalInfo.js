@@ -2,12 +2,13 @@ import { useState, useContext, useEffect } from "react";
 import Image from 'next/image';
 import AuthContext from "@/pages/context/AuthContext";
 import jwt from 'jsonwebtoken';
+import { useRouter } from 'next/router';
 
-//TODO Palagyan ako loader dito mi. Dapat mag-loload muna siya before mag mount
-//TODO Kayo na bahala kung ano pa pwede modify hehe
+//! After mag fill-up, mareredirect na sa Applicant Home
 
 const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
     const { authTokens } = useContext(AuthContext);
+    const router = useRouter();
     const [formData, setFormData] = useState({
         first_name: '',
         last_name: '',
@@ -40,7 +41,6 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
             return;
         }
     
-    
         if (age < 15) {
             alert("Age must be 15 years or older.");
             return;
@@ -58,14 +58,12 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
         });
     };
     
-
     const minDate = new Date();
         minDate.setFullYear(minDate.getFullYear() - 85);
     
 
     const handlePhoneNumberChange = (e) => {
         const value = e.target.value;
-
         if (/^\d*$/.test(value) && value.length <= 10) {
             setFormData({ ...formData, contact_number: value });
         }
@@ -165,6 +163,7 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
                 if (onUpdateComplete) {
                     onUpdateComplete();
                 }
+                router.push("/APPLICANT/ApplicantHome");
             } else {
                 console.error('Failed to update profile');
             }
@@ -173,7 +172,7 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
         }
     };
     
-
+    //* Retrieve and display applicant profile
     useEffect(() => {
         const token = authTokens?.access; 
         if (!token) return;
