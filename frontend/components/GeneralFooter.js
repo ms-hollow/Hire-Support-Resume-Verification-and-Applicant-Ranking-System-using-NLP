@@ -30,10 +30,10 @@ const GeneralFooter = () => {
     return (
         <div className="pt-10">
             <footer className={`bg-fontcolor text-background w-full fixed bottom-0 left-0 p-2 flex flex-col items-center ${isVisible ? 'block' : 'hidden'}`}>
-                <p className="lg:text-xsmall mb:text-xsmall sm:text-xsmall xsm:text-xsmall">© 2024 Hire Support. All rights reserved.</p>
+                <p className="lg:text-xsmall mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall">© 2024 Hire Support. All rights reserved.</p>
                 <ul className="list-disc list-inside flex space-x-4">
-                    <li className="text-background lg:text-xsmall mb:text-xsmall sm:text-xsmall xsm:text-xsmall">Privacy Policy</li>
-                    <li className="text-background lg:text-xsmall mb:text-xsmall sm:text-xsmall xsm:text-xsmall">Terms & Condition</li>
+                    <li className="text-background lg:text-xsmall mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall">Privacy Policy</li>
+                    <li className="text-background lg:text-xsmall mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall">Terms & Condition</li>
                 </ul>
          </footer> 
         </div>

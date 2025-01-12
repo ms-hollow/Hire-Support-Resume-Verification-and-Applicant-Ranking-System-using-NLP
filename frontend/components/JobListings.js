@@ -49,7 +49,7 @@ const SkeletonLoader = () => {
   );
 };
 
-const JobListings = ({ authToken }) => {
+const JobListings = ({ authToken, onJobClick }) => {
   const [jobListings, setJobListings] = useState([]);
   const [loading, setLoading] = useState(true); 
   const [savedStatus, setSavedStatus] = useState({});
@@ -110,6 +110,7 @@ const JobListings = ({ authToken }) => {
       undefined,
       { shallow: true }
     );
+    onJobClick();
   };
 
   const getSavedJobs = useCallback(async () => {
@@ -275,11 +276,11 @@ const JobListings = ({ authToken }) => {
   );
 };
 
-const JobListingsWrapper = () => {
+const JobListingsWrapper = ({ onJobClick }) => {
   const { authTokens } = useContext(AuthContext);
   return (
     <div className="flex overflow-y-auto border border-none hide-scrollbar p-1 h-[calc(100vh-150px)]">
-      <JobListings authToken={authTokens.access} />
+      <JobListings authToken={authTokens.access}   onJobClick={onJobClick} />
       <GeneralFooter />
     </div>
   );

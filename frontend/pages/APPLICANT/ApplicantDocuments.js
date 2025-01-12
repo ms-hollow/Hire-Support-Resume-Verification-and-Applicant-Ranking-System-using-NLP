@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useState, useEffect, useContext, useCallback } from "react";
 import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
+import { FaChevronDown } from 'react-icons/fa';
 
 //TODO Connect frontend to backend
 
@@ -119,14 +120,18 @@ export default function ApplicantDocument () {
                             {/* Resume */}
                             <div>
                                 {/* Resume Header (Clickable)*/}
-                                <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-primary mt-4 cursor-pointer" onClick={() => setIsResumeOpen(!isResumeOpen)}> 1. Resume </h2>
+                                <div className="flex justify-between items-center">
+                                    <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-fontcolor mt-4 cursor-pointer" onClick={() => setIsResumeOpen(!isResumeOpen)} > 1. Resume</h2>
+                                    <FaChevronDown className={`text-fontcolor transform ${isResumeOpen ? "rotate-180" : "rotate-0"} transition-transform`} />
+                                </div>
+
 
                                 {/* Accordion Content */}
                                 {isResumeOpen && (
                                     <div className="mt-2">
                                         <label className="flex items-center">
                                             <input type="radio" name="resumeOption" value="upload" className="text-primary h-medium rounded-xs border-2 border-fontcolor mr-4 w-3" checked={formData.resume.option === "upload"} onChange={(e) => handleOptionChange(e, "resume")} />
-                                                <span className="lg:text-medium mb:text-medium sm:text-medium xsm:text-medium text-fontcolor">
+                                                <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-fontcolor">
                                                     Upload Resume
                                                 </span>
                                         </label>
@@ -134,7 +139,7 @@ export default function ApplicantDocument () {
 
                                         <label className="flex items-center space-x-2 mt-2">
                                             <input type="radio" name="resumeOption" value="select" className="text-primary h-medium rounded-xs border-2 border-fontcolor mr-3 w-3" checked={formData.resume.option === "select"} onChange={(e) => handleOptionChange(e, "resume")} />
-                                                <span className="lg:text-medium mb:text-medium sm:text-medium xsm:text-medium text-fontcolor text-left">
+                                                <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-fontcolor text-left">
                                                     Select a Resume
                                                 </span>
                                         </label>
@@ -150,24 +155,39 @@ export default function ApplicantDocument () {
 
                              {/* Educational Documents */}
                              <div>
-                                <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-primary mt-2 cursor-pointer" onClick={() => setIsEducationalOpen(!isEducationalOpen)}>  2. Educational Documents</h2>
 
+                                <div className="flex flex-col justify-between items-start">
+                                    <div className="flex justify-between items-center w-full">
+                                        <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-fontcolor mt-3 cursor-pointer" onClick={() => setIsEducationalOpen(!isEducationalOpen)}  > 2. Upload Educational Documents </h2>
+                                        <FaChevronDown className={`text-fontcolor transform ${isEducationalOpen ? "rotate-180" : "rotate-0"} transition-transform`}/>
+                                    </div>
+
+                                    <p className="mt-auto font-medium text-xs text-fontcolor">
+                                        Upload a document that includes the applicant's name, course/program, and school, such as Diploma, Transcript of Records, or Certificate of Registration.
+                                    </p>
+                                </div>
+
+                                
                                 {/* Nested Accordions: Diploma and TOR */}
                                 {isEducationalOpen && (
                                     <div className="ml-4 mt-2">
                                     {/* Diploma */}
-                                    <h2 className="text-medium font-semibold text-primary cursor-pointer"onClick={() => setIsDiplomaOpen(!isDiplomaOpen)}> 1. Diploma</h2>
+                                    <div className="flex justify-between items-center">
+                                        <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-fontcolor mt-1 cursor-pointer" onClick={() => setIsDiplomaOpen(!isDiplomaOpen)} > 1. Diploma</h2>
+                                        <FaChevronDown className={`text-fontcolor transform ${isDiplomaOpen ? "rotate-180" : "rotate-0"} transition-transform`} />
+                                    </div>
+                                
                                     {isDiplomaOpen && (
                                         <div className=" ml-4">
                                             <label className="flex items-center">
                                                 <input type="radio" name="diplomaOption" value="upload" className="text-primary h-medium rounded-xs border-2 border-fontcolor mr-4 w-3"  checked={formData.diploma.option === "upload"}  onChange={(e) => handleOptionChange(e, "diploma")}/>
-                                                <span className="text-medium text-fontcolor">Upload Diploma</span>
+                                                <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-fontcolor">Upload Diploma</span>
                                             </label>
                                             <input type="file" name="diploma" onChange={(e) => handleFileUpload(e, "diploma")} className="block w-full px-2 py-1 text-medium border focus:ring-2 rounded-xs focus:outline-none" disabled={formData.diploma.option !== "upload"}  />
 
                                             <label className="flex items-center space-x-2 mt-2">
                                                 <input type="radio" name="diplomaOption"value="select" className="text-primary h-medium rounded-xs border-2 border-fontcolor mr-3 w-3" checked={formData.diploma.option === "select"} onChange={(e) => handleOptionChange(e, "diploma")} />
-                                                <span className="text-sm text-fontcolor text-left">Select a Diploma</span>
+                                                <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-fontcolor text-left">Select a Diploma</span>
                                             </label>
 
                                             <select name="diploma"onChange={(e) => handleDropdownChange(e, "diploma")}className="h-medium block w-full rounded-xs border-2 py-1 px-2 text-medium focus:ring-primary focus:outline-none" disabled={formData.diploma.option !== "select"} value={formData.diploma.file} >
@@ -179,19 +199,24 @@ export default function ApplicantDocument () {
                                 )}
 
                                         {/*TOR*/}
-                                        <h2 className="text-medium font-semibold text-primary cursor-pointer mt-2" onClick={() => setIsTOROpen(!isTOROpen)}> 2. Transcript of Records (TOR)  </h2>
+
+                                        <div className="flex justify-between items-center">
+                                            <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-fontcolor mt-1 cursor-pointer" onClick={() => setIsTOROpen(!isTOROpen)} > 2. Transcript of Records (TOR)</h2>
+                                            <FaChevronDown className={`text-fontcolor transform ${isTOROpen ? "rotate-180" : "rotate-0"} transition-transform`} />
+                                        </div>
+                                       
                                         {isTOROpen && (
                                             <div className=" ml-4">
                                             <label className="flex items-center">
                                                 <input type="radio"name="transcriptOption" value="upload" className="text-primary h-medium rounded-xs border-2 border-fontcolor mr-4 w-3" checked={formData.transcript.option === "upload"} onChange={(e) => handleOptionChange(e, "transcript")}/>
-                                                <span className="text-medium text-fontcolor">Upload Transcript of Records (TOR)</span>
+                                                <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-fontcolor">Upload Transcript of Records (TOR)</span>
                                             </label>
 
                                             <input type="file" name="transcript" onChange={(e) => handleFileUpload(e, "transcript")} className="block w-full px-2 py-1 text-medium border focus:ring-2 rounded-xs focus:outline-none" disabled={formData.transcript.option !== "upload"} />
 
                                             <label className="flex items-center space-x-2 mt-2">
                                                 <input type="radio" name="transcriptOption" value="select" className="text-primary h-medium rounded-xs border-2 border-fontcolor mr-3 w-3" checked={formData.transcript.option === "select"} onChange={(e) => handleOptionChange(e, "transcript")} />
-                                                <span className="text-sm text-fontcolor text-left"> Select a transcript </span>
+                                                <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-fontcolor text-left"> Select a transcript </span>
                                             </label>
 
                                             <select
@@ -208,17 +233,26 @@ export default function ApplicantDocument () {
 
                             {/* Work Experience Documents */}
                             <div>
-                                {/* Resume Header (Clickable)*/}
-                                <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-primary mt-2 cursor-pointer" onClick={() => setIsWorkExpOpen(!isWorkExpOpen)}> 3. Work Experience Documents </h2>
+                                <div className="flex flex-col justify-between items-start">
+                                    <div className="flex justify-between items-center w-full">
+                                        <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-fontcolor mt-3 cursor-pointer" onClick={() => setIsWorkExpOpen(!isWorkExpOpen)}  > 3. Upload Work Experience Documents </h2>
+                                        <FaChevronDown className={`text-fontcolor transform ${isWorkExpOpen ? "rotate-180" : "rotate-0"} transition-transform`}/>
+                                    </div>
+
+                                    <p className="mt-auto font-medium text-xs text-fontcolor">
+                                        Upload a document that includes the applicant's name, job title, and company, such as Certificate of Employment or Employment Contract.
+                                    </p>
+                                </div>
+
                                 
                                 {/* Accordion Content */}
                                 {isWorkExpOpen && (
                                     
                                     <div className="mt-2 ml-8">
-                                         <h2 className="text-medium font-semibold text-primary cursor-pointer -ml-3"onClick={() => setIsWorkExpOpen(!isWorkExpOpen)}> 1. Certificate of Employment</h2>
+                                         <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-fontcolor cursor-pointer -ml-3"onClick={() => setIsWorkExpOpen(!isWorkExpOpen)}> 1. Certificate of Employment</h2>
                                         <label className="flex items-center">
                                             <input type="radio" name="workcertificateOption" value="upload" className="text-primary h-medium rounded-xs border-2 border-fontcolor mr-4 w-3" checked={formData.workcertificate.option === "upload"} onChange={(e) => handleOptionChange(e, "seminarCertificate")} />
-                                                <span className="text-medium text-fontcolor">
+                                                <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-fontcolor">
                                                     Upload Certificate of Employment
                                                 </span>
                                         </label>
@@ -226,7 +260,7 @@ export default function ApplicantDocument () {
 
                                         <label className="flex items-center space-x-2 mt-2">
                                             <input type="radio" name="workcertificateOption" value="select" className="text-primary h-medium rounded-xs border-2 border-fontcolor mr-3 w-3" checked={formData.workcertificate.option === "select"} onChange={(e) => handleOptionChange(e, "seminarCertificate")} />
-                                                <span className="text-sm text-fontcolor text-left">
+                                                <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-fontcolor text-left">
                                                     Select a Certificate of Employment
                                                 </span>
                                         </label>
@@ -243,16 +277,24 @@ export default function ApplicantDocument () {
                             {/* Certifications */}
                             <div>
                                 {/* Certifications (Clickable)*/}
-                                <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-primary mt-2 cursor-pointer" onClick={() => setIsSeminarOpen(!isSeminarOpen)}> 4. Certifications </h2>
-                                
+                                <div className="flex flex-col justify-between items-start">
+                                    <div className="flex justify-between items-center w-full">
+                                        <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-fontcolor mt-3 cursor-pointer" onClick={() => setIsSeminarOpen(!isSeminarOpen)}  > 4. Upload Certification Document </h2>
+                                        <FaChevronDown className={`text-fontcolor transform ${isSeminarOpen ? "rotate-180" : "rotate-0"} transition-transform`}/>
+                                    </div>
+
+                                    <p className="mt-auto font-medium text-xs text-fontcolor">
+                                        Upload a document that includes the applicant's name, certificate title, and Certificate provider, such as a Completion Certificate, such as Certificate of Employment or Employment Contract.
+                                    </p>
+                                </div>
+                               
                                 {/* Accordion Content */}
                                 {isSeminarOpen && (
-                                    
                                     <div className="mt-2 ml-8">
-                                         <h2 className="text-medium font-semibold text-primary cursor-pointer -ml-3"onClick={() => setIsSeminarOpen(!isSeminarOpen)}> 1. Seminar/Skills Certificates</h2>
+                                         <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-fontcolor cursor-pointer -ml-3"onClick={() => setIsSeminarOpen(!isSeminarOpen)}> 1. Seminar/Skills Certificates</h2>
                                         <label className="flex items-center">
                                             <input type="radio" name="seminarCertificateOption" value="upload" className="text-primary h-medium rounded-xs border-2 border-fontcolor mr-4 w-3" checked={formData.seminarCertificate.option === "upload"} onChange={(e) => handleOptionChange(e, "seminarCertificate")} />
-                                                <span className="text-medium text-fontcolor">
+                                                <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-fontcolor">
                                                     Upload Seminar/Skills Certificates
                                                 </span>
                                         </label>
@@ -260,7 +302,7 @@ export default function ApplicantDocument () {
 
                                         <label className="flex items-center space-x-2 mt-2">
                                             <input type="radio" name="seminarCertificateOption" value="select" className="text-primary h-medium rounded-xs border-2 border-fontcolor mr-3 w-3" checked={formData.seminarCertificate.option === "select"} onChange={(e) => handleOptionChange(e, "seminarCertificate")} />
-                                                <span className="text-sm text-fontcolor text-left">
+                                                <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-fontcolor text-left">
                                                     Select Seminar/Skills Certificates
                                                 </span>
                                         </label>
@@ -277,14 +319,24 @@ export default function ApplicantDocument () {
                              {/* additional Documents */}
                             <div>
                                 {/* additional Documents Header (Clickable)*/}
-                                <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-primary mt-2 cursor-pointer" onClick={() => setIsAddOpen(!isAddOpen)}> 5. Additional Documents </h2>
+                                <div className="flex flex-col justify-between items-start">
+                                    <div className="flex justify-between items-center w-full">
+                                        <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-fontcolor mt-3 cursor-pointer" onClick={() => setIsAddOpen(!isAddOpen)}  > 5. Additional Documents </h2>
+                                        <FaChevronDown className={`text-fontcolor transform ${isAddOpen ? "rotate-180" : "rotate-0"} transition-transform`}/>
+                                    </div>
 
+                                    <p className="mt-auto font-medium text-xs text-fontcolor">
+                                        Upload additional documents.
+                                    </p>
+                                </div>
+                                
+                               
                                 {/* Accordion Content */}
                                 {isAddOpen && (
                                     <div className="mt-2">
                                         <label className="flex items-center">
                                             <input type="radio" name="additionalDocumentsOption" value="upload" className="text-primary h-medium rounded-xs border-2 border-fontcolor mr-4 w-3" checked={formData.additionalDocuments.option === "upload"} onChange={(e) => handleOptionChange(e, "additionalDocuments")} />
-                                                <span className="text-medium text-fontcolor">
+                                                <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-fontcolor">
                                                     Additional Documents
                                                 </span>
                                         </label>
