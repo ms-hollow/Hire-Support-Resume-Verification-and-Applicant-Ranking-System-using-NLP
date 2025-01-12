@@ -14,14 +14,14 @@ export default function CompanyProfile() {
     let {authTokens} = useContext(AuthContext);
     const router = useRouter();
     const [isEditable, setIsEditable] = useState(false);
-  
+
     const toggleEdit = () => {
       setIsEditable(!isEditable);
     };
   
-    const handleUpdateComplete = () => {
+   {/* const handleUpdateComplete = () => {
       setIsEditable(false);
-    };
+    };*/}
   
     useEffect(()=> {
       if (!authTokens){
@@ -58,7 +58,7 @@ export default function CompanyProfile() {
             {/* Hindi pa naka read0nly yung fields */}
   
             <div className="flex flex-col items-center">
-                <CompanyInfo isEditable={isEditable}  onUpdateComplete={handleUpdateComplete} />
+                <CompanyInfo isEditable={isEditable}/>
             </div>
           </div>
           </div>
