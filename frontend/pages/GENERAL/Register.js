@@ -8,6 +8,7 @@ import PersonalInfo from '@/components/PersonalInfo';
 import jwt from 'jsonwebtoken';
 import { useRouter } from 'next/router';
 import AuthContext from '../context/AuthContext'; 
+import CompanyInfo from '@/components/CompanyInfo';
 
 //TODO 1. Change routes 2. Setup show password
 
@@ -25,6 +26,7 @@ export default function Register() {
     const { registerUser } = useContext(AuthContext);
     const { handleProceed, handleSkip, user, loading } = useContext(AuthContext);
     const [showPersonalInfo, setShowPersonalInfo] = useState(false);
+    const [showCompanyInfo, setShowCompanyInfo] = useState(false);
 
     const router = useRouter();
 
@@ -36,6 +38,7 @@ export default function Register() {
         if (isApplicant) {
             setShowPersonalInfo(true);
         } else if (isCompany) {
+            setShowCompanyInfo(true);
             console.log('Company role detected. Redirecting to company-specific functionality.'); //! Change to company profile
         } else {
             console.log('No valid role detected.');
@@ -361,38 +364,66 @@ export default function Register() {
 
                         {/* Step 3: Review */}
                         {step === 3 && (
-                              <div>          
-                              {!showPersonalInfo ? (
-                                  <div>
-                                      <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
-                                          Would you like to fill out Personal Information Forms?
-                                      </p>
-                                      <div className="flex justify-end">
-                                          <button className="button1 mt-7 flex items-center justify-center" onClick={handleShowPersonalInfo}>
-                                              <div className="flex items-center space-x-2">
-                                                  <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
-                                                      Yes
-                                                  </p>
-                                                  <Image
-                                                      src="/Arrow Right.svg"
-                                                      width={23}
-                                                      height={10}
-                                                      alt="Arrow Icon"
-                                                  />
-                                              </div>
-                                          </button>
-                                      </div>
-                                  </div>
-                              ) : (
-                                  // Display the PersonalInfo component
-                                  <PersonalInfo isEditable={!isEditable}/>
-                              )}
-                             
-                              <p className="text-xsmall text-fontcolor pt-4 pb-1 font-medium">
-                                  Already have an account? <span className="font-semibold"><Link href="/GENERAL/Login" className='underline'>Sign in</Link></span>
-                              </p>
-                          </div>
-                        )}
+                            <div>
+                                {!showPersonalInfo && !showCompanyInfo ? (
+                                <div>
+                                    <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
+                                        Would you like to fill out your information forms?
+                                    </p>
+                                    {/* Display only one button based on the current state */}
+                                    {isApplicant ? (
+                                    <div className="flex justify-end">
+                                        <button className="button1 mt-7 flex items-center justify-center" onClick={handleShowPersonalInfo} >
+                                        <div className="flex items-center space-x-2">
+                                            <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
+                                                Yes
+                                            </p>
+                                            <Image
+                                                src="/Arrow Right.svg"
+                                                width={23}
+                                                height={10}
+                                                alt="Arrow Icon"
+                                            />
+                                        </div>
+                                        </button>
+                                    </div>
+                                    ) : isCompany ? (
+                                            <div className="flex justify-end">
+                                                <button className="button1 mt-7 flex items-center justify-center" onClick={() => setShowCompanyInfo(true)} >
+                                                    <div className="flex items-center space-x-2">
+                                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
+                                                            Yes
+                                                        </p>
+                                                        <Image
+                                                        src="/Arrow Right.svg"
+                                                        width={23}
+                                                        height={10}
+                                                        alt="Arrow Icon"
+                                                        />
+                                                    </div>
+                                                </button>
+                                            </div>
+                                            ) : (
+                                            <p className="text-red-500">No valid role detected. Please choose a role.</p>
+                                        )}
+                                </div>
+                                ) : showPersonalInfo ? (
+                                        // Display the PersonalInfo component
+                                        <PersonalInfo isEditable={!isEditable} />
+                                ) : (
+                                        // Display the CompanyInfo component
+                                        <CompanyInfo  isEditable={!isEditable} />
+                                )}
+
+                                <p className="text-xsmall text-fontcolor pt-4 pb-1 font-medium"> Already have an account?{" "} 
+                                    <span className="font-semibold">
+                                        <Link href="/GENERAL/Login" className="underline">
+                                            Sign in
+                                        </Link>
+                                    </span>
+                                </p>
+                            </div>
+                          )} 
                     </div>
                 )}
             </div>
