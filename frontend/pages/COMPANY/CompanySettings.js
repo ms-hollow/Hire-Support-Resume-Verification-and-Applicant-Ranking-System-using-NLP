@@ -3,7 +3,7 @@ import CompanyHeader from "@/components/CompanyHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import Link from "next/link";
 import Image from "next/image";
-import { FaChevronDown } from 'react-icons/fa'
+import { FaChevronDown } from 'react-icons/fa';
 
 
 export default function CompanySettings() {
