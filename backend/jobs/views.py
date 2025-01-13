@@ -164,169 +164,68 @@ def show_recent_searches(request):
 
     return Response(result_data)
 
-# Create a new job application
 @api_view(['POST'])
 def create_job_application(request):
     if request.method == 'POST':
-        # Copy the data from the request
+        # Get non-file data
         data = request.data.copy()
-
-        # Create a serializer for the JobApplication model
-        serializer = JobApplicationSerializer(data=data)
         
-        # Validate the serializer data
-        if serializer.is_valid():
-            with transaction.atomic():
-                job_application = serializer.save(application_status="draft")  # Save as draft
-
-                # Return the job application ID to frontend
-                return Response({'job_application_id': job_application.id}, status=status.HTTP_201_CREATED)
-
-        # If serializer is invalid, return validation errors
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-# Upload documents for the job application
-@api_view(['POST'])
-def upload_documents(request):
-    if request.method == 'POST':
-        # Copy the request data
-        data = request.data.copy()
-
-        # Retrieve the job application ID from the request data
-        job_application_id = data.get('job_application_id')
-        
-        # If no job application ID is provided, return an error
-        if not job_application_id:
-            return Response({'error': 'Job application ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Retrieve the job application from the database
-        try:
-            job_application = JobApplication.objects.get(id=job_application_id)
-        except JobApplication.DoesNotExist:
-            return Response({'error': 'Job application not found.'}, status=status.HTTP_404_NOT_FOUND)
-
-        # If the job application is no longer in the draft state, prevent document uploads
-        if job_application.application_status != 'draft':
-            return Response({'error': 'Application is already submitted and cannot be updated.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Retrieve document types and files from the request data
+        # Remove files-related fields from data to avoid issues with validation
         document_types = data.pop('document_type', [])
         document_files = request.FILES.getlist('document_file')
 
-        # Save each document type and file associated with the job application
-        for doc_type, doc_file in zip(document_types, document_files):
-            JobApplicationDocument.objects.create(
-                job_application=job_application,
-                document_type=doc_type,
-                document_file=doc_file
-            )
+        serializer = JobApplicationSerializer(data=data)
+        
+        if serializer.is_valid():
+            with transaction.atomic():  # Optional, to ensure all-or-nothing saving
+                job_application = serializer.save()
+                
+                # Save each file with corresponding document type
+                for doc_type, doc_file in zip(document_types, document_files):
+                    JobApplicationDocument.objects.create(
+                        job_application=job_application,
+                        document_type=doc_type,
+                        document_file=doc_file
+                    )
+                
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .models import JobApplication, JobHiring
 
-        # Return a success message after uploading documents
-        return Response({'message': 'Documents uploaded successfully.'}, status=status.HTTP_200_OK)
-
-
-# Confirm the job application (view details and uploaded documents)
 @api_view(['GET'])
-def confirm_job_application(request, job_application_id):
+def check_application(request, pk):
+    applicant_id = request.query_params.get('applicant_id')
+
+    if not applicant_id:
+        return Response(
+            {"error": "Applicant ID is required."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
     try:
-        # Retrieve the job application from the database
-        job_application = JobApplication.objects.get(id=job_application_id)
-        
-        # Retrieve all documents uploaded for the job application
-        documents = JobApplicationDocument.objects.filter(job_application=job_application)
+        # Retrieve the specific job posting
+        job_hiring = JobHiring.objects.get(pk=pk)
+    except JobHiring.DoesNotExist:
+        return Response(
+            {"error": "Job hiring not found."},
+            status=status.HTTP_404_NOT_FOUND
+        )
 
-        # If the job application is not in draft state, prevent further updates
-        if job_application.application_status != 'draft':
-            return Response({'error': 'Application already submitted.'}, status=status.HTTP_400_BAD_REQUEST)
+    # Check if there's already an application for this job by this applicant
+    application_exists = JobApplication.objects.filter(
+        job_hiring=job_hiring,
+        applicant_id=applicant_id
+    ).exists()
 
-        # Serialize the job application and documents to return in the response
-        job_application_data = JobApplicationSerializer(job_application).data
-        document_data = JobApplicationDocumentSerializer(documents, many=True).data
+    return Response({"hasApplied": application_exists}, status=status.HTTP_200_OK)
 
-        # Return the job application details and documents
-        return Response({
-            'job_application': job_application_data,
-            'documents': document_data
-        }, status=status.HTTP_200_OK)
-
-    except JobApplication.DoesNotExist:
-        return Response({'error': 'Job application not found.'}, status=status.HTTP_404_NOT_FOUND)
-
-
-# Submit the job application (mark as completed)
-@api_view(['POST'])
-def submit_job_application(request):
-    if request.method == 'POST':
-        # Retrieve the job application ID from the request data
-        job_application_id = request.data.get('job_application_id')
-
-        # If no job application ID is provided, return an error
-        if not job_application_id:
-            return Response({'error': 'Job application ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Retrieve the job application from the database
-        try:
-            job_application = JobApplication.objects.get(id=job_application_id)
-        except JobApplication.DoesNotExist:
-            return Response({'error': 'Job application not found.'}, status=status.HTTP_404_NOT_FOUND)
-
-        # If the job application is already completed, prevent resubmission
-        if job_application.application_status == 'completed':
-            return Response({'error': 'Application has already been submitted.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Update the application status to "completed"
-        job_application.application_status = 'completed'
-        job_application.save()
-
-        # Return a success message and the final job application data
-        return Response({
-            'message': 'Application submitted successfully.',
-            'job_application': JobApplicationSerializer(job_application).data
-        }, status=status.HTTP_200_OK)
-
-
-# def create_job_application(request):
-#     if request.method == 'POST':
-#         data = request.data.copy()  
-        
-#         job_hiring_id = data.get('job_hiring') 
-#         applicant_id = data.get('applicant')  
-
-#         # Check if an existing application already exists for the applicant and job_hiring
-#         existing_application = JobApplication.objects.filter(job_hiring=job_hiring_id, applicant=applicant_id).first()
-
-#         if existing_application:
-#             return Response({'error': 'You have already applied for this job.'}, status=status.HTTP_400_BAD_REQUEST)
-        
-#         # Remove files-related fields from data to avoid issues with validation
-#         document_types = data.pop('document_type', [])
-#         document_files = request.FILES.getlist('document_file')
-
-#         # Create the Job Application serializer
-#         serializer = JobApplicationSerializer(data=data)
-        
-#         if serializer.is_valid():
-#             with transaction.atomic():  # Optional, to ensure all-or-nothing saving
-#                 job_application = serializer.save()  # Save the job application
-                
-#                 # Save each file with corresponding document type
-#                 for doc_type, doc_file in zip(document_types, document_files):
-#                     JobApplicationDocument.objects.create(
-#                         job_application=job_application,
-#                         document_type=doc_type,
-#                         document_file=doc_file
-#                     )
-                
-#                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-#         # If the serializer is not valid, return errors
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #* Delete Job Application
 @api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
 def delete_job_application(request, pk):
     try:
         job_application = JobApplication.objects.get(pk=pk)
@@ -337,7 +236,6 @@ def delete_job_application(request, pk):
 
 #* Edit Job Application
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def edit_job_application(request, pk):
     try:
         job_application = JobApplication.objects.get(pk=pk)
@@ -351,7 +249,6 @@ def edit_job_application(request, pk):
 
 #* Get the list of all job applications 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def job_application_list(request):
     job_application = JobApplication.objects.all()
     serializer = JobApplicationSerializer(job_application, many=True)
@@ -359,7 +256,6 @@ def job_application_list(request):
 
 #* View job application details
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def job_application_details(request, pk):
     try:
         job_application = JobApplication.objects.get(pk=pk)

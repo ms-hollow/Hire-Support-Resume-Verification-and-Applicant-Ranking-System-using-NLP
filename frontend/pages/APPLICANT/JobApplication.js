@@ -32,6 +32,7 @@ export default function JobApplication () {
     const [draftJobApplication, setdraftJobApplication] = useState({
         job_hiring_id: '',
         job_application_id: '',
+        applicant: '',
         fullName: '',
         email: '',
         contact_number: '',
@@ -58,6 +59,20 @@ export default function JobApplication () {
         alert("Edit button clicked - implement your logic here.");
     };
 
+    const saveDraft = async () => {
+        const alreadyApplied = await checkIfAlreadyApplied();
+        if (alreadyApplied) {
+            alert("You have already applied for this job.");
+            return;
+        }
+    
+        // localStorage.setItem('draftJobApplication', JSON.stringify(draftJobApplication));
+        // router.push({
+        //     pathname: '/APPLICANT/ApplicantDocuments',
+        //     query: { jobId },
+        // });
+    };
+
     useEffect(() => {
         if (!authTokens?.access || !jobId || !convertAddressCodes) return;
 
@@ -79,6 +94,7 @@ export default function JobApplication () {
 
                 if (res.ok) {
                     const data = await res.json();
+                    const applicantKey = data?.applicant_key;
                     const profileData = data?.profile_data;
 
                     if (profileData) {
@@ -101,8 +117,8 @@ export default function JobApplication () {
                         });
 
                         setdraftJobApplication({
-                            job_hiring_id: Number(jobId),
-                            userId: decodedToken.user_id,
+                            job_hiring: Number(jobId),
+                            applicant: Number(applicantKey),
                             fullName: fullName,
                             email: decodedToken.email,
                             contact_number: profileData.contact_number,
@@ -127,6 +143,21 @@ export default function JobApplication () {
         getApplicantInfo();
     }, [authTokens, jobId, convertAddressCodes]);
 
+    const checkIfAlreadyApplied = async () => {
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/job/applications/check/${jobId}/?applicant_id=${draftJobApplication.applicant}`);
+            if (!response.ok) {
+                throw new Error("Failed to check application status");
+            }
+            const data = await response.json();
+            console.log("Application Status:", data);
+            return data.hasApplied;
+        } catch (error) {
+            console.error("Error checking application status:", error);
+            return false;
+        }
+    };
+
     const getTitleFromLocalStorage = () => {
         const jobTitle = localStorage.getItem('job_title');
         return jobTitle ? jobTitle : null; 
@@ -140,14 +171,32 @@ export default function JobApplication () {
     if (loading) {
         return <p className="text-accent">Loading... (temporary) </p>;
     }
-    
-    const navigateToApplicantDocuments = () => {
-        router.push({
-            pathname: '/APPLICANT/ApplicantDocuments',
-            query: { jobId },
-        });
-    };
 
+    // const saveDraft = async () => {
+    //     localStorage.setItem('draftJobApplication', JSON.stringify(draftJobApplication));
+    //     checkIfAlreadyApplied();
+    //     // router.push({
+    //     //     pathname: '/APPLICANT/ApplicantDocuments',
+    //     //     query: { jobId },
+    //     // });
+    // }
+
+    // const checkIfAlreadyApplied = async () => {
+    //     try {
+    //         const response = await fetch(`http://127.0.0.1:8000/job/applications/check/${jobId}/?applicant_id=${applicantId}`);
+    //         if (!response.ok) {
+    //             throw new Error("Failed to check application status");
+    //         }
+    //         const data = await response.json();
+    //         console.log(data)
+    //         return data.hasApplied;
+    //     } catch (error) {
+    //         console.error("Error checking application status:", error);
+    //         return false;
+    //     }
+    // };
+    
+    
     //TODO 1. Get lahat ng data and save it as draft sa database
     //TODO 2. Save ang job application id
 
@@ -239,7 +288,7 @@ export default function JobApplication () {
                                 </button>
                                 
 
-                                <button onClick={navigateToApplicantDocuments} type="button" className="button1 flex items-center justify-center">  
+                                <button onClick={saveDraft} type="button" className="button1 flex items-center justify-center">  
                                         <div className="flex items-center space-x-2">
                                             <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Continue</p>
                                             <Image 
