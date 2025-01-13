@@ -6,7 +6,6 @@ import { useState, useEffect, useContext, useCallback } from "react";
 import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
 
-//TODO Connect frontend to backend
 
 export default function ApplicantDocument () {
 
@@ -21,6 +20,20 @@ export default function ApplicantDocument () {
     const router = useRouter();
     const { jobId } = router.query;
     let {authTokens} = useContext(AuthContext);
+
+    const [draftJobApplication, setdraftJobApplication] = useState({
+        job_hiring_id: '',
+        job_application_id: '',
+        applicant: '',
+        fullName: '',
+        email: '',
+        contact_number: '',
+        address: '',
+        linkedin_profile: '',
+        application_date: '',
+        application_status: '',
+        documents: '',
+    });
 
     const [formData, setFormData] = useState({
         resume: { file: "", option: "upload" },
@@ -48,17 +61,6 @@ export default function ApplicantDocument () {
         });
     };
 
-    const handleFileUpload = (e, document) => {
-        const { files } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [document]: {
-                ...prevState[document],
-                file: files[0] ? files[0].name : "",
-            },
-        }));
-    };
-
     const handleOptionChange = (e, document) => {
         const { value } = e.target;
         setFormData(prevState => ({
@@ -82,32 +84,89 @@ export default function ApplicantDocument () {
         }));
     };
 
-    //TODO 1. Retrieve the job application id 
-    //TODO 2. Map yon sa may database 
-    //TODO 3. Get yung uploaded documents
-    //TODO 4. Gamit yung retrieved job application, send ng PATCH request sa backend para iedit and isave ang documents sa may job application na yon
-
-    //TODO Note: Lagi dapat icheck if may changes kasi kapag nag edit sa APPLICATION CONFIRMATION, bumabalik lang sa page kung saan siya nag fill-up
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        // Optional: Validate to ensure that at least one document is selected/uploaded
-        const allDocumentsUploaded = Object.values(formData).every(doc => doc.option === "select" && doc.file);
-
-        if (!allDocumentsUploaded) {
-            alert("Please select or upload all required documents.");
-            return;
+    useEffect(() => {
+        // Retrieve the draft job application data from localStorage
+        const savedDraft = localStorage.getItem('draftJobApplication');
+        
+        if (savedDraft) {
+            setdraftJobApplication(JSON.parse(savedDraft));
         }
-
-        alert("Documents submitted successfully!");
+    }, []);
+    
+    const handleFileUpload = (e, documentType) => {
+        const { files } = e.target;
+        
+        if (files[0]) {
+            setFormData((prevState) => ({
+                ...prevState,
+                [documentType]: {
+                    file: files[0], // Save the file object
+                    option: "upload", // Set option as upload
+                },
+            }));
+        }
     };
-
-    const navigateToApplicantConfirmation = () => {
-        router.push({
-            pathname: '/APPLICANT/ApplicationConfirmation',
-            query: { jobId },
+    
+    const handleSubmit = async (e) => {
+        if (e) {
+            e.preventDefault();
+        } else {
+            console.error("Event is undefined!");
+        }
+    
+        // Prepare the form data for submission
+        const applicationData = {
+            ...draftJobApplication,  // personal info retrieved from localStorage
+            documents: Object.keys(formData).map((key) => ({
+                document_type: key,  // document type (e.g., 'resume', 'transcript')
+                document_file: formData[key].file,  // uploaded file object
+            })),
+        };
+    
+        const formDataToSubmit = new FormData();
+        formDataToSubmit.append('job_hiring', applicationData.job_hiring_id);
+        formDataToSubmit.append('applicant', applicationData.applicant);
+        formDataToSubmit.append('fullName', applicationData.fullName);
+        formDataToSubmit.append('email', applicationData.email);
+        formDataToSubmit.append('contact_number', applicationData.contact_number);
+        formDataToSubmit.append('address', applicationData.address);
+        formDataToSubmit.append('linkedin_profile', applicationData.linkedin_profile);
+        formDataToSubmit.append('application_date', applicationData.application_date);
+        formDataToSubmit.append('application_status', applicationData.application_status);
+    
+        // Append each document file to FormData
+        applicationData.documents.forEach((doc) => {
+            // console.log(doc.document_type, doc.document_file);  
+            formDataToSubmit.append('document_type', doc.document_type);
+            formDataToSubmit.append('document_file', doc.document_file);  // Ensure it's a valid File object
         });
+    
+        // Log FormData to verify before submission
+        // for (let pair of formDataToSubmit.entries()) {
+        //     console.log(pair[0] + ": " + pair[1]);
+        // }
+    
+        // Send the data to the backend
+        const res = await fetch('http://127.0.0.1:8000/job/applications/create', {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${authTokens.access}`,
+            },
+            body: formDataToSubmit,
+        });
+    
+        if (res.ok) {
+            // Handle successful submission
+            alert("Job application submitted successfully!");
+            localStorage.removeItem('draftJobApplication');
+            router.push({
+                pathname: '/APPLICANT/ApplicationConfirmation',
+                query: { jobId },
+            });
+        } else {
+            // Handle errors
+            alert("Failed to submit job application.");
+        }
     };
 
     return ( 
@@ -324,7 +383,7 @@ export default function ApplicantDocument () {
                                 </button>
                                 
 
-                                <button onClick={navigateToApplicantConfirmation} type="button" className="button1 flex items-center justify-center">
+                                <button onClick={handleSubmit} type="button" className="button1 flex items-center justify-center">
                                     <div className="flex items-center space-x-2">
                                         <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Continue</p>
                                         <Image 
