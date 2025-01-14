@@ -65,27 +65,15 @@ export const AuthProvider = ({children}) => {
             console.error('Error during registration:', error);
         }
     };
-    
-    // Handle proceed to profile page if user decides to fill out profile details
-    const handleProceed = async () => {
-        if (authTokens) {
-            if (user.is_applicant) {
-                router.push("/APPLICANT/ApplicantProfile");
-            } else if (user.is_company) {
-                router.push("/COMPANY/CompanyProfile"); //! Change and redirect to company profile
-            } else {
-                console.error("Unknown user role");
-            }
-        }
-    };
 
     // Handle skip profile details if user wants to skip
     const handleSkip = async () => {
+        // console.log("user: ", user);
        if (authTokens) {
             if (user.is_applicant) {
                 router.push("/APPLICANT/ApplicantHome");
             } else if (user.is_company) {
-                router.push("/COMPANY/CompanyHome");  //! Change and redirect to company home 
+                router.push("/COMPANY/CompanyHome");  
             } else {
                 console.error("Unknown user role");
             }
@@ -180,7 +168,7 @@ export const AuthProvider = ({children}) => {
     const updateToken = async () => {
         if (!authTokens) return;
 
-        // console.log("Before update, authTokens:", authTokens);
+        console.log("Before update, authTokens:", authTokens);
 
         const response = await fetch('http://127.0.0.1:8000/users/token/refresh/', {
             method: 'POST',
@@ -194,7 +182,7 @@ export const AuthProvider = ({children}) => {
             setAuthTokens(data); // Schedule state update
             setUser(jwt.decode(data.access)); // Decode and set user state
             localStorage.setItem('authTokens', JSON.stringify(data)); // Store in localStorage
-            // console.log("Tokens received from refresh:", data); // Logs the response tokens
+            console.log("Tokens received from refresh:", data); // Logs the response tokens
         } else {
             logoutUser();
             // console.log("Failed");
@@ -225,7 +213,6 @@ export const AuthProvider = ({children}) => {
         loginWithGoogle,
         logoutUser,
         registerUser,
-        handleProceed,
         handleSkip
     };
 

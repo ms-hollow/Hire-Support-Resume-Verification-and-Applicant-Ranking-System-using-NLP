@@ -237,6 +237,7 @@ AUTHENTICATION_BACKENDS = (
 LOGIN_DIRECT_URL = "/GENERAL/Login"
 LOGOUT_REDIRECT_URL = '/' 
 
+# Folder path para sa documents
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 

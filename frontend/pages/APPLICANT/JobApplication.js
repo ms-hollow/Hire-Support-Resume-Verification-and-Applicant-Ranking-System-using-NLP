@@ -66,11 +66,11 @@ export default function JobApplication () {
             return;
         }
     
-        // localStorage.setItem('draftJobApplication', JSON.stringify(draftJobApplication));
-        // router.push({
-        //     pathname: '/APPLICANT/ApplicantDocuments',
-        //     query: { jobId },
-        // });
+        localStorage.setItem('draftJobApplication', JSON.stringify(draftJobApplication));
+        router.push({
+            pathname: '/APPLICANT/ApplicantDocuments',
+            query: { jobId },
+        });
     };
 
     useEffect(() => {
@@ -143,6 +143,8 @@ export default function JobApplication () {
         getApplicantInfo();
     }, [authTokens, jobId, convertAddressCodes]);
 
+
+    // Check kung nakapag apply na si applicant or hindi
     const checkIfAlreadyApplied = async () => {
         try {
             const response = await fetch(`http://127.0.0.1:8000/job/applications/check/${jobId}/?applicant_id=${draftJobApplication.applicant}`);

@@ -22,11 +22,14 @@ def complete_company_profile(request):
         return Response(serializer.errors, status=400)
     
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def view_company_profile(request, pk):
-    company = get_object_or_404(Company, pk=pk)
+def view_company_profile(request):
+    company = get_object_or_404(Company, user=request.user)
     serializer = CompanyProfileFormSerializer(company)
-    return Response(serializer.data, status=200)
+
+    return Response({
+        'company_key': company.id,  
+        'profile_data': serializer.data  
+    }, status=200)
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
