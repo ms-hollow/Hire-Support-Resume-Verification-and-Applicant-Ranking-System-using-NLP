@@ -32,11 +32,6 @@ export default function ApplicationConfirmation ({handleJobClick}) {
         localStorage.removeItem('job_application_draft');
     };    
 
-    const getJobIdFromLocalStorage = () => {
-        const jobId = localStorage.getItem('jobId');
-        return jobId ? jobId : null; // Return null if jobId doesn't exist
-    };
-
     const getTitleFromLocalStorage = () => {
         const jobTitle = localStorage.getItem('job_title');
         return jobTitle ? jobTitle : null; 
@@ -47,14 +42,14 @@ export default function ApplicationConfirmation ({handleJobClick}) {
         return company ? company : null; 
     };
 
-
     const goBack = () => {
-        const jobId = getJobIdFromLocalStorage();  // Retrieve jobId from localStorage
         router.push({
             pathname: '/APPLICANT/ApplicantDocuments',
             query: { jobId }, 
         });
     };
+
+    //TODO 1. Retrieve yung job application id then display it
 
     return ( 
         <div>

@@ -179,7 +179,7 @@ def google_login(request):
     user_info = response.json()
     email = user_info.get('email')
 
-    print(f"Google login successful. User email: {email}")  # Print the email from the token
+    # print(f"Google login successful. User email: {email}")  # Print the email from the token
 
     # Check if a user with the email exists
     User = get_user_model()
@@ -192,9 +192,9 @@ def google_login(request):
         return Response({'error': 'An unexpected error occurred.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # Print user details for debugging
-    print(f"User found: {user}")  
-    print(f"User is_company: {user.is_company}")  
-    print(f"User is_applicant: {user.is_applicant}")  
+    # print(f"User found: {user}")  
+    # print(f"User is_company: {user.is_company}")  
+    # print(f"User is_applicant: {user.is_applicant}")  
 
     # Generate JWT tokens for the user, including the roles
     refresh = RefreshToken.for_user(user)
