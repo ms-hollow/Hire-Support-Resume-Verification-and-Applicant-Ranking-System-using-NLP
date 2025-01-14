@@ -288,7 +288,7 @@ export default function JobSummary() {
                                             <li className="text-fontcolor text-xs">Secondary Skills</li>
                                             <p className="font-semibold text-fontcolor text-sm"> {jobDetails.criteria.skills.secondarySkills.join(", ")} </p> 
                                         </div>
-                                            <div className="border-b pb-1">
+                                          <div className="border-b pb-1">
                                             <li className="text-fontcolor text-xs">Additional Skills</li>
                                             <p className="font-semibold text-fontcolor text-sm"> {jobDetails.criteria.skills.additionalSkills.join(", ")} </p>  
                                         </div>

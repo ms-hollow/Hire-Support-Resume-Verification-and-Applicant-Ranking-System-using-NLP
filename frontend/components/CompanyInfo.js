@@ -1,33 +1,33 @@
 import { useState, useContext, useEffect } from "react";
-import Link from "next/link";
 import Image from 'next/image';
+import AuthContext from "@/pages/context/AuthContext";
+import jwt from 'jsonwebtoken';
+import { useRouter } from 'next/router';
 
-const CompanyInfo = ({ isEditable }) => {
+const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
+
+    const { authTokens } = useContext(AuthContext);
+    const router = useRouter();
+
     const [regions, setRegions] = useState([]);
     const [provinces, setProvinces] = useState([]);
     const [cities, setCities] = useState([]);
     const [barangays, setBarangays] = useState([]);
 
     const [formData, setFormData] = useState({
-        company_name:"",
-        num_applicants:"",
+        company_name: '',
+        num_applicants: '',
         email: '',
         contact_number: '',
-        job_industry:"",
-        region: "",
-        province: "",
-        city: "",
+        job_industry: '',
+        region: '',
+        province: '',
+        city: '',
         postal_code: '',
-        barangay: "",
+        barangay: '',
         present_address: '',
         linkedin_profile: ''
     });
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log('Form submitted:', formData);
-      };
-
 
     const handlePhoneNumberChange = (e) => {
         const value = e.target.value;
@@ -37,19 +37,20 @@ const CompanyInfo = ({ isEditable }) => {
     };
 
     const handleChange = (e) => {
-         const { name, value } = e.target;
+        
+        const { name, value } = e.target;
             setFormData({ ...formData, [name]: value });
         };
-    
+
         const { region, province, city, barangay } = formData;
-    
+
         useEffect(() => {
             fetch("https://psgc.gitlab.io/api/regions/")
                 .then((res) => res.json())
                 .then((data) => setRegions(data))
                 .catch((err) => console.error("Error fetching regions:", err));
         }, []);
-    
+
         useEffect(() => {
             if (region) {
                 if (region === "130000000") {
@@ -73,7 +74,7 @@ const CompanyInfo = ({ isEditable }) => {
 
             }
         }, [region]);
-    
+
         useEffect(() => {
             if (province && region !== "130000000") {
                 fetch(`https://psgc.gitlab.io/api/provinces/${province}/cities-municipalities/`)
@@ -84,7 +85,7 @@ const CompanyInfo = ({ isEditable }) => {
                 setCities([]);
             }
         }, [province, region]);
-    
+
         useEffect(() => {
             if (city) {
                 fetch(`https://psgc.gitlab.io/api/cities-municipalities/${city}/barangays/`)
@@ -93,6 +94,122 @@ const CompanyInfo = ({ isEditable }) => {
                     .catch((err) => console.error("Error fetching barangays:", err));
             }
         }, [city], [barangay]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const token = authTokens?.access;
+        if (!token) return;
+    
+        const updatedFormData = {
+            company_name: formData.company_name,
+            number_applicants: formData.num_applicants,
+            contact_number: formData.contact_number,
+            job_industry: formData.job_industry,
+            region: formData.region,
+            province: formData.province,
+            city: formData.city,
+            postal_code: formData.postal_code,
+            barangay: formData.barangay,
+            present_address: formData.present_address,
+            linkedin_profile: formData.linkedin_profile
+        };
+    
+        // console.log("Updated Form Data:", updatedFormData);
+    
+        try {
+            const res = await fetch('http://127.0.0.1:8000/company/profile/edit/', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedFormData),
+            });
+    
+            const data = await res.json();
+    
+            if (res.ok) {
+                alert('Company profile updated!');
+                setFormData(data);
+                if (onUpdateComplete) {
+                    onUpdateComplete();
+                }
+                validate(); // check kung anong page for redirect
+            } else {
+                alert("Error updating profile. See console for details.");
+            }
+        } catch (error) {
+            console.error("Request failed:", error);
+            alert("An unexpected error occurred. Please try again later.");
+        }
+    };    
+
+    const validate = async () => {
+        if (typeof window !== "undefined") {
+
+            const fullUrl = window.location.href;
+            // console.log("Full URL:", fullUrl);
+    
+            if (fullUrl === 'http://localhost:3000/COMPANY/CompanyProfile') {
+                router.push("/COMPANY/CompanyProfile");
+            } else if (fullUrl === 'http://localhost:3000/GENERAL/Register' ) {
+                router.push("/COMPANY/CompanyHome");
+            } else {
+                alert("An unexpected error occurred. Please try again later.");
+            }
+        }
+    };
+        
+    useEffect(() => {        
+
+        const token = authTokens?.access;
+        if (!token) return;
+
+        const decodedToken = jwt.decode(token);
+        // console.log(decodedToken);
+    
+        const getCompanyProfile = async () => {
+            try {
+                const res = await fetch("http://127.0.0.1:8000/company/profile/view/", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+    
+                if (res.ok) {
+                    const data = await res.json();
+                    // console.log("Company Profile Data:", data);
+                    const profileData = data.profile_data;
+
+                    setFormData({
+                        company_name: profileData.company_name,
+                        num_applicants: profileData.number_applicants,
+                        email: decodedToken.email,
+                        contact_number: profileData.contact_number,
+                        job_industry: profileData.job_industry,
+                        region: profileData.region,
+                        province: profileData.province,
+                        city: profileData.city,
+                        postal_code: profileData.postal_code,
+                        barangay: profileData.barangay,
+                        present_address: profileData.present_address,
+                        linkedin_profile: profileData.linkedin_profile
+                    });
+                    
+                } else {
+                    console.error(`Error fetching company profile: ${res.status} - ${res.statusText}`);
+                }
+            } catch (error) {
+                console.error("Request failed:", error);
+            }
+        };
+    
+        getCompanyProfile();
+    }, [authTokens]);
+    
+
   
     return ( 
         <div>
@@ -101,7 +218,7 @@ const CompanyInfo = ({ isEditable }) => {
                     <div className="flex flex-col flex-grow">
                         <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Company Name</p>
                             <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                <input type="text" name="company_name" value={formData.company_name} placeholder="" required /*onChange={handleChange}*/></input>
+                                <input type="text" name="company_name" value={formData.company_name} placeholder="" required onChange={handleChange}></input>
                             </div>
                     </div>        
                 </div>
@@ -109,7 +226,7 @@ const CompanyInfo = ({ isEditable }) => {
                     <div className="flex flex-col flex-grow">
                         <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Industry/Sector</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <select className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"  name="job_industry" value={formData.job_industry} required/*onChange={handleChange}*/>
+                            <select className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"  name="job_industry" value={formData.job_industry} required onChange={handleChange}>
                                 <option value=''  disabled selected hidden>Select Sector</option>
                                 <option value='IT'>Information Technology (IT)</option>
                                 <option value='IT'>Information System (IS)</option>
@@ -127,7 +244,7 @@ const CompanyInfo = ({ isEditable }) => {
                     <div className="flex flex-col flex-grow">
                         <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">No. of Employees</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <input type="text" name="num_applicants" value={formData.num_applicants} placeholder="" required /*onChange={handleChange}*/></input>
+                            <input type="text" name="num_applicants" value={formData.num_applicants} placeholder="" required onChange={handleChange}></input>
                         </div>
                     </div>
                 </div>
@@ -136,7 +253,7 @@ const CompanyInfo = ({ isEditable }) => {
                     <div className="flex flex-col flex-grow">
                         <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Email Address</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <input type="text"  name="email" value={formData.email} placeholder="applicant@gmail.com" required /*onChange={handleChange}*/></input>
+                            <input type="text"  name="email" value={formData.email} placeholder="applicant@gmail.com" required onChange={handleChange} disabled></input>
                         </div>
                     </div>
                     <div className="flex flex-col flex-grow">
@@ -189,7 +306,7 @@ const CompanyInfo = ({ isEditable }) => {
                     <div className="flex flex-col flex-grow-0 lg:w-1/4 mb:w-full sm:w-full">
                         <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Postal Code</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <input type="text"  name="postal_code" value={formData.postal_code} placeholder="" required></input>
+                            <input type="text"  name="postal_code" value={formData.postal_code} placeholder="" required onChange={handleChange}></input>
                         </div>
                     </div>
                 </div>
@@ -226,12 +343,12 @@ const CompanyInfo = ({ isEditable }) => {
                 <div className="flex lg:flex-col mb:flex-col sm:flex-col xsm: flex-col flex-grow pb-5">
                     <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-medium pb-1">Lot, Block, Unit, Building, Floor, Street Name, Subdivision</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex ">
-                            <input type="complete"  name="present_address" value={formData.present_address} placeholder="" required /*onChange={handleChange}*/></input>
+                            <input type="complete"  name="present_address" value={formData.present_address} placeholder="" required onChange={handleChange}></input>
                         </div>
                         
                     <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-medium pt-5">LinkedIn Profile Link</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <input type="linkedin-link"  name="linkedin_profile" value={formData.linkedin_profile} placeholder="" required /*onChange={handleChange}*/></input>
+                            <input type="linkedin-link"  name="linkedin_profile" value={formData.linkedin_profile} placeholder="" required onChange={handleChange}></input>
                         </div>  
                 </div>
 

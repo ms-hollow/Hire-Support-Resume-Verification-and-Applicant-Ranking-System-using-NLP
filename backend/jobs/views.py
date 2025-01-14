@@ -3,11 +3,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import JobHiringSerializer, JobApplicationSerializer
+from .serializers import JobHiringSerializer, JobApplicationSerializer, JobApplicationDocumentSerializer
 from .models import JobHiring, JobApplication, JobApplicationDocument, RecentSearch
 from django.db import transaction
 from django.utils import timezone
 from datetime import timedelta
+from django.views.decorators.csrf import csrf_exempt
 
 #* Create Job Hiring
 @api_view(['POST'])
@@ -55,7 +56,6 @@ def job_hiring_list(request):
     serializer = JobHiringSerializer(job_listings, many=True)
     return Response(serializer.data)
     
-
 #* View job hiring details
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -164,34 +164,68 @@ def show_recent_searches(request):
 
     return Response(result_data)
 
-#* Create Job Application
-@api_view(['POST', 'PATCH'])
+@api_view(['POST'])
 def create_job_application(request):
     if request.method == 'POST':
-        # Create a draft application
-        serializer = JobApplicationSerializer(data=request.data)
-        if serializer.is_valid():
-            job_application = serializer.save(application_status='draft')
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # Get non-file data
+        data = request.data.copy()
+        
+        # Remove files-related fields from data to avoid issues with validation
+        document_types = data.pop('document_type', [])
+        document_files = request.FILES.getlist('document_file')
 
-    elif request.method == 'PATCH':
-        # Update the application
-        job_application_id = request.data.get('job_application_id')
-        try:
-            job_application = JobApplication.objects.get(pk=job_application_id)
-        except JobApplication.DoesNotExist:
-            return Response({'error': 'Job application not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = JobApplicationSerializer(job_application, data=request.data, partial=True)
+        serializer = JobApplicationSerializer(data=data)
+        
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            with transaction.atomic():  # Optional, to ensure all-or-nothing saving
+                job_application = serializer.save()
+                
+                # Save each file with corresponding document type
+                for doc_type, doc_file in zip(document_types, document_files):
+                    JobApplicationDocument.objects.create(
+                        job_application=job_application,
+                        document_type=doc_type,
+                        document_file=doc_file
+                    )
+                
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .models import JobApplication, JobHiring
+
+@api_view(['GET'])
+def check_application(request, pk):
+    applicant_id = request.query_params.get('applicant_id')
+
+    if not applicant_id:
+        return Response(
+            {"error": "Applicant ID is required."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        # Retrieve the specific job posting
+        job_hiring = JobHiring.objects.get(pk=pk)
+    except JobHiring.DoesNotExist:
+        return Response(
+            {"error": "Job hiring not found."},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    # Check if there's already an application for this job by this applicant
+    application_exists = JobApplication.objects.filter(
+        job_hiring=job_hiring,
+        applicant_id=applicant_id
+    ).exists()
+
+    return Response({"hasApplied": application_exists}, status=status.HTTP_200_OK)
+
 
 #* Delete Job Application
 @api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
 def delete_job_application(request, pk):
     try:
         job_application = JobApplication.objects.get(pk=pk)
@@ -202,7 +236,6 @@ def delete_job_application(request, pk):
 
 #* Edit Job Application
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def edit_job_application(request, pk):
     try:
         job_application = JobApplication.objects.get(pk=pk)
@@ -216,7 +249,6 @@ def edit_job_application(request, pk):
 
 #* Get the list of all job applications 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def job_application_list(request):
     job_application = JobApplication.objects.all()
     serializer = JobApplicationSerializer(job_application, many=True)
@@ -224,7 +256,6 @@ def job_application_list(request):
 
 #* View job application details
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def job_application_details(request, pk):
     try:
         job_application = JobApplication.objects.get(pk=pk)

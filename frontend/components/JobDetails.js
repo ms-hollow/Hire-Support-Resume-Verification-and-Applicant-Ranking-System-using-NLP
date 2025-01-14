@@ -3,6 +3,8 @@ import { useState, useContext, useEffect, useCallback } from "react";
 import AuthContext from "@/pages/context/AuthContext";
 import { useRouter } from 'next/router';
 
+//TODO: Add condition that checks if the applicant already suubmitted an application
+
 const SkeletonLoader = () => {
     return (
         <div className="flex flex-col h-full"> 
@@ -256,7 +258,7 @@ const JobDetails = ({ authToken }) => {
     const navigateToJobApplication = () => {
         router.push({
             pathname: '/APPLICANT/JobApplication',
-            query: { jobId }, // Passing jobId in query
+            query: { jobId }, 
         });
     };
     

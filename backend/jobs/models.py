@@ -2,6 +2,8 @@ from django.db import models
 from company.models import Company
 from users.models import User
 
+#TODO Need to migrate
+
 class JobHiring(models.Model): 
     job_hiring_id = models.AutoField(primary_key=True) #PK
     company = models.ForeignKey(Company, on_delete=models.CASCADE) #FK
@@ -11,21 +13,20 @@ class JobHiring(models.Model):
     job_description = models.TextField()
     
     work_location = models.CharField(max_length=300, null=True, blank=False)
-    work_setup = models.CharField(max_length=300, choices=[('Onsite', 'Onsite'), ('Remote', 'Remote'), ('Hybrid', 'Hybrid')], null=True, blank=False)
-    employment_type = models.CharField(max_length=300, choices=[('Full-time', 'Full-time'), ('Part-time', 'Part-time'), ('Contract', 'Contract'), ('Internship', 'Internship')], null=True, blank=False)
+    work_setup = models.CharField(max_length=300, null=True, blank=False)
+    employment_type = models.CharField(max_length=300, null=True, blank=False)
     qualifications = models.TextField()
     schedule = models.CharField(max_length=300)
     salary = models.JSONField(null=True, blank=True)
-    frequency = models.CharField(max_length=300, choices=[('Weekly','Weekly'), ('Bi-Weekly','Bi-Weekly'), ('Semi-Monthly','Semi-Monthly'), ('Monthly','Monthly'), ('Annual','Annual'), ('Daily','Daily')], null=True, blank=False)
+    frequency = models.CharField(max_length=300, null=True, blank=False)
     benefits = models.JSONField(null=True, blank=True)
-    experience_level = models.CharField(max_length=300, choices=[('Internship','Internship'), ('Entry-level', 'Entry-level'), ('Associate', 'Associate'), 
-                                                                ('Mid-level','Mid-level'), ('Senior', 'Senior'), ('Lead', 'Lead'), ('Manager', 'Manager')], null=True, blank=False)
+    experience_level = models.CharField(max_length=300, null=True, blank=False)
     num_positions = models.PositiveIntegerField()
-    verification_option = models.CharField(max_length=300, choices=[('Score Unverified Credential Fully','Score Unverified Credential Fully'), ('Score Unverified Credential 50%','Score Unverified Credential 50%'), ('Ignore Unverified Credentials','Ignore Unverified Credentials')], null=True, blank=False)
+    verification_option = models.CharField(max_length=300, null=True, blank=False)
     creation_date = models.DateField(auto_now_add=True)
     required_documents = models.JSONField(null=True, blank=True)
     application_deadline = models.DateField()
-    status = models.CharField(max_length=10, choices=[('Draft', 'Draft'), ('Open', 'Open'), ('Active', 'Active'), ('Closed', 'Closed')], null=True, blank=False)
+    status = models.CharField(max_length=10, null=True, blank=False)
     additional_notes = models.TextField(max_length=300, null=True, blank=True)
 
     def get_scoring_criteria(self):
@@ -60,8 +61,8 @@ class JobApplication(models.Model):
     email = models.EmailField()  
     application_date = models.DateField(auto_now_add=True)
     application_status = models.CharField(max_length=20, default='draft')
-    # scores = models.JSONField(blank=True, null=True)
-    # verification_result = models.JSONField(blank=True, null=True)
+    scores = models.JSONField(blank=True, null=True)
+    verification_result = models.JSONField(blank=True, null=True)
 
     def __str__(self):
         return f"Application for {self.job_hiring.job_title}"
@@ -70,7 +71,7 @@ class JobApplication(models.Model):
 class JobApplicationDocument(models.Model):
     job_application = models.ForeignKey(JobApplication, related_name='documents', on_delete=models.CASCADE)
     document_type = models.CharField(max_length=255)
-    document_file = models.FileField(upload_to='documents/')
+    document_file = models.FileField(upload_to='documents/') # location kung saan siya iuupload #TODO modify ang path
 
     def __str__(self):
         return self.document_type

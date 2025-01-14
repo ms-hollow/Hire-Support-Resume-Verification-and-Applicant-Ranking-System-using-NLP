@@ -13,6 +13,7 @@ urlpatterns = [
     
     path('applications/', views.job_application_list, name='job_application_list'), # list of all job applications
     path('applications/<int:pk>', views.job_application_details, name='job_application_details'),
+    path('applications/check/<int:pk>/', views.check_application, name='check-application'),
     path('applications/create', views.create_job_application, name='create_job_application'),
     path('applications/edit/<int:pk>', views.edit_job_application, name='edit_job_application'),
     path('applications/delete/<int:pk>', views.delete_job_application, name='delete_job_application'),
