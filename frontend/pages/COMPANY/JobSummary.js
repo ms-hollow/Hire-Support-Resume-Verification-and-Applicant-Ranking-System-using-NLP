@@ -108,7 +108,7 @@ export default function JobSummary() {
                                 <span className="text-fontcolor text-xs font-medium">
                                       <ul className="list-disc pl-5 space-y-1">
                                         <li className="mb-1">Bachelor's degree in Computer Science, Software Engineering, or a related field.</li>
-                                        <li className="mb-3">2+ years of experience in software development.</li>
+                                        <li className="mb-3">1+ years of experience in software development.</li>
                                         <li className="mb-3">Proficiency in at least one programming language (e.g., Java, Python, C#).</li>
                                         <li className="mb-3">Familiarity with software development methodologies and tools (e.g., Agile, Git).</li>
                                         <li className="mb-3">Strong problem-solving and analytical skills.</li>
