@@ -7,6 +7,7 @@ import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import { FaChevronDown } from 'react-icons/fa';
 
+//TODO TODO TODO TODO
 
 export default function ApplicantDocument () {
 
@@ -137,7 +138,7 @@ export default function ApplicantDocument () {
     
         // Append each document file to FormData
         applicationData.documents.forEach((doc) => {
-            // console.log(doc.document_type, doc.document_file);  
+            console.log(doc.document_type, doc.document_file);  
             formDataToSubmit.append('document_type', doc.document_type);
             formDataToSubmit.append('document_file', doc.document_file);  // Ensure it's a valid File object
         });

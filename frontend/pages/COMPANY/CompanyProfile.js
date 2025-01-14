@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 import CompanyHeader from "@/components/CompanyHeader";
 import CompanyInfo from "@/components/CompanyInfo";
 
-
 {/* Hindi pa nakacomponent yung Edit Button */}
 
 export default function CompanyProfile() {
@@ -19,9 +18,9 @@ export default function CompanyProfile() {
       setIsEditable(!isEditable);
     };
   
-   {/* const handleUpdateComplete = () => {
+   const handleUpdateComplete = () => {
       setIsEditable(false);
-    };*/}
+    };
   
     useEffect(()=> {
       if (!authTokens){
@@ -58,7 +57,7 @@ export default function CompanyProfile() {
             {/* Hindi pa naka read0nly yung fields */}
   
             <div className="flex flex-col items-center">
-                <CompanyInfo isEditable={isEditable}/>
+                <CompanyInfo isEditable={isEditable} onUpdateComplete={handleUpdateComplete}/>
             </div>
           </div>
           </div>

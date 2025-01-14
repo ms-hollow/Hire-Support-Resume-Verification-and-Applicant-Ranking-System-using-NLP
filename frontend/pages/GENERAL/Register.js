@@ -8,7 +8,6 @@ import PersonalInfo from '@/components/PersonalInfo';
 import CompanyInfo from '@/components/CompanyInfo';
 import { useRouter } from 'next/router';
 import AuthContext from '../context/AuthContext'; 
-import CompanyInfo from '@/components/CompanyInfo';
 
 //TODO 1. Change routes 2. Setup show password
 //TODO Add CompanyInfo if company ang nag register
@@ -40,7 +39,6 @@ export default function Register() {
             setShowPersonalInfo(true);
         } else if (isCompany) {
             setShowCompanyInfo(true);
-            console.log('Company role detected. Redirecting to company-specific functionality.'); //! Change to company profile
         } else {
             console.log('No valid role detected.');
         }

@@ -163,12 +163,28 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
                 if (onUpdateComplete) {
                     onUpdateComplete();
                 }
-                router.push("/APPLICANT/ApplicantHome");
+                validate();
             } else {
                 console.error('Failed to update profile');
             }
         } catch (error) {
             console.error('Error updating profile:', error);
+        }
+    };
+
+    const validate = async () => {
+        if (typeof window !== "undefined") {
+
+            const fullUrl = window.location.href;
+            // console.log("Full URL:", fullUrl);
+    
+            if (fullUrl === 'http://localhost:3000/APPLICANT/ApplicantProfile') {
+                router.push("/APPLICANT/ApplicantProfile");
+            } else if (fullUrl === 'http://localhost:3000/GENERAL/Register' ) {
+                router.push("/APPLICANT/ApplicantHome");
+            } else {
+                alert("An unexpected error occurred. Please try again later.");
+            }
         }
     };
     
