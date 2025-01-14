@@ -92,48 +92,55 @@ export default function JobSummary() {
                                 <span className="text-fontcolor text-sm font-medium ml-1">Php 17,000-21,000 monthly</span>
                             </div>
                             <p className="text-fontcolor font-semibold mt-4">Salary is negotiable based on experience.</p>
-                            <span className="text-fontcolor text-xs font-medium">CompanLorem ipsum dolor sit amet, consectetur adipiscing elit.y</span>
+                            <p className="text-fontcolor text-xs font-medium">We offer a comprehensive benefits package including healthcare, retirement plans, and professional development opportunities</p>
 
                             {/* Job Description */}
                             <p className="text-fontcolor font-semibold mt-4">Job Description</p>
                             <div>
                                 <span className="text-fontcolor text-xs font-medium">
                                     <ul>
-                                        <li className="mb-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Amet tincidunt et turpis habitasse ultrices condimentum velit. At nulla eu urna cras sed odio mauris vivamus erat. Elit mi massa nisl enim. Tristique massa sit est in senectus amet, ut nullam. Amet consectetur netus duis diam.</li>
-                                        <li className="mb-3">Consectetur pellentesque non eget nisl, pretium, ultrices. Tortor dignissim pretium aliquet nunc, pulvinar. Faucibus tincidunt odio tincidunt massa lobortis aliquam venenatis neque. Tortor porttitor parturient sagittis non faucibus faucibus tincidunt ut aliquam.</li>
-                                        <li className="mb-3">Egestas sed massa enim tempor at orci dignissim id. Sed metus mi leo rutrum felis.</li>
+                                        <li className="mb-3">We are seeking a skilled Software Engineer to join our dynamic team. The ideal candidate will be responsible for developing, testing, and maintaining software applications, collaborating with cross-functional teams, and ensuring high-quality code delivery.</li>
+                                        <li className="mb-3">Develop and maintain software applications: Write clean, efficient, and well-documented code to create and update software products.</li>
+                                        <li className="mb-3">Collaborate with cross-functional teams: Work with various departments to gather requirements and develop effective solutions.</li>
                                     </ul>
                                 </span>
                                 <p className="text-fontcolor font-semibold mt-4">Qualifications (Credentials and Skills)</p>
                                 <span className="text-fontcolor text-xs font-medium">
                                       <ul className="list-disc pl-5 space-y-1">
-                                        <li className="mb-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Amet tincidunt et turpis habitasse ultrices condimentum velit. At nulla eu urna cras sed odio mauris vivamus erat. Elit mi massa nisl enim. Tristique massa sit est in senectus amet, ut nullam. Amet consectetur netus duis diam.</li>
-                                        <li className="mb-3">Consectetur pellentesque non eget nisl, pretium, ultrices. Tortor dignissim pretium aliquet nunc, pulvinar. Faucibus tincidunt odio tincidunt massa lobortis aliquam venenatis neque. Tortor porttitor parturient sagittis non faucibus faucibus tincidunt ut aliquam.</li>
-                                        <li className="mb-3">Egestas sed massa enim tempor at orci dignissim id. Sed metus mi leo rutrum felis.</li>
+                                        <li className="mb-1">Bachelor's degree in Computer Science, Software Engineering, or a related field.</li>
+                                        <li className="mb-3">2+ years of experience in software development.</li>
+                                        <li className="mb-3">Proficiency in at least one programming language (e.g., Java, Python, C#).</li>
+                                        <li className="mb-3">Familiarity with software development methodologies and tools (e.g., Agile, Git).</li>
+                                        <li className="mb-3">Strong problem-solving and analytical skills.</li>
+                                        <li className="mb-3">Excellent communication and teamwork abilities.</li>
                                     </ul>
                                 </span>
                                 <p className="text-fontcolor font-semibold mt-4">Application Requirements</p>
                                 <span className="text-xs font-semibold text-fontcolor"> 
                                 <ul className="list-disc pl-5 space-y-1">
-                                        <li className="mb-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Amet tincidunt et turpis habitasse ultrices condimentum velit. At nulla eu urna cras sed odio mauris vivamus erat. Elit mi massa nisl enim. Tristique massa sit est in senectus amet, ut nullam. Amet consectetur netus duis diam.</li>
-                                        <li className="mb-3">Consectetur pellentesque non eget nisl, pretium, ultrices. Tortor dignissim pretium aliquet nunc, pulvinar. Faucibus tincidunt odio tincidunt massa lobortis aliquam venenatis neque. Tortor porttitor parturient sagittis non faucibus faucibus tincidunt ut aliquam.</li>
-                                        <li className="mb-3">Egestas sed massa enim tempor at orci dignissim id. Sed metus mi leo rutrum felis.</li>
+                                        <li className="mb-1">Updated resume.</li>
+                                        <li className="mb-3">Professional references.</li>
+                                        <li className="mb-3">Portfolio or examples of previous work.</li>
                                     </ul>
                                 </span>
                                 <p className="text-fontcolor font-semibold mt-4">Benefits</p>
                                 <span className="text-xs font-semibold text-fontcolor">
                                       <ul className="list-disc pl-5 space-y-1">
-                                        <li className="mb-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Amet tincidunt et turpis habitasse ultrices condimentum velit. At nulla eu urna cras sed odio mauris vivamus erat. Elit mi massa nisl enim. Tristique massa sit est in senectus amet, ut nullam. Amet consectetur netus duis diam.</li>
-                                        <li className="mb-3">Consectetur pellentesque non eget nisl, pretium, ultrices. Tortor dignissim pretium aliquet nunc, pulvinar. Faucibus tincidunt odio tincidunt massa lobortis aliquam venenatis neque. Tortor porttitor parturient sagittis non faucibus faucibus tincidunt ut aliquam.</li>
-                                        <li className="mb-3">Egestas sed massa enim tempor at orci dignissim id. Sed metus mi leo rutrum felis.</li>
-                                    </ul>
+                                        <li className="mb-1">Competitive salary and performance-based bonuses.</li>
+                                        <li className="mb-3">Retirement savings plan with company matching.</li>
+                                        <li className="mb-3">Health, dental, and vision insurance.</li>
+                                        <li className="mb-3">Paid time off and holidays.</li>
+                                        <li className="mb-3">Professional development opportunities.</li>
+                                        <li className="mb-3">Flexible work hours and remote work options.</li>
+                                  </ul>
                                 </span>
                                 <p className="text-fontcolor font-semibold mt-4">No. of Position</p>
-                                <span className="text-fontcolor text-xs font-medium">CompanLorem ipsum dolor sit amet, consectetur adipiscing elit.y</span>
+                                <span className="text-fontcolor text-xs font-medium">5</span>
                                 <p className="text-fontcolor font-semibold mt-4">Application Deadline</p>
-                                <span className="text-fontcolor text-xs font-medium">CompanLorem ipsum dolor sit amet, consectetur adipiscing elit.y</span>
+                                <span className="text-fontcolor text-xs font-medium">October 10, 2024</span>
                                 <p className="text-fontcolor font-semibold mt-4">Additional Note</p>
-                                <span className="text-fontcolor text-xs font-medium">CompanLorem ipsum dolor sit amet, consectetur adipiscing elit.y</span>
+                                <span className="text-fontcolor text-xs font-medium">This position offers the opportunity to work on cutting-edge projects and make a significant impact on the company's success.</span>
+                                <span className="text-fontcolor text-xs font-medium">Applicants should be proactive, innovative, and passionate about technology.</span>
                               </div>
                           </div>
 
@@ -196,15 +203,15 @@ export default function JobSummary() {
                         <ul className="pl-5 mt-2 space-y-1">
                           <div className="border-b pb-1">
                           <li className="text-fontcolor text-xs">Directly Relevant</li>
-                          <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li> 
+                          <li className="text-semibold text-sm">1-3 year(s) as Full Stack Developer</li> 
                         </div>
                         <div className="border-b pb-1">
                           <li className="text-fontcolor text-xs">Highly Relevant</li>
-                          <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li>   
+                          <li className="text-semibold text-sm">1-2 year(s) as Frontend Developer </li>   
                           </div>
                           <div className="border-b pb-1">
                           <li className="text-fontcolor text-sm">Moderately Relevant</li>
-                          <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li>   
+                          <li className="text-semibold text-sm">1 year IT Support</li>   
                           </div>
                         </ul>
 
@@ -215,15 +222,15 @@ export default function JobSummary() {
                               <ul className="pl-5 mt-2 space-y-1">
                           <div className="border-b pb-1">
                           <li className="text-fontcolor text-xs">Primary Skills</li>
-                          <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li> 
+                          <li className="text-semibold text-sm">Java, Python, JavaScript, C++</li> 
                         </div>
                       <div className="border-b pb-1">
-                        <li className="text-fontcolor text-xs">Secondary Skillst</li>
-                        <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li>   
+                        <li className="text-fontcolor text-xs">Secondary Skills</li>
+                        <li className="text-semibold text-sm">React, Node.js, SQL, MongoDB</li>   
                         </div>
                         <div className="border-b pb-1">
                         <li className="text-fontcolor text-xs">Additional Skills</li>
-                        <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li>   
+                        <li className="text-semibold text-sm">Git version control</li>   
                         </div>
                       </ul>
                     
@@ -236,15 +243,15 @@ export default function JobSummary() {
                             <ul className="pl-5 mt-2 space-y-1">
                         <div className="border-b pb-1">
                         <li className="text-fontcolor text-xs">1st Choice Field Study</li>
-                        <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li> 
+                        <li className="text-semibold text-sm">BS/MS Computer Science</li> 
                       </div>
                       <div className="border-b pb-1">
                         <li className="text-fontcolor text-xs">2nd Choice Field Study</li>
-                        <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li>   
+                        <li className="text-semibold text-sm">BS Information Technology</li> 
                         </div>
                         <div className="border-b pb-1">
                         <li className="text-fontcolor text-xs">2nd Choice Field Study</li>
-                        <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li>   
+                        <li className="text-semibold text-sm">BS Information Systems</li> 
                         </div>
                       </ul>
                     
@@ -256,16 +263,16 @@ export default function JobSummary() {
                           <ul className="pl-5 mt-2 space-y-1">
                         <div className="border-b pb-1">
                         <li className="text-fontcolor text-xs">School Preference</li>
-                        <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li> 
+                        <li className="text-semibold text-sm">Technological University of the Philippines</li> 
                       </div>
                       <div className="border-b pb-1">
-                        <li className="text-fontcolor text-xs">Honorsy</li>
-                        <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li>   
-                        </div>
+                        <li className="text-fontcolor text-xs">Honors</li>
+                        <li className="text-semibold text-sm">Academic excellence awards (is a plus but not required)</li> 
+                      </div>
                         <div className="border-b pb-1">
                         <li className="text-fontcolor text-xs">Multiple Degrees</li>
-                        <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li>   
-                        </div>
+                        <li className="text-semibold text-sm">Not required</li> 
+                      </div>
                       </ul>
                           <div>
                             <div className="flex justify-between items-center">
@@ -273,8 +280,8 @@ export default function JobSummary() {
                               <span className="text-fontcolor text-sm">Weight: 100%</span>
                             </div>
                             <ul className="pl-5 mt-2 space-y-1">
-                            <li className="text-fontcolor text-xs">Institutional Preference Bonus</li>
-                            <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li> 
+                              <li className="text-fontcolor text-xs">Institutional Preference Bonus</li>
+                              <li className="text-semibold text-sm">Google Cloud Professional Developer (is a plus but not required)</li> 
                             </ul>
                           </div>
                         </div>
