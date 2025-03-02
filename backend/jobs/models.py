@@ -1,8 +1,8 @@
 from django.db import models
 from company.models import Company
 from users.models import User
-import os
-from django.utils.text import slugify
+
+#TODO Need to migrate
 
 class JobHiring(models.Model): 
     job_hiring_id = models.AutoField(primary_key=True) #PK
@@ -67,43 +67,11 @@ class JobApplication(models.Model):
     def __str__(self):
         return f"Application for {self.job_hiring.job_title}"
 
-def applicant_document_upload_path(instance, filename):
-    # Get the applicant's name, slugified (converted to a safe format for URLs)
-    applicant_name = slugify(instance.job_application.applicant.name)  
-    
-    # Get the job posting ID from the related job_hiring
-    job_posting = f"Job Posting - {instance.job_application.job_hiring.id}"
-    
-    # Get the document type, slugified
-    document_type = slugify(instance.document_type)  # Convert the document type into a safe string for file storage
-    
-    # Return the full file path where the document will be stored
-    return os.path.join('Applicants', applicant_name, job_posting, document_type, filename)
 
-class JobApplicationDocumentFile(models.Model):
-    # This field stores the actual document file, with a dynamic upload path.
-    # The path is defined by the applicant_document_upload_path function.
-    file = models.FileField(upload_to=applicant_document_upload_path)  
-    
-    # This field stores the timestamp when the file was uploaded.
-    created_at = models.DateTimeField(auto_now_add=True)  # Automatically set when the file is first created.
-
-    # String representation of the model (when printed or displayed)
-    def __str__(self):
-        return f"File uploaded on {self.created_at}"
-
-# Model representing a document associated with a job application.
 class JobApplicationDocument(models.Model):
-    # Foreign key relationship to JobApplication. This ties the document to a specific job application.
-    # 'related_name' allows reverse access to all documents from a JobApplication instance.
     job_application = models.ForeignKey(JobApplication, related_name='documents', on_delete=models.CASCADE)
-    
-    # The document's type (e.g., "Resume", "Cover Letter")
-    document_type = models.CharField(max_length=255)  
-    
-    # Many-to-many relationship with JobApplicationDocumentFile.
-    # A document can have multiple files (e.g., one document type may have multiple versions or formats).
-    files = models.ManyToManyField(JobApplicationDocumentFile, related_name='documents')
+    document_type = models.CharField(max_length=255)
+    document_file = models.FileField(upload_to='documents/') # location kung saan siya iuupload #TODO modify ang path
 
     def __str__(self):
         return self.document_type

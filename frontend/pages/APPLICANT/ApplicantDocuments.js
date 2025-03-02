@@ -9,6 +9,7 @@ import { FaChevronDown } from 'react-icons/fa';
 import { FaPlus } from "react-icons/fa";
 
 //TODO TODO TODO TODO
+//TODO Hindi nagsasave ang mga files
 
 export default function ApplicantDocument () {
 
@@ -24,7 +25,7 @@ export default function ApplicantDocument () {
     let {authTokens} = useContext(AuthContext);
 
     const [draftJobApplication, setdraftJobApplication] = useState({
-        job_hiring_id: '',
+        job_hiring: '',
         job_application_id: '',
         applicant: '',
         fullName: '',
@@ -63,31 +64,83 @@ export default function ApplicantDocument () {
         });
     };
 
-    const handleFileUpload = (e, document) => {
-        const { files } = e.target;
-        setFormData(prevState => ({
-            ...prevState,
-            [document]: {
-                ...prevState[document],
-                file: files[0] ? files[0].name : "",
-            },
-        }));
-    };
+    useEffect(() => {
+        // Retrieve the draft job application data from localStorage
+        const savedDraft = localStorage.getItem('draftJobApplication');
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        // Optional: Validate to ensure that at least one document is selected/uploaded
-        const allDocumentsUploaded = Object.values(formData).every(doc => doc.option === "select" && doc.file);
-
-        if (!allDocumentsUploaded) {
-            alert("Please select or upload all required documents.");
-            return;
+        if (savedDraft) {
+            const parsedDraft = JSON.parse(savedDraft);
+            console.log('Draft Loaded:', parsedDraft);
+            console.log(parsedDraft.job_hiring);
+            // console.log(typeof(parsedDraft.job_hiring))
+            setdraftJobApplication(parsedDraft);
         }
 
-        alert("Documents submitted successfully!");
-    };
+        console.log(draftJobApplication);
+    }, []);
 
+    const handleSubmit = async (e) => {
+        if (e) {
+            e.preventDefault();
+        } else {
+            console.error("Event is undefined!");
+        }
+    
+        // Prepare the form data for submission
+        const applicationData = {
+            ...draftJobApplication,  // personal info retrieved from localStorage
+            documents: Object.keys(formData).map((key) => ({
+                document_type: key,  // document type (e.g., 'resume', 'transcript')
+                document_file: formData[key].file,  // uploaded file object
+            })),
+        };
+    
+        const formDataToSubmit = new FormData();
+        formDataToSubmit.append('job_hiring', applicationData.job_hiring_id);
+        formDataToSubmit.append('applicant', applicationData.applicant);
+        formDataToSubmit.append('fullName', applicationData.fullName);
+        formDataToSubmit.append('email', applicationData.email);
+        formDataToSubmit.append('contact_number', applicationData.contact_number);
+        formDataToSubmit.append('address', applicationData.address);
+        formDataToSubmit.append('linkedin_profile', applicationData.linkedin_profile);
+        formDataToSubmit.append('application_date', applicationData.application_date);
+        formDataToSubmit.append('application_status', applicationData.application_status);
+    
+        // Append each document file to FormData
+        applicationData.documents.forEach((doc) => {
+            console.log(doc.document_type, doc.document_file);  
+            formDataToSubmit.append('document_type', doc.document_type);
+            formDataToSubmit.append('document_file', doc.document_file);  // Ensure it's a valid File object
+        });
+    
+        // Log FormData to verify before submission
+        for (let pair of formDataToSubmit.entries()) {
+            console.log(pair[0] + ": " + pair[1]);
+        }
+    
+        // Send the data to the backend
+        // const res = await fetch('http://127.0.0.1:8000/job/applications/create', {
+        //     method: 'POST',
+        //     headers: {
+        //         Authorization: `Bearer ${authTokens.access}`,
+        //     },
+        //     body: formDataToSubmit,
+        // });
+    
+        // if (res.ok) {
+        //     // Handle successful submission
+        //     alert("Job application submitted successfully!");
+        //     localStorage.removeItem('draftJobApplication');
+        //     router.push({
+        //         pathname: '/APPLICANT/ApplicationConfirmation',
+        //         query: { jobId },
+        //     });
+        // } else {
+        //     // Handle errors
+        //     alert("Failed to submit job application.");
+        // }
+    };
+    
     const addAdditionalFile = (category) => {
         setFormData((prevState) => {
             const updatedFiles = [...(prevState[category]?.files || [])];
@@ -121,7 +174,7 @@ export default function ApplicantDocument () {
         const { files } = e.target;
         setFormData((prevState) => {
             const updatedFiles = [...(prevState[category]?.files || [])];
-            updatedFiles[index] = files[0] ? files[0].name : "";
+            updatedFiles[index] = files[0]; // Store the file object, not just the filename
             return {
                 ...prevState,
                 [category]: {
@@ -131,6 +184,7 @@ export default function ApplicantDocument () {
             };
         });
     };
+    
 
     return ( 
         <div>

@@ -60,11 +60,11 @@ export default function JobApplication () {
     };
 
     const saveDraft = async () => {
-        const alreadyApplied = await checkIfAlreadyApplied();
-        if (alreadyApplied) {
-            alert("You have already applied for this job.");
-            return;
-        }
+        // const alreadyApplied = await checkIfAlreadyApplied();
+        // if (alreadyApplied) {
+        //     alert("You have already applied for this job.");
+        //     return;
+        // }
     
         localStorage.setItem('draftJobApplication', JSON.stringify(draftJobApplication));
         router.push({

@@ -72,8 +72,9 @@ class JobApplicationDocumentSerializer(serializers.ModelSerializer):
         fields = ['document_type', 'document_file']
 
 class JobApplicationSerializer(serializers.ModelSerializer):
+
     documents = JobApplicationDocumentSerializer(many=True, required=False)
-    applicant_name = serializers.CharField(source='applicant.applicant_name', read_only=True)  # Get applicant name
+    applicant_name = serializers.CharField(source='applicant.applicant_name', read_only=True) # kunin ang applicant name
 
     class Meta:
         model = JobApplication
@@ -81,41 +82,29 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             'job_application_id',
             'job_hiring',
             'applicant',
-            'applicant_name',  # Save applicant name
+            'applicant_name', # save applicant name
             'email',
             'application_date',
             'application_status',
-            'scores',
-            'verification_result',
+            # 'scores',
+            # 'verification_result',
             'documents',  # Include nested documents
         ]
-
+ 
     def create(self, validated_data):
         documents_list = validated_data.pop('documents', [])
         job_application = JobApplication.objects.create(**validated_data)
 
         # Save multiple documents
         for document_data in documents_list:
-            # Ensure file is saved with the correct directory structure
-            document_type = document_data['document_type']
-            document_file = document_data['document_file']
-            
-            # Define the path dynamically based on the applicant's name and job posting
-            applicant_name = validated_data['applicant'].applicant_name.replace(" ", "-").lower()
-            job_posting_name = validated_data['job_hiring'].job_title.replace(" ", "-").lower()
-
-            # Save document to the correct path
-            document_file.name = f"Applicants/{applicant_name}/{job_posting_name}/{document_type}/{document_file.name}"
-
-            # Save the document to the database
             JobApplicationDocument.objects.create(job_application=job_application, **document_data)
 
         return job_application
-
+    
     def update(self, instance, validated_data):
-        documents_data = validated_data.pop('documents', [])
+        documents_data = validated_data.pop('documents', []) 
 
-        # Update fields on the Job Application
+        # Update fields on the Job Application 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -123,20 +112,11 @@ class JobApplicationSerializer(serializers.ModelSerializer):
         # Update related documents
         if documents_data:
             instance.documents.all().delete()  # Optional: delete previous documents
-            for document_data in documents_data:  # Add new documents
-                # Define the path dynamically based on the applicant's name and job posting
-                applicant_name = validated_data['applicant'].applicant_name.replace(" ", "-").lower()
-                job_posting_name = validated_data['job_hiring'].job_title.replace(" ", "-").lower()
-                document_type = document_data['document_type']
-                document_file = document_data['document_file']
-
-                document_file.name = f"Applicants/{applicant_name}/{job_posting_name}/{document_type}/{document_file.name}"
-
-                # Save the document to the database
+            for document_data in documents_data: # Add new documents
                 JobApplicationDocument.objects.create(job_application=instance, **document_data)
 
         return instance
-
+    
     def validate(self, attrs):
         if attrs.get('application_status') == 'completed':
             required_fields = ['job_hiring', 'applicant', 'email', 'documents']
