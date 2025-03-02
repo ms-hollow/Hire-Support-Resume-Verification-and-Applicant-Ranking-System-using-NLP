@@ -4,12 +4,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import JobHiringSerializer, JobApplicationSerializer, JobApplicationDocumentSerializer
-from .models import JobHiring, JobApplication, JobApplicationDocument, RecentSearch, JobApplicationDocumentFile
+from .models import JobHiring, JobApplication, JobApplicationDocument, RecentSearch
 from django.db import transaction
 from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.csrf import csrf_exempt
-
 
 #* Create Job Hiring
 @api_view(['POST'])
@@ -170,36 +169,32 @@ def create_job_application(request):
     if request.method == 'POST':
         # Get non-file data
         data = request.data.copy()
-
+        
         # Remove files-related fields from data to avoid issues with validation
         document_types = data.pop('document_type', [])
         document_files = request.FILES.getlist('document_file')
 
-        # Serializer to save the non-file data
         serializer = JobApplicationSerializer(data=data)
-
+        
         if serializer.is_valid():
-            with transaction.atomic(): 
+            with transaction.atomic():  # Optional, to ensure all-or-nothing saving
                 job_application = serializer.save()
-
-                # Loop through each document type and upload multiple files
-                for doc_type, doc_files in zip(document_types, document_files):
-                    # Create a JobApplicationDocument entry for each document type
-                    job_application_document = JobApplicationDocument.objects.create(
+                
+                # Save each file with corresponding document type
+                for doc_type, doc_file in zip(document_types, document_files):
+                    JobApplicationDocument.objects.create(
                         job_application=job_application,
-                        document_type=doc_type
+                        document_type=doc_type,
+                        document_file=doc_file
                     )
-
-                    # For each file, create a JobApplicationDocumentFile entry and associate it with the JobApplicationDocument
-                    for file in doc_files:
-                        # Create a JobApplicationDocumentFile entry
-                        doc_file_instance = JobApplicationDocumentFile.objects.create(file=file)
-                        
-                        # Add the created file to the JobApplicationDocument
-                        job_application_document.files.add(doc_file_instance)
                 
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .models import JobApplication, JobHiring
 
 @api_view(['GET'])
 def check_application(request, pk):
