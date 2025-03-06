@@ -4,8 +4,6 @@ import AuthContext from "@/pages/context/AuthContext";
 import jwt from 'jsonwebtoken';
 import { useRouter } from 'next/router';
 
-//! After mag fill-up, mareredirect na sa Applicant Home
-
 const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
     const { authTokens } = useContext(AuthContext);
     const router = useRouter();
@@ -104,7 +102,7 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
             setCities([]);
             setBarangays([]);
         }
-    }, [formData.region]);
+    }, [formData.region]); 
     
     useEffect(() => {
         if (formData.province && formData.region !== '130000000') { 

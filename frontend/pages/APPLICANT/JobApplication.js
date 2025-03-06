@@ -60,13 +60,14 @@ export default function JobApplication () {
     };
 
     const saveDraft = async () => {
+        //! Need to uncomment this code when done with the document upload feature
         // const alreadyApplied = await checkIfAlreadyApplied();
         // if (alreadyApplied) {
         //     alert("You have already applied for this job.");
         //     return;
         // }
     
-        localStorage.setItem('draftJobApplication', JSON.stringify(draftJobApplication));
+        sessionStorage.setItem('draftJobApplication', JSON.stringify(draftJobApplication));
         router.push({
             pathname: '/APPLICANT/ApplicantDocuments',
             query: { jobId },
@@ -160,13 +161,13 @@ export default function JobApplication () {
         }
     };
 
-    const getTitleFromLocalStorage = () => {
-        const jobTitle = localStorage.getItem('job_title');
+    const getTitle = () => {
+        const jobTitle = sessionStorage.getItem('job_title');
         return jobTitle ? jobTitle : null; 
     };
     
-    const getCompanyFromLocalStorage = () => {
-        const company = localStorage.getItem('company');
+    const getCompany = () => {
+        const company = sessionStorage.getItem('company');
         return company ? company : null; 
     };
 
@@ -207,8 +208,8 @@ export default function JobApplication () {
             <ApplicantHeader/>
                 <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 sm:px-8 xsm:px-8 lg:px-20 py-8 mx-auto">
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
-                    <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>
-                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompanyFromLocalStorage() || 'No Job Company Available'}</p>
+                    <p className="font-semibold text-primary text-large pb-1">{getTitle() || 'No Job Title Available'}</p>
+                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompany() || 'No Job Company Available'}</p>
                     <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-8 font-bold underline"> See job hiring details</p>
                     
                     <div className="flex items-center justify-center ">
