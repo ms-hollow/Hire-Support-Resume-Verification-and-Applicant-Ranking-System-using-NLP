@@ -90,14 +90,14 @@ const JobDetails = ({ authToken }) => {
 
     useEffect(() => { 
         if (jobId) {
-            saveJobIdToLocalStorage(jobId);
+            saveJobIdToSessionStorage(jobId);
             fetchJobDetails(Number(jobId)); // Trigger fetch when jobId changes
             checkIfSaved();
         }
     }, [jobId]);
 
-    const saveJobIdToLocalStorage = (jobId) => {
-        localStorage.setItem('jobId', jobId);
+    const saveJobIdToSessionStorage = (jobId) => {
+        sessionStorage.setItem('jobId', jobId);
     };
 
     const fetchJobDetails = useCallback(async (id) => {
@@ -117,8 +117,8 @@ const JobDetails = ({ authToken }) => {
                 const data = await response.json();
                 setJobDetails(data);
 
-                localStorage.setItem('job_title', data.job_title);
-                localStorage.setItem('company', data.company_name);
+                sessionStorage.setItem('job_title', data.job_title);
+                sessionStorage.setItem('company', data.company_name);
     
                 // Format salary
                 const formattedSalary = data.salary

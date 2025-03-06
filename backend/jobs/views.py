@@ -190,11 +190,6 @@ def create_job_application(request):
                 
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
-from .models import JobApplication, JobHiring
 
 @api_view(['GET'])
 def check_application(request, pk):
@@ -222,7 +217,6 @@ def check_application(request, pk):
     ).exists()
 
     return Response({"hasApplied": application_exists}, status=status.HTTP_200_OK)
-
 
 #* Delete Job Application
 @api_view(['DELETE'])

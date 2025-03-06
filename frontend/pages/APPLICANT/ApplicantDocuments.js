@@ -1,15 +1,11 @@
 import ApplicantHeader from "@/components/ApplicantHeader";
 import GeneralFooter from "@/components/GeneralFooter";
-import Link from "next/link";
 import Image from 'next/image';
 import { useState, useEffect, useContext, useCallback } from "react";
 import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import { FaChevronDown } from 'react-icons/fa';
 import { FaPlus } from "react-icons/fa";
-
-//TODO TODO TODO TODO
-//TODO Hindi nagsasave ang mga files
 
 export default function ApplicantDocument () {
 
@@ -18,7 +14,6 @@ export default function ApplicantDocument () {
     const [isWorkExpOpen, setIsWorkExpOpen] = useState(false);
     const [isSeminarOpen, setIsSeminarOpen] = useState(false);
     const [isAddOpen, setIsAddOpen] = useState(false);
-
 
     const router = useRouter();
     const { jobId } = router.query;
@@ -47,13 +42,13 @@ export default function ApplicantDocument () {
         additionalDocs: { files: [] }, // Keep additional documents as an array
     });
 
-    const getTitleFromLocalStorage = () => {
-        const jobTitle = localStorage.getItem('job_title');
+    const getTitle = () => {
+        const jobTitle = sessionStorage.getItem('job_title');
         return jobTitle ? jobTitle : null; 
     };
-
-    const getCompanyFromLocalStorage = () => {
-        const company = localStorage.getItem('company');
+    
+    const getCompany = () => {
+        const company = sessionStorage.getItem('company');
         return company ? company : null; 
     };
 
@@ -66,7 +61,7 @@ export default function ApplicantDocument () {
 
     useEffect(() => {
         // Retrieve the draft job application data from localStorage
-        const savedDraft = localStorage.getItem('draftJobApplication');
+        const savedDraft = sessionStorage.getItem('draftJobApplication'); // use session storage
 
         if (savedDraft) {
             const parsedDraft = JSON.parse(savedDraft);
@@ -80,23 +75,20 @@ export default function ApplicantDocument () {
     }, []);
 
     const handleSubmit = async (e) => {
-        if (e) {
-            e.preventDefault();
-        } else {
-            console.error("Event is undefined!");
-        }
+        if (e) e.preventDefault();
     
-        // Prepare the form data for submission
         const applicationData = {
-            ...draftJobApplication,  // personal info retrieved from localStorage
+            ...draftJobApplication,
             documents: Object.keys(formData).map((key) => ({
-                document_type: key,  // document type (e.g., 'resume', 'transcript')
-                document_file: formData[key].file,  // uploaded file object
+                document_type: key,
+                document_file: formData[key].file, // <- This is the actual File object
             })),
         };
+
+        console.log(applicationData);
     
         const formDataToSubmit = new FormData();
-        formDataToSubmit.append('job_hiring', applicationData.job_hiring_id);
+        formDataToSubmit.append('job_hiring', applicationData.job_hiring);
         formDataToSubmit.append('applicant', applicationData.applicant);
         formDataToSubmit.append('fullName', applicationData.fullName);
         formDataToSubmit.append('email', applicationData.email);
@@ -106,40 +98,46 @@ export default function ApplicantDocument () {
         formDataToSubmit.append('application_date', applicationData.application_date);
         formDataToSubmit.append('application_status', applicationData.application_status);
     
-        // Append each document file to FormData
+        // Append each document file and its type to FormData
         applicationData.documents.forEach((doc) => {
-            console.log(doc.document_type, doc.document_file);  
-            formDataToSubmit.append('document_type', doc.document_type);
-            formDataToSubmit.append('document_file', doc.document_file);  // Ensure it's a valid File object
+            if (doc.document_file) {
+                formDataToSubmit.append('document_type', doc.document_type); // Matches 'document_type' in your backend
+                formDataToSubmit.append('document_file', doc.document_file); // Matches 'document_file' in your backend
+            }
         });
     
-        // Log FormData to verify before submission
+        // Debugging: See what's being sent
         for (let pair of formDataToSubmit.entries()) {
-            console.log(pair[0] + ": " + pair[1]);
+            console.log(pair[0], pair[1]);
         }
     
-        // Send the data to the backend
-        // const res = await fetch('http://127.0.0.1:8000/job/applications/create', {
-        //     method: 'POST',
-        //     headers: {
-        //         Authorization: `Bearer ${authTokens.access}`,
-        //     },
-        //     body: formDataToSubmit,
-        // });
+        try {
+            const res = await fetch('http://127.0.0.1:8000/job/applications/create', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${authTokens.access}`, // Keep headers minimal for FormData
+                },
+                body: formDataToSubmit,
+            });
     
-        // if (res.ok) {
-        //     // Handle successful submission
-        //     alert("Job application submitted successfully!");
-        //     localStorage.removeItem('draftJobApplication');
-        //     router.push({
-        //         pathname: '/APPLICANT/ApplicationConfirmation',
-        //         query: { jobId },
-        //     });
-        // } else {
-        //     // Handle errors
-        //     alert("Failed to submit job application.");
-        // }
+            if (res.ok) {
+                alert('Job application submitted successfully!');
+                localStorage.removeItem('draftJobApplication');
+                router.push({
+                    pathname: '/APPLICANT/ApplicationConfirmation',
+                    query: { jobId },
+                });
+            } else {
+                const errorData = await res.json();
+                console.error('Submission error:', errorData);
+                alert('Failed to submit job application.');
+            }
+        } catch (error) {
+            console.error('Network error:', error);
+            alert('An error occurred. Please try again later.');
+        }
     };
+    
     
     const addAdditionalFile = (category) => {
         setFormData((prevState) => {
@@ -185,14 +183,13 @@ export default function ApplicantDocument () {
         });
     };
     
-
     return ( 
         <div>
             <ApplicantHeader/>
                 <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 sm:px-8 xsm:px-8 lg:px-20 py-8 mx-auto">
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
-                    <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>
-                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompanyFromLocalStorage() || 'No Job Company Available'}</p>
+                    <p className="font-semibold text-primary text-large pb-1">{getTitle() || 'No Job Title Available'}</p>
+                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompany() || 'No Job Company Available'}</p>
                     <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-8 font-bold underline"> See job hiring details</p>
                     
                     <div className="flex items-center justify-center ">

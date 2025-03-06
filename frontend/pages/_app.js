@@ -1,9 +1,12 @@
 import "@/styles/globals.css";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from "./context/AuthContext";
-
 import { useRouter } from 'next/router';
 import ProtectedPage from './utils/ProtectedPage'; 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// Create a React Query client
+const queryClient = new QueryClient();
 
 const clientId = '90810976706-fcmfefhfhdsdvk8an3lo5nd1899ss6mu.apps.googleusercontent.com';
 
@@ -23,15 +26,17 @@ export default function App({ Component, pageProps }) {
 
   return (
     <GoogleOAuthProvider clientId={clientId}>
-      <AuthProvider>
-        {isNoAuthRequired ? (
-          <Component {...pageProps} />
-        ) : (
-          <ProtectedPage>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          {isNoAuthRequired ? (
             <Component {...pageProps} />
-          </ProtectedPage>
-        )}
-      </AuthProvider>
+          ) : (
+            <ProtectedPage>
+              <Component {...pageProps} />
+            </ProtectedPage>
+          )}
+        </AuthProvider>
+      </QueryClientProvider>
     </GoogleOAuthProvider>
   );
 }
