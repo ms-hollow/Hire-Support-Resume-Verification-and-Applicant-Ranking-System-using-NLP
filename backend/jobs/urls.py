@@ -4,7 +4,8 @@ from . import views
 urlpatterns = [
     path('job-hirings/', views.job_hiring_list, name='job_hiring_list'), # list of all job hirings
     path('hirings/<int:pk>/', views.job_hiring_details, name='job_hiring_details'), # specific job hiring
-    path('hirings/create/', views.create_job_hiring, name='create_job_hiring'),
+    path('hirings/create/', views.create_job_hiring, name='create-job-hiring'),
+    path('hirings/<int:job_hiring_id>/update/', views.update_job_hiring, name='update-job-hiring'),
     path('hirings/edit/<int:pk>/', views.edit_job_hiring, name='edit_job_hiring'),
     path('hirings/delete/<int:pk>', views.delete_job_hiring, name='delete_job_hiring'),
     path('hirings/search/', views.search_job_hiring_list, name='search_job_hiring_list'),
