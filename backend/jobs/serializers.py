@@ -17,31 +17,7 @@ class JobHiringSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = JobHiring
-        fields = [
-            'job_hiring_id',
-            'company',       
-            'company_name', # save applicant name
-            'job_title',
-            'job_industry',
-            'job_description',
-            'work_location',
-            'work_setup',
-            'employment_type',
-            'qualifications',
-            'schedule',
-            'salary',
-            'frequency',
-            'benefits',
-            'experience_level',
-            'num_positions',
-            'verification_option',
-            'creation_date',
-            'required_documents',
-            'application_deadline',
-            'status',
-            'additional_notes',
-            'scoring_criteria'
-        ]
+        fields = '__all__'
 
     def create(self, validated_data):
         scoring_criteria_scores = validated_data.pop('scoring_criteria', [])

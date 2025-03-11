@@ -12,21 +12,26 @@ class JobHiring(models.Model):
     job_industry = models.CharField(max_length=50, null=True, blank=False)
     job_description = models.TextField()
     
-    work_location = models.CharField(max_length=300, null=True, blank=False)
+    region = models.CharField(max_length=300, null=True, blank=False)
+    province = models.CharField(max_length=300, null=True, blank=False)
+    city = models.CharField(max_length=300, null=True, blank=False)
+
     work_setup = models.CharField(max_length=300, null=True, blank=False)
     employment_type = models.CharField(max_length=300, null=True, blank=False)
     qualifications = models.TextField()
     schedule = models.CharField(max_length=300)
-    salary = models.JSONField(null=True, blank=True)
-    frequency = models.CharField(max_length=300, null=True, blank=False)
-    benefits = models.JSONField(null=True, blank=True)
+    benefits = models.CharField(max_length=300, null=True, blank=True) # Note: change to CharField
     experience_level = models.CharField(max_length=300, null=True, blank=False)
     num_positions = models.PositiveIntegerField()
-    verification_option = models.CharField(max_length=300, null=True, blank=False)
+    salaryMin = models.CharField(max_length=300, null=True, blank=True) # Note: change to CharField
+    salaryMax = models.CharField(max_length=300, null=True, blank=True) # Note: change to CharField
+    salary_frequency = models.CharField(max_length=300, null=True, blank=False)
     creation_date = models.DateField(auto_now_add=True)
+    
+    verification_option = models.CharField(max_length=300, null=True, blank=True)
     required_documents = models.JSONField(null=True, blank=True)
-    application_deadline = models.DateField()
-    status = models.CharField(max_length=10, null=True, blank=False)
+    application_deadline = models.DateField(null=True, blank=True)
+    status = models.CharField(max_length=10, null=True, blank=True)
     additional_notes = models.TextField(max_length=300, null=True, blank=True)
 
     def get_scoring_criteria(self):
