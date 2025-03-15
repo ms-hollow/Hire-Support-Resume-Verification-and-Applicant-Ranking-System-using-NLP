@@ -1,8 +1,7 @@
 import CompanyHeader from "@/components/CompanyHeader";
 import GeneralFooter from "@/components/GeneralFooter";
-import Link from "next/link";
 import Image from "next/image";
-import { useState, useContext, useEffect, useCallback } from "react";
+import { useState, useContext, useEffect } from "react";
 import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
 
@@ -242,10 +241,11 @@ export default function CreateJob() {
 
       if (response.ok) {
         const data = await response.json();
-        // console.log("Job created successfully:", data);
+        console.log("Job created successfully:", data);
+        const id = data.job_hiring_id;
+
         alert("Job created successfully!");
-        //TODO Ipasa ang job hiring id sa next page
-        router.push("/COMPANY/CompanySettings");
+        router.push(`/COMPANY/CompanySettings?id=${id}`);
       } else {
         const errorData = await response.json();
         console.error("Failed to create job:", errorData);
