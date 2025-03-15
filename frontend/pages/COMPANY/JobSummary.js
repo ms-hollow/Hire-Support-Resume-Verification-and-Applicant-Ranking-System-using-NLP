@@ -87,18 +87,18 @@ export default function JobSummary() {
                                         <span className="text-fontcolor text-sm">Weight: 100%</span>
                                     </div>
                                     <ul className="pl-5 mt-2 space-y-1">
-                                      <div className="border-b pb-1">
-                                        <li className="text-fontcolor text-xs">Directly Relevant</li>
-                                        <li className="text-semibold text-sm">1-3 year(s) as Full Stack Developer</li> 
-                                      </div>
-                                      <div className="border-b pb-1">
-                                        <li className="text-fontcolor text-xs">Highly Relevant</li>
-                                        <li className="text-semibold text-sm">1-2 year(s) as Frontend Developer </li>   
-                                      </div>
-                                      <div className="border-b pb-1">
-                                        <li className="text-fontcolor text-sm">Moderately Relevant</li>
-                                        <li className="text-semibold text-sm">1 year IT Support</li>   
-                                      </div>
+                                        <div className="border-b pb-1">
+                                            <li className="text-fontcolor text-xs">Directly Relevant</li>
+                                            <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li> 
+                                        </div>
+                                        <div className="border-b pb-1">
+                                            <li className="text-fontcolor text-xs">Highly Relevant</li>
+                                            <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li>   
+                                        </div>
+                                        <div className="border-b pb-1">
+                                            <li className="text-fontcolor text-sm">Moderately Relevant</li>
+                                            <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li>   
+                                        </div>
                                     </ul>
 
                                     <div className="flex justify-between items-center">
@@ -108,16 +108,16 @@ export default function JobSummary() {
                                     <ul className="pl-5 mt-2 space-y-1">
                                         <div className="border-b pb-1">
                                             <li className="text-fontcolor text-xs">Primary Skills</li>
-                                            <li className="text-semibold text-sm">Java, Python, JavaScript, C++</li> 
+                                            <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li> 
                                         </div>
                                         <div className="border-b pb-1">
-                                            <li className="text-fontcolor text-xs">Secondary Skills</li>
-                                            <li className="text-semibold text-sm">React, Node.js, SQL, MongoDB</li>   
+                                            <li className="text-fontcolor text-xs">Secondary Skillst</li>
+                                            <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li>   
                                         </div>
-                                          <div className="border-b pb-1">
+                                            <div className="border-b pb-1">
                                             <li className="text-fontcolor text-xs">Additional Skills</li>
-                                            <li className="text-semibold text-sm">Git version control</li>   
-                                          </div>
+                                            <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li>   
+                                        </div>
                                     </ul>
 
                                     <div className="flex justify-between items-center">
@@ -128,15 +128,15 @@ export default function JobSummary() {
                                     <ul className="pl-5 mt-2 space-y-1">
                                         <div className="border-b pb-1">
                                             <li className="text-fontcolor text-xs">1st Choice Field Study</li>
-                                            <li className="text-semibold text-sm">BS/MS Computer Science</li> 
+                                            <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li> 
                                         </div>
                                         <div className="border-b pb-1">
                                             <li className="text-fontcolor text-xs">2nd Choice Field Study</li>
-                                            <li className="text-semibold text-sm">BS Information Technology</li> 
+                                            <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li>   
                                         </div>
                                         <div className="border-b pb-1">
                                             <li className="text-fontcolor text-xs">2nd Choice Field Study</li>
-                                            <li className="text-semibold text-sm">BS Information Systems</li> 
+                                            <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li>   
                                         </div>
                                     </ul>
                         
@@ -148,16 +148,16 @@ export default function JobSummary() {
                                     <ul className="pl-5 mt-2 space-y-1">
                                         <div className="border-b pb-1">
                                             <li className="text-fontcolor text-xs">School Preference</li>
-                                            <li className="text-semibold text-sm">Technological University of the Philippines</li> 
+                                            <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li> 
                                         </div>
                                         <div className="border-b pb-1">
-                                            <li className="text-fontcolor text-xs">Honors</li>
-                                            <li className="text-semibold text-sm">Academic excellence awards (is a plus but not required)</li> 
-                                         </div>
+                                            <li className="text-fontcolor text-xs">Honorsy</li>
+                                            <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li>   
+                                        </div>
                                         <div className="border-b pb-1">
                                             <li className="text-fontcolor text-xs">Multiple Degrees</li>
-                                            <li className="text-semibold text-sm">Not required</li> 
-                                          </div>
+                                            <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li>   
+                                        </div>
                                     </ul>
                                     <div>
                                         <div className="flex justify-between items-center">
@@ -166,8 +166,8 @@ export default function JobSummary() {
                                         </div>
                                         <ul className="pl-5 mt-2 space-y-1">
                                             <li className="text-fontcolor text-xs">Institutional Preference Bonus</li>
-                                            <li className="text-semibold text-sm">Google Cloud Professional Developer (is a plus but not required)</li> 
-                                       </ul>
+                                            <li className="text-semibold text-sm">Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, Lorem ipsum, </li> 
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
