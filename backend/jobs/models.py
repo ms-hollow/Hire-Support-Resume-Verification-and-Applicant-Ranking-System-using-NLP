@@ -23,8 +23,8 @@ class JobHiring(models.Model):
     benefits = models.CharField(max_length=300, null=True, blank=True) # Note: change to CharField
     experience_level = models.CharField(max_length=300, null=True, blank=False)
     num_positions = models.PositiveIntegerField()
-    salaryMin = models.CharField(max_length=300, null=True, blank=True) # Note: change to CharField
-    salaryMax = models.CharField(max_length=300, null=True, blank=True) # Note: change to CharField
+    salary_min = models.CharField(max_length=300, null=True, blank=True) # Note: change to CharField
+    salary_max = models.CharField(max_length=300, null=True, blank=True) # Note: change to CharField
     salary_frequency = models.CharField(max_length=300, null=True, blank=False)
     creation_date = models.DateField(auto_now_add=True)
     
