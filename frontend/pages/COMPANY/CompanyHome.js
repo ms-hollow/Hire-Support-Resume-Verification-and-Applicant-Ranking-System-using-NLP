@@ -3,8 +3,13 @@ import CompanyHeader from "@/components/CompanyHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import Link from "next/link";
 import Image from "next/image";
-import AuthContext from '../context/AuthContext';
-import { useRouter } from 'next/router';
+import AuthContext from "../context/AuthContext";
+import { useRouter } from "next/router";
+
+//* PAGE STATUS
+// TODO - Retrieve job list and display it - [PARTIALLY DONE]
+// TODO - Add functions sa mga button (View Applicants, Edit Job Hiring, Delete)
+// TODO - Pass the job hiring id to query (for edit job hiring)
 
 // Function to dynamically determine className based on status
 const getStatusClassName = (status) => {
@@ -12,20 +17,19 @@ const getStatusClassName = (status) => {
     Complete: "text-complete",
     Open: "text-fontcolor",
     Draft: "text-primary",
-    Closed: "text-accent"
+    Closed: "text-accent",
   };
   return statusClasses[status] || "text-default";
 };
 
-
 const getCompany = async (authTokens) => {
   try {
-    const res = await fetch('http://127.0.0.1:8000/company/profile/view', {
-      method: 'GET',
+    const res = await fetch("http://127.0.0.1:8000/company/profile/view", {
+      method: "GET",
       headers: {
         Authorization: `Bearer ${authTokens.access}`,
-        'Content-Type': 'application/json'
-      }
+        "Content-Type": "application/json",
+      },
     });
     if (!res.ok) throw new Error("Failed to fetch company data");
     return await res.json();
@@ -36,25 +40,34 @@ const getCompany = async (authTokens) => {
 };
 
 export default function CompanyHome() {
-  const [jobs, setJobDetails] = useState([]);
+  const [jobLists, setJobLists] = useState([]);
   const [selectedJobId, setSelectedJobId] = useState(null);
   const [companyName, setCompanyName] = useState(null);
   const router = useRouter();
 
-  let {authTokens} = useContext(AuthContext);
+  let { authTokens } = useContext(AuthContext);
 
-  const fetchJobDetails = useCallback(async () => {
+  const fetchJobList = useCallback(async () => {
     try {
-      const res = await fetch("/placeHolder/dummy_JobDetails.json"); 
+      const res = await fetch("http://127.0.0.1:8000/job/job-hirings/", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${authTokens.access}`,
+          "Content-Type": "application/json",
+        },
+      });
+
       if (!res.ok) {
-        throw new Error("Failed to fetch data");
+        throw new Error(`HTTP error! Status: ${res.status}`);
       }
-      const json = await res.json();
-      setJobDetails(json); 
+
+      const data = await res.json();
+      // console.log("Fetched Data:", data);
+      setJobLists(data);
     } catch (error) {
-      console.error("Error fetching job details:", error);
+      console.error("Error fetching job list:", error);
     }
-  }, []);
+  }, [authTokens]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,20 +75,19 @@ export default function CompanyHome() {
         router.push("/GENERAL/Login");
         return;
       }
-  
+
       const companyData = await getCompany(authTokens);
       setCompanyName(companyData.profile_data.company_name);
       // console.log("Company data:", companyData);
-  
-      fetchJobDetails();
+      fetchJobList();
     };
-  
+
     fetchData();
-  }, [authTokens, router, fetchJobDetails]);
-  
+  }, [authTokens, router]);
+
   const handleJobSelect = (jobId) => {
     setSelectedJobId(jobId);
-    localStorage.setItem('selectedJobId', jobId);
+    localStorage.setItem("selectedJobId", jobId);
   };
 
   return (
@@ -104,13 +116,20 @@ export default function CompanyHome() {
           <div className="flex items-center justify-center overflow-hidden rounded-t-lg rounded-b-lg border border-[#F5F5F5]">
             <table className="table-fixed w-full border-collapse text-center">
               <tbody>
-                {jobs.length > 0 ? (
-                  jobs.map((job, index) => (
-                    <tr key={index} className="px-2 hover:shadow-md border-b border-[#F5F5F5]">
+                {jobLists.length > 0 ? (
+                  jobLists.map((job, index) => (
+                    <tr
+                      key={index}
+                      className="px-2 hover:shadow-md border-b border-[#F5F5F5]"
+                    >
                       <td className="w-2/6 p-5 font-thin text-medium text-fontcolor truncate">
                         {job.job_title}
                       </td>
-                      <td className={`w-1/12 font-thin text-medium truncate ${getStatusClassName(job.status)}`}>
+                      <td
+                        className={`w-1/12 font-thin text-medium truncate ${getStatusClassName(
+                          job.status
+                        )}`}
+                      >
                         {job.status}
                       </td>
                       <td className="w-1/6 font-thin text-medium text-fontcolor truncate">
@@ -121,21 +140,40 @@ export default function CompanyHome() {
                       </td>
                       <td className="w-2/6">
                         <div className="flex flex-row justify-between px-5">
-                          <button type="button" className="button1 flex flex-col items-center justify-center" onClick={() => handleJobSelect(job.Id)}>
-                            <Link href="/COMPANY/ApplicantsSummary" className="flex items-center space-x-2">
+                          <button
+                            type="button"
+                            className="button1 flex flex-col items-center justify-center"
+                            onClick={() => handleJobSelect(job.Id)}
+                          >
+                            <Link
+                              href="/COMPANY/ApplicantsSummary"
+                              className="flex items-center space-x-2"
+                            >
                               <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
                                 View Applicants
                               </p>
                             </Link>
                           </button>
-                          <button type="button" className="button2 flex items-center justify-center" onClick={() => handleJobSelect(job.Id)}>
-                            <Link href="/COMPANY/EditJobHiring" className="flex items-center space-x-2">
+                          <button
+                            type="button"
+                            className="button2 flex items-center justify-center"
+                            onClick={() => handleJobSelect(job.Id)}
+                          >
+                            <Link
+                              href="/COMPANY/EditJobHiring"
+                              className="flex items-center space-x-2"
+                            >
                               <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
                                 Edit Job Hiring
                               </p>
                             </Link>
                           </button>
-                          <Image src="/Delete.png" width={25} height={15} alt="Delete Icon" />
+                          <Image
+                            src="/Delete.png"
+                            width={25}
+                            height={15}
+                            alt="Delete Icon"
+                          />
                         </div>
                       </td>
                     </tr>

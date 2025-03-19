@@ -1,24 +1,21 @@
 import "@/styles/globals.css";
-import { GoogleOAuthProvider } from '@react-oauth/google';
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "./context/AuthContext";
-import { useRouter } from 'next/router';
-import ProtectedPage from './utils/ProtectedPage'; 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useRouter } from "next/router";
+import ProtectedPage from "./utils/ProtectedPage";
 
-// Create a React Query client
-const queryClient = new QueryClient();
-
-const clientId = '90810976706-fcmfefhfhdsdvk8an3lo5nd1899ss6mu.apps.googleusercontent.com';
+const clientId =
+  "90810976706-fcmfefhfhdsdvk8an3lo5nd1899ss6mu.apps.googleusercontent.com";
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
 
   // Pages that should not be protected
   const noAuthRequiredPages = [
-    '/',
-    '/GENERAL/Login',
-    '/GENERAL/Register',
-    '/GENERAL/ForgotPassword',
+    "/",
+    "/GENERAL/Login",
+    "/GENERAL/Register",
+    "/GENERAL/ForgotPassword",
     // add here yung iba pang pages na hindi required iauthenticate
   ];
 
@@ -26,17 +23,15 @@ export default function App({ Component, pageProps }) {
 
   return (
     <GoogleOAuthProvider clientId={clientId}>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          {isNoAuthRequired ? (
+      <AuthProvider>
+        {isNoAuthRequired ? (
+          <Component {...pageProps} />
+        ) : (
+          <ProtectedPage>
             <Component {...pageProps} />
-          ) : (
-            <ProtectedPage>
-              <Component {...pageProps} />
-            </ProtectedPage>
-          )}
-        </AuthProvider>
-      </QueryClientProvider>
+          </ProtectedPage>
+        )}
+      </AuthProvider>
     </GoogleOAuthProvider>
   );
 }

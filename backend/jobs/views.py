@@ -41,7 +41,7 @@ def create_job_hiring(request):
         )
 
     # Default status is 'draft'
-    data['status'] = 'draft'
+    data['status'] = 'Draft'
     serializer = JobHiringSerializer(data=data)
     if serializer.is_valid():
         job_hiring = serializer.save()

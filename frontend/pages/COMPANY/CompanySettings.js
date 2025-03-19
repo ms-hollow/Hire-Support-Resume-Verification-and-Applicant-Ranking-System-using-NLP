@@ -7,9 +7,10 @@ import { FaChevronDown } from "react-icons/fa";
 import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
 
+//* PAGE STATUS
 // TODO Retrieve the job hiring details - [DONE]
 // TODO Save the job hiring details
-// TODO Pass the id 
+// TODO Pass the id
 
 const getDraftJobHiring = async (authTokens, id) => {
   try {
