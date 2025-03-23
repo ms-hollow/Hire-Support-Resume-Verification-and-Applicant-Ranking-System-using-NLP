@@ -321,7 +321,7 @@ export default function JobSummary() {
                                     <ul className="pl-5 mt-2 space-y-1">
                                         <div className="border-b pb-1">
                                             <li className="text-fontcolor text-xs">School Preference</li>
-                                            <li className="font-semibold text-fontcolor text-sm">{jobDetails.criteria.schools.selectedOptions.join(", ")} </li> 
+                                            <li className="font-semibold text-fontcolor text-sm">{jobDetails.criteria.schools.schoolPreference.join(", ")} </li> 
                                         </div>
                                         <div className="border-b pb-1">
                                             <li className="text-fontcolor text-xs">Honorsy</li>
@@ -339,7 +339,7 @@ export default function JobSummary() {
                                         </div>
                                         <ul className="pl-5 mt-2 space-y-1">
                                             <li className="text-fontcolor text-xs">Institutional Preference Bonus</li>
-                                            <li className="font-semibold text-fontcolor text-sm"> {jobDetails.criteria.certificates.preferred}</li> 
+                                            <li className="font-semibold text-fontcolor text-sm"> {jobDetails.criteria.certificates.preferred.join(", ")}</li> 
                                         </ul>
                                     </div>
                                 </div>

@@ -42,6 +42,7 @@ export default function CompanySettings() {
         selectedOptions: [],
       },
       schools: {
+        schoolPreference: [],
         selectedOptions: [],
       },
       additionalPoints: { honor: "", multipleDegrees: "" },
@@ -60,6 +61,27 @@ export default function CompanySettings() {
         certifications: 100
     }
   });
+
+  const getFilteredOptions = (currentCategory, currentField) => {
+    const allSelectedOptions = new Set([
+      ...formData.criteria.workExperience.directlyRelevant,
+      ...formData.criteria.workExperience.highlyRelevant,
+      ...formData.criteria.workExperience.moderatelyRelevant,
+      ...formData.criteria.skills.primarySkills,
+      ...formData.criteria.skills.secondarySkills,
+      ...formData.criteria.skills.additionalSkills,
+      ...formData.criteria.education.firstChoice ? [formData.criteria.education.firstChoice] : [],
+      ...formData.criteria.education.secondChoice ? [formData.criteria.education.secondChoice] : [],
+      ...formData.criteria.education.thirdChoice ? [formData.criteria.education.thirdChoice] : [],
+      ...formData.criteria.schools.schoolPreference,
+      ...formData.criteria.certificates.preferred,
+      
+    ]);
+  
+    return options[currentCategory].filter((option) => {
+      return !allSelectedOptions.has(option) || formData.criteria[currentCategory][currentField]?.includes(option);
+    });
+  };
   
 
   useEffect(() => {
@@ -101,7 +123,6 @@ export default function CompanySettings() {
     fetchData();
   }, []);
   
-  
 
   const handleSettingsSubmit = (e) => {
     e.preventDefault();
@@ -133,27 +154,57 @@ export default function CompanySettings() {
     localStorage.setItem("draft_job", JSON.stringify(updatedFormData));
   };
   
-const handleMultiSelectChange = (category, field, option) => {
-  setFormData((prev) => {
-    const selectedOptions = prev.criteria[category][field] || [];
-    const isSelected = selectedOptions.includes(option);
-    const updatedOptions = isSelected
-      ? selectedOptions.filter((item) => item !== option) // Remove if already selected
-      : [...selectedOptions, option]; // Add if not selected
+  const handleMultiSelectChange = (category, field, option) => {
+    setFormData((prev) => {
+      const selectedOptions = prev.criteria[category][field] || [];
+      const isSelected = selectedOptions.includes(option);
+      const updatedOptions = isSelected
+        ? selectedOptions.filter((item) => item !== option) // Remove if selected
+        : [...selectedOptions, option]; // Add if not selected
+  
+      return {
+        ...prev,
+        criteria: {
+          ...prev.criteria,
+          [category]: {
+            ...prev.criteria[category],
+            [field]: updatedOptions,
+          },
+        },
+      };
+    });
+  };
+  
 
-    return {
+  const handleAddCustomOption = (category, field, customOption) => {
+    if (!customOption.trim()) return; // Prevent empty input
+  
+    setOptions((prev) => ({
+      ...prev,
+      [category]: prev[category]?.includes(customOption) 
+        ? prev[category] 
+        : [...(prev[category] || []), customOption], // Add only if not exists
+    }));
+  
+    handleMultiSelectChange(category, field, customOption);
+  
+    setSearchTerm((prev) => ({ ...prev, [field]: "" })); // Reset only the relevant search field
+  };
+
+  const handleRemoveSelectedOption = (category, field, option) => {
+    setFormData((prev) => ({
       ...prev,
       criteria: {
         ...prev.criteria,
         [category]: {
           ...prev.criteria[category],
-          [field]: updatedOptions,
+          [field]: prev.criteria[category][field].filter((item) => item !== option),
         },
       },
-    };
-  });
-};
+    }));
+  };
 
+  
   const handleCriteriaChange = (field, subField, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -249,39 +300,570 @@ const handleMultiSelectChange = (category, field, option) => {
                   </div>
 
 
-                {/* Work Experience Multi-Select */}
+                 {/* Work Experience Directly Relevant */}
                 <div className="mb-4">
                   <div>
-                    <label className="block text-sm font-semibold text-fontcolor mb-1">
-                      Directly Relevant <span className="font-medium text-xsmall"> (Put roles that are exactly alike or have equal importance for the position)
-                      </span>
-                    </label>
-                    <div 
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between" 
-                      onClick={() => setDropdownOpen({ ...dropdownOpen, directly: !dropdownOpen.directly })}
-                    >
-                      <span>
-                        {formData.criteria.workExperience.directlyRelevant?.length > 0
-                          ? formData.criteria.workExperience.directlyRelevant.join(", ")
-                          : "Select Directly Relevant"}
-                      </span>
-                      <FaChevronDown className={`ml-2 transform ${dropdownOpen.directly ? "rotate-180" : "rotate-0"} transition-transform`} />
+                    <label className="block text-sm font-semibold text-fontcolor mb-1"> Directly Relevant <span className="font-medium text-xsmall"> (Put roles that are exactly alike or have equal importance for the position)</span></label>
+
+                    <div className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"  onClick={() => setDropdownOpen({ ...dropdownOpen, directly: !dropdownOpen.directly })}>
+                      {formData.criteria.workExperience.directlyRelevant?.length > 0 ? (
+                        formData.criteria.workExperience.directlyRelevant.map((selected, index) => (
+                          <div key={index} className="bg-gray-200 px-3 py-1 rounded-md flex items-center">
+                            <span className="text-sm">{selected}</span>
+                            <button className="ml-2 text-red-600 font-extrabold" onClick={(e) => {e.stopPropagation(); handleRemoveSelectedOption("workExperience", "directlyRelevant", selected); }}>
+                              X
+                            </button>
+                          </div>
+                        ))
+                      ) : (<span className="text-fontcolor">Select Directly Relevant</span>
+                      )}
+                      <FaChevronDown className={`ml-auto transform ${dropdownOpen.directly ? "rotate-180" : "rotate-0"} transition-transform`} />
                     </div>
 
                     {dropdownOpen.directly && (
                       <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                        {/* Search & Add Custom Option */}
                         <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                          <input type="text"  placeholder="Search options..." value={searchTerm.directly || ""} onChange={(e) => setSearchTerm({ ...searchTerm, directly: e.target.value })}  className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"/>
+                          <input 
+                            type="text"  
+                            placeholder="Search or add a new option..." 
+                            value={searchTerm.directly || ""} 
+                            onChange={(e) => setSearchTerm({ ...searchTerm, directly: e.target.value })}  
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleAddCustomOption("workExperience", "directlyRelevant", e.target.value);
+                              }
+                            }}
+                          />
+                          {searchTerm.directly && !options.workExperience.includes(searchTerm.directly) && (
+                            <button className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"  onClick={() => handleAddCustomOption("workExperience", "directlyRelevant", searchTerm.directly)}>
+                              Add "{searchTerm.directly}"
+                            </button>
+                          )}
                         </div>
-                        {options.workExperience
-                          .filter((option) => option.toLowerCase().includes((searchTerm.directly || "").toLowerCase()))
-                          .map((option, index) => (
+
+                        {/* Available Options List */}
+                        {getFilteredOptions("workExperience", "directlyRelevant").map((option, index) => (
+                          <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              value={option}
+                              checked={formData.criteria.workExperience.directlyRelevant.includes(option)}
+                              onChange={() => handleMultiSelectChange("workExperience", "directlyRelevant", option)}
+                              className="ml-5 w-5 h-5"
+                            />
+                            <span className="text-medium ml-5">{option}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Work Experience Highly Relevant */}
+                <div className="mb-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-fontcolor mb-1"> Highly Relevant <span className="font-medium text-xsmall"> (Put roles with significant overlap in core responsibilities)</span></label>
+
+                    <div className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"  onClick={() => setDropdownOpen({ ...dropdownOpen, highly: !dropdownOpen.highly })}>
+                      {/* Show selected options inside the input */}
+                      {formData.criteria.workExperience.highlyRelevant?.length > 0 ? (
+                        formData.criteria.workExperience.highlyRelevant.map((selected, index) => (
+                          <div key={index} className="bg-gray-200 px-3 py-1 rounded-md flex items-center">
+                            <span className="text-sm">{selected}</span>
+                            <button className="ml-2 text-red-600 font-extrabold" onClick={(e) => {e.stopPropagation(); handleRemoveSelectedOption("workExperience", "highlyRelevant", selected); }}>
+                              X
+                            </button>
+                          </div>
+                        ))
+                      ) : (<span className="text-fontcolor">Select Highly Relevant</span>
+                      )}
+                      <FaChevronDown className={`ml-auto transform ${dropdownOpen.highly ? "rotate-180" : "rotate-0"} transition-transform`} />
+                    </div>
+
+                    {dropdownOpen.highly && (
+                      <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                        {/* Search & Add Custom Option */}
+                        <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                          <input 
+                            type="text"  
+                            placeholder="Search or add a new option..." 
+                            value={searchTerm.highly || ""} 
+                            onChange={(e) => setSearchTerm({ ...searchTerm, highly: e.target.value })}  
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleAddCustomOption("workExperience", "highlyRelevant", e.target.value);
+                              }
+                            }}
+                          />
+                          {searchTerm.highly && !options.workExperience.includes(searchTerm.highly) && (
+                            <button className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"  onClick={() => handleAddCustomOption("workExperience", "highlyRelevant", searchTerm.highly)}>
+                              Add "{searchTerm.highly}"
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Available Options List */}
+                        {getFilteredOptions("workExperience", "highlyRelevant").map((option, index) => (
+                          <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              value={option}
+                              checked={formData.criteria.workExperience.highlyRelevant.includes(option)}
+                              onChange={() => handleMultiSelectChange("workExperience", "highlyRelevant", option)}
+                              className="ml-5 w-5 h-5"
+                            />
+                            <span className="text-medium ml-5">{option}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Work Experience Moderately Relevant */}
+                <div className="mb-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-fontcolor mb-1"> Moderately Relevant <span className="font-medium text-xsmall"> (Put roles in the same domain with some transferable skills)</span></label>
+
+                    <div className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"  onClick={() => setDropdownOpen({ ...dropdownOpen, moderately: !dropdownOpen.moderately })}>
+                      {/* Show selected options inside the input */}
+                      {formData.criteria.workExperience.moderatelyRelevant?.length > 0 ? (
+                        formData.criteria.workExperience.moderatelyRelevant.map((selected, index) => (
+                          <div key={index} className="bg-gray-200 px-3 py-1 rounded-md flex items-center">
+                            <span className="text-sm">{selected}</span>
+                            <button className="ml-2 text-red-600 font-extrabold" onClick={(e) => {e.stopPropagation(); handleRemoveSelectedOption("workExperience", "moderatelyRelevant", selected); }}>
+                              X
+                            </button>
+                          </div>
+                        ))
+                      ) : (<span className="text-fontcolor">Select Moderately Relevant</span>
+                      )}
+                      <FaChevronDown className={`ml-auto transform ${dropdownOpen.moderately ? "rotate-180" : "rotate-0"} transition-transform`} />
+                    </div>
+
+                    {dropdownOpen.moderately && (
+                      <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                        {/* Search & Add Custom Option */}
+                        <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                          <input 
+                            type="text"  
+                            placeholder="Search or add a new option..." 
+                            value={searchTerm.moderately || ""} 
+                            onChange={(e) => setSearchTerm({ ...searchTerm, moderately: e.target.value })}  
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleAddCustomOption("workExperience", "moderatelyRelevant", e.target.value);
+                              }
+                            }}
+                          />
+                          {searchTerm.moderately && !options.workExperience.includes(searchTerm.moderately) && (
+                            <button className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"  onClick={() => handleAddCustomOption("workExperience", "moderatelyRelevant", searchTerm.moderately)}>
+                              Add "{searchTerm.moderately}"
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Available Options List */}
+                        {getFilteredOptions("workExperience", "moderatelyRelevant").map((option, index) => (
+                          <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              value={option}
+                              checked={formData.criteria.workExperience.moderatelyRelevant.includes(option)}
+                              onChange={() => handleMultiSelectChange("workExperience", "moderatelyRelevant", option)}
+                              className="ml-5 w-5 h-5"
+                            />
+                            <span className="text-medium ml-5">{option}</span>
+                          </label>
+                        ))}
+                      </div>
+                      )}
+                  </div>
+                </div>
+
+                
+                {/* Skills Section */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <input 
+                        type="checkbox" 
+                        className="w-4 h-4 border border-gray-300 rounded text-fontcolor"
+                        checked={formData.criteria.skills.enabled} // Ensuring checkbox state is controlled
+                        onChange={() => handleCriteriaChange("skills", "enabled", !formData.criteria.skills.enabled)} // Toggle the checkbox state
+                      />
+                      <label className="ml-2 block text-sm font-semibold text-primary">Skills</label>
+                    </div>
+                    <div className="flex items-center">                                
+                    <span className="text-sm font-semibold text-fontcolor mr-2">Weight</span>
+                    <input
+                      type="text" 
+                      value={formData.criteria.skills.weight || ""} 
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (/^\d*$/.test(value) && Number(value) <= 100) {
+                          handleCriteriaChange("skills", "weight", value);
+                        }
+                      }}
+                      className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-sm text-fontcolor text-center"
+                    />
+                  </div>
+                  </div>
+
+
+                {/* Primary Skills Multi-Select */}
+                <div className="mb-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-fontcolor mb-1">
+                      Primary Skills <span className="font-medium text-xsmall">(Put roles with the most relevant skills and experience) </span>
+                    </label>
+               
+                    <div className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"  onClick={() => setDropdownOpen({ ...dropdownOpen, primary: !dropdownOpen.primary })}>
+                      {/* Show selected options inside the input */}
+                      {formData.criteria.skills.primarySkills?.length > 0 ? (
+                        formData.criteria.skills.primarySkills.map((selected, index) => (
+                          <div key={index} className="bg-gray-200 px-3 py-1 rounded-md flex items-center">
+                            <span className="text-sm">{selected}</span>
+                            <button className="ml-2 text-red-600 font-extrabold" onClick={(e) => {e.stopPropagation(); handleRemoveSelectedOption("skills", "primarySkills", selected); }}>
+                              X
+                            </button>
+                          </div>
+                        ))
+                      ) : (<span className="text-fontcolor">Select Primary Skills</span>
+                      )}
+                      <FaChevronDown className={`ml-auto transform ${dropdownOpen.primary ? "rotate-180" : "rotate-0"} transition-transform`} />
+                    </div>
+
+                    {dropdownOpen.primary && (
+                      <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                        {/* Search & Add Custom Option */}
+                        <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                          <input 
+                            type="text"  
+                            placeholder="Search or add a new option..." 
+                            value={searchTerm.primary || ""} 
+                            onChange={(e) => setSearchTerm({ ...searchTerm, primary: e.target.value })}  
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleAddCustomOption("skills", "primarySkills", e.target.value);
+                              }
+                            }}
+                          />
+                          {searchTerm.primary && !options.skills.includes(searchTerm.primary) && (
+                            <button className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"  onClick={() => handleAddCustomOption("skills", "primarySkills", searchTerm.primary)}>
+                              Add "{searchTerm.primary}"
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Available Options List */}
+                        {getFilteredOptions("skills", "primarySkills").map((option, index) => (
+                          <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              value={option}
+                              checked={formData.criteria.skills.primarySkills.includes(option)}
+                              onChange={() => handleMultiSelectChange("skills", "primarySkills", option)}
+                              className="ml-5 w-5 h-5"
+                            />
+                            <span className="text-medium ml-5">{option}</span>
+                          </label>
+                        ))}
+                      </div>
+                      )}
+                  </div>
+                </div>
+
+                {/* Secondary Skills Multi-Select */}
+                <div className="mb-4">
+                  <div>
+                  <label className="block text-sm font-semibold text-fontcolor mb-1">
+                    Secondary Skills<span className="font-medium text-xsmall"> (Put important skills that are frequently used but not absolutely essential) </span>
+                  </label>
+
+                    <div className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"  onClick={() => setDropdownOpen({ ...dropdownOpen, secondary: !dropdownOpen.secondary })}>
+                      {/* Show selected options inside the input */}
+                      {formData.criteria.skills.secondarySkills?.length > 0 ? (
+                        formData.criteria.skills.secondarySkills.map((selected, index) => (
+                          <div key={index} className="bg-gray-200 px-3 py-1 rounded-md flex items-center">
+                            <span className="text-sm">{selected}</span>
+                            <button className="ml-2 text-red-600 font-extrabold" onClick={(e) => {e.stopPropagation(); handleRemoveSelectedOption("skills", "secondarySkills", selected); }}>
+                              X
+                            </button>
+                          </div>
+                        ))
+                      ) : (<span className="text-fontcolor">Select Secondary Skills</span>
+                      )}
+                      <FaChevronDown className={`ml-auto transform ${dropdownOpen.secondary ? "rotate-180" : "rotate-0"} transition-transform`} />
+                    </div>
+
+                    {dropdownOpen.secondary && (
+                      <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                        {/* Search & Add Custom Option */}
+                        <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                          <input 
+                            type="text"  
+                            placeholder="Search or add a new option..." 
+                            value={searchTerm.secondary || ""} 
+                            onChange={(e) => setSearchTerm({ ...searchTerm, secondary: e.target.value })}  
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleAddCustomOption("skills", "secondarySkills", e.target.value);
+                              }
+                            }}
+                          />
+                          {searchTerm.secondary && !options.skills.includes(searchTerm.secondary) && (
+                            <button className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"  onClick={() => handleAddCustomOption("skills", "secondarySkills", searchTerm.secondary)}>
+                              Add "{searchTerm.secondary}"
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Available Options List */}
+                        {getFilteredOptions("skills", "secondarySkills").map((option, index) => (
+                          <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              value={option}
+                              checked={formData.criteria.skills.secondarySkills.includes(option)}
+                              onChange={() => handleMultiSelectChange("skills", "secondarySkills", option)}
+                              className="ml-5 w-5 h-5"
+                            />
+                            <span className="text-medium ml-5">{option}</span>
+                          </label>
+                        ))}
+                      </div>
+                      )}
+                  </div>
+                </div>
+
+                {/* Additional Skills Multi-Select */}
+                <div className="mb-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-fontcolor mb-1">
+                      Additional Skills <span className="font-medium text-xsmall"> (nice-to-have skills that would give a candidate an edge but aren't necessary for the core job functions)</span>
+                    </label>
+
+                    <div className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"  onClick={() => setDropdownOpen({ ...dropdownOpen, additional: !dropdownOpen.additional })}>
+                        {/* Show selected options inside the input */}
+                        {formData.criteria.skills.additionalSkills?.length > 0 ? (
+                          formData.criteria.skills.additionalSkills.map((selected, index) => (
+                            <div key={index} className="bg-gray-200 px-3 py-1 rounded-md flex items-center">
+                              <span className="text-sm">{selected}</span>
+                              <button className="ml-2 text-red-600 font-extrabold" onClick={(e) => {e.stopPropagation(); handleRemoveSelectedOption("skills", "additionalSkills", selected); }}>
+                                X
+                              </button>
+                            </div>
+                          ))
+                        ) : (<span className="text-fontcolor">Select Additional Skills</span>
+                        )}
+                        <FaChevronDown className={`ml-auto transform ${dropdownOpen.additional ? "rotate-180" : "rotate-0"} transition-transform`} />
+                      </div>
+
+                      {dropdownOpen.additional && (
+                        <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                          {/* Search & Add Custom Option */}
+                          <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                            <input 
+                              type="text"  
+                              placeholder="Search or add a new option..." 
+                              value={searchTerm.additional || ""} 
+                              onChange={(e) => setSearchTerm({ ...searchTerm, additional: e.target.value })}  
+                              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  handleAddCustomOption("skills", "additionalSkills", e.target.value);
+                                }
+                              }}
+                            />
+                            {searchTerm.additional && !options.skills.includes(searchTerm.additional) && (
+                              <button className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"  onClick={() => handleAddCustomOption("skills", "additionalSkills", searchTerm.additional)}>
+                                Add "{searchTerm.additional}"
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Available Options List */}
+                          {getFilteredOptions("skills", "additionalSkills").map((option, index) => (
                             <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
                               <input
                                 type="checkbox"
                                 value={option}
-                                checked={formData.criteria.workExperience.directlyRelevant?.includes(option)}
-                                onChange={() => handleMultiSelectChange("workExperience", "directlyRelevant", option)}
+                                checked={formData.criteria.skills.additionalSkills.includes(option)}
+                                onChange={() => handleMultiSelectChange("skills", "additionalSkills", option)}
+                                className="ml-5 w-5 h-5"
+                              />
+                              <span className="text-medium ml-5">{option}</span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                  </div>
+                </div>
+
+                 {/* Education Multi-Select */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 border border-gray-300 rounded text-fontcolor"
+                      />
+                      <label className="ml-2 block text-sm font-semibold text-primary">Education</label>
+                    </div>
+                      <div className="flex items-center">
+                      <span className="text-sm font-semibold text-fontcolor mr-2">Weight</span>
+                      <input
+                        type="text"
+                        value={formData.criteria.education.weight || ""}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Allow only numbers and validate the range
+                          if (/^\d*$/.test(value) && Number(value) <= 100) {
+                            handleCriteriaChange("education", "weight", value);
+                          }
+                        }}
+                        className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-sm text-black text-center"
+                      />
+                    </div>
+                  </div>
+
+                  {/* 1st Choice Field of Study */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold text-fontcolor mb-1">
+                      1st Choice Field of Study <span className="font-medium text-xsmall">(Put the most directly relevant fields of study for the position)</span>
+                    </label>
+
+                    <div className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between" onClick={() => setDropdownOpen({ ...dropdownOpen, firstChoice: !dropdownOpen.firstChoice })}>
+                      <span>
+                        {formData.criteria.education.firstChoice || "Select 1st Choice Field of Study"}
+                      </span>
+                      <FaChevronDown
+                        className={`ml-2 transform ${dropdownOpen.firstChoice ? "rotate-180" : "rotate-0"} transition-transform`}
+                      />
+                    </div>
+
+                    {dropdownOpen.firstChoice && (
+                      <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                        <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                          <input
+                            type="text"
+                            placeholder="Search options..."
+                            value={searchTerm.firstChoice || ""}
+                            onChange={(e) => setSearchTerm({ ...searchTerm, firstChoice: e.target.value })}
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                          />
+                        </div>
+                
+                          {getFilteredOptions("education", "firstChoice").map((option, index) => (
+                            <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
+                              <input
+                                type="radio"
+                                value={option}
+                                checked={formData.criteria.education.firstChoice === option}
+                                onChange={() => handleCriteriaChange("education", "firstChoice", option)}
+                                className="ml-5 w-5 h-5"
+                              />
+                              <span className="text-medium ml-5">{option}</span>
+                            </label>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 2nd Choice Field of Study */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold text-fontcolor mb-1">
+                      2nd Choice Field of Study
+                      <span className="font-medium text-xsmall">
+                        (Put closely related fields that have significant overlap with the job requirements)
+                      </span>
+                    </label>
+                    <div
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
+                      onClick={() => setDropdownOpen({ ...dropdownOpen, secondChoice: !dropdownOpen.secondChoice })}
+                    >
+                      <span>
+                        {formData.criteria.education.secondChoice || "Select 2nd Choice Field of Study"}
+                      </span>
+                      <FaChevronDown
+                        className={`ml-2 transform ${dropdownOpen.secondChoice ? "rotate-180" : "rotate-0"} transition-transform`}
+                      />
+                    </div>
+
+                    {dropdownOpen.secondChoice && (
+                      <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                        <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                          <input
+                            type="text"
+                            placeholder="Search options..."
+                            value={searchTerm.secondChoice || ""}
+                            onChange={(e) => setSearchTerm({ ...searchTerm, secondChoice: e.target.value })}
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                          />
+                        </div>
+
+                        {getFilteredOptions("education", "secondChoice").map((option, index) => (
+                            <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
+                              <input
+                                type="radio"
+                                value={option}
+                                checked={formData.criteria.education.secondChoice === option}
+                                onChange={() => handleCriteriaChange("education", "secondChoice", option)}
+                                className="ml-5 w-5 h-5"
+                              />
+                              <span className="text-medium ml-5">{option}</span>
+                            </label>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 3rd Choice Field of Study */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-semibold text-fontcolor mb-1">
+                      3rd Choice Field of Study
+                      <span className="font-medium text-xsmall">
+                        (Put fields that have some relevance or provide useful background knowledge)
+                      </span>
+                    </label>
+                    <div
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
+                      onClick={() => setDropdownOpen({ ...dropdownOpen, thirdChoice: !dropdownOpen.thirdChoice })}
+                    >
+                      <span>
+                        {formData.criteria.education.thirdChoice || "Select 3rd Choice Field of Study"}
+                      </span>
+                      <FaChevronDown
+                        className={`ml-2 transform ${dropdownOpen.thirdChoice ? "rotate-180" : "rotate-0"} transition-transform`}
+                      />
+                    </div>
+
+                    {dropdownOpen.thirdChoice && (
+                      <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                        <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                          <input
+                            type="text"
+                            placeholder="Search options..."
+                            value={searchTerm.thirdChoice || ""}
+                            onChange={(e) => setSearchTerm({ ...searchTerm, thirdChoice: e.target.value })}
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                          />
+                        </div>
+
+                        {getFilteredOptions("education", "secondChoice").map((option, index) => (
+                            <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
+                              <input
+                                type="radio"
+                                value={option}
+                                checked={formData.criteria.education.thirdChoice === option}
+                                onChange={() => handleCriteriaChange("education", "thirdChoice", option)}
                                 className="ml-5 w-5 h-5"
                               />
                               <span className="text-medium ml-5">{option}</span>
@@ -291,552 +873,85 @@ const handleMultiSelectChange = (category, field, option) => {
                     )}
                   </div>
                 </div>
+              </div>
 
-                {/* Highly Relevant Multi-Select */}
-                <div className="mb-4">
-                  <label className="block text-sm font-semibold text-fontcolor mb-1">
-                    Highly Relevant <span className="font-medium text-xsmall">  (Put roles with significant overlap in core responsibilities)
-                    </span>
-                  </label>
-                  <div 
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between" 
-                    onClick={() => setDropdownOpen({ ...dropdownOpen, highly: !dropdownOpen.highly })}
-                  >
-                    <span>
-                      {formData.criteria.workExperience.highlyRelevant?.length > 0
-                        ? formData.criteria.workExperience.highlyRelevant.join(", ")
-                        : "Select Highly Relevant"}
-                    </span>
-                    <FaChevronDown className={`ml-2 transform ${dropdownOpen.highly ? "rotate-180" : "rotate-0"} transition-transform`} />
-                  </div>
+              <label className="block text-sm font-semibold text-primary mb-2">Additional Points</label>
+              
+             
+              {/* School Preference */}
+              <div className="mb-4">
+                <div>
+                <label className="block text-sm font-semibold text-fontcolor mb-1">
+                  School Preference <span className="font-medium text-xsmall"> (Put any preferred institutions, if applicable) </span>
+                </label>
 
-                  {dropdownOpen.highly && (
-                    <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                      <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                        <input 
-                          type="text" 
-                          placeholder="Search options..." 
-                          value={searchTerm.highly || ""} 
-                          onChange={(e) => setSearchTerm({ ...searchTerm, highly: e.target.value })} 
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                        />
-                      </div>
-                      {options.workExperience
-                        .filter((option) => option.toLowerCase().includes((searchTerm.highly || "").toLowerCase()))
-                        .map((option, index) => (
-                          <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              value={option}
-                              checked={formData.criteria.workExperience.highlyRelevant?.includes(option)}
-                              onChange={() => handleMultiSelectChange("workExperience", "highlyRelevant", option)}
-                              className="ml-5 w-5 h-5"
-                            />
-                            <span className="text-medium ml-5">{option}</span>
-                          </label>
-                        ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Moderately Relevant Multi-Select */}
-                <div className="mb-4">
-                  <label className="block text-sm font-semibold text-fontcolor mb-1">
-                    Moderately Relevant
-                    <span className="font-medium text-xsmall">
-                      (Put roles in the same domain with some transferable skills)
-                    </span>
-                  </label>
-                  <div 
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between" 
-                    onClick={() => setDropdownOpen({ ...dropdownOpen, moderately: !dropdownOpen.moderately })}
-                  >
-                    <span>
-                      {formData.criteria.workExperience.moderatelyRelevant?.length > 0
-                        ? formData.criteria.workExperience.moderatelyRelevant.join(", ")
-                        : "Select Moderately Relevant"}
-                    </span>
-                    <FaChevronDown className={`ml-2 transform ${dropdownOpen.moderately ? "rotate-180" : "rotate-0"} transition-transform`} />
-                  </div>
-
-                  {dropdownOpen.moderately && (
-                    <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                      <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                        <input 
-                          type="text" 
-                          placeholder="Search options..." 
-                          value={searchTerm.moderately || ""} 
-                          onChange={(e) => setSearchTerm({ ...searchTerm, moderately: e.target.value })} 
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                        />
-                      </div>
-                      {options.workExperience
-                        .filter((option) => option.toLowerCase().includes((searchTerm.moderately || "").toLowerCase()))
-                        .map((option, index) => (
-                          <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              value={option}
-                              checked={formData.criteria.workExperience.moderatelyRelevant?.includes(option)}
-                              onChange={() => handleMultiSelectChange("workExperience", "moderatelyRelevant", option)}
-                              className="ml-5 w-5 h-5"
-                            />
-                            <span className="text-medium ml-5">{option}</span>
-                          </label>
-                        ))}
-                    </div>
-                  )}
-                </div>
-
-                    {/* Skills Section */}
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center">
-                          <input 
-                            type="checkbox" 
-                            className="w-4 h-4 border border-gray-300 rounded text-fontcolor"
-                            checked={formData.criteria.skills.enabled} // Ensuring checkbox state is controlled
-                            onChange={() => handleCriteriaChange("skills", "enabled", !formData.criteria.skills.enabled)} // Toggle the checkbox state
-                          />
-                          <label className="ml-2 block text-sm font-semibold text-primary">Skills</label>
-                        </div>
-                        <div className="flex items-center">                                
-                        <span className="text-sm font-semibold text-fontcolor mr-2">Weight</span>
-                        <input
-                          type="text" 
-                          value={formData.criteria.skills.weight || ""} 
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (/^\d*$/.test(value) && Number(value) <= 100) {
-                              handleCriteriaChange("skills", "weight", value);
-                            }
-                          }}
-                          className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-sm text-fontcolor text-center"
-                        />
-                      </div>
-
-                      </div>
-                    {/* Primary Skills Multi-Select */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-semibold text-fontcolor mb-1">
-                        Primary Skills
-                        <span className="font-medium text-xsmall">
-                           (Put roles with the most relevant skills and experience)
-                        </span>
-                      </label>
-                      <div 
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between" 
-                        onClick={() => setDropdownOpen({ ...dropdownOpen, primary: !dropdownOpen.primary })}
-                      >
-                        <span>
-                          {formData.criteria.skills.primarySkills?.length > 0
-                            ? formData.criteria.skills.primarySkills.join(", ")
-                            : "Select Primary Skills"}
-                        </span>
-                        <FaChevronDown className={`ml-2 transform ${dropdownOpen.primary ? "rotate-180" : "rotate-0"} transition-transform`} />
-                      </div>
-
-                      {dropdownOpen.primary && (
-                        <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                          <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                            <input 
-                              type="text" 
-                              placeholder="Search options..." 
-                              value={searchTerm.primary || ""} 
-                              onChange={(e) => setSearchTerm({ ...searchTerm, primary: e.target.value })} 
-                              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                            />
+                <div className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"  onClick={() => setDropdownOpen({ ...dropdownOpen, school: !dropdownOpen.school })}>
+                      {/* Show selected options inside the input */}
+                      {formData.criteria.schools.schoolPreference?.length > 0 ? (
+                        formData.criteria.schools.schoolPreference.map((selected, index) => (
+                          <div key={index} className="bg-gray-200 px-3 py-1 rounded-md flex items-center">
+                            <span className="text-sm">{selected}</span>
+                            <button className="ml-2 text-red-600 font-extrabold" onClick={(e) => {e.stopPropagation(); handleRemoveSelectedOption("schools", "schoolPreference", selected); }}>
+                              X
+                            </button>
                           </div>
-                          {options.skills
-                            .filter((option) => option.toLowerCase().includes((searchTerm.primary || "").toLowerCase()))
-                            .map((option, index) => (
-                              <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  value={option}
-                                  checked={formData.criteria.skills.primarySkills?.includes(option)}
-                                  onChange={() => handleMultiSelectChange("skills", "primarySkills", option)}
-                                  className="ml-5 w-5 h-5"
-                                />
-                                <span className="text-medium ml-5">{option}</span>
-                              </label>
-                            ))}
-                        </div>
+                        ))
+                      ) : (<span className="text-fontcolor">Select Preferred School</span>
                       )}
+                      <FaChevronDown className={`ml-auto transform ${dropdownOpen.school ? "rotate-180" : "rotate-0"} transition-transform`} />
                     </div>
 
-
-                    {/* Secondary Skills Multi-Select */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-semibold text-fontcolor mb-1">
-                        Secondary Skills
-                        <span className="font-medium text-xsmall">
-                         (Put important skills that are frequently used but not absolutely essential)
-                        </span>
-                      </label>
-                      <div 
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between" 
-                        onClick={() => setDropdownOpen({ ...dropdownOpen, secondary: !dropdownOpen.secondary })}
-                      >
-                        <span>
-                          {formData.criteria.skills.secondarySkills?.length > 0
-                            ? formData.criteria.skills.secondarySkills.join(", ")
-                            : "Select Secondary Skills"}
-                        </span>
-                        <FaChevronDown className={`ml-2 transform ${dropdownOpen.secondary ? "rotate-180" : "rotate-0"} transition-transform`} />
-                      </div>
-
-                      {dropdownOpen.secondary && (
-                        <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                          <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                            <input 
-                              type="text" 
-                              placeholder="Search options..." 
-                              value={searchTerm.secondary || ""} 
-                              onChange={(e) => setSearchTerm({ ...searchTerm, secondary: e.target.value })} 
-                              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                            />
-                          </div>
-                          {options.skills
-                            .filter((option) => option.toLowerCase().includes((searchTerm.secondary || "").toLowerCase()))
-                            .map((option, index) => (
-                              <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  value={option}
-                                  checked={formData.criteria.skills.secondarySkills?.includes(option)}
-                                  onChange={() => handleMultiSelectChange("skills", "secondarySkills", option)}
-                                  className="ml-5 w-5 h-5"
-                                />
-                                <span className="text-medium ml-5">{option}</span>
-                              </label>
-                            ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Additional Skills Multi-Select */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-semibold text-fontcolor mb-1">
-                        Additional Skills
-                        <span className="font-medium text-xsmall">
-                         (nice-to-have skills that would give a candidate an edge but aren't necessary for the core job functions)
-                        </span>
-                      </label>
-                      <div 
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between" 
-                        onClick={() => setDropdownOpen({ ...dropdownOpen, additional: !dropdownOpen.additional })}
-                      >
-                        <span>
-                          {formData.criteria.skills.additionalSkills?.length > 0
-                            ? formData.criteria.skills.additionalSkills.join(", ")
-                            : "Select Additional Skills"}
-                        </span>
-                        <FaChevronDown className={`ml-2 transform ${dropdownOpen.additional ? "rotate-180" : "rotate-0"} transition-transform`} />
-                      </div>
-
-                      {dropdownOpen.additional && (
-                        <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                          <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                            <input 
-                              type="text" 
-                              placeholder="Search options..." 
-                              value={searchTerm.additional || ""} 
-                              onChange={(e) => setSearchTerm({ ...searchTerm, additional: e.target.value })} 
-                              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                            />
-                          </div>
-                          {options.skills
-                            .filter((option) => option.toLowerCase().includes((searchTerm.additional || "").toLowerCase()))
-                            .map((option, index) => (
-                              <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  value={option}
-                                  checked={formData.criteria.skills.additionalSkills?.includes(option)}
-                                  onChange={() => handleMultiSelectChange("skills", "additionalSkills", option)}
-                                  className="ml-5 w-5 h-5"
-                                />
-                                <span className="text-medium ml-5">{option}</span>
-                              </label>
-                            ))}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            className="w-4 h-4 border border-gray-300 rounded text-fontcolor"
-                          />
-                          <label className="ml-2 block text-sm font-semibold text-primary">Education</label>
-                        </div>
-                        <div className="flex items-center">
-                        <span className="text-sm font-semibold text-fontcolor mr-2">Weight</span>
-                        <input
-                          type="text"
-                          value={formData.criteria.education.weight || ""}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            // Allow only numbers and validate the range
-                            if (/^\d*$/.test(value) && Number(value) <= 100) {
-                              handleCriteriaChange("education", "weight", value);
-                            }
-                          }}
-                          className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-sm text-black text-center"
-                        />
-                      </div>
-                      </div>
-                      {/* 1st Choice Field of Study */}
-                      <div className="mb-4">
-                        <label className="block text-sm font-semibold text-fontcolor mb-1">
-                          1st Choice Field of Study
-                          <span className="font-medium text-xsmall">
-                            (Put the most directly relevant fields of study for the position)
-                          </span>
-                        </label>
-                        <div
-                          className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
-                          onClick={() => setDropdownOpen({ ...dropdownOpen, firstChoice: !dropdownOpen.firstChoice })}
-                        >
-                          <span>
-                            {formData.criteria.education.firstChoice || "Select 1st Choice Field of Study"}
-                          </span>
-                          <FaChevronDown
-                            className={`ml-2 transform ${dropdownOpen.firstChoice ? "rotate-180" : "rotate-0"} transition-transform`}
-                          />
-                        </div>
-
-                        {dropdownOpen.firstChoice && (
-                          <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                            <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                              <input
-                                type="text"
-                                placeholder="Search options..."
-                                value={searchTerm.firstChoice || ""}
-                                onChange={(e) => setSearchTerm({ ...searchTerm, firstChoice: e.target.value })}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                              />
-                            </div>
-                            {options.education
-                              .filter((option) => option.toLowerCase().includes((searchTerm.firstChoice || "").toLowerCase()))
-                              .map((option, index) => (
-                                <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
-                                  <input
-                                    type="radio"
-                                    value={option}
-                                    checked={formData.criteria.education.firstChoice === option}
-                                    onChange={() => handleCriteriaChange("education", "firstChoice", option)}
-                                    className="ml-5 w-5 h-5"
-                                  />
-                                  <span className="text-medium ml-5">{option}</span>
-                                </label>
-                              ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* 2nd Choice Field of Study */}
-                      <div className="mb-4">
-                        <label className="block text-sm font-semibold text-fontcolor mb-1">
-                          2nd Choice Field of Study
-                          <span className="font-medium text-xsmall">
-                            (Put closely related fields that have significant overlap with the job requirements)
-                          </span>
-                        </label>
-                        <div
-                          className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
-                          onClick={() => setDropdownOpen({ ...dropdownOpen, secondChoice: !dropdownOpen.secondChoice })}
-                        >
-                          <span>
-                            {formData.criteria.education.secondChoice || "Select 2nd Choice Field of Study"}
-                          </span>
-                          <FaChevronDown
-                            className={`ml-2 transform ${dropdownOpen.secondChoice ? "rotate-180" : "rotate-0"} transition-transform`}
-                          />
-                        </div>
-
-                        {dropdownOpen.secondChoice && (
-                          <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                            <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                              <input
-                                type="text"
-                                placeholder="Search options..."
-                                value={searchTerm.secondChoice || ""}
-                                onChange={(e) => setSearchTerm({ ...searchTerm, secondChoice: e.target.value })}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                              />
-                            </div>
-                            {options.education
-                              .filter((option) => option.toLowerCase().includes((searchTerm.secondChoice || "").toLowerCase()))
-                              .map((option, index) => (
-                                <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
-                                  <input
-                                    type="radio"
-                                    value={option}
-                                    checked={formData.criteria.education.secondChoice === option}
-                                    onChange={() => handleCriteriaChange("education", "secondChoice", option)}
-                                    className="ml-5 w-5 h-5"
-                                  />
-                                  <span className="text-medium ml-5">{option}</span>
-                                </label>
-                              ))}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* 3rd Choice Field of Study */}
-                      <div className="mb-4">
-                        <label className="block text-sm font-semibold text-fontcolor mb-1">
-                          3rd Choice Field of Study
-                          <span className="font-medium text-xsmall">
-                            (Put fields that have some relevance or provide useful background knowledge)
-                          </span>
-                        </label>
-                        <div
-                          className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
-                          onClick={() => setDropdownOpen({ ...dropdownOpen, thirdChoice: !dropdownOpen.thirdChoice })}
-                        >
-                          <span>
-                            {formData.criteria.education.thirdChoice || "Select 3rd Choice Field of Study"}
-                          </span>
-                          <FaChevronDown
-                            className={`ml-2 transform ${dropdownOpen.thirdChoice ? "rotate-180" : "rotate-0"} transition-transform`}
-                          />
-                        </div>
-
-                        {dropdownOpen.thirdChoice && (
-                          <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                            <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                              <input
-                                type="text"
-                                placeholder="Search options..."
-                                value={searchTerm.thirdChoice || ""}
-                                onChange={(e) => setSearchTerm({ ...searchTerm, thirdChoice: e.target.value })}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                              />
-                            </div>
-                            {options.education
-                              .filter((option) => option.toLowerCase().includes((searchTerm.thirdChoice || "").toLowerCase()))
-                              .map((option, index) => (
-                                <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
-                                  <input
-                                    type="radio"
-                                    value={option}
-                                    checked={formData.criteria.education.thirdChoice === option}
-                                    onChange={() => handleCriteriaChange("education", "thirdChoice", option)}
-                                    className="ml-5 w-5 h-5"
-                                  />
-                                  <span className="text-medium ml-5">{option}</span>
-                                </label>
-                              ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    </div>
-
-                    <label className="block text-sm font-semibold text-primary mb-2">Additional Points</label>
-                    <div className="flex items-center mb-4">
-                      <input
-                        type="checkbox"
-                        className="w-4 h-4 border border-gray-300 rounded text-black mr-2"
-                      />
-                      <label className="text-sm text-fontcolor font-semibold">
-                        School Preference
-                      </label>
-                    </div>
-
-                    {/* School Preference */}
-                    <div className="mb-4">
-                    <label className="block text-sm font-semibold text-fontcolor mb-1">
-                      School Preference
-                      <span className="font-medium text-xsmall">
-                        (Put any preferred institutions, if applicable)
-                      </span>
-                    </label>
-                    <div
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
-                      onClick={() =>
-                        setDropdownOpen({
-                          ...dropdownOpen,
-                          schoolPreference: !dropdownOpen.schoolPreference,
-                        })
-                      }
-                    >
-                      <span>
-                        {formData.criteria.schools.selectedOptions.join(", ") || "Select School Preference"}
-                      </span>
-                      <FaChevronDown
-                        className={`ml-2 transform ${
-                          dropdownOpen.schoolPreference ? "rotate-180" : "rotate-0"
-                        } transition-transform`}
-                      />
-                    </div>
-                    {dropdownOpen.schoolPreference && (
+                    {dropdownOpen.school && (
                       <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                        {/* Search & Add Custom Option */}
                         <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                          <input
-                            type="text"
-                            placeholder="Search options..."
-                            value={searchTerm.schoolPreference || ""}
-                            onChange={(e) => setSearchTerm({ ...searchTerm, schoolPreference: e.target.value })} 
+                          <input 
+                            type="text"  
+                            placeholder="Search or add a new option..." 
+                            value={searchTerm.school || ""} 
+                            onChange={(e) => setSearchTerm({ ...searchTerm, school: e.target.value })}  
                             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleAddCustomOption("schools", "schoolPreference", e.target.value);
+                              }
+                            }}
                           />
+                          {searchTerm.school && !options.schools.includes(searchTerm.school) && (
+                            <button className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"  onClick={() => handleAddCustomOption("schools", "schoolPreference", searchTerm.school)}>
+                              Add "{searchTerm.school}"
+                            </button>
+                          )}
                         </div>
-                        {(
-                          options.schools
-                          .filter((option) => option.toLowerCase().includes((searchTerm.schoolPreference || "").toLowerCase()))
-                            .map((school, index) => (
-                              <label
-                                key={index}
-                                className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
-                              >
-                                <input
-                                  type="checkbox"
-                                  value={school}
-                                  checked={formData.criteria.schools.selectedOptions.includes(
-                                    school
-                                  )}
-                                  onChange={(e) => {
-                                    const updatedSchools = e.target.checked
-                                      ? [...formData.criteria.schools.selectedOptions, school]
-                                      : formData.schools.schools.selectedOptions.filter(
-                                          (s) => s !== school
-                                        );
-                                    setFormData((prev) => ({
-                                      ...prev,
-                                      criteria: {
-                                        ...prev.criteria,
-                                        schools: {
-                                          ...prev.criteria.schools,
-                                          selectedOptions: updatedSchools,
-                                        },
-                                      },
-                                    }));
-                                  }}
-                                  className="ml-5 w-5 h-5"
-                                />
-                                <span className="text-medium ml-5">{school}</span>
-                              </label>
-                            ))
-                        )}
+
+                        {/* Available Options List */}
+                        {getFilteredOptions("schools", "schoolPreference").map((option, index) => (
+                          <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              value={option}
+                              checked={formData.criteria.schools.schoolPreference?.includes(option)}
+                              onChange={() => handleMultiSelectChange("schools", "schoolPreference", option)}
+                              className="ml-5 w-5 h-5"
+                            />
+                            <span className="text-medium ml-5">{option}</span>
+                          </label>
+                        ))}
                       </div>
-                    )}
+                      )}
+                  </div>
+                </div>
+
+                  <div className="flex items-center mb-4">
+                      <input type="checkbox" className="w-4 h-4 border border-gray-300 rounded text-black mr-2" />
+                      <label className="text-sm text-fontcolor">Honors</label>
                   </div>
 
-                        <div className="flex items-center mb-4">
-                            <input type="checkbox" className="w-4 h-4 border border-gray-300 rounded text-black mr-2" />
-                            <label className="text-sm text-fontcolor">Honors</label>
-                        </div>
-
-                        <div className="flex items-center">
-                            <input type="checkbox" className="w-4 h-4 border border-gray-300 rounded text-black mr-2" />
-                            <label className="text-sm text-fontcolor">Multiple Degrees</label>
-                        </div>
-                    </div>
+                  <div className="flex items-center">
+                      <input type="checkbox" className="w-4 h-4 border border-gray-300 rounded text-black mr-2" />
+                      <label className="text-sm text-fontcolor">Multiple Degrees</label>
+                  </div>
+              </div>
                     
                     <div className="mb-6">
                         <div className="flex items-center justify-between mb-4">
@@ -862,51 +977,67 @@ const handleMultiSelectChange = (category, field, option) => {
                         </div>
 
                         <div className="mb-4">
+                          <div>
                         <label className="block text-sm font-semibold text-fontcolor mb-1">
-                          Certificate Preference
-                          <span className="font-medium text-xsmall">
-                          (Select any preferred certificates, if applicable)</span>
+                          Certificate Preference <span className="font-medium text-xsmall">(Select any preferred certificates, if applicable)</span>
                         </label>
-                      <div 
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between" 
-                        onClick={() => setDropdownOpen({ ...dropdownOpen, certificatePreference: !dropdownOpen.certificatePreference })}
-                      >
-                        <span>
-                          {formData.criteria.certificates.preferred?.length > 0
-                            ? formData.criteria.certificates.preferred.join(", ")
-                            : "Select Certificate Preference"}
-                        </span>
-                        <FaChevronDown className={`ml-2 transform ${dropdownOpen.secondary ? "rotate-180" : "rotate-0"} transition-transform`} />
-                      </div>
-
-                      {dropdownOpen.certificatePreference  && (
-                        <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                          <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                            <input 
-                              type="text" 
-                              placeholder="Search options..." 
-                              value={searchTerm.certificatePreference  || ""} 
-                              onChange={(e) => setSearchTerm({ ...searchTerm, certificatePreference: e.target.value })} 
-                              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                            />
+                      
+                        <div className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"  onClick={() => setDropdownOpen({ ...dropdownOpen, certicatePrefered: !dropdownOpen.certicatePrefered })}>
+                      {/* Show selected options inside the input */}
+                      {formData.criteria.certificates.preferred?.length > 0 ? (
+                        formData.criteria.certificates.preferred.map((selected, index) => (
+                          <div key={index} className="bg-gray-200 px-3 py-1 rounded-md flex items-center">
+                            <span className="text-sm">{selected}</span>
+                            <button className="ml-2 text-red-600 font-extrabold" onClick={(e) => {e.stopPropagation(); handleRemoveSelectedOption("certificates", "preferred", selected); }}>
+                              X
+                            </button>
                           </div>
-                          {options.certs
-                            .filter((option) => option.toLowerCase().includes((searchTerm.certificatePreference || "").toLowerCase()))
-                            .map((option, index) => (
-                              <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  value={option}
-                                  checked={formData.criteria.certificates.preferred?.includes(option)}
-                                  onChange={() => handleMultiSelectChange("certificates", "preferred", option)}
-                                  className="ml-5 w-5 h-5"
-                                />
-                                <span className="text-medium ml-5">{option}</span>
-                              </label>
-                            ))}
-                        </div>
+                        ))
+                      ) : (<span className="text-fontcolor">Select Preferred Certificate</span>
                       )}
+                      <FaChevronDown className={`ml-auto transform ${dropdownOpen.certicatePrefered ? "rotate-180" : "rotate-0"} transition-transform`} />
                     </div>
+
+                    {dropdownOpen.certicatePrefered && (
+                      <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                        {/* Search & Add Custom Option */}
+                        <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                          <input 
+                            type="text"  
+                            placeholder="Search or add a new option..." 
+                            value={searchTerm.certicatePrefered || ""} 
+                            onChange={(e) => setSearchTerm({ ...searchTerm, certicatePrefered: e.target.value })}  
+                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleAddCustomOption("certificates", "preferred", e.target.value);
+                              }
+                            }}
+                          />
+                          {searchTerm.certicatePrefered && !options.certificates.includes(searchTerm.certicatePrefered) && (
+                            <button className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"  onClick={() => handleAddCustomOption("certificates", "preferred", searchTerm.certicatePrefered)}>
+                              Add "{searchTerm.certicatePrefered}"
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Available Options List */}
+                        {getFilteredOptions("certificates", "preferred").map((option, index) => (
+                          <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              value={option}
+                              checked={formData.criteria.certificates.preferred?.includes(option)}
+                              onChange={() => handleMultiSelectChange("certificates", "preferred", option)}
+                              className="ml-5 w-5 h-5"
+                            />
+                            <span className="text-medium ml-5">{option}</span>
+                          </label>
+                        ))}
+                      </div>
+                      )}
+                  </div>
+                </div>
                  
                 </div>
                 <div className="mb-6">
