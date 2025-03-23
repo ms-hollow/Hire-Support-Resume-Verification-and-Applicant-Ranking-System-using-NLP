@@ -155,55 +155,81 @@ const SavedJobs = () => {
   }
 
   return (
-    <div className="flex flex-col">
-        {jobListings.map((job) => (
-            <div key={job.job_id} className="flex flex-col items-center justify-center pt-6 mx-80 w-[50vw]">
-                <div className="justify-center items-center box-container px-8 py-5">
-                    <div className="flex items-center justify-between -mt-8">
-                        <Image src="/Logo.png" width={30} height={30} alt="Company Logo" />
-                        <div className="justify-center items-center ml-4 mt-8">
-                            <b className="font-bold text-large text-fontcolor">{job.job_title}</b>
-                                <div className="text-xsmall font-thin text-fontcolor mt-1">
-                                    <p>{job.company_name}</p>
-                                    <p>{job.job_industry}</p>
-                                </div>
-                        </div>
-                        <button className="button1 items-center flex justify-center flex-shrink-0 text-center ml-40">
-                            <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-center">Apply Now</p>
-                        </button>
-                        <button onClick={() => toggleSave(job.job_id)} className="ml-auto">
-                            <Image src={savedStatus[job.job_id] ? "/Save Icon.svg" : "/Unsave Icon.svg"} width={13} height={11} alt={savedStatus[job.job_id] ? "Save Icon" : "Unsave Icon"} />
-                        </button>
-                    </div>  
-                    <div className="flex flex-row justify-between mt-2 px-11">
-                        <div className="flex flex-row">
-                            <Image src="/Location Icon.svg" width={23} height={20} alt="Location Icon" />
-                            <p id='work_location' className="ml-1.5 font-thin text-xsmall text-fontcolor">{job.location}</p>
-                        </div>
-                        <div className="flex flex-row mx-4">
-                            <Image src="/Work Setup Icon.svg" width={23} height={20} alt="Work Setup Icon" />
-                            <p id='work_setup' className="ml-2 font-thin text-xsmall text-fontcolor">{job.work_setup}</p>
-                        </div>
-                        <div className="flex flex-row">
-                            <Image src="/Schedule Icon.svg" width={18} height={20} alt="Schedule Icon" />
-                            <p id='schedule' className="ml-2 font-thin text-xsmall text-fontcolor">{job.schedule}</p>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-row mt-2 px-11">
-                        <Image 
-                            src="/Salary Icon.svg" 
-                            width={18} 
-                            height={20}
-                            alt="Salary Icon"
-                        />
-                        <p id='salary' className="ml-2 font-thin text-xsmall pl-px text-fontcolor">{job.salary}</p>
-                    </div>
+    <div>
+      {jobListings.map((job) => (
+        <div key={job.job_id} className="flex flex-col pt-4">
+          <div className= "box-container px-2 py-2 mb-4"> 
+            {/* 2-column layout */}
+            <div className="grid grid-cols-12  gap-4 p-3">
+              <div className="col-span-2  justify-center">
+                <Image src="/Logo.png" width={50} height={30} alt="Company Logo" />
+              </div>
+  
+              {/* Right Column - Job Info + Buttons */}
+              <div className="col-span-10 flex flex-col w-full">
+              <div className="flex justify-between items-start w-full">
+              {/* Job Title & Company Info */}
+              <div>
+                <b className="font-bold text-large text-fontcolor">{job.job_title}</b>
+                <div className="text-xsmall font-thin text-fontcolor">
+                  <p>{job.company_name}</p>
+                  <p>{job.job_industry}</p>
                 </div>
+              </div>
+
+              {/* Right-aligned buttons */}
+              <div className="flex items-start gap-4">
+                {/* Apply Now Button + Save Icon (Centered Together) */}
+                <div className="flex items-center gap-4">
+                  {/* Apply Now Button */}
+                  <button className="button1 flex items-center justify-center text-center">
+                    <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-center">Apply Now</p>
+                  </button>
+
+                  {/* Save/Unsave Icon (Centered with Apply Button) */}
+                  <button onClick={() => toggleSave(job.job_id)} className="flex items-center">
+                    <Image
+                      src={savedStatus[job.job_id] ? "/Save Icon.svg" : "/Unsave Icon.svg"}
+                      width={13}
+                      height={11}
+                      alt={savedStatus[job.job_id] ? "Save Icon" : "Unsave Icon"}
+                    />
+                  </button>
+                </div>
+              </div>
             </div>
-        ))}
+
+
+                {/* Job Details (Location, Setup, Schedule, Salary) */}
+                <div className="flex flex-row justify-between mt-2">
+                  <div className="flex items-center">
+                    <Image src="/Location Icon.svg" width={23} height={20} alt="Location Icon" />
+                    <p className="ml-1 font-thin text-xsmall text-fontcolor">{job.location}</p>
+                  </div>
+                  <div className="flex items-center">
+                    <Image src="/Work Setup Icon.svg" width={23} height={20} alt="Work Setup Icon" />
+                    <p className="ml-2 font-thin text-xsmall text-fontcolor">{job.work_setup}</p>
+                  </div>
+                  <div className="flex items-center">
+                    <Image src="/Schedule Icon.svg" width={18} height={20} alt="Schedule Icon" />
+                    <p className="ml-2 font-thin text-xsmall text-fontcolor">{job.schedule}</p>
+                  </div>
+                </div>
+
+                {/* Job Details (Location, Setup, Schedule, Salary) */}
+                <div className="flex flex-row justify-between mt-2">
+                  <div className="flex items-center">
+                    <Image src="/Salary Icon.svg" width={18} height={20} alt="Salary Icon" />
+                    <p className="ml-2 font-thin text-xsmall text-fontcolor">{job.salary}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
-  );
+  );  
 };
 
 const SavedJobsWrapper = () => {

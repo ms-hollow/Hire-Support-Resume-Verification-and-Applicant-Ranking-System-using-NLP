@@ -2,6 +2,7 @@ import CompanyHeader from "@/components/CompanyHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import Link from "next/link";
 import Image from "next/image";
+import { FaChevronDown } from 'react-icons/fa';
 import { saveJobDetails } from "@/pages/utils/JobUtils";
 import { useRouter } from 'next/router';
 import { useState, useEffect } from "react";
@@ -12,11 +13,18 @@ export default function CreateJob() {
     const [provinces, setProvinces] = useState([]);
     const [cities, setCities] = useState([]);
     const [dummyJobDetails, setDummyJobDetails] = useState([]);
+    const [options, setOptions] = useState(null);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
     const router = useRouter();
 
     const [formData, setFormData] = useState({
       job_title: '',
       job_industry: '',
+      specialization: {
+        specOptions: [],
+        selectedOptions: [],
+      },
       job_description: '',
       company_name: '',
       region: '',
@@ -35,20 +43,28 @@ export default function CreateJob() {
   });
 
   useEffect(() => {
-    fetch("/placeHolder/dummy_JobDetails.json")
-      .then((response) => {
-        if (!response.ok) {
+    const fetchData = async () => {
+      try {
+        // Fetch options data
+        const optionsResponse = await fetch("/placeHolder/dummy_options.json");
+        if (!optionsResponse.ok) {
+          throw new Error("Failed to fetch dummy_options.json");
+        }
+        const optionsData = await optionsResponse.json();
+        setOptions(optionsData);
+  
+        // Fetch job details
+        const jobResponse = await fetch("/placeHolder/dummy_JobDetails.json");
+        if (!jobResponse.ok) {
           throw new Error("Failed to fetch dummy_JobDetails.json");
         }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Fetched dummy_JobDetails:", data);
-        setDummyJobDetails(data);
+        const jobData = await jobResponse.json();
+        console.log("Fetched dummy_JobDetails:", jobData);
+        setDummyJobDetails(jobData);
   
         // Initialize localStorage only if empty
         if (!localStorage.getItem("dummy_JobDetails")) {
-          localStorage.setItem("dummy_JobDetails", JSON.stringify(data));
+          localStorage.setItem("dummy_JobDetails", JSON.stringify(jobData));
         }
   
         // Load draft if it exists
@@ -56,12 +72,16 @@ export default function CreateJob() {
         if (draftJob) {
           setFormData(JSON.parse(draftJob));
         }
-      })
-
-      .catch((error) => console.error("Error fetching dummy_JobDetails:", error));
+        
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
   }, []);
   
-
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     const updatedFormData = {
@@ -119,7 +139,6 @@ export default function CreateJob() {
   };
   
 
-
   useEffect(() => {
     fetch("https://psgc.gitlab.io/api/regions/")
       .then((res) => res.json())
@@ -160,6 +179,36 @@ export default function CreateJob() {
     }
   }, [formData.province, formData.region]);
 
+  const handleMultiSelectChange = (option) => {
+    setFormData((prev) => {
+      const prevSpecialization = prev.specialization || { specOptions: [] };
+  
+      // Toggle selection: If selected, remove it. If not, add it.
+      const updatedOptions = prevSpecialization.specOptions.includes(option)
+        ? prevSpecialization.specOptions.filter((item) => item !== option) // Uncheck if already selected
+        : [...prevSpecialization.specOptions, option]; // Add if not selected
+  
+      const newFormData = {
+        ...prev,
+        specialization: {
+          ...prevSpecialization,
+          specOptions: updatedOptions, // ✅ Updates specOptions
+        },
+      };
+  
+      // Save updated selections in localStorage for persistence
+      localStorage.setItem("draft_job", JSON.stringify(newFormData));
+  
+      return newFormData;
+    });
+  };
+  
+  
+  const handleRemoveSelectedOption = (option) => {
+    handleMultiSelectChange(option);
+  };
+  
+  
   return (
     <div>
       <CompanyHeader />
@@ -191,6 +240,54 @@ export default function CreateJob() {
                 <div>
                   <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">Job Industry</label>
                   <input type="text" name="job_industry" value={formData.job_industry} onChange={handleInputChange} placeholder="Job Industry"className="h-medium rounded-xs border-2 border-fontcolor"/>
+                </div>
+
+                <div className="col-span-2 gap-3">
+                  <div className="mb-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-fontcolor mb-1">Specialization</label>
+                      <div className="w-full border-2 border-black rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"  onClick={() => setDropdownOpen({ ...dropdownOpen, specoption: !dropdownOpen.specoption })} >
+                      {formData.specialization?.specOptions.length > 0 ? (
+                          formData.specialization.specOptions.map((selected, index) => (
+                          <div key={index} className="bg-gray-200 px-3 py-1 rounded-md flex items-center">
+                            <span className="text-sm">{selected}</span>
+                            <button className="ml-2 text-red-600 font-extrabold"  onClick={(e) => {e.stopPropagation();handleRemoveSelectedOption(selected); }}>
+                              X
+                            </button>
+                          </div>
+                        ))
+                      ) : (<span className="text-fontcolor">Select Specialization</span>
+                      )}
+                      <FaChevronDown className={`ml-auto transform ${dropdownOpen.specoption ? "rotate-180" : "rotate-0"} transition-transform`} />
+                    </div>
+                        
+                      {dropdownOpen.specoption && (
+                        <div className="top-full mt-1 w-full border border-gray-300 rounded-xs bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                          
+                          {/* Search Box */}
+                          <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                            <input type="text" placeholder="Search options..." value={searchTerm.specoption || ""} onChange={(e) => setSearchTerm({ ...searchTerm, specoption: e.target.value })} className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"  />
+                          </div>
+
+                          {/* Specialization Options */}
+                          {options.specialization
+                            .filter((option) => option.toLowerCase().includes((searchTerm.specoption || "").toLowerCase()))
+                            .map((option, index) => (
+                              <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  value={option}
+                                  checked={formData.specialization?.specOptions.includes(option)}
+                                  onChange={() => handleMultiSelectChange(option)}
+                                  className="ml-5 w-5 h-5"
+                                />
+                                <span className="text-medium ml-5">{option}</span>
+                              </label>
+                            ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="col-span-2 gap-3">

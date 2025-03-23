@@ -24,6 +24,10 @@ const generateJobId = (existingJobs) => {
       Id: generateJobId(existingJobs),
       job_title: formData.job_title || '',
       job_industry: formData.job_industry || '',
+      specialization: {
+          specOptions: formData.specialization?.specOptions || [],
+          selectedOptions: formData.specialization?.selectedOptions || [],
+        },
       job_description: formData.job_description || '',
       company_name: formData.company_name || '',
       region: formData.region || '',
@@ -74,7 +78,9 @@ const generateJobId = (existingJobs) => {
           thirdChoice: formData.criteria?.education?.thirdChoice || [],
           selectedOptions: formData.criteria?.education?.selectedOptions || [] 
         },
+        
         schools: { 
+          schoolPreference: formData.criteria?.schools?.schoolPreference || [] ,
           selectedOptions: formData.criteria?.schools?.selectedOptions || [] 
         },
         additionalPoints: { honor: "", multipleDegrees: "" },
