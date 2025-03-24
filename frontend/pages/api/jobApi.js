@@ -69,7 +69,7 @@ export const saveJob = async (authToken, jobId) => {
 
     return response.ok;
   } catch (error) {
-    console.error("❌ Failed to save job:", error);
+    console.error("Failed to save job:", error);
     return false;
   }
 };
@@ -152,7 +152,7 @@ export const fetchJobDetails = async (authToken, jobId) => {
       application_deadline: formatDate(data.application_deadline, "long"),
     };
   } catch (error) {
-    console.error("❌ Error fetching job details:", error);
+    console.error("Error fetching job details:", error);
     return null;
   }
 };
@@ -177,7 +177,7 @@ export const checkIfJobIsSaved = async (authToken, jobId) => {
     const savedJobs = await response.json();
     return savedJobs.some((job) => String(job.job_hiring_id) === jobId);
   } catch (error) {
-    console.error("❌ Error checking saved job status:", error);
+    console.error("Error checking saved job status:", error);
     return false;
   }
 };
