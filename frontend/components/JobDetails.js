@@ -2,7 +2,7 @@ import Image from "next/image";
 import { useState, useContext, useEffect, useCallback } from "react";
 import AuthContext from "@/pages/context/AuthContext";
 import { useRouter } from "next/router";
-import { JDSkeletonLoader } from "./ui/JDSkeletonLoader";
+import { JDSkeletonLoader } from "./ui/SkeletonLoader";
 import {
   fetchJobDetails,
   checkIfJobIsSaved,
