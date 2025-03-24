@@ -113,7 +113,7 @@ const ReviewApplication = ({showEditButtons = true}) => {
 
             <section className=" pb-6">
                 <div className="flex flex-row justify-between items-center pt-3 mb-2">
-                    <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium text-primary pb-1">Additional Documents</p>
+                    <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium text-primary pb-1">Uploaded Documents</p>
                     {showEditButtons && (
                         <button className="flex items-center focus:outline-none">
                             <Link href="/APPLICANT/ApplicantDocuments">

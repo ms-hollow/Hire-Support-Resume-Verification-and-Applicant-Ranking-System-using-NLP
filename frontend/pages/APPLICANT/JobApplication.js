@@ -7,14 +7,21 @@ import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import jwt from 'jsonwebtoken';
 import { useAddressMapping } from "@/pages/utils/AddressMapping";
+import JobDetailsWrapper from "@/components/JobDetails";
 
-export default function JobApplication () {
+export default function JobApplication ({handleJobClick}) {
 
     let {authTokens} = useContext(AuthContext);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     const { jobId } = router.query;
     const { convertAddressCodes } = useAddressMapping();
+
+    const [showJobDetails, setShowJobDetails] = useState(false);
+
+    const handleToggleDetails = () => {
+        setShowJobDetails((prev) => !prev); // Toggle visibility
+    };
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -208,17 +215,30 @@ export default function JobApplication () {
             <ApplicantHeader/>
                 <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 sm:px-8 xsm:px-8 lg:px-20 py-8 mx-auto">
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
-                    <p className="font-semibold text-primary text-large pb-1">{getTitle() || 'No Job Title Available'}</p>
-                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompany() || 'No Job Company Available'}</p>
-                    <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-8 font-bold underline"> See job hiring details</p>
-                    
+                    <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>
+                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompanyFromLocalStorage() || 'No Job Company Available'}</p>
+                    <div className="relative">
+                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-8 font-bold underline cursor-pointer" onClick={handleToggleDetails} >See job hiring details</p>
+                        {showJobDetails && (
+                            <div className="flex items-center justify-center absolute inset-0 bg-background h-screen ">
+                                <div className="relative w-full lg:w-6/12 mb:w-10/12 sm:w-full bg-background rounded ">
+                                    <button onClick={() => setShowJobDetails(false)} className="absolute -top-12 right-0  text-xl text-fontcolor hover:text-gray-700" > ✖ </button>
+                                    <JobDetailsWrapper
+                                    authToken={authTokens?.access}
+                                    onJobClick={handleJobClick}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
                     <div className="flex items-center justify-center ">
                         <div className="box-container px-8 py-5 mx-auto">
                             <p className="font-semibold lg:text-large mb:text-large sm:text-large text-primary">Personal Information</p>
 
                             <div className="flex items-center pt-2">
-                                <div className="w-full bg-background h-1. border-2 border-primary rounded-full relative">
-                                    <div className={`relative h-1 rounded-full transition-all duration-300 bg-primary`} style={{ width: "25%" }}></div>
+                                <div className="w-full bg-background h-1. border-2 border-primary rounded-full ">
+                                    <div className={` h-1 rounded-full transition-all duration-300 bg-primary`} style={{ width: "25%" }}></div>
                                 </div>
                             </div>
 
