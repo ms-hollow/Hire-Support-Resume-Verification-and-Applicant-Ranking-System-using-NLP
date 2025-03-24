@@ -10,6 +10,7 @@ class JobHiring(models.Model):
 
     job_title = models.CharField(max_length=100, null=True, blank=False)
     job_industry = models.CharField(max_length=50, null=True, blank=False)
+    specialization = models.JSONField(null=True, blank=False)
     job_description = models.TextField()
     
     region = models.CharField(max_length=300, null=True, blank=False)
