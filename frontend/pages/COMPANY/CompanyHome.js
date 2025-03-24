@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
+import { getCompany } from "../api/companyApi";
+import { fetchJobList } from "../api/jobApi";
 
 //* PAGE STATUS
 // TODO - Retrieve job list and display it - [PARTIALLY DONE]
@@ -22,23 +24,6 @@ const getStatusClassName = (status) => {
   return statusClasses[status] || "text-default";
 };
 
-const getCompany = async (authTokens) => {
-  try {
-    const res = await fetch("http://127.0.0.1:8000/company/profile/view", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${authTokens.access}`,
-        "Content-Type": "application/json",
-      },
-    });
-    if (!res.ok) throw new Error("Failed to fetch company data");
-    return await res.json();
-  } catch (error) {
-    console.error("Error fetching company details:", error);
-    return null;
-  }
-};
-
 export default function CompanyHome() {
   const [jobLists, setJobLists] = useState([]);
   const [selectedJobId, setSelectedJobId] = useState(null);
@@ -46,28 +31,6 @@ export default function CompanyHome() {
   const router = useRouter();
 
   let { authTokens } = useContext(AuthContext);
-
-  const fetchJobList = useCallback(async () => {
-    try {
-      const res = await fetch("http://127.0.0.1:8000/job/job-hirings/", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${authTokens.access}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error(`HTTP error! Status: ${res.status}`);
-      }
-
-      const data = await res.json();
-      // console.log("Fetched Data:", data);
-      setJobLists(data);
-    } catch (error) {
-      console.error("Error fetching job list:", error);
-    }
-  }, [authTokens]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,9 +40,14 @@ export default function CompanyHome() {
       }
 
       const companyData = await getCompany(authTokens);
-      setCompanyName(companyData.profile_data.company_name);
-      // console.log("Company data:", companyData);
-      fetchJobList();
+      setCompanyName(
+        companyData?.profile_data?.company_name || "Unknown Company"
+      );
+
+      const jobData = await fetchJobList(authTokens);
+      if (jobData) {
+        setJobLists(jobData);
+      }
     };
 
     fetchData();

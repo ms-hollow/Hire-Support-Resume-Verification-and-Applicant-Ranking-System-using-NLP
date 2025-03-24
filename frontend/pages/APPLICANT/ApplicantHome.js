@@ -1,25 +1,24 @@
-import ApplicantHeader from '@/components/ApplicantHeader';
-import GeneralFooter from '@/components/GeneralFooter';
-import JobDetails from '@/components/JobDetails';
-import JobListings from '@/components/JobListings';
-import Image from 'next/image';
+import ApplicantHeader from "@/components/ApplicantHeader";
+import GeneralFooter from "@/components/GeneralFooter";
+import JobDetails from "@/components/JobDetails";
+import JobListings from "@/components/JobListings";
+import Image from "next/image";
 import { useState, useEffect, useContext } from "react";
-import AuthContext from '../context/AuthContext';
-import { useRouter } from 'next/router';
+import AuthContext from "../context/AuthContext";
+import { useRouter } from "next/router";
+import { getApplicant } from "../api/applicantApi";
 
 //TODO Search
 
 export default function ApplicantHome() {
-
-  let {authTokens} = useContext(AuthContext);
+  let { authTokens } = useContext(AuthContext);
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
-  const [applicantName, setApplicantName] = useState('');
+  const [applicantName, setApplicantName] = useState("");
   const [isJobDetailsOpen, setIsJobDetailsOpen] = useState(false);
   const [isSalaryOpen, setIsSalaryOpen] = useState(false);
   const [paymentType, setPaymentType] = useState("Annually");
   const [range, setRange] = useState(0);
-
 
   // Only run this after component is mounted to avoid mismatch between server/client render
   useEffect(() => {
@@ -33,34 +32,16 @@ export default function ApplicantHome() {
     }
   }, [authTokens, isMounted, router]);
 
-  const getApplicant = async () => {
-    try {
-      const response = await fetch(
-        'http://127.0.0.1:8000/applicant/profile/view/',
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${authTokens.access}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        const profileData = data?.profile_data;
-        if (profileData) {
-          setApplicantName(profileData.first_name);
-        } else {
-          console.error('Profile data not found in response.');
-        }
-      } else {
-        console.error('Failed to fetch applicant profile:', response.status, response.statusText);
+  useEffect(() => {
+    const fetchApplicantData = async () => {
+      if (authTokens?.access) {
+        const profileData = await getApplicant(authTokens);
+        setApplicantName(profileData?.first_name || "Unknown");
       }
-    } catch (error) {
-      console.error('Error fetching applicant profile:', error);
-    }
-  };
+    };
+
+    fetchApplicantData();
+  }, [authTokens]);
 
   const handleJobClick = () => {
     setIsJobDetailsOpen(true);
@@ -72,9 +53,15 @@ export default function ApplicantHome() {
   };
 
   const salaryRanges = {
-    Hourly: [ 5, 10, 20, 50, 100, 500, 700, 1000, 1500],
-    Monthly: [5000, 10000, 15000, 20000, 25000, 30000, 40000, 50000, 60000, 70000, 80000, 100000],
-    Annually: [ 60000, 70000, 80000, 90000, 100000, 120000, 180000, 240000, 300000, 360000, 480000, 600000, ]
+    Hourly: [5, 10, 20, 50, 100, 500, 700, 1000, 1500],
+    Monthly: [
+      5000, 10000, 15000, 20000, 25000, 30000, 40000, 50000, 60000, 70000,
+      80000, 100000,
+    ],
+    Annually: [
+      60000, 70000, 80000, 90000, 100000, 120000, 180000, 240000, 300000,
+      360000, 480000, 600000,
+    ],
   };
 
   const formatSalary = (value) => {
@@ -90,7 +77,6 @@ export default function ApplicantHome() {
     setRange(Number(e.target.value));
   };
 
-
   // Fetch applicant data after mounting
   useEffect(() => {
     if (authTokens) {
@@ -102,8 +88,6 @@ export default function ApplicantHome() {
   if (!isMounted || !authTokens) {
     return null;
   }
-
-  
 
   return (
     <div>
@@ -118,7 +102,12 @@ export default function ApplicantHome() {
           <div className="flex lg:flex-row gap-5 pb-5 mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col">
             <div className="relative h-medium rounded-xs border-2 border-fontcolor justify-center flex flex-grow items-center">
               <div className="absolute left-3">
-                <Image src="/Search Icon.svg" width={26} height={24} alt="Search Icon" />
+                <Image
+                  src="/Search Icon.svg"
+                  width={26}
+                  height={24}
+                  alt="Search Icon"
+                />
               </div>
               <input
                 type="text"
@@ -140,7 +129,9 @@ export default function ApplicantHome() {
                 <option value="" disabled selected hidden>
                   Classification
                 </option>
-                <option value="Science and Technology">Science and Technology</option>
+                <option value="Science and Technology">
+                  Science and Technology
+                </option>
                 <option value="Engineering">Engineering</option>
                 <option value="Computer Science">Computer Science</option>
               </select>
@@ -148,7 +139,12 @@ export default function ApplicantHome() {
 
             <div className="relative h-medium rounded-xs border-2 border-fontcolor justify-center flex flex-grow items-center">
               <div className="absolute left-3">
-                <Image src="/Location Icon.svg" width={24} height={24} alt="Search Icon" />
+                <Image
+                  src="/Location Icon.svg"
+                  width={24}
+                  height={24}
+                  alt="Search Icon"
+                />
               </div>
               <input
                 type="text"
@@ -161,7 +157,9 @@ export default function ApplicantHome() {
             </div>
 
             <button className="button1 items-center flex justify-center flex-shrink-0 p-5">
-              <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-center">Find Job</p>
+              <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-center">
+                Find Job
+              </p>
             </button>
           </div>
         </div>
@@ -170,7 +168,12 @@ export default function ApplicantHome() {
         <div className="pt-5 w-full">
           <div className="flex gap-5 pb-5 overflow-x-auto">
             <div className="h-medium rounded-xs bg-secondary flex flex-grow min-w-[200px]">
-              <select className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium" id="date-posted" name="DatePosted" required>
+              <select
+                className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium"
+                id="date-posted"
+                name="DatePosted"
+                required
+              >
                 <option value="" disabled selected hidden>
                   Date Posted
                 </option>
@@ -181,7 +184,12 @@ export default function ApplicantHome() {
             </div>
 
             <div className="h-medium rounded-xs bg-secondary flex flex-grow min-w-[200px]">
-              <select className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium" id="work-setup" name="WorkSetup" required>
+              <select
+                className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium"
+                id="work-setup"
+                name="WorkSetup"
+                required
+              >
                 <option value="" disabled selected hidden>
                   Work Setup
                 </option>
@@ -192,7 +200,12 @@ export default function ApplicantHome() {
             </div>
 
             <div className="h-medium rounded-xs bg-secondary flex flex-grow min-w-[200px]">
-              <select className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium" id="employ-type" name="EmployType" required>
+              <select
+                className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium"
+                id="employ-type"
+                name="EmployType"
+                required
+              >
                 <option value="" disabled selected hidden>
                   Employment Type
                 </option>
@@ -202,11 +215,16 @@ export default function ApplicantHome() {
                 <option value="Contract">Contract</option>
               </select>
             </div>
-     
+
             <div className="relative">
-              <div className="flex flex-col justify-center h-medium rounded-xs bg-secondary flex-grow min-w-[200px] cursor-pointer"onClick={() => setIsSalaryOpen(!isSalaryOpen)} >
+              <div
+                className="flex flex-col justify-center h-medium rounded-xs bg-secondary flex-grow min-w-[200px] cursor-pointer"
+                onClick={() => setIsSalaryOpen(!isSalaryOpen)}
+              >
                 <div className="flex text-fontcolor items-center text-sm px-3">
-                    {isSalaryOpen ? "" : ` ${paymentType || "Select Salary Type"}`}
+                  {isSalaryOpen
+                    ? ""
+                    : ` ${paymentType || "Select Salary Type"}`}
                 </div>
               </div>
 
@@ -214,23 +232,45 @@ export default function ApplicantHome() {
                 <div className="bg-white mt-2 w-full p-4 rounded-md shadow-lg">
                   <div className="flex space-x-4 border-b">
                     {["Annually", "Monthly", "Hourly"].map((type) => (
-                      <button key={type} className={`pb-2 text-sm ${ paymentType === type
+                      <button
+                        key={type}
+                        className={`pb-2 text-sm ${
+                          paymentType === type
                             ? "text-primary border-b-2 border-blue-500"
                             : "text-gray-500"
                         }`}
-                        onClick={() => setPaymentType(type)}>
+                        onClick={() => setPaymentType(type)}
+                      >
                         {type}
                       </button>
                     ))}
                   </div>
 
                   {/* Label */}
-                  <div className="text-gray-500 text-medium mt-4">Salary Range (PHP)</div>
+                  <div className="text-gray-500 text-medium mt-4">
+                    Salary Range (PHP)
+                  </div>
                   <div className="mt-4 space-y-2 max-h-20 overflow-y-auto">
-                    {paymentType && salaryRanges[paymentType].map((value, index) => (
-                        <label key={index}className="flex items-center space-x-2 text-gray-700 cursor-pointer">
-                          <input type="radio" name="salaryRange" value={index} checked={range === index} onChange={() => { setRange(index); setIsSalaryOpen(false);}} className=" ml-5 w-5 h-5" />
-                            <span className='text-medium'>{formatSalary(index)}</span>
+                    {paymentType &&
+                      salaryRanges[paymentType].map((value, index) => (
+                        <label
+                          key={index}
+                          className="flex items-center space-x-2 text-gray-700 cursor-pointer"
+                        >
+                          <input
+                            type="radio"
+                            name="salaryRange"
+                            value={index}
+                            checked={range === index}
+                            onChange={() => {
+                              setRange(index);
+                              setIsSalaryOpen(false);
+                            }}
+                            className=" ml-5 w-5 h-5"
+                          />
+                          <span className="text-medium">
+                            {formatSalary(index)}
+                          </span>
                         </label>
                       ))}
                   </div>
@@ -239,7 +279,12 @@ export default function ApplicantHome() {
             </div>
 
             <div className="h-medium rounded-xs bg-secondary flex flex-grow min-w-[200px]">
-              <select className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium" id="exp-level" name="ExperienceLevel" required>
+              <select
+                className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium"
+                id="exp-level"
+                name="ExperienceLevel"
+                required
+              >
                 <option value="" disabled selected hidden>
                   Experience Level
                 </option>
@@ -253,13 +298,13 @@ export default function ApplicantHome() {
         </div>
 
         {/* Job Listings and Details */}
-      
+
         <div className="flex flex-col w-full pt-4 gap-2 pb-16">
           {/* Job Listings */}
           <div className="flex flex-row gap-2">
             <JobListings
-              authToken={authTokens?.access} 
-              onJobClick={handleJobClick}// Trigger to open job details
+              authToken={authTokens?.access}
+              onJobClick={handleJobClick} // Trigger to open job details
             />
             {/* Job Details for Desktop */}
             <div className="hidden md:block flex-grow">
@@ -268,9 +313,9 @@ export default function ApplicantHome() {
           </div>
 
           {/* Job Details for Mobile (Animated Drawer) */}
-          <div 
+          <div
             className={`fixed inset-0 bg-background transition-transform duration-300 md:hidden z-20 ${
-              isJobDetailsOpen ? 'translate-y-0' : 'translate-y-full'
+              isJobDetailsOpen ? "translate-y-0" : "translate-y-full"
             }`}
           >
             <div className="relative h-full w-full pt-28 px-4">
@@ -284,10 +329,7 @@ export default function ApplicantHome() {
             </div>
           </div>
         </div>
-
-         
-
       </div>
-      </div>
+    </div>
   );
 }
