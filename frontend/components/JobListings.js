@@ -3,7 +3,7 @@ import Image from "next/image";
 import GeneralFooter from "./GeneralFooter";
 import { useRouter } from "next/router";
 import AuthContext from "@/pages/context/AuthContext";
-import { JLSkeletonLoader } from "./ui/JLSkeletonLoader";
+import { JLSkeletonLoader } from "./ui/SkeletonLoader";
 import {
   fetchJobListings,
   fetchSavedJobs,
