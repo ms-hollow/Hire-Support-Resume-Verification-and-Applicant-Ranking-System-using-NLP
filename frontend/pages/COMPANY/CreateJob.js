@@ -1,6 +1,5 @@
 import CompanyHeader from "@/components/CompanyHeader";
 import GeneralFooter from "@/components/GeneralFooter";
-import Link from "next/link";
 import Image from "next/image";
 import { FaChevronDown } from "react-icons/fa";
 import { useRouter } from "next/router";
@@ -11,10 +10,13 @@ import {
   fetchCities,
 } from "@/pages/api/locationApi";
 
+// TODO TODO TODO
+
 export default function CreateJob() {
   const [regions, setRegions] = useState([]);
   const [provinces, setProvinces] = useState([]);
   const [cities, setCities] = useState([]);
+  const [dummyJobDetails, setDummyJobDetails] = useState([]);
   const [options, setOptions] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,10 +25,7 @@ export default function CreateJob() {
   const [formData, setFormData] = useState({
     job_title: "",
     job_industry: "",
-    specialization: {
-      specOptions: [],
-      selectedOptions: [],
-    },
+    specialization: [],
     job_description: "",
     company_name: "",
     region: "",
@@ -43,6 +42,24 @@ export default function CreateJob() {
     salary_max: "",
     salary_frequency: "",
   });
+
+  //* Import list of specialization
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch options data
+        const optionsResponse = await fetch("/placeHolder/dummy_options.json");
+        if (!optionsResponse.ok) {
+          throw new Error("Failed to fetch dummy_options.json");
+        }
+        const optionsData = await optionsResponse.json();
+        setOptions(optionsData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -63,6 +80,7 @@ export default function CreateJob() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(formData);
   };
 
   useEffect(() => {
@@ -100,21 +118,15 @@ export default function CreateJob() {
 
   const handleMultiSelectChange = (option) => {
     setFormData((prev) => {
-      const prevSpecialization = prev.specialization || { specOptions: [] };
-
       // Toggle selection: If selected, remove it. If not, add it.
-      const updatedOptions = prevSpecialization.specOptions.includes(option)
-        ? prevSpecialization.specOptions.filter((item) => item !== option) // Uncheck if already selected
-        : [...prevSpecialization.specOptions, option]; // Add if not selected
+      const updatedSpecialization = prev.specialization.includes(option)
+        ? prev.specialization.filter((item) => item !== option)
+        : [...prev.specialization, option];
 
-      const newFormData = {
+      return {
         ...prev,
-        specialization: {
-          ...prevSpecialization,
-          specOptions: updatedOptions,
-        },
+        specialization: updatedSpecialization,
       };
-      return newFormData;
     });
   };
 
@@ -193,26 +205,24 @@ export default function CreateJob() {
                           })
                         }
                       >
-                        {formData.specialization?.specOptions.length > 0 ? (
-                          formData.specialization.specOptions.map(
-                            (selected, index) => (
-                              <div
-                                key={index}
-                                className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
+                        {formData.specialization.length > 0 ? (
+                          formData.specialization.map((selected, index) => (
+                            <div
+                              key={index}
+                              className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
+                            >
+                              <span className="text-sm">{selected}</span>
+                              <button
+                                className="ml-2 text-red-600 font-extrabold"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRemoveSelectedOption(selected);
+                                }}
                               >
-                                <span className="text-sm">{selected}</span>
-                                <button
-                                  className="ml-2 text-red-600 font-extrabold"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleRemoveSelectedOption(selected);
-                                  }}
-                                >
-                                  X
-                                </button>
-                              </div>
-                            )
-                          )
+                                X
+                              </button>
+                            </div>
+                          ))
                         ) : (
                           <span className="text-fontcolor">
                             Select Specialization
@@ -260,7 +270,7 @@ export default function CreateJob() {
                                 <input
                                   type="checkbox"
                                   value={option}
-                                  checked={formData.specialization?.specOptions.includes(
+                                  checked={formData.specialization.includes(
                                     option
                                   )}
                                   onChange={() =>
@@ -549,6 +559,7 @@ export default function CreateJob() {
                       onChange={handleInputChange}
                       className="h-medium rounded-xs border-2 border-fontcolor valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
                     >
+                      <option value="">Select Frequency</option>
                       <option value="Monthly">Monthly</option>
                       <option value="Weekly">Weekly</option>
                       <option value="Hourly">Hourly</option>
@@ -563,7 +574,7 @@ export default function CreateJob() {
                   onClick={(e) => handleSubmit(e, "draft")}
                   className="button1 flex items-center justify-center"
                 >
-                  <Link href="/COMPANY/CompanySettings" className="ml-auto">
+                  <div className="ml-auto">
                     <div className="flex items-center space-x-2">
                       <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
                         Continue
@@ -575,7 +586,7 @@ export default function CreateJob() {
                         alt="Continue Icon"
                       />
                     </div>
-                  </Link>
+                  </div>
                 </button>
               </div>
             </form>
