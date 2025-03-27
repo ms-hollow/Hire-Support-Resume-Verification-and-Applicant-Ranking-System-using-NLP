@@ -4,7 +4,7 @@ export const fetchRegions = async () => {
     if (!response.ok) throw new Error("Failed to fetch regions");
     return await response.json();
   } catch (error) {
-    console.error("❌ Error fetching regions:", error);
+    console.error("Error fetching regions:", error);
     return [];
   }
 };
@@ -19,7 +19,7 @@ export const fetchProvinces = async (regionCode) => {
     if (!response.ok) throw new Error("Failed to fetch provinces");
     return await response.json();
   } catch (error) {
-    console.error("❌ Error fetching provinces:", error);
+    console.error("Error fetching provinces:", error);
     return [];
   }
 };
@@ -37,7 +37,7 @@ export const fetchCities = async (provinceCode, regionCode) => {
     if (!response.ok) throw new Error("Failed to fetch cities");
     return await response.json();
   } catch (error) {
-    console.error("❌ Error fetching cities:", error);
+    console.error("Error fetching cities:", error);
     return [];
   }
 };
@@ -52,7 +52,7 @@ export const fetchBarangays = async (cityCode) => {
     if (!response.ok) throw new Error("Failed to fetch barangays");
     return await response.json();
   } catch (error) {
-    console.error("❌ Error fetching barangays:", error);
+    console.error("Error fetching barangays:", error);
     return [];
   }
 };

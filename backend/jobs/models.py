@@ -35,6 +35,8 @@ class JobHiring(models.Model):
     status = models.CharField(max_length=10, null=True, blank=True)
     additional_notes = models.TextField(max_length=300, null=True, blank=True)
 
+    weight_of_criteria = models.JSONField(null=True, blank=True)  # New field
+
     def get_scoring_criteria(self):
         criteria_list = []
         for criteria in self.scoring_criteria.all():
@@ -45,11 +47,11 @@ class JobHiring(models.Model):
             }
             criteria_list.append(criteria_data)
         return criteria_list
-    
+
     def __str__(self):
         return f"{self.job_title} at {self.company.company_name}"
-    
-#Represents the criteria used to evaluate applicants for a specific job posting. This model stores details about each scoring criterion, such as its name, weight, and preference.
+
+
 class ScoringCriteria(models.Model):
     job_hiring = models.ForeignKey(JobHiring, related_name='scoring_criteria', on_delete=models.CASCADE)
     criteria_name = models.CharField(max_length=100, blank=True, null=True)

@@ -4,75 +4,180 @@ import GeneralFooter from "./GeneralFooter";
 import { useRouter } from "next/router";
 import AuthContext from "@/pages/context/AuthContext";
 import { JLSkeletonLoader } from "./ui/SkeletonLoader";
-import {
-  fetchJobListings,
-  fetchSavedJobs,
-  saveJob,
-  unsaveJob,
-} from "@/pages/api/jobApi";
+import { useAddressMapping } from "@/pages/utils/AddressMapping";
+
+//TODO Polish save and unsave animation
 
 const JobListings = ({ authToken, onJobClick }) => {
   const [jobListings, setJobListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [savedStatus, setSavedStatus] = useState({});
   const router = useRouter();
+  const { convertAddressCodes } = useAddressMapping();
 
   useEffect(() => {
-    loadJobs();
+    getJobs();
   }, []);
 
-  const loadJobs = async () => {
-    setLoading(true);
-    const jobs = await fetchJobListings(authToken);
-    setJobListings(jobs);
-    setLoading(false);
+  const getJobs = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/job/job-hirings/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + String(authToken),
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.status === 200) {
+        const filteredJobs = data.map((job) => {
+          const address = convertAddressCodes(
+            job.region,
+            job.province,
+            job.city,
+            job.barangay
+          );
+
+          return {
+            job_id: job.job_hiring_id,
+            job_title: job.job_title,
+            company_name: job.company_name,
+            job_industry: job.job_industry,
+            job_description: job.job_description || "No description available",
+            salary: job.salary
+              ? `Php ${job.salary.min} - ${job.salary.max}`
+              : "Not specified",
+            schedule: job.schedule,
+            location: `${address.regionName}, ${address.provinceName}, ${address.cityName}, ${address.barangayName}`,
+            work_setup: job.work_setup,
+          };
+        });
+
+        setJobListings(filteredJobs);
+      } else {
+        console.error("Failed to fetch job listings");
+      }
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleJobClick = (jobId) => {
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { jobId },
+      },
+      undefined,
+      { shallow: true }
+    );
+    onJobClick();
   };
 
   const getSavedJobs = useCallback(async () => {
-    const savedJobs = await fetchSavedJobs(authToken);
-    const savedJobsIds = savedJobs.map((job) => job.job_hiring_id);
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/applicant/saved-jobs/",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
 
-    setSavedStatus(
-      jobListings.reduce((acc, job) => {
-        acc[job.job_id] = savedJobsIds.includes(job.job_id);
-        return acc;
-      }, {})
-    );
+      const savedJobs = await response.json();
+
+      if (response.status === 200) {
+        const savedJobsIds = savedJobs.map((job) => job.job_hiring_id);
+        const savedStatusObj = jobListings.reduce((acc, job) => {
+          acc[job.job_id] = savedJobsIds.includes(job.job_id);
+          return acc;
+        }, {});
+        setSavedStatus(savedStatusObj);
+      } else {
+        console.error("Failed to fetch saved jobs");
+      }
+    } catch (error) {
+      console.error("Error fetching saved jobs:", error);
+    }
   }, [authToken, jobListings]);
 
   useEffect(() => {
     getSavedJobs();
-    const intervalId = setInterval(getSavedJobs, 10000); // Refresh every 10 seconds
+    const intervalId = setInterval(getSavedJobs, 10000); // Refresh yung pag retrieve every 10 seconds
+
     return () => clearInterval(intervalId);
   }, [getSavedJobs]);
 
-  const handleJobClick = (jobId) => {
-    router.push({ pathname: router.pathname, query: { jobId } }, undefined, {
-      shallow: true,
-    });
-    onJobClick();
-  };
+  const handleSaveJob = useCallback(
+    async (jobId) => {
+      try {
+        const savedJobs = await fetch(
+          `http://127.0.0.1:8000/applicant/save-job/${jobId}/`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
 
-  const toggleSave = async (jobId) => {
-    const success = savedStatus[jobId]
-      ? await unsaveJob(authToken, jobId)
-      : await saveJob(authToken, jobId);
+        if (savedJobs.ok) {
+          setSavedStatus((prevState) => ({
+            ...prevState,
+            [jobId]: true,
+          }));
+          alert("Job saved successfully!");
+        } else {
+          console.error(`Failed to save job: ${savedJobs.status}`);
+        }
+      } catch (error) {
+        console.error("Failed to save job:", error);
+      }
+    },
+    [authToken]
+  );
 
-    if (success) {
-      setSavedStatus((prev) => ({
-        ...prev,
-        [jobId]: !prev[jobId],
-      }));
-      alert(
-        savedStatus[jobId]
-          ? "Job unsaved successfully!"
-          : "Job saved successfully!"
-      );
+  const handleUnsaveJob = useCallback(
+    async (jobId) => {
+      try {
+        await fetch(`http://127.0.0.1:8000/applicant/unsave-job/${jobId}/`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        setSavedStatus((prevState) => ({
+          ...prevState,
+          [jobId]: false,
+        }));
+        alert("Job unsaved successfully!");
+      } catch (error) {
+        console.error("Failed to unsave job:", error);
+      }
+    },
+    [authToken]
+  );
+
+  const toggleSave = (jobId) => {
+    if (savedStatus[jobId]) {
+      handleUnsaveJob(jobId);
+    } else {
+      handleSaveJob(jobId);
     }
   };
 
-  if (loading) return <p>Loading jobs...</p>;
-  if (!jobListings.length) return <p>No job listings available.</p>;
+  if (!Array.isArray(jobListings)) {
+    return <p>No job listings available.</p>;
+  }
 
   return (
     <div className="flex flex-col w-full">
