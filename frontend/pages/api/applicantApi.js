@@ -1,34 +1,5 @@
 import jwt from "jsonwebtoken";
 
-export const getApplicant = async (authTokens) => {
-  if (!authTokens?.access) return null; // Prevent fetching if no token
-
-  try {
-    const response = await fetch(
-      "http://127.0.0.1:8000/applicant/profile/view/",
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${authTokens.access}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Failed to fetch profile (${response.status}):`, errorText);
-      return null;
-    }
-
-    const data = await response.json();
-    return data?.profile_data || null; // Return only profile data
-  } catch (error) {
-    console.error("Network error while fetching applicant profile:", error);
-    return null;
-  }
-};
-
 export const getApplicantProfile = async (authTokens) => {
   if (!authTokens?.access) return null;
 
@@ -50,8 +21,7 @@ export const getApplicantProfile = async (authTokens) => {
     }
 
     const data = await response.json();
-    // console.log(data);
-    
+
     return {
       ...data.profile_data,
       email: jwt.decode(authTokens.access)?.email,

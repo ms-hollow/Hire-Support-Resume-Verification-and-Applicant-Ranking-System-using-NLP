@@ -1,5 +1,4 @@
 //* APPLICANT SIDE JOBS
-
 export const fetchJobListings = async (authToken) => {
   try {
     const response = await fetch("http://127.0.0.1:8000/job/job-hirings/", {
@@ -13,6 +12,7 @@ export const fetchJobListings = async (authToken) => {
     if (!response.ok) throw new Error("Failed to fetch job listings");
 
     const data = await response.json();
+    console.log(data);
 
     return data.map((job) => ({
       job_id: job.job_hiring_id,
@@ -20,11 +20,10 @@ export const fetchJobListings = async (authToken) => {
       company_name: job.company_name,
       job_industry: job.job_industry,
       job_description: job.job_description || "No description available",
-      salary: job.salary
-        ? `Php ${job.salary.min} - ${job.salary.max}`
-        : "Not specified",
+      salary_min: job.salary_min,
+      salary_max: job.salary_max,
       schedule: job.schedule,
-      location: job.work_location,
+      location: `${job.region} ${job.province} ${job.city}`,
       work_setup: job.work_setup,
     }));
   } catch (error) {
@@ -182,7 +181,7 @@ export const checkIfJobIsSaved = async (authToken, jobId) => {
   }
 };
 
-// Company
+//* Company side jobs
 export const fetchJobList = async (authTokens) => {
   if (!authTokens?.access) return null;
 
@@ -203,5 +202,26 @@ export const fetchJobList = async (authTokens) => {
   } catch (error) {
     console.error("Error fetching job list:", error);
     return null;
+  }
+};
+
+export const createJob = async (formData, token) => {
+  try {
+    const response = await fetch("http://127.0.0.1:8000/job/hirings/create/", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) {
+      console.log("Failed to create job");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error creating job:", error);
   }
 };

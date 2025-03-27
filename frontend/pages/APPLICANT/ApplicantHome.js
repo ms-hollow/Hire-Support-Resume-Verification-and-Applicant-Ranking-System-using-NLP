@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useState, useEffect, useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
-import { getApplicant } from "../api/applicantApi";
+import { getApplicantProfile } from "../api/applicantApi";
 
 //TODO Search
 
@@ -35,7 +35,7 @@ export default function ApplicantHome() {
   useEffect(() => {
     const fetchApplicantData = async () => {
       if (authTokens?.access) {
-        const profileData = await getApplicant(authTokens);
+        const profileData = await getApplicantProfile(authTokens);
         setApplicantName(profileData?.first_name || "Unknown");
       }
     };
@@ -80,7 +80,7 @@ export default function ApplicantHome() {
   // Fetch applicant data after mounting
   useEffect(() => {
     if (authTokens) {
-      getApplicant();
+      getApplicantProfile();
     }
   }, [authTokens]);
 

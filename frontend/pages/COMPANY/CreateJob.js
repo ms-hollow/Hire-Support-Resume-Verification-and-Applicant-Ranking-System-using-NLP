@@ -3,23 +3,21 @@ import GeneralFooter from "@/components/GeneralFooter";
 import Image from "next/image";
 import { FaChevronDown } from "react-icons/fa";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
-import {
-  fetchRegions,
-  fetchProvinces,
-  fetchCities,
-} from "@/pages/api/locationApi";
-
-// TODO TODO TODO
+import { useState, useEffect, useContext } from "react";
+import phLocations from "@/public/placeHolder/philippines.json";
+import { createJob } from "../api/jobApi";
+import { getCompany } from "../api/companyApi";
+import AuthContext from "../context/AuthContext";
 
 export default function CreateJob() {
   const [regions, setRegions] = useState([]);
   const [provinces, setProvinces] = useState([]);
   const [cities, setCities] = useState([]);
-  const [dummyJobDetails, setDummyJobDetails] = useState([]);
   const [options, setOptions] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  let { authTokens } = useContext(AuthContext);
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -43,6 +41,62 @@ export default function CreateJob() {
     salary_frequency: "",
   });
 
+  useEffect(() => {
+    const storedData = localStorage.getItem("draftData");
+    if (storedData) {
+      setFormData(JSON.parse(storedData));
+    }
+  }, []);
+
+  const formatDate = (date) => {
+    const month = date.getMonth() + 1; // Months are zero-indexed, so add 1
+    const day = date.getDate();
+    const year = date.getFullYear();
+
+    const formattedMonth = month < 10 ? `0${month}` : month;
+    const formattedDay = day < 10 ? `0${day}` : day;
+
+    return `${formattedMonth}-${formattedDay}-${year}`;
+  };
+
+  useEffect(() => {
+    if (!authTokens) {
+      router.push("/GENERAL/Login");
+      return;
+    }
+
+    const fetchCompanyData = async () => {
+      try {
+        const companyData = await getCompany(authTokens);
+        const company_key = companyData.company_key;
+        const fetchedCompanyName =
+          companyData?.profile_data?.company_name || "Unknown Company";
+        setCompanyName(fetchedCompanyName);
+
+        const currentDate = new Date();
+        const formattedDate = formatDate(currentDate);
+
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          company: company_key,
+          company_name: fetchedCompanyName,
+          creation_date: formattedDate,
+        }));
+      } catch (error) {
+        console.error("Error fetching company data:", error);
+        setCompanyName("Unknown Company");
+
+        // Set default company name in formData
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          company_name: "Unknown Company",
+        }));
+      }
+    };
+
+    fetchCompanyData();
+  }, [authTokens, router]);
+
   //* Import list of specialization
   useEffect(() => {
     const fetchData = async () => {
@@ -59,6 +113,7 @@ export default function CreateJob() {
       }
     };
     fetchData();
+    // console.log(authTokens);
   }, []);
 
   const handleInputChange = (e) => {
@@ -68,6 +123,7 @@ export default function CreateJob() {
       [name]: value,
     };
     setFormData(updatedFormData);
+    localStorage.setItem("draftData", JSON.stringify(updatedFormData)); //* Save sa local storage
   };
 
   const handleScheduleSelect = (schedule) => {
@@ -78,43 +134,140 @@ export default function CreateJob() {
     setFormData(updatedFormData);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
+  const validateForm = () => {
+    let errors = {};
+
+    const requiredFields = Object.keys(formData).filter(
+      (key) => !formData[key]
+    );
+
+    requiredFields.forEach((field) => {
+      if (!formData[field]) {
+        errors[field] = `${field.replace("_", " ")} is required.`;
+      }
+    });
+
+    // Salary validation
+    if (formData.salary_min < 0 || formData.salary_max < 0) {
+      errors.salary = "Salary cannot be negative.";
+    }
+
+    if (formData.salary_min < 20) {
+      errors.salary_min = "Minimum salary must not be less than 20.";
+    }
+
+    if (formData.salary_max > 1000000) {
+      errors.salary_max = "Maximum salary must not exceed 1,000,000.";
+    }
+
+    if (Number(formData.salary_min) >= Number(formData.salary_max)) {
+      errors.salary = "Minimum salary must be less than maximum salary.";
+    }
+
+    // Experience level validation
+    if (formData.experience_level < 0 || formData.experience_level > 30) {
+      errors.experience_level = "Experience level must be between 0 and 30.";
+    }
+
+    if (!formData.region) {
+      alert("Please select a region.");
+      return false;
+    }
+
+    if (!formData.province) {
+      alert("Please select a province.");
+      return false;
+    }
+
+    if (!formData.city) {
+      alert("Please select a city.");
+      return false;
+    }
+
+    // Ensure no validation errors
+    if (Object.keys(errors).length > 0) {
+      const errorMessages = Object.values(errors).join("\n");
+      alert(`Please fix the following errors:\n\n${errorMessages}`);
+      return false;
+    }
+
+    return true;
   };
 
-  useEffect(() => {
-    const loadRegions = async () => {
-      const data = await fetchRegions();
-      setRegions(data);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    const token = authTokens?.access;
+    if (!token) return;
+
+    // Find the selected region by ID
+    const selectedRegion = regions.find(
+      (region) => region.id === formData.region
+    );
+
+    // Create a new object with the region name instead of ID
+    const updatedFormData = {
+      ...formData,
+      region: selectedRegion ? selectedRegion.n : formData.region,
     };
-    loadRegions();
+
+    //* Comment if implementation na
+    console.log(updatedFormData);
+
+    router.push(`/COMPANY/CompanySettings`);
+
+    // try {
+    //   const data = await createJob(formData, token);
+    //   // console.log("Job created successfully:", data);
+    //   const id = data.job_hiring_id;
+
+    //   alert("Job created successfully!");
+    //   router.push(`/COMPANY/CompanySettings?id=${id}`);
+    // } catch (error) {
+    //   alert("Failed to create job. Please try again.");
+    // }
+  };
+
+  //* Pressing the browser's back button will delete the draft data stored in local storage.
+  useEffect(() => {
+    const handleBackButton = () => {
+      localStorage.removeItem("draftData");
+    };
+
+    window.addEventListener("popstate", handleBackButton);
+
+    return () => {
+      window.removeEventListener("popstate", handleBackButton);
+    };
   }, []);
 
   useEffect(() => {
-    const loadProvinces = async () => {
-      setProvinces([]);
-      setCities([]);
+    setRegions(phLocations);
+  }, []);
 
-      if (formData.region) {
-        const data = await fetchProvinces(formData.region);
-        setProvinces(data);
-      }
-    };
-    loadProvinces();
+  // Load provinces when a region is selected
+  useEffect(() => {
+    if (formData.region) {
+      const selectedRegion = phLocations.find(
+        (region) => region.id === formData.region
+      );
+      setProvinces(selectedRegion ? selectedRegion.p : []);
+      setCities([]); // Reset cities
+      setFormData((prev) => ({ ...prev, province: "", city: "" }));
+    }
   }, [formData.region]);
 
+  // Load cities when a province is selected
   useEffect(() => {
-    const loadCities = async () => {
-      setCities([]);
-
-      if (formData.province || formData.region === "130000000") {
-        const data = await fetchCities(formData.province, formData.region);
-        setCities(data);
-      }
-    };
-    loadCities();
-  }, [formData.province, formData.region]);
+    if (formData.province) {
+      const selectedProvince = provinces.find(
+        (province) => province.n === formData.province
+      );
+      setCities(selectedProvince ? selectedProvince.c : []);
+      setFormData((prev) => ({ ...prev, city: "" }));
+    }
+  }, [formData.province]);
 
   const handleMultiSelectChange = (option) => {
     setFormData((prev) => {
@@ -310,10 +463,11 @@ export default function CreateJob() {
                   <input
                     type="text"
                     name="company_name"
-                    value={formData.company_name}
+                    value={companyName}
                     onChange={handleInputChange}
                     placeholder="Company Name"
                     className="h-medium rounded-xs border-2 border-fontcolor"
+                    disabled
                   />
                 </div>
 
@@ -334,8 +488,8 @@ export default function CreateJob() {
                         Select Region
                       </option>
                       {regions.map((region) => (
-                        <option key={region.code} value={region.code}>
-                          {region.name}
+                        <option key={region.id} value={region.id}>
+                          {region.n}
                         </option>
                       ))}
                     </select>
@@ -354,12 +508,12 @@ export default function CreateJob() {
                       required={formData.region !== "130000000"}
                       disabled={formData.region === "130000000"}
                     >
-                      <option value="province" disabled selected hidden>
+                      <option value="" disabled selected hidden>
                         Select Province
                       </option>
-                      {provinces.map((province) => (
-                        <option key={province.code} value={province.code}>
-                          {province.name}
+                      {provinces.map((province, index) => (
+                        <option key={index} value={province.n}>
+                          {province.n}
                         </option>
                       ))}
                     </select>
@@ -377,12 +531,12 @@ export default function CreateJob() {
                       value={formData.city}
                       onChange={handleInputChange}
                     >
-                      <option value="city" disabled selected hidden>
+                      <option value="" disabled selected hidden>
                         Select City
                       </option>
-                      {cities.map((city) => (
-                        <option key={city.code} value={city.code}>
-                          {city.name}
+                      {cities.map((city, index) => (
+                        <option key={index} value={city.n}>
+                          {city.n}
                         </option>
                       ))}
                     </select>
@@ -400,7 +554,7 @@ export default function CreateJob() {
                       onChange={handleInputChange}
                       className="h-medium rounded-xs border-2 border-fontcolor valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
                     >
-                      <option value="workSetup" disabled>
+                      <option value="" disabled selected>
                         Work Setup
                       </option>
                       <option value="On-Site">Onsite</option>
