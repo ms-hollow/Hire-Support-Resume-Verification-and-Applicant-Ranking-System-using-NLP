@@ -8,6 +8,7 @@ import phLocations from "@/public/placeHolder/philippines.json";
 import { createJob } from "../api/jobApi";
 import { getCompany } from "../api/companyApi";
 import AuthContext from "../context/AuthContext";
+import Cookies from "js-cookie";
 
 export default function CreateJob() {
   const [regions, setRegions] = useState([]);
@@ -42,8 +43,19 @@ export default function CreateJob() {
   });
 
   useEffect(() => {
-    const storedData = localStorage.getItem("draftData");
+    //* Set ang formdata
+    function getCookie(name) {
+      const cookieValue = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith(name + "="))
+        ?.split("=")[1];
+
+      return cookieValue ? decodeURIComponent(cookieValue) : null;
+    }
+
+    const storedData = getCookie("DRAFT_DATA");
     if (storedData) {
+      // console.log(JSON.parse(storedData)); // Only parse if not null
       setFormData(JSON.parse(storedData));
     }
   }, []);
@@ -123,7 +135,11 @@ export default function CreateJob() {
       [name]: value,
     };
     setFormData(updatedFormData);
-    localStorage.setItem("draftData", JSON.stringify(updatedFormData)); //* Save sa local storage
+    // const expiryDate = new Date();
+    // expiryDate.setMinutes(expiryDate.getMinutes() + 5);
+    Cookies.set("DRAFT_DATA", JSON.stringify(updatedFormData), {
+      expires: 1,
+    });
   };
 
   const handleScheduleSelect = (schedule) => {
@@ -213,7 +229,7 @@ export default function CreateJob() {
     };
 
     //* Comment if implementation na
-    console.log(updatedFormData);
+    console.log("Data:", updatedFormData);
 
     router.push(`/COMPANY/CompanySettings`);
 
@@ -313,7 +329,7 @@ export default function CreateJob() {
             <p className="font-medium lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-5">
               Fill out all required job hiring details.
             </p>
-
+            {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-3">
                 <div>
