@@ -91,7 +91,6 @@ def job_hiring_list(request):
 
     serializer = JobHiringSerializer(job_listings, many=True)
     return Response(serializer.data)
-
     
 #* View job hiring details
 @api_view(['GET'])

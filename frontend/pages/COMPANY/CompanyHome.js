@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext, useCallback } from "react";
+import { useEffect, useState, useContext } from "react";
 import CompanyHeader from "@/components/CompanyHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import Link from "next/link";
@@ -6,12 +6,10 @@ import Image from "next/image";
 import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
 import { getCompany } from "../api/companyApi";
-import { fetchJobList } from "../api/jobApi";
+import { fetchJobList, deleteJobHiring } from "../api/companyJobApi";
 
 //* PAGE STATUS
-// TODO - Retrieve job list and display it - [PARTIALLY DONE]
-// TODO - Add functions sa mga button (View Applicants, Edit Job Hiring, Delete)
-// TODO - Pass the job hiring id to query (for edit job hiring)
+// TODO - Pass the job hiring id to query (for edit job hiring & view)
 
 const getStatusClassName = (status) => {
     const statusClasses = {
@@ -31,30 +29,54 @@ export default function CompanyHome() {
 
     let { authTokens } = useContext(AuthContext);
 
+    const fetchJobLists = async () => {
+        if (!authTokens) {
+            router.push("/GENERAL/Login");
+            return;
+        }
+
+        const companyData = await getCompany(authTokens);
+        setCompanyName(companyData?.profile_data?.company_name || " ");
+
+        const jobData = await fetchJobList(authTokens);
+        if (jobData) {
+            setJobLists(jobData);
+        }
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            if (!authTokens) {
-                router.push("/GENERAL/Login");
-                return;
-            }
-
-            const companyData = await getCompany(authTokens);
-            setCompanyName(
-                companyData?.profile_data?.company_name || "Unknown Company"
-            );
-
-            const jobData = await fetchJobList(authTokens);
-            if (jobData) {
-                setJobLists(jobData);
-            }
-        };
-
-        fetchData();
+        fetchJobLists();
     }, [authTokens, router]);
 
-    const handleJobSelect = (jobId) => {
+    const handleJobView = (jobId) => {
         setSelectedJobId(jobId);
-        localStorage.setItem("selectedJobId", jobId);
+        // console.log("selectedJobId", jobId);
+        router.push({
+            pathname: "/COMPANY/ApplicantsSummary",
+            query: { jobId },
+        });
+    };
+
+    const handleEditJob = (jobId) => {
+        setSelectedJobId(jobId);
+        // console.log("selectedJobId", jobId);
+        router.push({
+            pathname: "/COMPANY/EditJobHiring",
+            query: { jobId },
+        });
+    };
+
+    const handleDelete = async (jobId) => {
+        const success = await deleteJobHiring(jobId, authTokens);
+        if (success) {
+            alert("Job successfully deleted");
+            setJobLists((prevJobLists) =>
+                prevJobLists.filter((job) => job.id !== jobId)
+            );
+            await fetchJobLists();
+        } else {
+            alert("Failed to delete job.");
+        }
     };
 
     return (
@@ -113,7 +135,8 @@ export default function CompanyHome() {
                                                     job.status.slice(1)}
                                             </td>
                                             <td className="w-1/6 font-thin text-medium text-fontcolor truncate">
-                                                {job.num_applicants}
+                                                {job.num_applicants ||
+                                                    "Wala pa"}
                                             </td>
                                             <td className="w-1/12 font-thin text-medium text-fontcolor truncate">
                                                 {job.application_deadline}
@@ -124,44 +147,43 @@ export default function CompanyHome() {
                                                         type="button"
                                                         className="button1 flex flex-col items-center justify-center"
                                                         onClick={() =>
-                                                            handleJobSelect(
-                                                                job.Id
+                                                            handleJobView(
+                                                                job.job_hiring_id
                                                             )
                                                         }
                                                     >
-                                                        <Link
-                                                            href="/COMPANY/ApplicantsSummary"
-                                                            className="flex items-center space-x-2"
-                                                        >
-                                                            <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
-                                                                View Applicants
-                                                            </p>
-                                                        </Link>
+                                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
+                                                            View Applicants
+                                                        </p>
                                                     </button>
                                                     <button
                                                         type="button"
                                                         className="button2 flex items-center justify-center"
                                                         onClick={() =>
-                                                            handleJobSelect(
-                                                                job.Id
+                                                            handleEditJob(
+                                                                job.job_hiring_id
                                                             )
                                                         }
                                                     >
-                                                        <Link
-                                                            href="/COMPANY/EditJobHiring"
-                                                            className="flex items-center space-x-2"
-                                                        >
-                                                            <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
-                                                                Edit Job Hiring
-                                                            </p>
-                                                        </Link>
+                                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
+                                                            Edit Job Hiring
+                                                        </p>
                                                     </button>
-                                                    <Image
-                                                        src="/Delete.png"
-                                                        width={25}
-                                                        height={15}
-                                                        alt="Delete Icon"
-                                                    />
+                                                    <div
+                                                        className="cursor-pointer"
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                job.job_hiring_id
+                                                            )
+                                                        }
+                                                    >
+                                                        <Image
+                                                            src="/Delete.png"
+                                                            width={25}
+                                                            height={15}
+                                                            alt="Delete Icon"
+                                                        />
+                                                    </div>
                                                 </div>
                                             </td>
                                         </tr>
