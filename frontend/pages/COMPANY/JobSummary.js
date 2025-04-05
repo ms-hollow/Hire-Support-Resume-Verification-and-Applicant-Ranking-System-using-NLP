@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useContext } from "react";
 import Cookies from "js-cookie";
-import { createJob } from "../api/jobApi";
+import { createJob } from "../api/companyJobApi";
 import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
 

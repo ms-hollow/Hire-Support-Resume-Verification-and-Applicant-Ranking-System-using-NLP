@@ -2,219 +2,229 @@ import { useState, useContext, useEffect, useCallback } from "react";
 import Image from "next/image";
 import AuthContext from "@/pages/context/AuthContext";
 import {
-  fetchJobListings,
-  fetchSavedJobs,
-  saveJob,
-  unsaveJob,
-} from "@/pages/api/jobApi";
+    fetchJobListings,
+    fetchSavedJobs,
+    saveJob,
+    unsaveJob,
+} from "@/pages/api/applicantJobApi";
 
 const SavedJobs = () => {
-  const { authTokens } = useContext(AuthContext);
-  const [savedJobs, setSavedJobs] = useState([]);
-  const [jobListings, setJobListings] = useState([]);
-  const [savedStatus, setSavedStatus] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+    const { authTokens } = useContext(AuthContext);
+    const [savedJobs, setSavedJobs] = useState([]);
+    const [jobListings, setJobListings] = useState([]);
+    const [savedStatus, setSavedStatus] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const loadSavedJobs = async () => {
-      try {
-        const savedJobsData = await fetchSavedJobs(authTokens.access);
-        setSavedJobs(savedJobsData);
-        const jobHiringIds = savedJobsData.map((job) => job.job_hiring_id);
-        const allJobs = await fetchJobListings(authTokens.access);
+    useEffect(() => {
+        const loadSavedJobs = async () => {
+            try {
+                const savedJobsData = await fetchSavedJobs(authTokens.access);
+                setSavedJobs(savedJobsData);
+                const jobHiringIds = savedJobsData.map(
+                    (job) => job.job_hiring_id
+                );
+                const allJobs = await fetchJobListings(authTokens.access);
 
-        const filteredJobs = allJobs.filter((job) =>
-          jobHiringIds.includes(job.job_id)
-        );
+                const filteredJobs = allJobs.filter((job) =>
+                    jobHiringIds.includes(job.job_id)
+                );
 
-        const initialSavedStatus = filteredJobs.reduce((acc, job) => {
-          acc[job.job_id] = true;
-          return acc;
-        }, {});
+                const initialSavedStatus = filteredJobs.reduce((acc, job) => {
+                    acc[job.job_id] = true;
+                    return acc;
+                }, {});
 
-        setJobListings(filteredJobs);
-        setSavedStatus(initialSavedStatus);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
+                setJobListings(filteredJobs);
+                setSavedStatus(initialSavedStatus);
+            } catch (error) {
+                setError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadSavedJobs();
+    }, [authTokens]);
+
+    // 🔹 Save Job
+    const handleSaveJob = useCallback(
+        async (jobId) => {
+            const success = await saveJob(authTokens.access, jobId);
+            if (success) {
+                setSavedStatus((prevState) => ({
+                    ...prevState,
+                    [jobId]: true,
+                }));
+                alert("Job saved successfully!");
+            }
+        },
+        [authTokens]
+    );
+
+    // 🔹 Unsave Job
+    const handleUnsaveJob = useCallback(
+        async (jobId) => {
+            const success = await unsaveJob(authTokens.access, jobId);
+            if (success) {
+                setSavedStatus((prevState) => ({
+                    ...prevState,
+                    [jobId]: false,
+                }));
+                setJobListings((prevJobs) =>
+                    prevJobs.filter((job) => job.job_id !== jobId)
+                );
+                alert("Job unsaved successfully!");
+            }
+        },
+        [authTokens]
+    );
+
+    // 🔹 Toggle Save/Unsave
+    const toggleSave = async (jobId) => {
+        if (savedStatus[jobId]) {
+            await handleUnsaveJob(jobId);
+        } else {
+            await handleSaveJob(jobId);
+        }
     };
 
-    loadSavedJobs();
-  }, [authTokens]);
+    if (loading) return <div>Loading saved jobs...</div>;
+    if (error) return <div>Error: {error}</div>;
 
-  // 🔹 Save Job
-  const handleSaveJob = useCallback(
-    async (jobId) => {
-      const success = await saveJob(authTokens.access, jobId);
-      if (success) {
-        setSavedStatus((prevState) => ({ ...prevState, [jobId]: true }));
-        alert("Job saved successfully!");
-      }
-    },
-    [authTokens]
-  );
+    return (
+        <div>
+            {jobListings.map((job) => (
+                <div key={job.job_id} className="flex flex-col pt-4">
+                    <div className="box-container px-2 py-2 mb-4">
+                        {/* 2-column layout */}
+                        <div className="grid grid-cols-12  gap-4 p-3">
+                            <div className="col-span-2  justify-center">
+                                <Image
+                                    src="/Logo.png"
+                                    width={50}
+                                    height={30}
+                                    alt="Company Logo"
+                                />
+                            </div>
 
-  // 🔹 Unsave Job
-  const handleUnsaveJob = useCallback(
-    async (jobId) => {
-      const success = await unsaveJob(authTokens.access, jobId);
-      if (success) {
-        setSavedStatus((prevState) => ({ ...prevState, [jobId]: false }));
-        setJobListings((prevJobs) =>
-          prevJobs.filter((job) => job.job_id !== jobId)
-        );
-        alert("Job unsaved successfully!");
-      }
-    },
-    [authTokens]
-  );
+                            {/* Right Column - Job Info + Buttons */}
+                            <div className="col-span-10 flex flex-col w-full">
+                                <div className="flex justify-between items-start w-full">
+                                    {/* Job Title & Company Info */}
+                                    <div>
+                                        <b className="font-bold text-large text-fontcolor">
+                                            {job.job_title}
+                                        </b>
+                                        <div className="text-xsmall font-thin text-fontcolor">
+                                            <p>{job.company_name}</p>
+                                            <p>{job.job_industry}</p>
+                                        </div>
+                                    </div>
 
-  // 🔹 Toggle Save/Unsave
-  const toggleSave = async (jobId) => {
-    if (savedStatus[jobId]) {
-      await handleUnsaveJob(jobId);
-    } else {
-      await handleSaveJob(jobId);
-    }
-  };
+                                    {/* Right-aligned buttons */}
+                                    <div className="flex items-start gap-4">
+                                        {/* Apply Now Button + Save Icon (Centered Together) */}
+                                        <div className="flex items-center gap-4">
+                                            {/* Apply Now Button */}
+                                            <button className="button1 flex items-center justify-center text-center">
+                                                <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-center">
+                                                    Apply Now
+                                                </p>
+                                            </button>
 
-  if (loading) return <div>Loading saved jobs...</div>;
-  if (error) return <div>Error: {error}</div>;
+                                            {/* Save/Unsave Icon (Centered with Apply Button) */}
+                                            <button
+                                                onClick={() =>
+                                                    toggleSave(job.job_id)
+                                                }
+                                                className="flex items-center"
+                                            >
+                                                <Image
+                                                    src={
+                                                        savedStatus[job.job_id]
+                                                            ? "/Save Icon.svg"
+                                                            : "/Unsave Icon.svg"
+                                                    }
+                                                    width={13}
+                                                    height={11}
+                                                    alt={
+                                                        savedStatus[job.job_id]
+                                                            ? "Save Icon"
+                                                            : "Unsave Icon"
+                                                    }
+                                                />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
 
-  return (
-    <div>
-      {jobListings.map((job) => (
-        <div key={job.job_id} className="flex flex-col pt-4">
-          <div className="box-container px-2 py-2 mb-4">
-            {/* 2-column layout */}
-            <div className="grid grid-cols-12  gap-4 p-3">
-              <div className="col-span-2  justify-center">
-                <Image
-                  src="/Logo.png"
-                  width={50}
-                  height={30}
-                  alt="Company Logo"
-                />
-              </div>
+                                {/* Job Details (Location, Setup, Schedule, Salary) */}
+                                <div className="flex flex-row justify-between mt-2">
+                                    <div className="flex items-center">
+                                        <Image
+                                            src="/Location Icon.svg"
+                                            width={23}
+                                            height={20}
+                                            alt="Location Icon"
+                                        />
+                                        <p className="ml-1 font-thin text-xsmall text-fontcolor">
+                                            {job.location}
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <Image
+                                            src="/Work Setup Icon.svg"
+                                            width={23}
+                                            height={20}
+                                            alt="Work Setup Icon"
+                                        />
+                                        <p className="ml-2 font-thin text-xsmall text-fontcolor">
+                                            {job.work_setup}
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <Image
+                                            src="/Schedule Icon.svg"
+                                            width={18}
+                                            height={20}
+                                            alt="Schedule Icon"
+                                        />
+                                        <p className="ml-2 font-thin text-xsmall text-fontcolor">
+                                            {job.schedule}
+                                        </p>
+                                    </div>
+                                </div>
 
-              {/* Right Column - Job Info + Buttons */}
-              <div className="col-span-10 flex flex-col w-full">
-                <div className="flex justify-between items-start w-full">
-                  {/* Job Title & Company Info */}
-                  <div>
-                    <b className="font-bold text-large text-fontcolor">
-                      {job.job_title}
-                    </b>
-                    <div className="text-xsmall font-thin text-fontcolor">
-                      <p>{job.company_name}</p>
-                      <p>{job.job_industry}</p>
+                                {/* Job Details (Location, Setup, Schedule, Salary) */}
+                                <div className="flex flex-row justify-between mt-2">
+                                    <div className="flex items-center">
+                                        <Image
+                                            src="/Salary Icon.svg"
+                                            width={18}
+                                            height={20}
+                                            alt="Salary Icon"
+                                        />
+                                        <p className="ml-2 font-thin text-xsmall text-fontcolor">
+                                            {job.salary}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  </div>
-
-                  {/* Right-aligned buttons */}
-                  <div className="flex items-start gap-4">
-                    {/* Apply Now Button + Save Icon (Centered Together) */}
-                    <div className="flex items-center gap-4">
-                      {/* Apply Now Button */}
-                      <button className="button1 flex items-center justify-center text-center">
-                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-center">
-                          Apply Now
-                        </p>
-                      </button>
-
-                      {/* Save/Unsave Icon (Centered with Apply Button) */}
-                      <button
-                        onClick={() => toggleSave(job.job_id)}
-                        className="flex items-center"
-                      >
-                        <Image
-                          src={
-                            savedStatus[job.job_id]
-                              ? "/Save Icon.svg"
-                              : "/Unsave Icon.svg"
-                          }
-                          width={13}
-                          height={11}
-                          alt={
-                            savedStatus[job.job_id]
-                              ? "Save Icon"
-                              : "Unsave Icon"
-                          }
-                        />
-                      </button>
-                    </div>
-                  </div>
                 </div>
-
-                {/* Job Details (Location, Setup, Schedule, Salary) */}
-                <div className="flex flex-row justify-between mt-2">
-                  <div className="flex items-center">
-                    <Image
-                      src="/Location Icon.svg"
-                      width={23}
-                      height={20}
-                      alt="Location Icon"
-                    />
-                    <p className="ml-1 font-thin text-xsmall text-fontcolor">
-                      {job.location}
-                    </p>
-                  </div>
-                  <div className="flex items-center">
-                    <Image
-                      src="/Work Setup Icon.svg"
-                      width={23}
-                      height={20}
-                      alt="Work Setup Icon"
-                    />
-                    <p className="ml-2 font-thin text-xsmall text-fontcolor">
-                      {job.work_setup}
-                    </p>
-                  </div>
-                  <div className="flex items-center">
-                    <Image
-                      src="/Schedule Icon.svg"
-                      width={18}
-                      height={20}
-                      alt="Schedule Icon"
-                    />
-                    <p className="ml-2 font-thin text-xsmall text-fontcolor">
-                      {job.schedule}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Job Details (Location, Setup, Schedule, Salary) */}
-                <div className="flex flex-row justify-between mt-2">
-                  <div className="flex items-center">
-                    <Image
-                      src="/Salary Icon.svg"
-                      width={18}
-                      height={20}
-                      alt="Salary Icon"
-                    />
-                    <p className="ml-2 font-thin text-xsmall text-fontcolor">
-                      {job.salary}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+            ))}
         </div>
-      ))}
-    </div>
-  );
+    );
 };
 
 const SavedJobsWrapper = () => {
-  return (
-    <div className="flex overflow-y-auto border border-none hide-scrollbar p-1 h-[calc(100vh-150px)]">
-      <SavedJobs />
-    </div>
-  );
+    return (
+        <div className="flex overflow-y-auto border border-none hide-scrollbar p-1 h-[calc(100vh-150px)]">
+            <SavedJobs />
+        </div>
+    );
 };
 
 export default SavedJobsWrapper;
