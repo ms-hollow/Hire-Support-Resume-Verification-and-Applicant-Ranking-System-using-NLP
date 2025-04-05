@@ -33,7 +33,6 @@ class JobHiring(models.Model):
     required_documents = models.JSONField(null=True, blank=True)
     application_deadline = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=10, null=True, blank=True)
-    additional_points = models.JSONField(null=True, blank=True)
 
     weight_of_criteria = models.JSONField(null=True, blank=True)  # New field
 

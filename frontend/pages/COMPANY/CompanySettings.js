@@ -5,6 +5,7 @@ import Image from "next/image";
 import { FaChevronDown } from "react-icons/fa";
 import { useRouter } from "next/router";
 import Cookies from "js-cookie";
+import Link from "next/link";
 
 export default function CompanySettings() {
     const [options, setOptions] = useState(null);
@@ -114,6 +115,7 @@ export default function CompanySettings() {
         }
 
         let parsedStoredData;
+
         try {
             parsedStoredData = JSON.parse(storedData);
         } catch (error) {
@@ -2382,19 +2384,24 @@ export default function CompanySettings() {
                                     type="button"
                                     className="button2 flex items-center justify-center"
                                 >
-                                    <div className="ml-auto">
-                                        <div className="flex items-center space-x-2">
-                                            <Image
-                                                src="/Arrow Left.svg"
-                                                width={23}
-                                                height={10}
-                                                alt="Back Icon"
-                                            />
-                                            <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
-                                                Back
-                                            </p>
+                                    <Link
+                                        href="/COMPANY/CreateJob"
+                                        className="ml-auto"
+                                    >
+                                        <div className="ml-auto">
+                                            <div className="flex items-center space-x-2">
+                                                <Image
+                                                    src="/Arrow Left.svg"
+                                                    width={23}
+                                                    height={10}
+                                                    alt="Back Icon"
+                                                />
+                                                <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
+                                                    Back
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 </button>
 
                                 <button
