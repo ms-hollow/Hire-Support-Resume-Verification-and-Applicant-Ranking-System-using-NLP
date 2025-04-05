@@ -39,7 +39,7 @@ export default function CompanySettings() {
             schools: {
                 schoolPreference: [],
             },
-            additionalPoints: { honor: "0", multipleDegrees: "0" },
+            additionalPoints: { honor: "", multipleDegrees: "" },
             certificates: {
                 preferred: [],
                 weight: "",
@@ -105,6 +105,149 @@ export default function CompanySettings() {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        const storedData = Cookies.get("SERIALIZED_DATA");
+
+        if (!storedData) {
+            console.error("No stored data found.");
+            return;
+        }
+
+        let parsedStoredData;
+        try {
+            parsedStoredData = JSON.parse(storedData);
+        } catch (error) {
+            console.error("Error parsing stored data:", error);
+            return;
+        }
+
+        setFormData((prevData) => ({
+            ...prevData,
+            required_documents: parsedStoredData?.required_documents || [],
+            application_deadline: parsedStoredData?.application_deadline || "",
+            verification_option: parsedStoredData?.verification_option || "",
+            weight_of_criteria: parsedStoredData?.weight_of_criteria || "",
+            criteria: {
+                ...prevData.criteria,
+                workExperience: {
+                    ...prevData.criteria.workExperience,
+                    directlyRelevant:
+                        parsedStoredData.scoring_criteria[0]?.preference
+                            ?.directlyRelevant || [],
+                    highlyRelevant:
+                        parsedStoredData.scoring_criteria[0]?.preference
+                            ?.highlyRelevant || [],
+                    moderatelyRelevant:
+                        parsedStoredData.scoring_criteria[0]?.preference
+                            ?.moderatelyRelevant || [],
+                    weight:
+                        parsedStoredData.scoring_criteria[0]
+                            ?.weight_percentage || "",
+                },
+                skills: {
+                    ...prevData.criteria.skills,
+                    primarySkills:
+                        parsedStoredData.scoring_criteria[1]?.preference
+                            ?.primarySkills || [],
+                    secondarySkills:
+                        parsedStoredData.scoring_criteria[1]?.preference
+                            ?.secondarySkills || [],
+                    additionalSkills:
+                        parsedStoredData.scoring_criteria[1]?.preference
+                            ?.additionalSkills || [],
+                    weight:
+                        parsedStoredData.scoring_criteria[1]
+                            ?.weight_percentage || "",
+                },
+                education: {
+                    ...prevData.criteria.education,
+                    firstChoice:
+                        parsedStoredData.scoring_criteria[2]?.preference
+                            ?.firstChoice || [],
+                    secondChoice:
+                        parsedStoredData.scoring_criteria[2]?.preference
+                            ?.secondChoice || [],
+                    thirdChoice:
+                        parsedStoredData.scoring_criteria[2]?.preference
+                            ?.thirdChoice || [],
+                    weight:
+                        parsedStoredData.scoring_criteria[2]
+                            ?.weight_percentage || "",
+                },
+                schools: {
+                    ...prevData.criteria.schools,
+                    schoolPreference:
+                        parsedStoredData.scoring_criteria[3]?.preference
+                            ?.schoolPreference || [],
+                },
+                additionalPoints: {
+                    ...prevData.criteria.additionalPoints,
+                    honor: parsedStoredData.honor || "0",
+                    multipleDegrees:
+                        parsedStoredData.scoring_criteria[4]?.preference
+                            ?.multipleDegrees || "0",
+                },
+                certificates: {
+                    ...prevData.criteria.certificates,
+                    preferred:
+                        parsedStoredData.scoring_criteria[5]?.preference
+                            ?.preferred || [],
+                    weight:
+                        parsedStoredData.scoring_criteria[5]
+                            ?.weight_percentage || "",
+                },
+            },
+        }));
+    }, []);
+
+    function validation() {
+        const totalWeight =
+            parseFloat(formData.criteria.workExperience.weight || 0) +
+            parseFloat(formData.criteria.skills.weight || 0) +
+            parseFloat(formData.criteria.education.weight || 0) +
+            parseFloat(formData.criteria.schools.weight || 0) +
+            parseFloat(formData.criteria.certificates.weight || 0);
+
+        if (totalWeight !== 100) {
+            alert("Total weight of criteria must be equal to 100");
+            return false;
+        }
+
+        if (!formData.weight_of_criteria) {
+            alert("Please select a weight of criteria.");
+            return false;
+        }
+
+        if (!formData.verification_option) {
+            alert("Please select a verification option.");
+            return false;
+        }
+
+        if (!formData.application_deadline) {
+            alert("Please select an application deadline.");
+            return false;
+        }
+
+        //* UNCOMMENT IF APPLIED
+        // const today = new Date();
+        // const selectedDeadline = new Date(formData.application_deadline);
+
+        // today.setHours(0, 0, 0, 0);
+        // selectedDeadline.setHours(0, 0, 0, 0);
+
+        // if (selectedDeadline.getTime() === today.getTime()) {
+        //     alert("The application deadline cannot be today's date.");
+        //     return false; // Prevent form submission if the deadline is today's date
+        // }
+
+        if (formData.required_documents.length === 0) {
+            alert("Please select at least one required document.");
+            return false;
+        }
+
+        return true;
+    }
+
     const handleSettingsSubmit = (e) => {
         function getCookie(name) {
             const cookieValue = document.cookie
@@ -116,7 +259,6 @@ export default function CompanySettings() {
         }
 
         const storedData = getCookie("DRAFT_DATA");
-        // console.log("Raw Stored Data:", storedData);
 
         if (!storedData) {
             console.error("No stored data found.");
@@ -132,17 +274,13 @@ export default function CompanySettings() {
             return;
         }
 
-        // console.log("Parsed Stored Data:", parsedStoredData);
-        // console.log("Form Data from Handle Submit:", formData);
-
         const mergedData = {
-            ...parsedStoredData, // Spread stored job data
+            ...parsedStoredData,
             required_documents: formData.required_documents,
             application_deadline: formData.application_deadline,
             weight_of_criteria: formData.weight_of_criteria,
             verification_option: formData.verification_option,
-            additional_points: formData.criteria.additionalPoints,
-            weight_of_criteria: formData.criteria_weights,
+            weight_of_criteria: formData.weight_of_criteria,
             scoring_criteria: [
                 {
                     criteria_name: "Work Experience",
@@ -177,6 +315,24 @@ export default function CompanySettings() {
                     },
                 },
                 {
+                    criteria_name: "Schools",
+                    weight_percentage: formData.criteria.schools.weight,
+                    preference: {
+                        schoolPreference:
+                            formData.criteria.schools.schoolPreference,
+                    },
+                },
+                {
+                    criteria_name: "Additional Points",
+                    weight_percentage:
+                        formData.criteria.additionalPoints.weight,
+                    preference: {
+                        honor: formData.criteria.additionalPoints.honor,
+                        multipleDegrees:
+                            formData.criteria.additionalPoints.multipleDegrees,
+                    },
+                },
+                {
                     criteria_name: "Certifications",
                     weight_percentage: formData.criteria.certificates.weight,
                     preference: {
@@ -185,13 +341,13 @@ export default function CompanySettings() {
                 },
             ],
         };
-        // console.log("Merged Data:", mergedData);
 
         Cookies.set("SERIALIZED_DATA", JSON.stringify(mergedData), {
             expires: 1,
         });
-
-        router.push("/COMPANY/JobSummary");
+        if (validation()) {
+            router.push("/COMPANY/JobSummary");
+        }
     };
 
     const handleInputChange = (e) => {
@@ -201,9 +357,6 @@ export default function CompanySettings() {
             [name]: value,
         };
         setFormData(updatedFormData);
-
-        // Save draft to localStorage
-        localStorage.setItem("draft_job", JSON.stringify(updatedFormData));
     };
 
     const handleMultiSelectChange = (category, field, option) => {
@@ -211,8 +364,8 @@ export default function CompanySettings() {
             const selectedOptions = prev.criteria[category][field] || [];
             const isSelected = selectedOptions.includes(option);
             const updatedOptions = isSelected
-                ? selectedOptions.filter((item) => item !== option) // Remove if selected
-                : [...selectedOptions, option]; // Add if not selected
+                ? selectedOptions.filter((item) => item !== option)
+                : [...selectedOptions, option];
 
             return {
                 ...prev,
@@ -279,8 +432,6 @@ export default function CompanySettings() {
                 : prevFormData.required_documents.filter(
                       (item) => item !== doc
                   );
-
-            console.log("Updated Documents:", updatedDocuments);
 
             return { ...prevFormData, required_documents: updatedDocuments };
         });
@@ -379,10 +530,10 @@ export default function CompanySettings() {
                             <div className="mb-6">
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center">
-                                        <input
+                                        {/* <input
                                             type="checkbox"
                                             className="w-4 h-4 border border-gray-300 rounded text-fontcolor"
-                                        />
+                                        /> */}
                                         <label className="ml-2 block text-sm font-semibold text-primary">
                                             Work Experience
                                         </label>
@@ -895,7 +1046,7 @@ export default function CompanySettings() {
                                 <div className="mb-6">
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="flex items-center">
-                                            <input
+                                            {/* <input
                                                 type="checkbox"
                                                 className="w-4 h-4 border border-gray-300 rounded text-fontcolor"
                                                 checked={
@@ -910,7 +1061,7 @@ export default function CompanySettings() {
                                                             .skills.enabled
                                                     )
                                                 } // Toggle the checkbox state
-                                            />
+                                            /> */}
                                             <label className="ml-2 block text-sm font-semibold text-primary">
                                                 Skills
                                             </label>
@@ -1425,10 +1576,10 @@ export default function CompanySettings() {
                                     <div className="mb-6">
                                         <div className="flex items-center justify-between mb-4">
                                             <div className="flex items-center">
-                                                <input
+                                                {/* <input
                                                     type="checkbox"
                                                     className="w-4 h-4 border border-gray-300 rounded text-fontcolor"
-                                                />
+                                                /> */}
                                                 <label className="ml-2 block text-sm font-semibold text-primary">
                                                     Education
                                                 </label>
@@ -1969,10 +2120,10 @@ export default function CompanySettings() {
                             <div className="mb-6">
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center">
-                                        <input
+                                        {/* <input
                                             type="checkbox"
                                             className="w-4 h-4 border border-gray-300 rounded text-black"
-                                        />
+                                        /> */}
                                         <label className="ml-2 block text-sm font-semibold text-primary">
                                             {" "}
                                             Certificates

@@ -8,74 +8,9 @@ export default function JobSummary() {
     const [jobDetails, setJobDetails] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        try {
-            // Retrieve all job details saved in localStorage
-            const savedJobDetails = JSON.parse(
-                localStorage.getItem("dummy_JobDetails")
-            );
-            console.log("Retrieved job details:", savedJobDetails);
-
-            // Retrieve the draft job details if available
-            const draftJob = JSON.parse(localStorage.getItem("draft_job"));
-
-            // If there are saved job details, display the latest one
-            if (savedJobDetails && savedJobDetails.length > 0) {
-                const latestJob = savedJobDetails[savedJobDetails.length - 1];
-                console.log("Latest job:", latestJob);
-                setJobDetails(latestJob);
-            } else if (draftJob) {
-                // If no saved jobs but a draft exists, load the draft
-                console.log("Loading draft job:", draftJob);
-                setJobDetails(draftJob);
-            }
-        } catch (error) {
-            console.error("Error loading job details:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-
-    if (isLoading) {
-        return (
-            <div className="flex justify-center items-center min-h-screen">
-                <p className="text-lg">Loading job details...</p>
-            </div>
-        );
-    }
-
-    if (!jobDetails) {
-        return (
-            <div className="flex justify-center items-center min-h-screen">
-                <p className="text-lg">
-                    No job details found. Please create a job first.
-                </p>
-            </div>
-        );
-    }
-
+   
     const handleStatusUpdate = (status) => {
-        if (!jobDetails) return;
-
-        // Retrieve saved jobs from localStorage
-        const savedJobs =
-            JSON.parse(localStorage.getItem("dummy_JobDetails")) || [];
-
-        // Update the status of the latest job
-        const updatedJobs = savedJobs.map((job, index) => {
-            if (index === savedJobs.length - 1) {
-                return { ...job, status };
-            }
-            return job;
-        });
-
-        // Save the updated jobs back to localStorage
-        localStorage.setItem("dummy_JobDetails", JSON.stringify(updatedJobs));
-
-        // Clear jobDetails to allow for new job input
-        setJobDetails(null);
-
-        console.log(`Job status updated to: ${status}`);
+        
     };
 
     return (
@@ -111,7 +46,7 @@ export default function JobSummary() {
                                 <div className="job-details-box bg-background border-b-8 top rounded-t-lg p-4">
                                     <div className="flex justify-between items-center">
                                         <p className="font-semibold text-fontcolor text-large">
-                                            Software Engineer
+                                            Software Engineer 
                                         </p>
                                         <div className="flex items-center gap-2">
                                             <p className="font-thin text-fontcolor text-xsmall">
@@ -242,7 +177,7 @@ export default function JobSummary() {
                                         id="AppliReq"
                                         className="font-thin text-xsmall text-fontcolor pb-3"
                                     >
-                                        {jobDetails.required_documents ? (
+                                        {/* {jobDetails.required_documents ? (
                                             <>
                                                 {Object.entries(
                                                     jobDetails.required_documents
@@ -255,7 +190,7 @@ export default function JobSummary() {
                                             </>
                                         ) : (
                                             "No benefits information available."
-                                        )}
+                                        )} */}
                                     </p>
 
                                     {/*Benefits*/}
@@ -285,13 +220,13 @@ export default function JobSummary() {
                                         Application Deadline
                                     </p>
                                     <p className="font-thin text-xsmall text-fontcolor pb-3">
-                                        {new Date(
+                                        {/* {new Date(
                                             jobDetails.application_deadline
                                         ).toLocaleDateString("en-US", {
                                             month: "2-digit",
                                             day: "2-digit",
                                             year: "numeric",
-                                        })}
+                                        })} */}
                                     </p>
 
                                     {/*Additional Notes*/}
@@ -320,7 +255,7 @@ export default function JobSummary() {
                                     <h3 className="text-sm font-semibold text-primary mb-2">
                                         Required Documents
                                     </h3>
-                                    {[
+                                    {/* {[
                                         "Resume",
                                         "Educational Documents",
                                         "Work Experience Documents",
@@ -345,7 +280,7 @@ export default function JobSummary() {
                                                 {doc}
                                             </span>
                                         </label>
-                                    ))}
+                                    ))} */}
                                 </div>
 
                                 {/* Right Side - Other Settings */}
@@ -355,13 +290,13 @@ export default function JobSummary() {
                                             Deadline
                                         </h3>
                                         <p className="text-fontcolor text-sm">
-                                            {new Date(
+                                            {/* {new Date(
                                                 jobDetails.application_deadline
                                             ).toLocaleDateString("en-US", {
                                                 month: "2-digit",
                                                 day: "2-digit",
                                                 year: "numeric",
-                                            })}
+                                            })} */}
                                         </p>
                                     </div>
 
@@ -370,7 +305,8 @@ export default function JobSummary() {
                                             Weight of Criteria
                                         </h3>
                                         <p className="text-fontcolor text-sm">
-                                            {jobDetails.weightOfCriteria}
+                                            {/* {jobDetails.weightOfCriteria} */}
+                                            Weight of Criteria
                                         </p>
                                     </div>
 
@@ -379,7 +315,8 @@ export default function JobSummary() {
                                             Verification Option
                                         </h3>
                                         <p className="text-fontcolor text-sm">
-                                            {jobDetails.verification_option}
+                                            {/* {jobDetails.verification_option} */}{" "}
+                                            Verification Option
                                         </p>
                                     </div>
                                 </div>
@@ -398,10 +335,10 @@ export default function JobSummary() {
                                         <span className="text-fontcolor text-sm">
                                             {" "}
                                             Weight:{" "}
-                                            {
+                                            {/* {
                                                 jobDetails.criteria
                                                     .workExperience.weight
-                                            }
+                                            } */}
                                             %
                                         </span>
                                     </div>
@@ -411,9 +348,9 @@ export default function JobSummary() {
                                                 Directly Relevant
                                             </p>
                                             <p className="font-semibold  text-fontcolor text-sm">
-                                                {jobDetails.criteria.workExperience.directlyRelevant.join(
+                                                {/* {jobDetails.criteria.workExperience.directlyRelevant.join(
                                                     ", "
-                                                )}{" "}
+                                                )}{" "} */}
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
@@ -421,10 +358,10 @@ export default function JobSummary() {
                                                 Highly Relevant
                                             </li>
                                             <p className="font-semibold text-fontcolor text-sm">
-                                                {" "}
+                                                {/* {" "}
                                                 {jobDetails.criteria.workExperience.highlyRelevant.join(
                                                     ", "
-                                                )}{" "}
+                                                )}{" "} */}
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
@@ -432,10 +369,10 @@ export default function JobSummary() {
                                                 Moderately Relevant
                                             </li>
                                             <p className="font-semibold text-fontcolor text-sm">
-                                                {" "}
+                                                {/* {" "}
                                                 {jobDetails.criteria.workExperience.moderatelyRelevant.join(
                                                     ", "
-                                                )}{" "}
+                                                )}{" "} */}
                                             </p>
                                         </div>
                                     </ul>
@@ -446,7 +383,7 @@ export default function JobSummary() {
                                         </h4>
                                         <span className="text-fontcolor text-sm">
                                             Weight:{" "}
-                                            {jobDetails.criteria.skills.weight}%
+                                            {/* {jobDetails.criteria.skills.weight}% */}
                                         </span>
                                     </div>
                                     <ul className="pl-5 mt-2 space-y-1">
@@ -455,10 +392,10 @@ export default function JobSummary() {
                                                 Primary Skills
                                             </li>
                                             <p className="font-semibold text-fontcolor text-sm">
-                                                {" "}
+                                                {/* {" "}
                                                 {jobDetails.criteria.skills.primarySkills.join(
                                                     ", "
-                                                )}{" "}
+                                                )}{" "} */}
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
@@ -466,10 +403,10 @@ export default function JobSummary() {
                                                 Secondary Skills
                                             </li>
                                             <p className="font-semibold text-fontcolor text-sm">
-                                                {" "}
+                                                {/* {" "}
                                                 {jobDetails.criteria.skills.secondarySkills.join(
                                                     ", "
-                                                )}{" "}
+                                                )}{" "} */}
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
@@ -477,10 +414,10 @@ export default function JobSummary() {
                                                 Additional Skills
                                             </li>
                                             <p className="font-semibold text-fontcolor text-sm">
-                                                {" "}
+                                                {/* {" "}
                                                 {jobDetails.criteria.skills.additionalSkills.join(
                                                     ", "
-                                                )}{" "}
+                                                )}{" "} */}
                                             </p>
                                         </div>
                                     </ul>
@@ -491,10 +428,10 @@ export default function JobSummary() {
                                         </h4>
                                         <span className="text-fontcolor text-sm">
                                             Weight:{" "}
-                                            {
+                                            {/* {
                                                 jobDetails.criteria.education
                                                     .weight
-                                            }
+                                            } */}
                                             %
                                         </span>
                                     </div>
@@ -505,10 +442,10 @@ export default function JobSummary() {
                                                 1st Choice Field Study
                                             </li>
                                             <p className="font-semibold text-fontcolor text-sm">
-                                                {
+                                                {/* {
                                                     jobDetails.criteria
                                                         .education.firstChoice
-                                                }{" "}
+                                                }{" "} */}
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
@@ -516,10 +453,10 @@ export default function JobSummary() {
                                                 2nd Choice Field Study
                                             </li>
                                             <p className="font-semibold text-fontcolor text-sm">
-                                                {
+                                                {/* {
                                                     jobDetails.criteria
                                                         .education.secondChoice
-                                                }{" "}
+                                                }{" "} */}
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
@@ -527,10 +464,10 @@ export default function JobSummary() {
                                                 3rd Choice Field Study
                                             </li>
                                             <p className="font-semibold text-fontcolor text-sm">
-                                                {
+                                                {/* {
                                                     jobDetails.criteria
                                                         .education.thirdChoice
-                                                }{" "}
+                                                }{" "} */}
                                             </p>
                                         </div>
                                     </ul>
@@ -547,9 +484,9 @@ export default function JobSummary() {
                                                 School Preference
                                             </li>
                                             <li className="font-semibold text-fontcolor text-sm">
-                                                {jobDetails.criteria.schools.schoolPreference.join(
+                                                {/* {jobDetails.criteria.schools.schoolPreference.join(
                                                     ", "
-                                                )}{" "}
+                                                )}{" "} */}
                                             </li>
                                         </div>
                                         <div className="border-b pb-1">
@@ -576,10 +513,10 @@ export default function JobSummary() {
                                             </h4>
                                             <span className="text-fontcolor text-sm">
                                                 Weight:{" "}
-                                                {
+                                                {/* {
                                                     jobDetails.criteria
                                                         .certificates.weight
-                                                }
+                                                } */}
                                                 %
                                             </span>
                                         </div>
@@ -588,10 +525,10 @@ export default function JobSummary() {
                                                 Institutional Preference Bonus
                                             </li>
                                             <li className="font-semibold text-fontcolor text-sm">
-                                                {" "}
+                                                {/* {" "}
                                                 {jobDetails.criteria.certificates.preferred.join(
                                                     ", "
-                                                )}
+                                                )} */}
                                             </li>
                                         </ul>
                                     </div>
