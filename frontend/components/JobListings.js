@@ -218,17 +218,10 @@ const JobListings = ({ authToken, onJobClick }) => {
         ? Array.from({ length: 5 }).map((_, index) => <SkeletonLoader key={index} />)
         : jobListings.length > 0
         ? jobListings.map((job) => (
-            <div
-              key={job.job_id}
-              onClick={() => handleJobClick(job.job_id)}
-              className="job-listing-box flex flex-col p-4 mb-4 mx-auto w-full"
-            >
+            <div key={job.job_id} onClick={() => handleJobClick(job.job_id)} className="job-listing-box flex flex-col p-4 mb-4 mx-auto w-full">
               <div className="flex flex-row justify-between items-center">
                 <Image src="/Logo.png" width={30} height={30} alt="Company Logo" />
-                <button
-                  onClick={() => toggleSave(job.job_id)}
-                  className="ml-auto"
-                >
+                <button onClick={() => toggleSave(job.job_id)} className="ml-auto">
                   <Image
                     src={savedStatus[job.job_id] ? "/Save Icon.svg" : "/Unsave Icon.svg"}
                     width={13}
@@ -237,40 +230,40 @@ const JobListings = ({ authToken, onJobClick }) => {
                   />
                 </button>
               </div>
-              <p className="font-semibold text-fontcolor text-large mt-2">{job.job_title}</p>
-              <p className="font-thin text-fontcolor text-xsmall">{job.company_name}</p>
-              <p className="font-thin text-fontcolor text-xsmall">{job.job_industry}</p>
-              <div className="flex flex-row mt-2">
-                <Image src="/Location Icon.svg" width={23} height={20} alt="Location Icon" />
-                <p id="work_location" className="ml-1.5 font-thin text-fontcolor text-xsmall pl-px">
-                  {job.location}
-                </p>
-              </div>
-              <div className="flex flex-row mt-2 pl-px">
-                <Image src="/Work Setup Icon.svg" width={20} height={20} alt="Work Setup Icon" />
-                <p id="work_setup" className="ml-2 font-thin text-fontcolor text-xsmall pl-px">
-                  {job.work_setup}
-                </p>
-              </div>
-              <div className="flex flex-row mt-2">
-                <Image src="/Schedule Icon.svg" width={18} height={20} alt="Schedule Icon" />
-                <p id="schedule" className="ml-2 font-thin text-fontcolor text-xsmall pl-1">
-                  {job.schedule}
-                </p>
-              </div>
-              <div className="flex flex-row mt-2">
-                <Image src="/Salary Icon.svg" width={18} height={20} alt="Salary Icon" />
-                <p id="salary" className="ml-2 font-thin text-fontcolor text-xsmall pl-px">
-                  {job.salary}
-                </p>
-              </div>
-              <div className="flex flex-col mt-2">
-                <p id="job_description" className="text-xsmall text-fontcolor">
-                  {job.job_description}
-                </p>
-              </div>
-            </div>
-          ))
+                  <p className="font-semibold text-fontcolor lg:text-large mb:text-large sm:text-medium xsm:text-medium xxsm:text-medium mt-2">{job.job_title}</p>
+                  <p className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall ">{job.company_name}</p>
+                  <p className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall ">{job.job_industry}</p>
+                  <div className="flex flex-row mt-2">
+                    <Image src="/Location Icon.svg" width={23} height={20} alt="Location Icon" />
+                    <p id="work_location" className="ml-1.5 font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall pl-px">
+                      {job.location}
+                    </p>
+                  </div>
+                  <div className="flex flex-row mt-2 pl-px">
+                    <Image src="/Work Setup Icon.svg" width={20} height={20} alt="Work Setup Icon" />
+                    <p id="work_setup" className="ml-2 font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall pl-px">
+                      {job.work_setup}
+                    </p>
+                  </div>
+                  <div className="flex flex-row mt-2">
+                    <Image src="/Schedule Icon.svg" width={18} height={20} alt="Schedule Icon" />
+                    <p id="schedule" className="ml-2 font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall pl-1">
+                      {job.schedule}
+                    </p>
+                  </div>
+                  <div className="flex flex-row mt-2">
+                    <Image src="/Salary Icon.svg" width={18} height={20} alt="Salary Icon" />
+                    <p id="salary" className="ml-2 font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall pl-px">
+                      {job.salary}
+                    </p>
+                  </div>
+                  <div className="flex flex-col mt-2">
+                    <p id="job_description" className="lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
+                      {job.job_description}
+                    </p>
+                  </div>
+                </div>
+              ))
         : <p className="flex flex-col text-fontcolor">No job listings available.</p>}
     </div>
   );

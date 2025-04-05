@@ -218,15 +218,17 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                     <div className="flex flex-col flex-grow">
                         <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Company Name</p>
                             <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                <input type="text" name="company_name" value={formData.company_name} placeholder="" required onChange={handleChange}></input>
+                                <input type="text" name="company_name" value={formData.company_name} placeholder="" required onChange={handleChange}  readOnly={!isEditable}
+                                className={`w-full px-2 py-1 outline-none rounded-xs 
+                                ${isEditable ? 'text-fontcolor' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}></input>
                             </div>
                     </div>        
                 </div>
-                <div className="flex lg:flex-row sm:flex-col gap-5 pb-5">
+                <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col gap-5 pb-5">
                     <div className="flex flex-col flex-grow">
                         <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Industry/Sector</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <select className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"  name="job_industry" value={formData.job_industry} required onChange={handleChange}>
+                            <select disabled={!isEditable} className={`valid:text-fontcolor invalid:text-placeholder lg:w-auto mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall ${!isEditable ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ' text-fontcolor'}`} name="job_industry" value={formData.job_industry} required onChange={handleChange} >
                                 <option value=''  disabled selected hidden>Select Sector</option>
                                 <option value='IT'>Information Technology (IT)</option>
                                 <option value='IT'>Information System (IS)</option>
@@ -244,16 +246,20 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                     <div className="flex flex-col flex-grow">
                         <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">No. of Employees</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <input type="text" name="num_applicants" value={formData.num_applicants} placeholder="" required onChange={handleChange}></input>
+                            <input type="text" name="num_applicants" value={formData.num_applicants} placeholder="" required onChange={handleChange}  readOnly={!isEditable}
+                                className={`w-full px-2 py-1 outline-none rounded-xs 
+                                ${isEditable ? 'text-fontcolor' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}></input>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex lg:flex-row sm:flex-col gap-5 pb-5">
+                <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col gap-5 pb-5">
                     <div className="flex flex-col flex-grow">
                         <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Email Address</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <input type="text"  name="email" value={formData.email} placeholder="applicant@gmail.com" required onChange={handleChange} disabled></input>
+                            <input type="text"  name="email" value={formData.email} placeholder="applicant@gmail.com" required onChange={handleChange} readOnly={!isEditable}
+                                className={`w-full px-2 py-1 outline-none rounded-xs 
+                                ${isEditable ? 'text-fontcolor' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}></input>
                         </div>
                     </div>
                     <div className="flex flex-col flex-grow">
@@ -267,18 +273,29 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                                     required 
                                     onChange={handlePhoneNumberChange} 
                                     maxLength="10" 
-                                    placeholder="9XXXXXXXXX" 
-                                    className="flex-grow outline-none" 
+                                    placeholder="9XXXXXXXXX"  
+                                    readOnly={!isEditable}
+                                    className={`flex-grow w-full px-2 py-1 outline-none rounded-xs 
+                                    ${isEditable ? 'text-fontcolor' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
                                 />
                         </div>
                     </div>
                 </div>
                 
-                <div className="flex lg:flex-row sm:flex-col flex-grow gap-5 pb-5">
+                <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col flex-grow gap-5 pb-5">
                     <div className="flex flex-col flex-grow">
                         <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Region</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <select className="valid:text-fontcolor invalid:text-placeholder w-full mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall" id="region" name="region" value={formData.region}  onChange={handleChange}  required>
+                            <select
+                                disabled={!isEditable}
+                                className={`valid:text-fontcolor invalid:text-placeholder lg:w-full mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall 
+                                    ${!isEditable ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'text-fontcolor'}`}
+                                id="region"
+                                name="region"
+                                value={formData.region}
+                                onChange={handleChange}
+                                required
+                            >
                                 <option value="" disabled selected hidden>Select Region</option>
                                 {regions.map((region) => (
                                     <option key={region.code} value={region.code}>
@@ -292,63 +309,91 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                     <div className="flex flex-col flex-grow">
                         <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Province</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <select className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall" id="province" name="province" value={formData.province}  onChange={handleChange}   required={region !== '130000000'}  disabled={region === '130000000'}>
-                                <option value="province" disabled selected hidden>Select Province</option>
-                                    {provinces.map((province) => (
-                                        <option key={province.code} value={province.code}>
-                                            {province.name}
+                            <select
+                                disabled={!isEditable || formData.region === '130000000'}
+                                className={`valid:text-fontcolor invalid:text-placeholder lg:w-full mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall 
+                                    ${(!isEditable || formData.region === '130000000') ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'text-fontcolor'}`}
+                                id="province"
+                                name="province"
+                                value={formData.province}
+                                onChange={handleChange}
+                                required={formData.region !== '130000000'}
+                            >
+                                <option value="" disabled selected hidden>Select Province</option>
+                                {provinces.map((province) => (
+                                    <option key={province.code} value={province.code}>
+                                        {province.name}
                                     </option>
-                                    ))}
+                                ))}
                             </select>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col flex-grow-0 lg:w-1/4 mb:w-full sm:w-full">
-                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Postal Code</p>
-                        <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <input type="text"  name="postal_code" value={formData.postal_code} placeholder="" required onChange={handleChange}></input>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex lg:flex-row sm:flex-col flex-grow gap-5 pb-5">
+                <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col flex-grow pb-5">
                     <div className="flex flex-col flex-grow">
                         <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">City/Municipality</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <select className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall" id="city" name="city" required value={formData.city}  onChange={handleChange}>
-                                <option value="city" disabled selected hidden>Select City</option>
+                            <select
+                                disabled={!isEditable}
+                                className={`valid:text-fontcolor invalid:text-placeholder lg:w-full mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall 
+                                    ${!isEditable ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'text-fontcolor'}`}
+                                id="city"
+                                name="city"
+                                required
+                                value={formData.city}
+                                onChange={handleChange}
+                            >
+                                <option value="" disabled selected hidden>Select City</option>
                                 {cities.map((city) => (
                                     <option key={city.code} value={city.code}>
                                         {city.name}
                                     </option>
-                                ))}  
+                                ))}
                             </select>
                         </div>
                     </div>
+                </div>
+
+
+                <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col flex-grow gap-5 pb-5">
                     <div className="flex flex-col flex-grow">
                         <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Barangay</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <select className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall" id="barangay" name="barangay" required value={formData.barangay}  onChange={handleChange}>
-                                <option value="barangay" disabled selected hidden>Select Barangay</option>
-                                {barangays.map((city) => (
-                                    <option key={city.code} value={city.code}>
-                                        {city.name}
+                            <select disabled={!isEditable} className={`valid:text-fontcolor invalid:text-placeholder lg:w-full mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall ${!isEditable ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'text-fontcolor'}`} id="barangay" name="barangay" value={formData.barangay}   required  onChange={handleChange} >
+                                <option value="" disabled selected hidden>Select Barangay</option>
+                                {barangays.map((barangay) => (
+                                    <option key={barangay.code} value={barangay.code}>
+                                        {barangay.name}
                                     </option>
-                                ))}  
+                                ))}
                             </select>
                         </div>
-                    </div>  
+                    </div>
+
+                    <div className="flex flex-col flex-grow">
+                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Postal Code</p>
+                        <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+                            <input type="text" id="postal-code" name="postal_code" placeholder="" required value={formData.postal_code || ''}  onChange={handleChange} readOnly={!isEditable}
+                            className={`w-full px-2 py-1 outline-none rounded-xs 
+                            ${isEditable ? 'text-fontcolor' : 'bg-gray-100 text-gray-500 cursor-not-allowed'}`}></input>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="flex lg:flex-col mb:flex-col sm:flex-col xsm: flex-col flex-grow pb-5">
                     <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-medium pb-1">Lot, Block, Unit, Building, Floor, Street Name, Subdivision</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex ">
-                            <input type="complete"  name="present_address" value={formData.present_address} placeholder="" required onChange={handleChange}></input>
+                            <input type="complete"  name="present_address" value={formData.present_address} placeholder="" required onChange={handleChange}   readOnly={!isEditable}
+                                className={`w-full px-2 py-1 outline-none rounded-xs 
+                                ${isEditable ? 'text-fontcolor' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}></input>
                         </div>
                         
                     <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-medium pt-5">LinkedIn Profile Link</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <input type="linkedin-link"  name="linkedin_profile" value={formData.linkedin_profile} placeholder="" required onChange={handleChange}></input>
+                            <input type="linkedin-link"  name="linkedin_profile" value={formData.linkedin_profile} placeholder="" required onChange={handleChange}   readOnly={!isEditable}
+                                className={`w-full px-2 py-1 outline-none rounded-xs 
+                                ${isEditable ? 'text-fontcolor' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}></input>
                         </div>  
                 </div>
 

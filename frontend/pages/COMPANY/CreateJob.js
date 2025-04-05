@@ -245,7 +245,7 @@ export default function CreateJob() {
                 <div className="col-span-2 gap-3">
                   <div className="mb-4">
                     <div>
-                      <label className="block text-sm font-semibold text-fontcolor mb-1">Specialization</label>
+                      <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall font-semibold text-fontcolor mb-1">Specialization</label>
                       <div className="w-full border-2 border-black rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"  onClick={() => setDropdownOpen({ ...dropdownOpen, specoption: !dropdownOpen.specoption })} >
                       {formData.specialization?.specOptions.length > 0 ? (
                           formData.specialization.specOptions.map((selected, index) => (
@@ -301,8 +301,8 @@ export default function CreateJob() {
                     <input type="text" name="company_name" value={formData.company_name} onChange={handleInputChange} placeholder="Company Name" className="h-medium rounded-xs border-2 border-fontcolor"/>
                   </div>
 
-                  <div className="flex space-x-3 col-span-2">
-                    <div className="w-1/3">
+                  <div className="flex space-x-2 col-span-2">
+                    <div className="w-1/2">
                         <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">Region </label>
                         <select className="valid:text-fontcolor invalid:text-placeholder mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall border-2 border-black h-medium rounded-xs w-full text-sm text-gray-500" id="region"  name="region" value={formData.region} onChange={handleInputChange} required>
                             <option value="" disabled selected hidden>Select Region</option>
@@ -314,7 +314,7 @@ export default function CreateJob() {
                             </select>
                     </div>
 
-                    <div className="w-1/3">
+                    <div className="w-1/2">
                         <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">City/Municipality</label>
                         <select className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall border-2 border-black h-medium rounded-xs w-full" id="province" name="province" value={formData.province} onChange={handleInputChange}  required={formData.region !== '130000000'}  disabled={formData.region === '130000000'} >
                             <option value="province" disabled selected hidden>Select Province</option>
@@ -326,15 +326,28 @@ export default function CreateJob() {
                             </select>
                     </div>
 
-                    <div className="w-1/3">
-                        <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">City</label>
-                        <select className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall border-2 border-black h-medium rounded-xs w-full" id="city" name="city" required value={formData.city} onChange={handleInputChange}>
+                   
+                </div>
+
+                <div className="col-span-2 gap-3">
+                    <div className="w-full">
+                        <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">
+                            City
+                        </label>
+                        <select
+                            className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall border-2 border-black h-medium rounded-xs w-full"
+                            id="city"
+                            name="city"
+                            required
+                            value={formData.city}
+                            onChange={handleInputChange}
+                        >
                             <option value="city" disabled selected hidden>Select City</option>
-                                {cities.map((city) => (
-                                    <option key={city.code} value={city.code}>
-                                        {city.name}
-                                    </option>
-                                ))}
+                            {cities.map((city) => (
+                                <option key={city.code} value={city.code}>
+                                    {city.name}
+                                </option>
+                            ))}
                         </select>
                     </div>
                 </div>
@@ -419,18 +432,22 @@ export default function CreateJob() {
                   <input  type="number" name="num_positions" value={formData.num_positions} onChange={handleInputChange} placeholder="No. of Positions"  className="h-medium rounded-xs border-2 border-fontcolor"  />
                 </div>
 
-                <div className="flex space-x-4 mt-4 col-span-2">
-                  <div className="w-1/3">
+                <div className="flex space-x-4 col-span-2">
+                  <div className="w-1/2">
                     <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">Salary Minimum</label>
                     <input type="number" name="salary_min" value={formData.salary_min} onChange={handleInputChange} placeholder="Salary Minimum" className="h-medium rounded-xs border-2 border-fontcolor" />
                   </div>
 
-                  <div className="w-1/3">
+                  <div className="w-1/2">
                     <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">Salary Maximum</label>
                     <input type="number" name="salary_max" value={formData.salary_max} onChange={handleInputChange} placeholder="Salary Maximum"className="h-medium rounded-xs border-2 border-fontcolor" />
                   </div>
 
-                  <div className="w-1/3">
+                </div>
+              </div>
+
+              <div className="col-span-2 mt-3">
+                <div className="w-full">
                     <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">Salary Frequency</label>
                     <select name="salary_frequency" value={formData.salary_frequency} onChange={handleInputChange} className="h-medium rounded-xs border-2 border-fontcolor valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall" >
                       <option value="Monthly">Monthly</option>
@@ -438,7 +455,6 @@ export default function CreateJob() {
                       <option value="Hourly">Hourly</option>
                     </select>
                   </div>
-                </div>
               </div>
 
               <div className="flex justify-end mt-8">

@@ -113,7 +113,7 @@ const CompanyJobDetails = ({ jobId }) => {
         {/* Top Part of Job Details - Fixed */}
         <div className="job-details-box border-b-8 top rounded-t-lg p-4">
           <div className="flex justify-between items-center">
-            <p className="font-semibold text-fontcolor text-large">{jobDetails.job_title}</p>
+            <p className="font-semibold text-fontcolor text-xlarge">{jobDetails.job_title}</p>
             <div className="flex items-center gap-2">
               <p className="font-thin text-fontcolor text-xsmall">{jobDetails.creation_date}</p>
               <Image src="/Menu.svg" width={23} height={20} alt="Menu" />
