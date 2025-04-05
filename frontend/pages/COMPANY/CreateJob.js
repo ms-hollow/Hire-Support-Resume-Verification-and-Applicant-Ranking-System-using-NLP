@@ -153,8 +153,6 @@ export default function CreateJob() {
             [name]: value,
         };
         setFormData(updatedFormData);
-        // const expiryDate = new Date();
-        // expiryDate.setMinutes(expiryDate.getMinutes() + 5);
         Cookies.set("DRAFT_DATA", JSON.stringify(updatedFormData), {
             expires: 1,
         });
@@ -167,21 +165,20 @@ export default function CreateJob() {
         };
         setFormData(updatedFormData);
     };
-
     const validateForm = () => {
         let errors = {};
 
-        const requiredFields = Object.keys(formData).filter(
-            (key) => !formData[key]
-        );
+        if (!formData.job_title) errors.job_title = "Job title is required.";
+        if (!formData.job_industry)
+            errors.job_industry = "Job industry is required.";
+        if (!formData.specialization.length)
+            errors.specialization = "Specialization is required.";
+        if (!formData.job_description)
+            errors.job_description = "Job description is required.";
+        if (!formData.region) errors.region = "Region is required.";
+        if (!formData.province) errors.province = "Province is required.";
+        if (!formData.city) errors.city = "City is required.";
 
-        requiredFields.forEach((field) => {
-            if (!formData[field]) {
-                errors[field] = `${field.replace("_", " ")} is required.`;
-            }
-        });
-
-        // Salary validation
         if (formData.salary_min < 0 || formData.salary_max < 0) {
             errors.salary = "Salary cannot be negative.";
         }
@@ -198,56 +195,28 @@ export default function CreateJob() {
             errors.salary = "Minimum salary must be less than maximum salary.";
         }
 
-        // Experience level validation
-        if (formData.experience_level < 0 || formData.experience_level > 30) {
-            errors.experience_level =
-                "Experience level must be between 0 and 30.";
-        }
+        return errors;
+    };
 
-        if (!formData.region) {
-            alert("Please select a region.");
-            return false;
-        }
-
-        if (!formData.province) {
-            alert("Please select a province.");
-            return false;
-        }
-
-        if (!formData.city) {
-            alert("Please select a city.");
-            return false;
-        }
-
-        // Ensure no validation errors
-        if (Object.keys(errors).length > 0) {
-            const errorMessages = Object.values(errors).join("\n");
-            alert(`Please fix the following errors:\n\n${errorMessages}`);
-            return false;
-        }
-
-        return true;
+    const formatNumberWithCommas = (number) => {
+        if (!number) return number;
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!validateForm()) return;
+        const errors = validateForm();
+        if (Object.keys(errors).length > 0) {
+            alert(
+                `Please fix the following errors:\n\n${Object.values(
+                    errors
+                ).join("\n")}`
+            );
+            return;
+        }
 
         const token = authTokens?.access;
         if (!token) return;
-
-        // Find the selected region by ID
-        const selectedRegion = regions.find(
-            (region) => region.id === formData.region
-        );
-
-        const updatedFormData = {
-            ...formData,
-            region: selectedRegion ? selectedRegion.n : formData.region,
-        };
-
-        //* Comment if implementation na
-        // console.log("Data:", updatedFormData);
 
         router.push(`/COMPANY/CompanySettings`);
     };

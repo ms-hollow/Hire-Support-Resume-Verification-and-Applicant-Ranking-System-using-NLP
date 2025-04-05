@@ -3,20 +3,45 @@ import GeneralFooter from "@/components/GeneralFooter";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 
 export default function JobSummary() {
-    const [jobDetails, setJobDetails] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [SerializedData, setSerializedData] = useState(null);
+    const [salaryMin, setSalaryMin] = useState(null);
+    const [salaryMax, setSalaryMax] = useState(null);
 
-   
-    const handleStatusUpdate = (status) => {
-        
-    };
+    useEffect(() => {
+        const storedData = Cookies.get("SERIALIZED_DATA");
+
+        if (!storedData) {
+            console.error("No stored data found.");
+            return;
+        }
+
+        try {
+            const parsedStoredData = JSON.parse(storedData);
+            setSerializedData(parsedStoredData);
+            console.log("Parsed stored data:", parsedStoredData);
+
+            const formatNumberWithCommas = (number) => {
+                if (!number) return number;
+                return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            };
+
+            setSalaryMin(formatNumberWithCommas(parsedStoredData.salary_min));
+            setSalaryMax(formatNumberWithCommas(parsedStoredData.salary_max));
+        } catch (error) {
+            console.error("Error parsing stored data:", error);
+            return;
+        }
+    }, []);
+
+    const handleStatusUpdate = (status) => {};
 
     return (
         <div>
             <CompanyHeader />
-            <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 mx-auto">
+            <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 mx-auto cursor-default">
                 <h1 className="lg:text-xl mb:text-xl sm:text-large text-primary">
                     {" "}
                     Job Hiring Summary{" "}
@@ -46,7 +71,7 @@ export default function JobSummary() {
                                 <div className="job-details-box bg-background border-b-8 top rounded-t-lg p-4">
                                     <div className="flex justify-between items-center">
                                         <p className="font-semibold text-fontcolor text-large">
-                                            Software Engineer 
+                                            {SerializedData?.job_title || ""}
                                         </p>
                                         <div className="flex items-center gap-2">
                                             <p className="font-thin text-fontcolor text-xsmall">
@@ -61,10 +86,26 @@ export default function JobSummary() {
                                         </div>
                                     </div>
                                     <p className="font-thin text-fontcolor text-xsmall">
-                                        Adobe
+                                        <p className="font-thin text-fontcolor text-xsmall">
+                                            {SerializedData &&
+                                            SerializedData.specialization &&
+                                            SerializedData.specialization
+                                                .length > 0 ? (
+                                                SerializedData.specialization.join(
+                                                    ", "
+                                                )
+                                            ) : (
+                                                <p>
+                                                    No specializations
+                                                    available.
+                                                </p>
+                                            )}
+                                        </p>
                                     </p>
                                     <p className="font-thin text-fontcolor text-xsmall">
-                                        (Senior Level)
+                                        (
+                                        {SerializedData?.experience_level || ""}
+                                        )
                                     </p>
                                     <div className="flex flex-row mt-2">
                                         <div className="flex flex-row">
@@ -75,7 +116,9 @@ export default function JobSummary() {
                                                 alt="Location Icon"
                                             />
                                             <p className="ml-1.5 font-thin text-xsmall text-fontcolor">
-                                                Valenzuela City
+                                                {SerializedData?.region || ""},{" "}
+                                                {SerializedData?.province || ""}
+                                                , {SerializedData?.city || ""}
                                             </p>
                                         </div>
                                         <div className="flex flex-row mx-4">
@@ -86,7 +129,8 @@ export default function JobSummary() {
                                                 alt="Work Setup Icon"
                                             />
                                             <p className="ml-2 font-thin text-xsmall text-fontcolor">
-                                                Remote
+                                                {SerializedData?.work_setup ||
+                                                    ""}
                                             </p>
                                         </div>
                                         <div className="flex flex-row">
@@ -97,7 +141,7 @@ export default function JobSummary() {
                                                 alt="Schedule Icon"
                                             />
                                             <p className="ml-2 font-thin text-xsmall text-fontcolor">
-                                                8 hrs Shift
+                                                {SerializedData?.schedule || ""}
                                             </p>
                                         </div>
                                     </div>
@@ -109,7 +153,9 @@ export default function JobSummary() {
                                             alt="Salary Icon"
                                         />
                                         <p className="ml-2 font-thin text-xsmall pl-px text-fontcolor">
-                                            Php 17,000-21,000 Monthly
+                                            Php {salaryMin} - {salaryMax}{" "}
+                                            {SerializedData?.salary_frequency ||
+                                                ""}
                                         </p>
                                     </div>
                                 </div>
@@ -121,7 +167,7 @@ export default function JobSummary() {
                                         Employment Type
                                     </p>
                                     <p className="font-thin text-xsmall text-fontcolor pb-3">
-                                        Full-Time
+                                        {SerializedData?.employment_type || ""}
                                     </p>
 
                                     {/*Job Description*/}
@@ -129,21 +175,7 @@ export default function JobSummary() {
                                         Job Description
                                     </p>
                                     <p className="font-thin text-xsmall text-fontcolor pb-3">
-                                        • We are seeking a skilled Software
-                                        Engineer to join our dynamic team. The
-                                        ideal candidate will be responsible for
-                                        developing, testing, and maintaining
-                                        software applications, collaborating
-                                        with cross-functional teams, and
-                                        ensuring high-quality code delivery.{" "}
-                                        <br></br>• Develop and maintain software
-                                        applications: Write clean, efficient,
-                                        and well-documented code to create and
-                                        update software products. <br></br>•
-                                        Collaborate with cross-functional teams:
-                                        Work with various departments to gather
-                                        requirements and develop effective
-                                        solutions. <br></br>
+                                        {SerializedData?.job_description || ""}
                                     </p>
 
                                     {/*Qualifications*/}
@@ -151,22 +183,7 @@ export default function JobSummary() {
                                         Qualifications (Credentials and Skills)
                                     </p>
                                     <p className="font-thin text-xsmall text-fontcolor pb-3">
-                                        • Bachelor's degree in Computer Science,
-                                        Software Engineering, or a related
-                                        field. <br></br>• 1+ years of experience
-                                        in software development. <br></br>•
-                                        Proficiency in at least one programming
-                                        language (e.g., Java, Python, C#).{" "}
-                                        <br></br>• Familiarity with software
-                                        development methodologies and tools
-                                        (e.g., Agile, Git).<br></br>• Strong
-                                        problem-solving and analytical skills.{" "}
-                                        <br></br>• Excellent communication and
-                                        teamwork abilities. <br></br>• Strong
-                                        communication and collaboration skills.{" "}
-                                        <br></br>• Ability to prioritize tasks,
-                                        meet deadlines, and manage multiple
-                                        projects simultaneously.
+                                        {SerializedData?.qualifications || ""}
                                     </p>
 
                                     {/*Application Requirements*/}
@@ -177,20 +194,16 @@ export default function JobSummary() {
                                         id="AppliReq"
                                         className="font-thin text-xsmall text-fontcolor pb-3"
                                     >
-                                        {/* {jobDetails.required_documents ? (
-                                            <>
-                                                {Object.entries(
-                                                    jobDetails.required_documents
-                                                ).map(([key, value]) => (
-                                                    <span key={key}>
-                                                        • {value}
-                                                        <br />
-                                                    </span>
-                                                ))}
-                                            </>
-                                        ) : (
-                                            "No benefits information available."
-                                        )} */}
+                                        {SerializedData?.required_documents.map(
+                                            (doc, index) => (
+                                                <li
+                                                    key={index}
+                                                    className="font-thin text-xsmall text-fontcolor"
+                                                >
+                                                    {doc}
+                                                </li>
+                                            )
+                                        ) || ""}
                                     </p>
 
                                     {/*Benefits*/}
@@ -198,13 +211,7 @@ export default function JobSummary() {
                                         Benefits
                                     </p>
                                     <p className="font-thin text-xsmall text-fontcolor pb-3">
-                                        • Competitive salary and
-                                        performance-based bonuses <br></br>• HMO
-                                        (Health Maintenance Organization){" "}
-                                        <br></br>• Retirement savings plan with
-                                        company matching <br></br>• Paid leave
-                                        and holidays <br></br>• Professional
-                                        development opportunities
+                                        {SerializedData?.benefits || ""}
                                     </p>
 
                                     {/*No of Positions*/}
@@ -212,7 +219,7 @@ export default function JobSummary() {
                                         No. of Positions
                                     </p>
                                     <p className="font-thin text-xsmall text-fontcolor pb-3">
-                                        4
+                                        {SerializedData?.num_positions || ""}
                                     </p>
 
                                     {/*Application Deadline*/}
@@ -220,13 +227,15 @@ export default function JobSummary() {
                                         Application Deadline
                                     </p>
                                     <p className="font-thin text-xsmall text-fontcolor pb-3">
-                                        {/* {new Date(
-                                            jobDetails.application_deadline
-                                        ).toLocaleDateString("en-US", {
-                                            month: "2-digit",
-                                            day: "2-digit",
-                                            year: "numeric",
-                                        })} */}
+                                        {SerializedData?.application_deadline
+                                            ? new Date(
+                                                  SerializedData.application_deadline
+                                              ).toLocaleDateString("en-US", {
+                                                  month: "2-digit",
+                                                  day: "2-digit",
+                                                  year: "numeric",
+                                              })
+                                            : ""}
                                     </p>
 
                                     {/*Additional Notes*/}
@@ -255,32 +264,30 @@ export default function JobSummary() {
                                     <h3 className="text-sm font-semibold text-primary mb-2">
                                         Required Documents
                                     </h3>
-                                    {/* {[
-                                        "Resume",
-                                        "Educational Documents",
-                                        "Work Experience Documents",
-                                        "Certification Documents",
-                                    ].map((doc, index) => (
-                                        <label
-                                            key={index}
-                                            className="flex items-center space-x-2 mb-2"
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                value={doc}
-                                                checked={jobDetails.required_documents.includes(
-                                                    doc
-                                                )}
-                                                onChange={(e) => {
-                                                    // Handle checkbox logic here
-                                                }}
-                                                className="w-4 h-4 border border-gray-300 rounded text-black"
-                                            />
-                                            <span className="text-fontcolor text-sm">
-                                                {doc}
-                                            </span>
-                                        </label>
-                                    ))} */}
+                                    {SerializedData?.required_documents &&
+                                        SerializedData.required_documents.map(
+                                            (doc, index) => (
+                                                <label
+                                                    key={index}
+                                                    className="flex items-center space-x-2 mb-2"
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        value={doc}
+                                                        checked={SerializedData.required_documents.includes(
+                                                            doc
+                                                        )}
+                                                        onChange={(e) => {
+                                                            // Handle checkbox logic here
+                                                        }}
+                                                        className="w-4 h-4 border border-gray-300 rounded text-black"
+                                                    />
+                                                    <span className="text-fontcolor text-sm">
+                                                        {doc}
+                                                    </span>
+                                                </label>
+                                            )
+                                        )}
                                 </div>
 
                                 {/* Right Side - Other Settings */}
@@ -290,13 +297,18 @@ export default function JobSummary() {
                                             Deadline
                                         </h3>
                                         <p className="text-fontcolor text-sm">
-                                            {/* {new Date(
-                                                jobDetails.application_deadline
-                                            ).toLocaleDateString("en-US", {
-                                                month: "2-digit",
-                                                day: "2-digit",
-                                                year: "numeric",
-                                            })} */}
+                                            {SerializedData?.application_deadline
+                                                ? new Date(
+                                                      SerializedData.application_deadline
+                                                  ).toLocaleDateString(
+                                                      "en-US",
+                                                      {
+                                                          month: "2-digit",
+                                                          day: "2-digit",
+                                                          year: "numeric",
+                                                      }
+                                                  )
+                                                : ""}
                                         </p>
                                     </div>
 
@@ -305,8 +317,8 @@ export default function JobSummary() {
                                             Weight of Criteria
                                         </h3>
                                         <p className="text-fontcolor text-sm">
-                                            {/* {jobDetails.weightOfCriteria} */}
-                                            Weight of Criteria
+                                            {SerializedData?.weight_of_criteria ||
+                                                ""}
                                         </p>
                                     </div>
 
@@ -315,8 +327,8 @@ export default function JobSummary() {
                                             Verification Option
                                         </h3>
                                         <p className="text-fontcolor text-sm">
-                                            {/* {jobDetails.verification_option} */}{" "}
-                                            Verification Option
+                                            {SerializedData?.verification_option ||
+                                                ""}{" "}
                                         </p>
                                     </div>
                                 </div>
@@ -335,10 +347,8 @@ export default function JobSummary() {
                                         <span className="text-fontcolor text-sm">
                                             {" "}
                                             Weight:{" "}
-                                            {/* {
-                                                jobDetails.criteria
-                                                    .workExperience.weight
-                                            } */}
+                                            {SerializedData?.scoring_criteria[0]
+                                                ?.weight_percentage || ""}
                                             %
                                         </span>
                                     </div>
@@ -348,9 +358,9 @@ export default function JobSummary() {
                                                 Directly Relevant
                                             </p>
                                             <p className="font-semibold  text-fontcolor text-sm">
-                                                {/* {jobDetails.criteria.workExperience.directlyRelevant.join(
-                                                    ", "
-                                                )}{" "} */}
+                                                {SerializedData?.scoring_criteria[0]?.preference?.directlyRelevant?.join(
+                                                    " "
+                                                ) || ""}
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
@@ -358,10 +368,9 @@ export default function JobSummary() {
                                                 Highly Relevant
                                             </li>
                                             <p className="font-semibold text-fontcolor text-sm">
-                                                {/* {" "}
-                                                {jobDetails.criteria.workExperience.highlyRelevant.join(
-                                                    ", "
-                                                )}{" "} */}
+                                                {SerializedData?.scoring_criteria[0]?.preference?.highlyRelevant?.join(
+                                                    " "
+                                                ) || ""}
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
@@ -369,10 +378,9 @@ export default function JobSummary() {
                                                 Moderately Relevant
                                             </li>
                                             <p className="font-semibold text-fontcolor text-sm">
-                                                {/* {" "}
-                                                {jobDetails.criteria.workExperience.moderatelyRelevant.join(
-                                                    ", "
-                                                )}{" "} */}
+                                                {SerializedData?.scoring_criteria[0]?.preference?.moderatelyRelevant?.join(
+                                                    " "
+                                                ) || ""}
                                             </p>
                                         </div>
                                     </ul>
@@ -383,7 +391,9 @@ export default function JobSummary() {
                                         </h4>
                                         <span className="text-fontcolor text-sm">
                                             Weight:{" "}
-                                            {/* {jobDetails.criteria.skills.weight}% */}
+                                            {SerializedData?.scoring_criteria[1]
+                                                ?.weight_percentage || ""}
+                                            %
                                         </span>
                                     </div>
                                     <ul className="pl-5 mt-2 space-y-1">
@@ -392,10 +402,9 @@ export default function JobSummary() {
                                                 Primary Skills
                                             </li>
                                             <p className="font-semibold text-fontcolor text-sm">
-                                                {/* {" "}
-                                                {jobDetails.criteria.skills.primarySkills.join(
-                                                    ", "
-                                                )}{" "} */}
+                                                {SerializedData?.scoring_criteria[1]?.preference?.primarySkills?.join(
+                                                    " "
+                                                ) || ""}
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
@@ -403,10 +412,10 @@ export default function JobSummary() {
                                                 Secondary Skills
                                             </li>
                                             <p className="font-semibold text-fontcolor text-sm">
-                                                {/* {" "}
-                                                {jobDetails.criteria.skills.secondarySkills.join(
-                                                    ", "
-                                                )}{" "} */}
+                                                {" "}
+                                                {SerializedData?.scoring_criteria[1]?.preference?.secondarySkills?.join(
+                                                    " "
+                                                ) || ""}{" "}
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
@@ -414,10 +423,10 @@ export default function JobSummary() {
                                                 Additional Skills
                                             </li>
                                             <p className="font-semibold text-fontcolor text-sm">
-                                                {/* {" "}
-                                                {jobDetails.criteria.skills.additionalSkills.join(
-                                                    ", "
-                                                )}{" "} */}
+                                                {" "}
+                                                {SerializedData?.scoring_criteria[1]?.preference?.additionalSkills?.join(
+                                                    " "
+                                                ) || ""}{" "}
                                             </p>
                                         </div>
                                     </ul>
@@ -428,10 +437,8 @@ export default function JobSummary() {
                                         </h4>
                                         <span className="text-fontcolor text-sm">
                                             Weight:{" "}
-                                            {/* {
-                                                jobDetails.criteria.education
-                                                    .weight
-                                            } */}
+                                            {SerializedData?.scoring_criteria[2]
+                                                ?.weight_percentage || ""}
                                             %
                                         </span>
                                     </div>
@@ -442,10 +449,10 @@ export default function JobSummary() {
                                                 1st Choice Field Study
                                             </li>
                                             <p className="font-semibold text-fontcolor text-sm">
-                                                {/* {
-                                                    jobDetails.criteria
-                                                        .education.firstChoice
-                                                }{" "} */}
+                                                {SerializedData
+                                                    ?.scoring_criteria[2]
+                                                    ?.preference?.firstChoice ||
+                                                    ""}
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
@@ -453,10 +460,10 @@ export default function JobSummary() {
                                                 2nd Choice Field Study
                                             </li>
                                             <p className="font-semibold text-fontcolor text-sm">
-                                                {/* {
-                                                    jobDetails.criteria
-                                                        .education.secondChoice
-                                                }{" "} */}
+                                                {SerializedData
+                                                    ?.scoring_criteria[2]
+                                                    ?.preference
+                                                    ?.secondChoice || ""}
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
@@ -464,10 +471,10 @@ export default function JobSummary() {
                                                 3rd Choice Field Study
                                             </li>
                                             <p className="font-semibold text-fontcolor text-sm">
-                                                {/* {
-                                                    jobDetails.criteria
-                                                        .education.thirdChoice
-                                                }{" "} */}
+                                                {SerializedData
+                                                    ?.scoring_criteria[2]
+                                                    ?.preference?.thirdChoice ||
+                                                    ""}
                                             </p>
                                         </div>
                                     </ul>
@@ -484,9 +491,10 @@ export default function JobSummary() {
                                                 School Preference
                                             </li>
                                             <li className="font-semibold text-fontcolor text-sm">
-                                                {/* {jobDetails.criteria.schools.schoolPreference.join(
-                                                    ", "
-                                                )}{" "} */}
+                                                {" "}
+                                                {SerializedData?.scoring_criteria[3]?.preference?.schoolPreference?.join(
+                                                    " "
+                                                ) || ""}{" "}
                                             </li>
                                         </div>
                                         <div className="border-b pb-1">
@@ -494,7 +502,11 @@ export default function JobSummary() {
                                                 Honorsy
                                             </li>
                                             <li className="text-semibold text-sm">
-                                                {" "}
+                                                {SerializedData
+                                                    ?.scoring_criteria[4]
+                                                    ?.preference?.honor === "1"
+                                                    ? "Applied"
+                                                    : "Not Applied"}
                                             </li>
                                         </div>
                                         <div className="border-b pb-1">
@@ -502,7 +514,12 @@ export default function JobSummary() {
                                                 Multiple Degrees
                                             </li>
                                             <li className="text-semibold text-sm">
-                                                {" "}
+                                                {SerializedData
+                                                    ?.scoring_criteria[4]
+                                                    ?.preference
+                                                    ?.multipleDegrees === "1"
+                                                    ? "Applied"
+                                                    : "Not Applied"}
                                             </li>
                                         </div>
                                     </ul>
@@ -513,10 +530,9 @@ export default function JobSummary() {
                                             </h4>
                                             <span className="text-fontcolor text-sm">
                                                 Weight:{" "}
-                                                {/* {
-                                                    jobDetails.criteria
-                                                        .certificates.weight
-                                                } */}
+                                                {SerializedData
+                                                    ?.scoring_criteria[5]
+                                                    ?.weight_percentage || ""}
                                                 %
                                             </span>
                                         </div>
@@ -525,10 +541,10 @@ export default function JobSummary() {
                                                 Institutional Preference Bonus
                                             </li>
                                             <li className="font-semibold text-fontcolor text-sm">
-                                                {/* {" "}
-                                                {jobDetails.criteria.certificates.preferred.join(
-                                                    ", "
-                                                )} */}
+                                                {" "}
+                                                {SerializedData?.scoring_criteria[5]?.preference?.preferred?.join(
+                                                    " "
+                                                ) || ""}{" "}
                                             </li>
                                         </ul>
                                     </div>
