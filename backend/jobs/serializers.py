@@ -11,36 +11,52 @@ class ScoringCriteriaSerializer(serializers.ModelSerializer):
         ]
 
 class JobHiringSerializer(serializers.ModelSerializer):
-    
-    company_name = serializers.CharField(source='company.company_name', read_only=True) # kunin ang company name
+    company_name = serializers.CharField(source='company.company_name', read_only=True)
     scoring_criteria = ScoringCriteriaSerializer(many=True, required=False)
 
     class Meta:
         model = JobHiring
         fields = '__all__'
 
-    def create(self, validated_data):
-        scoring_criteria_scores = validated_data.pop('scoring_criteria', [])
-        job_hiring = JobHiring.objects.create(**validated_data) # Create JobHiring instance
+    def validate(self, data):
+        # Default to 'open' if status isn't provided
+        status = data.get('status', 'open')
 
-        for criteria_data in scoring_criteria_scores:
-            ScoringCriteria.objects.create(job_hiring=job_hiring, **criteria_data)
-        
+        # Only check required fields if not a draft
+        if status != 'draft':
+            required_fields = [
+                'job_title', 'job_industry', 'specialization', 'job_description',
+                'region', 'province', 'city', 'work_setup', 'employment_type',
+                'qualifications', 'schedule', 'experience_level',
+                'num_positions', 'salary_frequency'
+            ]
+            missing = [field for field in required_fields if not data.get(field)]
+            if missing:
+                raise serializers.ValidationError(
+                    f"Missing required fields for a published job: {', '.join(missing)}"
+                )
+        return data
+
+    def create(self, validated_data):
+        scoring_data = validated_data.pop('scoring_criteria', [])
+        job_hiring = JobHiring.objects.create(**validated_data)
+        for item in scoring_data:
+            ScoringCriteria.objects.create(job_hiring=job_hiring, **item)
         return job_hiring
-    
+
     def update(self, instance, validated_data):
-        scoring_criteria_scores = validated_data.pop('scoring_criteria', [])
+        scoring_data = validated_data.pop('scoring_criteria', [])
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
         instance.scoring_criteria.all().delete()
-
-        for criteria_data in scoring_criteria_scores:
-            ScoringCriteria.objects.create(job_hiring=instance, **criteria_data)
+        for item in scoring_data:
+            ScoringCriteria.objects.create(job_hiring=instance, **item)
 
         return instance
+
 
 class JobApplicationDocumentSerializer(serializers.ModelSerializer):
     class Meta:

@@ -53,6 +53,9 @@ export default function CreateJob() {
         }
 
         const storedData = getCookie("DRAFT_DATA");
+
+        console.log(storedData);
+
         if (storedData) {
             const parsedData = JSON.parse(storedData);
             setFormData(parsedData);
@@ -153,9 +156,6 @@ export default function CreateJob() {
             [name]: value,
         };
         setFormData(updatedFormData);
-        Cookies.set("DRAFT_DATA", JSON.stringify(updatedFormData), {
-            expires: 1,
-        });
     };
 
     const handleScheduleSelect = (schedule) => {
@@ -173,6 +173,7 @@ export default function CreateJob() {
             errors.job_industry = "Job industry is required.";
         if (!formData.specialization.length)
             errors.specialization = "Specialization is required.";
+        if (!formData.schedule) errors.schedule = "Schedule is required.";
         if (!formData.job_description)
             errors.job_description = "Job description is required.";
         if (!formData.region) errors.region = "Region is required.";
@@ -198,11 +199,6 @@ export default function CreateJob() {
         return errors;
     };
 
-    const formatNumberWithCommas = (number) => {
-        if (!number) return number;
-        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         const errors = validateForm();
@@ -215,9 +211,9 @@ export default function CreateJob() {
             return;
         }
 
-        const token = authTokens?.access;
-        if (!token) return;
-
+        Cookies.set("DRAFT_DATA", JSON.stringify(formData), {
+            expires: 1,
+        });
         router.push(`/COMPANY/CompanySettings`);
     };
 

@@ -3,6 +3,8 @@ from . import views
 
 urlpatterns = [
     path('job-hirings/', views.job_hiring_list, name='job_hiring_list'), # list of all job hirings
+    path('job-hirings/company', views.job_hiring_list_company, name='job_hiring_list_company'), # list of all job hirings for company
+    path('job-hirings/drafts/', views.list_draft_job_hirings, name='list_draft_job_hirings'),  # GET endpoint to list drafts
     path('hirings/<int:pk>/', views.job_hiring_details, name='job_hiring_details'), # specific job hiring
     path('hirings/create/', views.create_job_hiring, name='create-job-hiring'),
     path('hirings/<int:job_hiring_id>/update/', views.update_job_hiring, name='update-job-hiring'),
