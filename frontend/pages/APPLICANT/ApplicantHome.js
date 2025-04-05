@@ -110,13 +110,13 @@ export default function ApplicantHome() {
       <ApplicantHeader />
       <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto">
         <div>
-          <p className="text-fontcolor">Hi, {applicantName}</p>
+          <p className="text-fontcolor text-large">Hi, {applicantName}</p>
         </div>
 
         {/* Search */}
         <div className="pt-5 flex-wrap w-full">
           <div className="flex lg:flex-row gap-5 pb-5 mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col">
-            <div className="relative h-medium rounded-xs border-2 border-fontcolor justify-center flex flex-grow items-center">
+            <div className="relative h-medium rounded-xs border-2 border-[#A5A5A5] justify-center flex flex-grow items-center">
               <div className="absolute left-3">
                 <Image src="/Search Icon.svg" width={26} height={24} alt="Search Icon" />
               </div>
@@ -126,13 +126,13 @@ export default function ApplicantHome() {
                 name="keyword"
                 placeholder="Enter Keyword"
                 required
-                className="w-full h-full border-primarycolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall pl-12"
+                className="w-full h-full border-primarycolor lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall pl-12"
               />
             </div>
 
-            <div className="h-medium rounded-xs border-2 border-fontcolor flex flex-grow">
+            <div className="h-medium rounded-xs border-2 border-[#A5A5A5] flex flex-grow">
               <select
-                className="valid:text-fontcolor invalid:text-placeholder lg:flex-grow mb:flex-grow sm:flex-grow xsm:flex-grow lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
+                className="valid:text-fontcolor invalid:text-placeholder lg:flex-grow mb:flex-grow sm:flex-grow xsm:flex-grow lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall"
                 id="classification"
                 name="classification"
                 required
@@ -146,7 +146,7 @@ export default function ApplicantHome() {
               </select>
             </div>
 
-            <div className="relative h-medium rounded-xs border-2 border-fontcolor justify-center flex flex-grow items-center">
+            <div className="relative h-medium rounded-xs border-2 border-[#A5A5A5] justify-center flex flex-grow items-center">
               <div className="absolute left-3">
                 <Image src="/Location Icon.svg" width={24} height={24} alt="Search Icon" />
               </div>
@@ -156,7 +156,7 @@ export default function ApplicantHome() {
                 name="location"
                 placeholder="Metro Manila"
                 required
-                className="w-full h-full border-primarycolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall pl-12"
+                className="w-full h-full border-primarycolor lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall pl-12"
               />
             </div>
 
@@ -170,7 +170,7 @@ export default function ApplicantHome() {
         <div className="pt-5 w-full">
           <div className="flex gap-5 pb-5 overflow-x-auto">
             <div className="h-medium rounded-xs bg-secondary flex flex-grow min-w-[200px]">
-              <select className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium" id="date-posted" name="DatePosted" required>
+              <select className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall" id="date-posted" name="DatePosted" required>
                 <option value="" disabled selected hidden>
                   Date Posted
                 </option>
@@ -181,7 +181,7 @@ export default function ApplicantHome() {
             </div>
 
             <div className="h-medium rounded-xs bg-secondary flex flex-grow min-w-[200px]">
-              <select className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium" id="work-setup" name="WorkSetup" required>
+              <select className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall" id="work-setup" name="WorkSetup" required>
                 <option value="" disabled selected hidden>
                   Work Setup
                 </option>
@@ -192,7 +192,7 @@ export default function ApplicantHome() {
             </div>
 
             <div className="h-medium rounded-xs bg-secondary flex flex-grow min-w-[200px]">
-              <select className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium" id="employ-type" name="EmployType" required>
+              <select className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall" id="employ-type" name="EmployType" required>
                 <option value="" disabled selected hidden>
                   Employment Type
                 </option>
@@ -205,16 +205,16 @@ export default function ApplicantHome() {
      
             <div className="relative">
               <div className="flex flex-col justify-center h-medium rounded-xs bg-secondary flex-grow min-w-[200px] cursor-pointer"onClick={() => setIsSalaryOpen(!isSalaryOpen)} >
-                <div className="flex text-fontcolor items-center text-sm px-3">
+                <div className="flex text-fontcolor items-center lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall px-3">
                     {isSalaryOpen ? "" : ` ${paymentType || "Select Salary Type"}`}
                 </div>
               </div>
 
               {isSalaryOpen && (
                 <div className="bg-white mt-2 w-full p-4 rounded-md shadow-lg">
-                  <div className="flex space-x-4 border-b">
+                  <div className="flex space-x-4 border-b lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                     {["Annually", "Monthly", "Hourly"].map((type) => (
-                      <button key={type} className={`pb-2 text-sm ${ paymentType === type
+                      <button key={type} className={`pb-2 lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall ${ paymentType === type
                             ? "text-primary border-b-2 border-blue-500"
                             : "text-gray-500"
                         }`}
@@ -225,12 +225,12 @@ export default function ApplicantHome() {
                   </div>
 
                   {/* Label */}
-                  <div className="text-gray-500 text-medium mt-4">Salary Range (PHP)</div>
+                  <div className="text-gray-500 lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall mt-4">Salary Range (PHP)</div>
                   <div className="mt-4 space-y-2 max-h-20 overflow-y-auto">
                     {paymentType && salaryRanges[paymentType].map((value, index) => (
                         <label key={index}className="flex items-center space-x-2 text-gray-700 cursor-pointer">
                           <input type="radio" name="salaryRange" value={index} checked={range === index} onChange={() => { setRange(index); setIsSalaryOpen(false);}} className=" ml-5 w-5 h-5" />
-                            <span className='text-medium'>{formatSalary(index)}</span>
+                            <span className='lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall'>{formatSalary(index)}</span>
                         </label>
                       ))}
                   </div>
@@ -239,7 +239,7 @@ export default function ApplicantHome() {
             </div>
 
             <div className="h-medium rounded-xs bg-secondary flex flex-grow min-w-[200px]">
-              <select className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium" id="exp-level" name="ExperienceLevel" required>
+              <select className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall" id="exp-level" name="ExperienceLevel" required>
                 <option value="" disabled selected hidden>
                   Experience Level
                 </option>
