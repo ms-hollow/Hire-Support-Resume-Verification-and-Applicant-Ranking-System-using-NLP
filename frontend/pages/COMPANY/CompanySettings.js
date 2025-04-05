@@ -18,6 +18,7 @@ export default function CompanySettings() {
         application_deadline: "",
         weight_of_criteria: "",
         verification_option: "",
+        additional_notes: "",
         criteria: {
             workExperience: {
                 directlyRelevant: [],
@@ -129,6 +130,7 @@ export default function CompanySettings() {
             application_deadline: parsedStoredData?.application_deadline || "",
             verification_option: parsedStoredData?.verification_option || "",
             weight_of_criteria: parsedStoredData?.weight_of_criteria || "",
+            additional_notes: parsedStoredData?.additional_notes || "",
             criteria: {
                 ...prevData.criteria,
                 workExperience: {
@@ -230,6 +232,11 @@ export default function CompanySettings() {
             return false;
         }
 
+        if (!formData.additional_notes){
+            alert("Please add additional notes.");
+            return false;
+        }
+
         //* UNCOMMENT IF APPLIED
         // const today = new Date();
         // const selectedDeadline = new Date(formData.application_deadline);
@@ -283,6 +290,7 @@ export default function CompanySettings() {
             weight_of_criteria: formData.weight_of_criteria,
             verification_option: formData.verification_option,
             weight_of_criteria: formData.weight_of_criteria,
+            additional_notes: formData.additional_notes,
             scoring_criteria: [
                 {
                     criteria_name: "Work Experience",
@@ -343,6 +351,8 @@ export default function CompanySettings() {
                 },
             ],
         };
+
+        console.log("Final Merged Data:", mergedData);
 
         Cookies.set("SERIALIZED_DATA", JSON.stringify(mergedData), {
             expires: 1,
@@ -2379,6 +2389,25 @@ export default function CompanySettings() {
                                     </option>
                                 </select>
                             </div>
+
+                            <div className="mb-6">
+                                <label
+                                    htmlFor="verification-option"
+                                    className="block text-sm font-semibold text-primary mb-2"
+                                >
+                                    {" "}
+                                    Additional Notes
+                                </label>
+
+                                <textarea
+                                    name="additional_notes"
+                                    placeholder="Additional Notes"
+                                    value={formData.additional_notes}
+                                    onChange={handleInputChange}
+                                    className="w-full p-1 rounded-xs border-2 border-fontcolor text-fontcolor h-20"
+                                ></textarea>
+                            </div>
+
                             <div className="flex justify-between mt-8">
                                 <button
                                     type="button"

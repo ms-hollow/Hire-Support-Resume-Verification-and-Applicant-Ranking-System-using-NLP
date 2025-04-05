@@ -4,6 +4,12 @@ from users.models import User
 
 #TODO Need to migrate
 
+STATUS_CHOICES = (
+    ('draft', 'Draft'),
+    ('open', 'Open'),
+    ('closed', 'Closed'),
+)
+
 class JobHiring(models.Model): 
     job_hiring_id = models.AutoField(primary_key=True) #PK
     company = models.ForeignKey(Company, on_delete=models.CASCADE) #FK
@@ -11,7 +17,7 @@ class JobHiring(models.Model):
     job_title = models.CharField(max_length=100, null=True, blank=False)
     job_industry = models.CharField(max_length=50, null=True, blank=False)
     specialization = models.JSONField(null=True, blank=False)
-    job_description = models.TextField()
+    job_description = models.TextField(null=True, blank=False)
     
     region = models.CharField(max_length=300, null=True, blank=False)
     province = models.CharField(max_length=300, null=True, blank=False)
@@ -32,9 +38,10 @@ class JobHiring(models.Model):
     verification_option = models.CharField(max_length=300, null=True, blank=True)
     required_documents = models.JSONField(null=True, blank=True)
     application_deadline = models.DateField(null=True, blank=True)
-    status = models.CharField(max_length=10, null=True, blank=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, null=True, blank=True)
 
-    weight_of_criteria = models.JSONField(null=True, blank=True)  # New field
+    weight_of_criteria = models.JSONField(null=True, blank=True)
+    additional_notes = models.TextField(null=True, blank=True) 
 
     def get_scoring_criteria(self):
         criteria_list = []

@@ -2,13 +2,31 @@ import CompanyHeader from "@/components/CompanyHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import Cookies from "js-cookie";
+import { createJob } from "../api/jobApi";
+import AuthContext from "../context/AuthContext";
+import { useRouter } from "next/router";
 
 export default function JobSummary() {
     const [SerializedData, setSerializedData] = useState(null);
     const [salaryMin, setSalaryMin] = useState(null);
     const [salaryMax, setSalaryMax] = useState(null);
+    const [status, setStatus] = useState("Draft");
+    const router = useRouter();
+
+    let { authTokens } = useContext(AuthContext);
+
+    useEffect(() => {
+        const fetchToken = async () => {
+            if (!authTokens) {
+                router.push("/GENERAL/Login");
+                return;
+            }
+        };
+
+        fetchToken();
+    }, [authTokens, router]);
 
     useEffect(() => {
         const storedData = Cookies.get("SERIALIZED_DATA");
@@ -21,7 +39,6 @@ export default function JobSummary() {
         try {
             const parsedStoredData = JSON.parse(storedData);
             setSerializedData(parsedStoredData);
-            console.log("Parsed stored data:", parsedStoredData);
 
             const formatNumberWithCommas = (number) => {
                 if (!number) return number;
@@ -36,7 +53,102 @@ export default function JobSummary() {
         }
     }, []);
 
-    const handleStatusUpdate = (status) => {};
+    const handleSaveAsDraft = async () => {
+        if (!SerializedData) {
+            console.error("Serialized data is not available.");
+            return;
+        }
+
+        const formData = {
+            job_title: SerializedData.job_title,
+            job_industry: SerializedData.job_industry,
+            specialization: SerializedData.specialization,
+            job_description: SerializedData.job_description,
+            company_name: SerializedData.company_name,
+            additional_notes: SerializedData.additional_notes,
+            application_deadline: SerializedData.application_deadline,
+            benefits: SerializedData.benefits,
+            city: SerializedData.city,
+            company: SerializedData.company,
+            creation_date: new Date().toISOString(),
+            employment_type: SerializedData.employment_type,
+            experience_level: SerializedData.experience_level,
+            num_positions: SerializedData.num_positions,
+            qualifications: SerializedData.qualifications,
+            region: SerializedData.region,
+            province: SerializedData.province,
+            required_documents: SerializedData.required_documents,
+            salary_frequency: SerializedData.salary_frequency,
+            salary_max: salaryMax,
+            salary_min: salaryMin,
+            schedule: SerializedData.schedule,
+            scoring_criteria: SerializedData.scoring_criteria,
+            verification_option: SerializedData.verification_option,
+            weight_of_criteria: SerializedData.weight_of_criteria,
+            work_setup: SerializedData.work_setup,
+            status: "draft",
+        };
+
+        const response = await createJob(formData, authTokens.access);
+
+        if (response) {
+            console.log("Job created successfully:", response);
+        } else {
+            console.error("Failed to create job.");
+        }
+        Cookies.remove("DRAFT_DATA");
+        Cookies.remove("SERIALIZED_DATA");
+        router.push("/COMPANY/CompanyHome");
+    };
+
+    const handlePublish = async () => {
+        if (!SerializedData) {
+            console.error("Serialized data is not available.");
+            return;
+        }
+
+        const formData = {
+            job_title: SerializedData.job_title,
+            job_industry: SerializedData.job_industry,
+            specialization: SerializedData.specialization,
+            job_description: SerializedData.job_description,
+            company_name: SerializedData.company_name,
+            additional_notes: SerializedData.additional_notes,
+            application_deadline: SerializedData.application_deadline,
+            benefits: SerializedData.benefits,
+            city: SerializedData.city,
+            company: SerializedData.company,
+            creation_date: new Date().toISOString(),
+            employment_type: SerializedData.employment_type,
+            experience_level: SerializedData.experience_level,
+            num_positions: SerializedData.num_positions,
+            qualifications: SerializedData.qualifications,
+            region: SerializedData.region,
+            province: SerializedData.province,
+            required_documents: SerializedData.required_documents,
+            salary_frequency: SerializedData.salary_frequency,
+            salary_max: salaryMax,
+            salary_min: salaryMin,
+            schedule: SerializedData.schedule,
+            scoring_criteria: SerializedData.scoring_criteria,
+            verification_option: SerializedData.verification_option,
+            weight_of_criteria: SerializedData.weight_of_criteria,
+            work_setup: SerializedData.work_setup,
+            status: "open",
+        };
+
+        const response = await createJob(formData, authTokens.access);
+
+        if (response) {
+            console.log("Job created successfully:", response);
+        } else {
+            console.error("Failed to create job.");
+        }
+
+        Cookies.remove("DRAFT_DATA");
+        Cookies.remove("SERIALIZED_DATA");
+        router.push("/COMPANY/CompanyHome");
+    };
 
     return (
         <div>
@@ -75,7 +187,9 @@ export default function JobSummary() {
                                         </p>
                                         <div className="flex items-center gap-2">
                                             <p className="font-thin text-fontcolor text-xsmall">
-                                                1/15/2025
+                                                {new Date().toLocaleDateString(
+                                                    "en-US"
+                                                )}
                                             </p>
                                             <Image
                                                 src="/Menu.svg"
@@ -243,12 +357,7 @@ export default function JobSummary() {
                                         Additional Notes
                                     </p>
                                     <p className="font-thin text-xsmall text-fontcolor pb-6">
-                                        • This position offers the opportunity
-                                        to work on cutting-edge projects and
-                                        make a significant impact on the
-                                        company's success. <br></br>• Applicants
-                                        should be proactive, innovative, and
-                                        passionate about technology.
+                                        {SerializedData?.additional_notes || ""}
                                     </p>
                                 </div>
                             </div>
@@ -579,7 +688,7 @@ export default function JobSummary() {
                         <div className="flex gap-4">
                             <button
                                 type="button"
-                                onClick={() => handleStatusUpdate("publish")}
+                                onClick={handleSaveAsDraft}
                                 className="button2 flex items-center justify-center"
                             >
                                 <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
@@ -590,17 +699,12 @@ export default function JobSummary() {
 
                             <button
                                 type="button"
-                                onClick={() => handleStatusUpdate("publish")}
+                                onClick={handlePublish}
                                 className="button1 flex items-center justify-center"
                             >
-                                <Link
-                                    href="/COMPANY/CompanyHome"
-                                    className="flex items-center space-x-2 ml-auto"
-                                >
-                                    <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
-                                        Publish Job Hiring
-                                    </p>
-                                </Link>
+                                <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
+                                    Publish Job Hiring
+                                </p>
                             </button>
                         </div>
                     </div>
