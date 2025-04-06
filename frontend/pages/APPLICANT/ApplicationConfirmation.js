@@ -54,12 +54,12 @@ export default function ApplicationConfirmation ({handleJobClick}) {
     return ( 
         <div>
             <ApplicantHeader/>
-                <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 sm:px-8 xsm:px-8 lg:px-20 py-8 mx-auto">
-                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
+                <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto">
+                    <p className="font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall   text-fontcolor pb-1">You are Applying for </p>
                     <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompanyFromLocalStorage() || 'No Job Company Available'}</p>
                     <div className="relative">
-                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-8 font-bold underline cursor-pointer" onClick={handleToggleDetails} >See job hiring details</p>
+                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall  text-fontcolor pb-8 font-bold underline cursor-pointer" onClick={handleToggleDetails} >See job hiring details</p>
                         {showJobDetails && (
                             <div className="flex items-center justify-center absolute inset-0 bg-background h-screen ">
                                 <div className="relative w-full lg:w-6/12 mb:w-10/12 sm:w-full z-10 bg-background rounded ">
@@ -73,7 +73,7 @@ export default function ApplicationConfirmation ({handleJobClick}) {
                         )}
                     </div>
                     <div className="flex items-center justify-center">
-                        <div className="box-container px-8 py-5 mx-auto">
+                        <div className="job-application-box rounded-xs px-8 py-5 mx-auto">
                             <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium text-primary">Please review your application</p>
 
                             <div className="flex items-center pt-2 pb-2">

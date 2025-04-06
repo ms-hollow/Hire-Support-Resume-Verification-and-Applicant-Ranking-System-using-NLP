@@ -275,7 +275,7 @@ const JobDetails = ({ authToken }) => {
             {/* Top Part of Job Details - Fixed */}
             <div className="job-details-box border-b-8 top rounded-t-lg p-4">
                 <div className="flex justify-between items-center">
-                    <p className="font-semibold text-fontcolor text-xlarge lg:text-xlarge mb:text-large sm:text-large xsm:text-large xxsm:text-large">{jobDetails.job_title}</p>
+                    <p className="font-semibold text-fontcolor lg:text-xlarge mb:text-large sm:text-large xsm:text-large xxsm:text-large">{jobDetails.job_title}</p>
                     <div className="flex items-center gap-2">
                         <p className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">{jobDetails.creation_date}</p>
                         <Image 
