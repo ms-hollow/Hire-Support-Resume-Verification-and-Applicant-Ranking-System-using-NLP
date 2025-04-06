@@ -1,432 +1,447 @@
 import { useState, useContext, useEffect } from "react";
 import Image from "next/image";
 import AuthContext from "@/pages/context/AuthContext";
-import jwt from "jsonwebtoken";
 import { useRouter } from "next/router";
+import phLocations from "@/public/placeHolder/philippines.json";
 import {
-  fetchRegions,
-  fetchProvinces,
-  fetchCities,
-  fetchBarangays,
-} from "@/pages/api/locationApi";
-import {
-  getCompanyProfile,
-  updateCompanyProfile,
+    getCompanyProfile,
+    updateCompanyProfile,
 } from "@/pages/api/companyApi";
 
 const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
-  const { authTokens } = useContext(AuthContext);
-  const router = useRouter();
-  const [formData, setFormData] = useState({
-    company_name: "",
-    num_applicants: "",
-    email: "",
-    contact_number: "",
-    job_industry: "",
-    region: "",
-    province: "",
-    city: "",
-    postal_code: "",
-    barangay: "",
-    present_address: "",
-    linkedin_profile: "",
-  });
+    const { authTokens } = useContext(AuthContext);
+    const router = useRouter();
+    const [regions, setRegions] = useState([]);
+    const [provinces, setProvinces] = useState([]);
+    const [cities, setCities] = useState([]);
+    const [barangays, setBarangays] = useState([]);
+    const [formData, setFormData] = useState({
+        company_name: "",
+        number_applicants: "",
+        email: "",
+        contact_number: "",
+        job_industry: "",
+        region: "",
+        province: "",
+        city: "",
+        postal_code: "",
+        barangay: "",
+        present_address: "",
+        linkedin_profile: "",
+    });
 
-  const handlePhoneNumberChange = (e) => {
-    const value = e.target.value;
-    if (/^\d*$/.test(value) && value.length <= 10) {
-      setFormData({ ...formData, contact_number: value });
-    }
-  };
+    // Fetch company profile on mount
+    useEffect(() => {
+        const fetchProfile = async () => {
+            const profileData = await getCompanyProfile(authTokens);
+            if (profileData) {
+                setFormData(profileData);
+            }
+        };
+        fetchProfile();
+    }, [authTokens]);
 
-  const [regions, setRegions] = useState([]);
-  const [provinces, setProvinces] = useState([]);
-  const [cities, setCities] = useState([]);
-  const [barangays, setBarangays] = useState([]);
-
-  // Load regions when the component mounts
-  useEffect(() => {
-    const loadRegions = async () => {
-      const data = await fetchRegions();
-      setRegions(data);
-    };
-    loadRegions();
-  }, []);
-
-  // Load provinces or cities when the region changes
-  useEffect(() => {
-    const loadProvincesOrCities = async () => {
-      if (!formData.region) {
-        setProvinces([]);
-        setCities([]);
-        setBarangays([]);
-        return;
-      }
-
-      if (formData.region === "130000000") {
-        // If NCR, directly fetch cities instead of provinces
-        const cityData = await fetchCities(null, formData.region);
-        setCities(cityData);
-        setProvinces([]);
-        setFormData((prev) => ({ ...prev, province: "", city: "" }));
-      } else {
-        const provinceData = await fetchProvinces(formData.region);
-        setProvinces(provinceData);
-        setCities([]);
-      }
+    const handlePhoneNumberChange = (e) => {
+        const value = e.target.value;
+        if (/^\d*$/.test(value) && value.length <= 10) {
+            setFormData({ ...formData, contact_number: value });
+        }
     };
 
-    loadProvincesOrCities();
-  }, [formData.region]);
+    useEffect(() => {
+        setRegions(phLocations);
+    }, []);
 
-  // Load cities when the province changes
-  useEffect(() => {
-    const loadCities = async () => {
-      if (!formData.province || formData.region === "130000000") return;
-      const cityData = await fetchCities(formData.province, formData.region);
-      setCities(cityData);
+    useEffect(() => {
+        if (formData.region) {
+            const selectedRegion = phLocations.find(
+                (region) => region.id === formData.region
+            );
+            const provincesList = selectedRegion ? selectedRegion.p : [];
+            setProvinces(provincesList);
+
+            if (!provincesList.find((p) => p.n === formData.province)) {
+                setFormData((prev) => ({
+                    ...prev,
+                    province: "",
+                    city: "",
+                    barangay: "",
+                }));
+                setCities([]);
+                setBarangays([]);
+            }
+        }
+    }, [formData.region]);
+
+    useEffect(() => {
+        if (formData.province) {
+            const selectedProvince = provinces.find(
+                (province) => province.n === formData.province
+            );
+            const cityList = selectedProvince ? selectedProvince.c : [];
+            setCities(cityList);
+
+            if (!cityList.find((c) => c.n === formData.city)) {
+                setFormData((prev) => ({ ...prev, city: "", barangay: "" }));
+                setBarangays([]);
+            }
+        }
+    }, [formData.province, provinces]);
+
+    useEffect(() => {
+        if (formData.city) {
+            const selectedCity = cities.find(
+                (city) => city.n === formData.city
+            );
+            const barangayList = selectedCity ? selectedCity.b : [];
+            setBarangays(barangayList);
+
+            if (!barangayList.find((b) => b === formData.barangay)) {
+                setFormData((prev) => ({ ...prev, barangay: "" }));
+            }
+        }
+    }, [formData.city, cities]);
+
+    // Handle input changes
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
     };
 
-    loadCities();
-  }, [formData.province]);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-  // Load barangays when the city changes
-  useEffect(() => {
-    const loadBarangays = async () => {
-      if (!formData.city) return;
-      const barangayData = await fetchBarangays(formData.city);
-      setBarangays(barangayData);
+        const success = await updateCompanyProfile(authTokens, formData);
+        if (success) {
+            alert("Company profile updated!");
+            if (onUpdateComplete) {
+                onUpdateComplete();
+            }
+            validate();
+        } else {
+            alert("Error updating profile. See console for details.");
+        }
     };
 
-    loadBarangays();
-  }, [formData.city]);
+    const validate = async () => {
+        if (typeof window !== "undefined") {
+            const fullUrl = window.location.href;
 
-  // Handle input changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const success = await updateCompanyProfile(authTokens, formData);
-    if (success) {
-      alert("Company profile updated!");
-      if (onUpdateComplete) {
-        onUpdateComplete();
-      }
-      validate();
-    } else {
-      alert("Error updating profile. See console for details.");
-    }
-  };
-
-  const validate = async () => {
-    if (typeof window !== "undefined") {
-      const fullUrl = window.location.href;
-      // console.log("Full URL:", fullUrl);
-
-      if (fullUrl === "http://localhost:3000/COMPANY/CompanyProfile") {
-        router.push("/COMPANY/CompanyProfile");
-      } else if (fullUrl === "http://localhost:3000/GENERAL/Register") {
-        router.push("/COMPANY/CompanyHome");
-      } else {
-        alert("An unexpected error occurred. Please try again later.");
-      }
-    }
-  };
-
-  // Fetch company profile on mount
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const profileData = await getCompanyProfile(authTokens);
-      if (profileData) {
-        setFormData(profileData);
-      }
+            if (fullUrl === "http://localhost:3000/COMPANY/CompanyProfile") {
+                router.push("/COMPANY/CompanyProfile");
+            } else if (fullUrl === "http://localhost:3000/GENERAL/Register") {
+                router.push("/COMPANY/CompanyHome");
+            } else {
+                alert("An unexpected error occurred. Please try again later.");
+            }
+        }
     };
 
-    fetchProfile();
-  }, [authTokens]);
+    return (
+        <div>
+            <form onSubmit={handleSubmit}>
+                <div className="flex gap-5 pb-5">
+                    <div className="flex flex-col flex-grow">
+                        <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">
+                            Company Name
+                        </p>
+                        <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+                            <input
+                                type="text"
+                                name="company_name"
+                                value={formData.company_name}
+                                placeholder=""
+                                required
+                                onChange={handleChange}
+                            ></input>
+                        </div>
+                    </div>
+                </div>
+                <div className="flex lg:flex-row sm:flex-col gap-5 pb-5">
+                    <div className="flex flex-col flex-grow">
+                        <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">
+                            Industry/Sector
+                        </p>
+                        <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+                            <select
+                                className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
+                                name="job_industry"
+                                value={formData.job_industry}
+                                required
+                                onChange={handleChange}
+                            >
+                                <option value="" disabled selected hidden>
+                                    Select Sector
+                                </option>
+                                <option value="IT">
+                                    Information Technology (IT)
+                                </option>
+                                <option value="IT">
+                                    Information System (IS)
+                                </option>
+                                <option value="Computer Science">
+                                    Computer Science
+                                </option>
+                                <option value="Data Science">
+                                    Data Science
+                                </option>
+                                <option value="Cybersecurity">
+                                    Cybersecurity
+                                </option>
+                                <option value="Artificial Intelligence">
+                                    Artificial Intelligence
+                                </option>
+                                <option value="Cloud Computing">
+                                    Cloud Computing
+                                </option>
+                                <option value="Robotics">Robotics</option>
+                                <option value="Bioinformatics">
+                                    Bioinformatics
+                                </option>
+                            </select>
+                        </div>
+                    </div>
 
-  return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <div className="flex gap-5 pb-5">
-          <div className="flex flex-col flex-grow">
-            <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">
-              Company Name
-            </p>
-            <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-              <input
-                type="text"
-                name="company_name"
-                value={formData.company_name}
-                placeholder=""
-                required
-                onChange={handleChange}
-              ></input>
-            </div>
-          </div>
+                    <div className="flex flex-col flex-grow">
+                        <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">
+                            No. of Employees
+                        </p>
+                        <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+                            <input
+                                type="text"
+                                name="number_applicants"
+                                value={formData.number_applicants}
+                                placeholder=""
+                                required
+                                onChange={handleChange}
+                            ></input>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex lg:flex-row sm:flex-col gap-5 pb-5">
+                    <div className="flex flex-col flex-grow">
+                        <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">
+                            Email Address
+                        </p>
+                        <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+                            <input
+                                type="text"
+                                name="email"
+                                value={formData.email}
+                                placeholder="applicant@gmail.com"
+                                required
+                                onChange={handleChange}
+                                disabled
+                            ></input>
+                        </div>
+                    </div>
+                    <div className="flex flex-col flex-grow">
+                        <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">
+                            Contact No.
+                        </p>
+                        <div className="h-medium rounded-xs border-2 border-fontcolor flex items-center">
+                            <span className="pl-2 pr-1 text-fontcolor">
+                                +63
+                            </span>
+                            <input
+                                type="text"
+                                name="contact_number"
+                                value={formData.contact_number}
+                                required
+                                onChange={handlePhoneNumberChange}
+                                maxLength="10"
+                                placeholder="9XXXXXXXXX"
+                                className="flex-grow outline-none"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex lg:flex-row sm:flex-col flex-grow gap-5 pb-5">
+                    <div className="flex flex-col flex-grow">
+                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
+                            Region
+                        </p>
+                        <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+                            <select
+                                className="valid:text-fontcolor invalid:text-placeholder w-full mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
+                                id="region"
+                                name="region"
+                                value={formData.region}
+                                onChange={handleChange}
+                                required
+                            >
+                                <option value="" disabled selected hidden>
+                                    Select Region
+                                </option>
+                                {regions.map((region) => (
+                                    <option key={region.id} value={region.id}>
+                                        {region.n}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col flex-grow">
+                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
+                            Province
+                        </p>
+                        <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+                            <select
+                                className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
+                                id="province"
+                                name="province"
+                                value={formData.province}
+                                onChange={handleChange}
+                                required={formData.region !== "130000000"}
+                                disabled={formData.region === "130000000"}
+                            >
+                                <option
+                                    value="province"
+                                    disabled
+                                    selected
+                                    hidden
+                                >
+                                    Select Province
+                                </option>
+                                {provinces.map((province, index) => (
+                                    <option key={index} value={province.n}>
+                                        {province.n}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col flex-grow-0 lg:w-1/4 mb:w-full sm:w-full">
+                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
+                            Postal Code
+                        </p>
+                        <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+                            <input
+                                type="text"
+                                name="postal_code"
+                                value={formData.postal_code}
+                                placeholder=""
+                                required
+                                onChange={handleChange}
+                            ></input>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex lg:flex-row sm:flex-col flex-grow gap-5 pb-5">
+                    <div className="flex flex-col flex-grow">
+                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
+                            City/Municipality
+                        </p>
+                        <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+                            <select
+                                className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
+                                id="city"
+                                name="city"
+                                required
+                                value={formData.city}
+                                onChange={handleChange}
+                            >
+                                <option value="city" disabled selected hidden>
+                                    Select City
+                                </option>
+                                {cities.map((city, index) => (
+                                    <option key={index} value={city.n}>
+                                        {city.n}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                    <div className="flex flex-col flex-grow">
+                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
+                            Barangay
+                        </p>
+                        <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+                            <select
+                                className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
+                                id="barangay"
+                                name="barangay"
+                                required
+                                value={formData.barangay}
+                                onChange={handleChange}
+                            >
+                                <option
+                                    value="barangay"
+                                    disabled
+                                    selected
+                                    hidden
+                                >
+                                    Select Barangay
+                                </option>
+                                {barangays.map((barangay, index) => (
+                                    <option key={index} value={barangay}>
+                                        {barangay}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex lg:flex-col mb:flex-col sm:flex-col xsm: flex-col flex-grow pb-5">
+                    <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-medium pb-1">
+                        Lot, Block, Unit, Building, Floor, Street Name,
+                        Subdivision
+                    </p>
+                    <div className="h-medium rounded-xs border-2 border-fontcolor flex ">
+                        <input
+                            type="complete"
+                            name="present_address"
+                            value={formData.present_address}
+                            placeholder=""
+                            required
+                            onChange={handleChange}
+                        ></input>
+                    </div>
+
+                    <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-medium pt-5">
+                        LinkedIn Profile Link
+                    </p>
+                    <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+                        <input
+                            type="linkedin-link"
+                            name="linkedin_profile"
+                            value={formData.linkedin_profile}
+                            placeholder=""
+                            required
+                            onChange={handleChange}
+                        ></input>
+                    </div>
+                </div>
+
+                <div className="flex justify-end">
+                    {isEditable && (
+                        <button
+                            onClick={handleSubmit}
+                            className="button1 mt-5 flex items-center justify-center"
+                        >
+                            <div className="flex items-center space-x-2">
+                                <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-small font-medium text-center">
+                                    {isEditable ? "Continue" : "Register"}
+                                </p>
+                                <Image
+                                    src="/Arrow Right.svg"
+                                    width={23}
+                                    height={10}
+                                    alt="Notification Icon"
+                                />
+                            </div>
+                        </button>
+                    )}
+                </div>
+            </form>
         </div>
-        <div className="flex lg:flex-row sm:flex-col gap-5 pb-5">
-          <div className="flex flex-col flex-grow">
-            <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">
-              Industry/Sector
-            </p>
-            <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-              <select
-                className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
-                name="job_industry"
-                value={formData.job_industry}
-                required
-                onChange={handleChange}
-              >
-                <option value="" disabled selected hidden>
-                  Select Sector
-                </option>
-                <option value="IT">Information Technology (IT)</option>
-                <option value="IT">Information System (IS)</option>
-                <option value="Computer Science">Computer Science</option>
-                <option value="Data Science">Data Science</option>
-                <option value="Cybersecurity">Cybersecurity</option>
-                <option value="Artificial Intelligence">
-                  Artificial Intelligence
-                </option>
-                <option value="Cloud Computing">Cloud Computing</option>
-                <option value="Robotics">Robotics</option>
-                <option value="Bioinformatics">Bioinformatics</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="flex flex-col flex-grow">
-            <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">
-              No. of Employees
-            </p>
-            <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-              <input
-                type="text"
-                name="num_applicants"
-                value={formData.num_applicants}
-                placeholder=""
-                required
-                onChange={handleChange}
-              ></input>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex lg:flex-row sm:flex-col gap-5 pb-5">
-          <div className="flex flex-col flex-grow">
-            <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">
-              Email Address
-            </p>
-            <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-              <input
-                type="text"
-                name="email"
-                value={formData.email}
-                placeholder="applicant@gmail.com"
-                required
-                onChange={handleChange}
-                disabled
-              ></input>
-            </div>
-          </div>
-          <div className="flex flex-col flex-grow">
-            <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">
-              Contact No.
-            </p>
-            <div className="h-medium rounded-xs border-2 border-fontcolor flex items-center">
-              <span className="pl-2 pr-1 text-fontcolor">+63</span>
-              <input
-                type="text"
-                name="contact_number"
-                value={formData.contact_number}
-                required
-                onChange={handlePhoneNumberChange}
-                maxLength="10"
-                placeholder="9XXXXXXXXX"
-                className="flex-grow outline-none"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex lg:flex-row sm:flex-col flex-grow gap-5 pb-5">
-          <div className="flex flex-col flex-grow">
-            <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
-              Region
-            </p>
-            <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-              <select
-                className="valid:text-fontcolor invalid:text-placeholder w-full mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
-                id="region"
-                name="region"
-                value={formData.region}
-                onChange={handleChange}
-                required
-              >
-                <option value="" disabled selected hidden>
-                  Select Region
-                </option>
-                {regions.map((region) => (
-                  <option key={region.code} value={region.code}>
-                    {region.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="flex flex-col flex-grow">
-            <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
-              Province
-            </p>
-            <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-              <select
-                className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
-                id="province"
-                name="province"
-                value={formData.province}
-                onChange={handleChange}
-                required={formData.region !== "130000000"}
-                disabled={formData.region === "130000000"}
-              >
-                <option value="province" disabled selected hidden>
-                  Select Province
-                </option>
-                {provinces.map((province) => (
-                  <option key={province.code} value={province.code}>
-                    {province.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="flex flex-col flex-grow-0 lg:w-1/4 mb:w-full sm:w-full">
-            <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
-              Postal Code
-            </p>
-            <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-              <input
-                type="text"
-                name="postal_code"
-                value={formData.postal_code}
-                placeholder=""
-                required
-                onChange={handleChange}
-              ></input>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex lg:flex-row sm:flex-col flex-grow gap-5 pb-5">
-          <div className="flex flex-col flex-grow">
-            <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
-              City/Municipality
-            </p>
-            <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-              <select
-                className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
-                id="city"
-                name="city"
-                required
-                value={formData.city}
-                onChange={handleChange}
-              >
-                <option value="city" disabled selected hidden>
-                  Select City
-                </option>
-                {cities.map((city) => (
-                  <option key={city.code} value={city.code}>
-                    {city.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className="flex flex-col flex-grow">
-            <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
-              Barangay
-            </p>
-            <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-              <select
-                className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
-                id="barangay"
-                name="barangay"
-                required
-                value={formData.barangay}
-                onChange={handleChange}
-              >
-                <option value="barangay" disabled selected hidden>
-                  Select Barangay
-                </option>
-                {barangays.map((city) => (
-                  <option key={city.code} value={city.code}>
-                    {city.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex lg:flex-col mb:flex-col sm:flex-col xsm: flex-col flex-grow pb-5">
-          <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-medium pb-1">
-            Lot, Block, Unit, Building, Floor, Street Name, Subdivision
-          </p>
-          <div className="h-medium rounded-xs border-2 border-fontcolor flex ">
-            <input
-              type="complete"
-              name="present_address"
-              value={formData.present_address}
-              placeholder=""
-              required
-              onChange={handleChange}
-            ></input>
-          </div>
-
-          <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-medium pt-5">
-            LinkedIn Profile Link
-          </p>
-          <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-            <input
-              type="linkedin-link"
-              name="linkedin_profile"
-              value={formData.linkedin_profile}
-              placeholder=""
-              required
-              onChange={handleChange}
-            ></input>
-          </div>
-        </div>
-
-        <div className="flex justify-end">
-          {isEditable && (
-            <button
-              onClick={handleSubmit}
-              className="button1 mt-5 flex items-center justify-center"
-            >
-              <div className="flex items-center space-x-2">
-                <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-small font-medium text-center">
-                  {isEditable ? "Continue" : "Register"}
-                </p>
-                <Image
-                  src="/Arrow Right.svg"
-                  width={23}
-                  height={10}
-                  alt="Notification Icon"
-                />
-              </div>
-            </button>
-          )}
-        </div>
-      </form>
-    </div>
-  );
+    );
 };
 
 export default CompanyInfo;

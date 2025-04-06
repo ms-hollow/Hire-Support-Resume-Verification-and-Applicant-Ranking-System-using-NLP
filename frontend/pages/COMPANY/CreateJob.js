@@ -265,7 +265,7 @@ export default function CreateJob() {
                 setFormData((prev) => ({ ...prev, city: "" }));
             }
         }
-    }, [formData.province, provinces]); // Trigger when formData.province or provinces change
+    }, [formData.province, provinces]); 
 
     const handleMultiSelectChange = (option) => {
         setFormData((prev) => {

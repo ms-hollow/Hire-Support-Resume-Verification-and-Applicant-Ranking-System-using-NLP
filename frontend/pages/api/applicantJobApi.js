@@ -1,4 +1,3 @@
-
 export const fetchJobListings = async (authToken) => {
     try {
         const response = await fetch("http://127.0.0.1:8000/job/job-hirings/", {
@@ -12,7 +11,6 @@ export const fetchJobListings = async (authToken) => {
         if (!response.ok) throw new Error("Failed to fetch job listings");
 
         const data = await response.json();
-        console.log(data);
 
         return data.map((job) => ({
             job_id: job.job_hiring_id,
@@ -23,7 +21,7 @@ export const fetchJobListings = async (authToken) => {
             salary_min: job.salary_min,
             salary_max: job.salary_max,
             schedule: job.schedule,
-            location: `${job.region} ${job.province} ${job.city}`,
+            location: `${job.region}, ${job.province}, ${job.city}`,
             work_setup: job.work_setup,
         }));
     } catch (error) {
@@ -183,4 +181,3 @@ export const checkIfJobIsSaved = async (authToken, jobId) => {
         return false;
     }
 };
-

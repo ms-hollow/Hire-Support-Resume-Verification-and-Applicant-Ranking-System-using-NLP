@@ -84,7 +84,7 @@ def delete_job_hiring(request, pk):
 @api_view(['GET']) 
 @permission_classes([IsAuthenticated])
 def job_hiring_list(request):
-    job_listings = JobHiring.objects.filter(company=request.user.company, status='draft')
+    job_listings = JobHiring.objects.filter(status='draft')
 
     if not job_listings:
         return Response({"message": "No draft job listings found"}, status=404)

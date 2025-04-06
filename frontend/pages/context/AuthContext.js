@@ -151,7 +151,6 @@ export const AuthProvider = ({children}) => {
     };
 
     const logoutUser = () => {
-        // console.log('Logging out...');
         setAuthTokens(null);
         setUser(null);
         if (typeof window !== 'undefined') {
