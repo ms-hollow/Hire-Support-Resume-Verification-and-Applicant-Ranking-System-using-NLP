@@ -352,8 +352,6 @@ export default function CompanySettings() {
             ],
         };
 
-        console.log("Final Merged Data:", mergedData);
-
         Cookies.set("SERIALIZED_DATA", JSON.stringify(mergedData), {
             expires: 1,
         });

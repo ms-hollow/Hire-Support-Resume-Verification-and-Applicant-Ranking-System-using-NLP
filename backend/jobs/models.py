@@ -8,6 +8,7 @@ STATUS_CHOICES = (
     ('draft', 'Draft'),
     ('open', 'Open'),
     ('closed', 'Closed'),
+    ('complete', 'Complete')
 )
 
 class JobHiring(models.Model): 
@@ -42,6 +43,12 @@ class JobHiring(models.Model):
 
     weight_of_criteria = models.JSONField(null=True, blank=True)
     additional_notes = models.TextField(null=True, blank=True) 
+
+    num_applications = models.PositiveIntegerField(default=0)
+
+    def update_num_applications(self): # Method to update the num_applications field.
+        self.num_applications = self.jobapplication_set.count() 
+        self.save()
 
     def get_scoring_criteria(self):
         criteria_list = []

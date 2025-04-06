@@ -94,7 +94,7 @@ export default function JobSummary() {
         if (response) {
             console.log("Job created successfully:", response);
         } else {
-            console.error("Failed to create job.");
+            console.log("Failed to create job.");
         }
         Cookies.remove("DRAFT_DATA");
         Cookies.remove("SERIALIZED_DATA");
@@ -140,9 +140,9 @@ export default function JobSummary() {
         const response = await createJob(formData, authTokens.access);
 
         if (response) {
-            console.log("Job created successfully:", response);
+            console.log("Job created successfully.");
         } else {
-            console.error("Failed to create job.");
+            console.log("Failed to create job.");
         }
 
         Cookies.remove("DRAFT_DATA");

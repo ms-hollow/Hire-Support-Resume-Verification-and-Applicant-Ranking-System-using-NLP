@@ -2,16 +2,13 @@ export const fetchJobList = async (authTokens) => {
     if (!authTokens?.access) return null;
 
     try {
-        const res = await fetch(
-            "http://127.0.0.1:8000/job/job-hirings/company",
-            {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${authTokens.access}`,
-                    "Content-Type": "application/json",
-                },
-            }
-        );
+        const res = await fetch("http://127.0.0.1:8000/job/hirings/company", {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${authTokens.access}`,
+                "Content-Type": "application/json",
+            },
+        });
 
         if (!res.ok) {
             throw new Error(`HTTP error! Status: ${res.status}`);
@@ -23,6 +20,36 @@ export const fetchJobList = async (authTokens) => {
         return null;
     }
 };
+
+export const getJobHiringDetails = async (id, authTokens) => {
+    if (!authTokens?.access) {
+        console.error("No access token available.");
+        return null;
+    }
+
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/job/hirings/${id}`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${authTokens.access}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!res.ok) {
+            console.error(
+                `Failed to fetch job details, status code: ${res.status}`
+            );
+            return null;
+        }
+
+        return await res.json();
+    } catch (error) {
+        console.error("Error fetching job details:", error);
+        return null; 
+    }
+};
+
 
 export const createJob = async (formData, token) => {
     try {
@@ -55,12 +82,12 @@ export const createJob = async (formData, token) => {
     }
 };
 
-export const deleteJobHiring = async (jobId, authTokens) => {
+export const deleteJobHiring = async (id, authTokens) => {
     if (!authTokens?.access) return null;
 
     try {
         const res = await fetch(
-            `http://127.0.0.1:8000/job/hirings/delete/${jobId}`,
+            `http://127.0.0.1:8000/job/hirings/delete/${id}`,
             {
                 method: "DELETE", // Use DELETE method for deleting resources
                 headers: {
