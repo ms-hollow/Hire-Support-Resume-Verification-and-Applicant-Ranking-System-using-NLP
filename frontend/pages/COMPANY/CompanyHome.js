@@ -23,7 +23,6 @@ const getStatusClassName = (status) => {
 
 export default function CompanyHome() {
     const [jobLists, setJobLists] = useState([]);
-    const [selectedJobId, setSelectedJobId] = useState(null);
     const [companyName, setCompanyName] = useState(null);
     const router = useRouter();
 
@@ -48,21 +47,19 @@ export default function CompanyHome() {
         fetchJobLists();
     }, [authTokens, router]);
 
-    const handleJobView = (jobId) => {
-        setSelectedJobId(jobId);
+    const handleJobView = (id) => {
         // console.log("selectedJobId", jobId);
         router.push({
             pathname: "/COMPANY/ApplicantsSummary",
-            query: { jobId },
+            query: { id },
         });
     };
 
-    const handleEditJob = (jobId) => {
-        setSelectedJobId(jobId);
+    const handleEditJob = (id) => {
         // console.log("selectedJobId", jobId);
         router.push({
             pathname: "/COMPANY/EditJobHiring",
-            query: { jobId },
+            query: { id },
         });
     };
 
@@ -135,8 +132,7 @@ export default function CompanyHome() {
                                                     job.status.slice(1)}
                                             </td>
                                             <td className="w-1/6 font-thin text-medium text-fontcolor truncate">
-                                                {job.num_applicants ||
-                                                    "Wala pa"}
+                                                {job.num_applications}
                                             </td>
                                             <td className="w-1/12 font-thin text-medium text-fontcolor truncate">
                                                 {job.application_deadline}

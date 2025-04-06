@@ -54,8 +54,6 @@ export default function CreateJob() {
 
         const storedData = getCookie("DRAFT_DATA");
 
-        console.log(storedData);
-
         if (storedData) {
             const parsedData = JSON.parse(storedData);
             setFormData(parsedData);
@@ -146,7 +144,6 @@ export default function CreateJob() {
             }
         };
         fetchData();
-        // console.log(authTokens);
     }, []);
 
     const handleInputChange = (e) => {
