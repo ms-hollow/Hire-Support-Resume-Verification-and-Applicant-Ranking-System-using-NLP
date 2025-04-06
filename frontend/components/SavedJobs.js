@@ -47,7 +47,6 @@ const SavedJobs = () => {
         loadSavedJobs();
     }, [authTokens]);
 
-    // 🔹 Save Job
     const handleSaveJob = useCallback(
         async (jobId) => {
             const success = await saveJob(authTokens.access, jobId);
@@ -62,7 +61,6 @@ const SavedJobs = () => {
         [authTokens]
     );
 
-    // 🔹 Unsave Job
     const handleUnsaveJob = useCallback(
         async (jobId) => {
             const success = await unsaveJob(authTokens.access, jobId);
@@ -80,7 +78,6 @@ const SavedJobs = () => {
         [authTokens]
     );
 
-    // 🔹 Toggle Save/Unsave
     const toggleSave = async (jobId) => {
         if (savedStatus[jobId]) {
             await handleUnsaveJob(jobId);
@@ -206,7 +203,7 @@ const SavedJobs = () => {
                                             alt="Salary Icon"
                                         />
                                         <p className="ml-2 font-thin text-xsmall text-fontcolor">
-                                            {job.salary}
+                                            {job.salary_min} - {job.salary_max}
                                         </p>
                                     </div>
                                 </div>
