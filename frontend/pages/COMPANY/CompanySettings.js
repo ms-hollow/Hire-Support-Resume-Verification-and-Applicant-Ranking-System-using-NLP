@@ -241,7 +241,7 @@ export default function CompanySettings() {
   return (
     <div>
       <CompanyHeader />
-      <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 mx-auto">
+      <div className="lg:pt-28 mb:pt-24 sm:pt-24 xsm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 xxsm:px-4 mx-auto">
         <h1 className="lg:text-xl mb:text-xl sm:text-large text-primary">Settings</h1>
         <div className="pb-8">
           <div className="flex pt-2 pb-2">
@@ -253,8 +253,9 @@ export default function CompanySettings() {
             Fill out all required job hiring details.
           </p>
           <form onSubmit={handleSettingsSubmit} className="flex gap-6">
+            <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col gap-5">
             {/* Required Documents */}
-            <div className="w-1/3 flex flex-col gap-6 sticky top-20 h-max">
+            <div className="lg:w-1/3 md:w-1/3 sm:w-full flex flex-col gap-6 lg:sticky mb:sticky top-20 h-max">
               <div className="bg-white shadow-md rounded-lg p-6">
                 <h2 className="text-lg font-semibold text-primary mb-2">Required Documents</h2>
                 <p className="text-sm text-fontcolor mt-1 mb-4">Please make sure to upload all the required documents before the deadline.</p>
@@ -275,7 +276,7 @@ export default function CompanySettings() {
             </div>
             
                  {/* Settings */}
-                <div className="w-2/3 bg-white shadow-md rounded-lg p-6">
+                <div className="lg:w-2/3 mb:w-2/3 sm:w-full bg-white shadow-md rounded-lg p-6">
                     <h2 className="text-lg font-semibold text-primary mb-4">Criteria of Scoring</h2>
                     <div className="mb-6">
                     <div className="flex items-center justify-between mb-4">
@@ -1095,6 +1096,7 @@ export default function CompanySettings() {
                             </Link>
                         </button>
                     </div>
+                </div>
                 </div>
             </form>
             </div>

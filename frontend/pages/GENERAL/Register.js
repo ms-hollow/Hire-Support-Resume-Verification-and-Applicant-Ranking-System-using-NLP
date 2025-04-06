@@ -192,11 +192,11 @@ export default function Register() {
     return (
         <div className="pb-20">
             <GeneralHeader />
-            <div className="flex items-center justify-center lg:pt-36 mb:pt-24 xsm:pt-24 sm:pt-24 mb:p-5 sm:p-12 xsm:p-14 py-8 mx-auto">
+            <div className="flex items-center justify-center lg:pt-36 mb:pt-24 xsm:pt-24 xxsm:pt-24 sm:pt-24 mb:p-8 sm:p-8 xsm:p-8 xxsm:p-4 py-8 mx-auto">
                 
                 {/* Step 0: Selection Buttons */}
                 {step === 0 && (
-                    <div className="box-container px-8 py-5">
+                    <div className="job-application-box rounded-xs px-8 py-5">
                         <div className="flex flex-col items-center mt-8">
                             <div className="flex justify-center h-full mb-5">
                                 <Image 
@@ -247,7 +247,7 @@ export default function Register() {
 
                 {/* Steps 1-3 */}
                 {step > 0 && (
-                    <div className="box-container px-8 py-5">
+                    <div className="job-application-box rounded-xs px-8 py-5">
                         <div className="flex items-center justify-between">
                             <h1 className="lg:text-extralarge mb:text-large sm:text-large text-primary">Register</h1>
                             {step === 3 && (
@@ -280,7 +280,7 @@ export default function Register() {
                             {/*checkbox*/}
                             <div className="flex pt-8 pb-1">
                                 <input type="checkbox"value="" id="agreement" className="flex items-start h-5 w-8 " onChange={handleCheckboxChange}/>
-                                <p className="text-fontcolor text-xsmall items-center justify-center ml-4"> By creating an account or signing in, you understand and agree to our Terms. By using our platform, you acknowledge that you have read, understood, and agree to our <span className="font-medium"> <Link href="" className="underline">Terms & Condition</Link></span> and <span className="font-medium"> <Link href="" className="underline">Privacy Policy</Link></span> that outlines how we collect, use, and protect your personal information.</p>      
+                                <p className="text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall items-center justify-center ml-4"> By creating an account or signing in, you understand and agree to our Terms. By using our platform, you acknowledge that you have read, understood, and agree to our <span className="font-medium"> <Link href="" className="underline">Terms & Condition</Link></span> and <span className="font-medium"> <Link href="" className="underline">Privacy Policy</Link></span> that outlines how we collect, use, and protect your personal information.</p>      
                             </div>
 
                             <div className="flex justify-between mt-12">

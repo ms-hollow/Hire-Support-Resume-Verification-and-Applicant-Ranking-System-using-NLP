@@ -212,12 +212,12 @@ export default function JobApplication ({handleJobClick}) {
     return ( 
         <div>
             <ApplicantHeader/>
-                <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 sm:px-8 xsm:px-8 lg:px-20 py-8 mx-auto">
-                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
+                <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 xxsm:px-4 py-8 mx-auto">
+                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">You are Applying for </p>
                     <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompanyFromLocalStorage() || 'No Job Company Available'}</p>
                     <div className="relative">
-                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-8 font-bold underline cursor-pointer" onClick={handleToggleDetails} >See job hiring details</p>
+                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-8 font-bold underline cursor-pointer" onClick={handleToggleDetails} >See job hiring details</p>
                         {showJobDetails && (
                             <div className="flex items-center justify-center absolute inset-0 bg-background h-screen ">
                                 <div className="relative w-full lg:w-6/12 mb:w-10/12 sm:w-full bg-background rounded ">
@@ -232,7 +232,7 @@ export default function JobApplication ({handleJobClick}) {
                     </div>
 
                     <div className="flex items-center justify-center ">
-                        <div className="box-container px-8 py-5 mx-auto">
+                        <div className="job-application-box rounded-xs px-8 py-5 mx-auto ">
                             <p className="font-semibold lg:text-large mb:text-large sm:text-large text-primary">Personal Information</p>
 
                             <div className="flex items-center pt-2">
@@ -248,50 +248,50 @@ export default function JobApplication ({handleJobClick}) {
                                     <tbody>
                                         <tr className="px-2 border-b border-[#F5F5F5]">
                                         <td className="p-2 ">
-                                            <p className="pl-2 font-thin text-medium text-fontcolor">Full Name</p>
-                                            <p id="" className=" pl-2 font-semibold text-medium text-fontcolor">{formData.firstName} {formData.middleName} {formData.lastName}</p>
+                                            <p className="pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">Full Name</p>
+                                            <p id="" className=" pl-2 font-semibold lg:text-xsmall mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">{formData.firstName} {formData.middleName} {formData.lastName}</p>
                                         </td>
                                         </tr>
                                         <tr className="px-2 border-b border-[#F5F5F5]">
                                         <td className="p-2 ">
-                                            <p className="pl-2 font-thin text-medium text-fontcolor">Email Address</p>
-                                            <p id="" className="pl-2 font-semibold text-medium text-fontcolor">{formData.email}</p>
+                                            <p className="pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">Email Address</p>
+                                            <p id="" className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">{formData.email}</p>
                                         </td>
                                         </tr>
                                         <tr className="px-2 border-b border-[#F5F5F5]">
                                         <td className="p-2">
-                                            <p className="pl-2 font-thin text-medium text-fontcolor">Contact No.</p>
-                                            <p id="" className="pl-2 font-semibold text-medium text-fontcolor">{formData.contact_number}</p>
+                                            <p className="pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">Contact No.</p>
+                                            <p id="" className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">{formData.contact_number}</p>
                                         </td>
                                         </tr>
                                         <tr className="px-2 border-b border-[#F5F5F5]">
                                         <td className="p-2">
-                                            <p className="pl-2 font-thin text-medium text-fontcolor">Sex</p>
-                                            <p id="" className="pl-2 font-semibold text-medium text-fontcolor">{formData.sex}</p>
+                                            <p className="pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">Sex</p>
+                                            <p id="" className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">{formData.sex}</p>
                                         </td>
                                         </tr>
                                         <tr className="px-2 border-b border-[#F5F5F5]">
                                         <td className="p-2">
-                                            <p className="pl-2 font-thin text-medium text-fontcolor">Date of Birth</p>
-                                            <p id="" className="pl-2 font-semibold text-medium text-fontcolor">{formData.date_of_birth}</p>
+                                            <p className="pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">Date of Birth</p>
+                                            <p id="" className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">{formData.date_of_birth}</p>
                                         </td>
                                         </tr>
                                         <tr className="px-2 border-b border-[#F5F5F5]">
                                         <td className="p-2">
-                                            <p className="pl-2 font-thin text-medium text-fontcolor">Age</p>
-                                            <p id="" className="pl-2 font-semibold text-medium text-fontcolor">{formData.age}</p>
+                                            <p className="pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">Age</p>
+                                            <p id="" className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">{formData.age}</p>
                                         </td>
                                         </tr>
                                         <tr className="px-2 border-b border-[#F5F5F5]">
                                         <td className="p-2">
-                                            <p className="pl-2 font-thin text-medium text-fontcolor">Complete Address</p>
-                                            <p id="" className="pl-2 font-semibold text-medium text-fontcolor">{formData.complete}</p>
+                                            <p className="pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">Complete Address</p>
+                                            <p id="" className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">{formData.complete}</p>
                                         </td>
                                         </tr>
                                         <tr className="px-2 border-b border-[#F5F5F5]">
                                         <td className="p-2">
-                                            <p className="pl-2 font-thin text-medium text-fontcolor">LinkedIn Profile Link</p>
-                                            <p id="" className="pl-2 font-semibold text-medium text-fontcolor">{formData.linkedin_profile}</p>
+                                            <p className="pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">LinkedIn Profile Link</p>
+                                            <p id="" className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">{formData.linkedin_profile}</p>
                                         </td>
                                         </tr>
                                     </tbody>

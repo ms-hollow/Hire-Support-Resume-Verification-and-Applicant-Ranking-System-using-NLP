@@ -181,12 +181,12 @@ export default function ApplicantDocument ({handleJobClick }) {
     return ( 
         <div>
             <ApplicantHeader/>
-                <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 sm:px-8 xsm:px-8 lg:px-20 py-8 mx-auto">
-                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
+                <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 xxsm:px-4  py-8 mx-auto">
+                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
                     <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompanyFromLocalStorage() || 'No Job Company Available'}</p>
                     <div className="relative">
-                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-8 font-bold underline cursor-pointer" onClick={handleToggleDetails} >See job hiring details</p>
+                        <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-8 font-bold underline cursor-pointer" onClick={handleToggleDetails} >See job hiring details</p>
                         {showJobDetails && (
                             <div className="flex items-center justify-center absolute inset-0 bg-background h-screen ">
                                 <div className="relative w-full lg:w-6/12 mb:w-10/12 sm:w-full z-10 bg-background rounded ">
@@ -200,8 +200,8 @@ export default function ApplicantDocument ({handleJobClick }) {
                         )}
                     </div>
                     <div className="flex items-center justify-center ">
-                        <div className="box-container px-8 py-5 mx-auto">
-                            <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium text-primary"> Applicant Documents</p>
+                        <div className="job-application-box rounded-xs px-8 py-5 mx-auto">
+                            <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium  text-primary"> Applicant Documents</p>
                             
                             <div className="flex items-center pt-2 pb-2">
                                 <div className="w-full bg-background h-1. border-2 border-primary rounded-full ">
@@ -209,13 +209,13 @@ export default function ApplicantDocument ({handleJobClick }) {
                                 </div>
                             </div>
 
-                            <p className="font-medium lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor">Please upload your documents in one of the following formats: PDF, PNG, JPEG, or DOCX.</p>
+                            <p className="font-medium lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">Please upload your documents in one of the following formats: PDF, PNG, JPEG, or DOCX.</p>
                             
                             {/* Resume */}
                             <div>
                                 {/* Resume Header (Clickable)*/}
                                 <div className="flex justify-between items-center" onClick={() => setIsResumeOpen(!isResumeOpen)}>
-                                    <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-fontcolor mt-4 cursor-pointer" > 1. Resume</h2>
+                                    <h2 className="lg:text-large mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-semibold text-fontcolor mt-4 cursor-pointer" > 1. Resume</h2>
                                     <FaChevronDown className={`text-fontcolor transform ${isResumeOpen ? "rotate-180" : "rotate-0"} transition-transform`} />
                                 </div>
 
@@ -229,7 +229,7 @@ export default function ApplicantDocument ({handleJobClick }) {
                                                 onChange={(e) => handleAdditionalFileChange(e, "resume", index)}
                                                 className="block w-full px-2 py-1 text-medium border focus:ring-2 rounded-xs focus:outline-none"
                                             />
-                                            <button type="button" onClick={() => removeAdditionalFile("resume", index)} className="text-accent lg:text-medium mb:text-medium sm:text-medium xsm:text-medium">
+                                            <button type="button" onClick={() => removeAdditionalFile("resume", index)} className="text-accent lg:text-large mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall">
                                                 Remove
                                             </button>
                                         </div>
@@ -237,7 +237,7 @@ export default function ApplicantDocument ({handleJobClick }) {
 
                                     <button type="button"   onClick={() => addAdditionalFile("resume")} className="flex items-center space-x-2 text-primary font-semibold" >
                                         <FaPlus className="text-lg" />
-                                        <span className="lg:text-medium mb:text-medium sm:text-medium xsm:text-medium">Add Resume</span>
+                                        <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall">Add Resume</span>
                                     </button>
                                     </div>
                                 )}
@@ -248,7 +248,7 @@ export default function ApplicantDocument ({handleJobClick }) {
 
                                 <div className="flex flex-col justify-between items-start">
                                     <div className="flex justify-between items-center w-full" onClick={() => setIsEducationalOpen(!isEducationalOpen)}>
-                                        <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-fontcolor mt-3 cursor-pointer"> 2. Upload Educational Documents </h2>
+                                        <h2 className="lg:text-large mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-semibold text-fontcolor mt-3 cursor-pointer"> 2. Upload Educational Documents </h2>
                                         <FaChevronDown className={`text-fontcolor transform ${isEducationalOpen ? "rotate-180" : "rotate-0"} transition-transform`}/>
                                     </div>
 
@@ -273,7 +273,7 @@ export default function ApplicantDocument ({handleJobClick }) {
                                     ))}
                                     <button type="button" onClick={() => addAdditionalFile("educationaldocs")} className="flex items-center space-x-2 text-primary font-semibold" >
                                         <FaPlus className="text-lg" />
-                                        <span className="lg:text-medium mb:text-medium sm:text-medium xsm:text-medium">Add Educational Documents</span>
+                                        <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall">Add Educational Documents</span>
                                     </button>
                                     </div>
                                 )}
@@ -283,7 +283,7 @@ export default function ApplicantDocument ({handleJobClick }) {
                             <div>
                                 <div className="flex flex-col justify-between items-start">
                                     <div className="flex justify-between items-center w-full" onClick={() => setIsWorkExpOpen(!isWorkExpOpen)} >
-                                        <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-fontcolor mt-3 cursor-pointer" > 3. Upload Work Experience Documents </h2>
+                                        <h2 className="lg:text-large mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-semibold text-fontcolor mt-3 cursor-pointer" > 3. Upload Work Experience Documents </h2>
                                         <FaChevronDown className={`text-fontcolor transform ${isWorkExpOpen ? "rotate-180" : "rotate-0"} transition-transform`}/>
                                     </div>
 
@@ -308,7 +308,7 @@ export default function ApplicantDocument ({handleJobClick }) {
                                     ))}
                                     <button type="button" onClick={() => addAdditionalFile("workcertificate")} className="flex items-center space-x-2 text-primary font-semibold" >
                                         <FaPlus className="text-lg" />
-                                        <span className="lg:text-medium mb:text-medium sm:text-medium xsm:text-medium">Add Work Experience Documents</span>
+                                        <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall">Add Work Experience Documents</span>
                                     </button>
                                     </div>
                                 )}
@@ -319,7 +319,7 @@ export default function ApplicantDocument ({handleJobClick }) {
                                 {/* Certifications (Clickable)*/}
                                 <div className="flex flex-col justify-between items-start">
                                     <div className="flex justify-between items-center w-full" onClick={() => setIsSeminarOpen(!isSeminarOpen)}>
-                                        <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-fontcolor mt-3 cursor-pointer"  > 4. Upload Certification Documents </h2>
+                                        <h2 className="lg:text-large mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-semibold text-fontcolor mt-3 cursor-pointer"  > 4. Upload Certification Documents </h2>
                                         <FaChevronDown className={`text-fontcolor transform ${isSeminarOpen ? "rotate-180" : "rotate-0"} transition-transform`}/>
                                     </div>
 
@@ -344,7 +344,7 @@ export default function ApplicantDocument ({handleJobClick }) {
                                     ))}
                                     <button type="button"  onClick={() => addAdditionalFile("seminarCertificate")}  className="flex items-center space-x-2 text-primary font-semibold" >
                                         <FaPlus className="text-lg" />
-                                        <span className="lg:text-medium mb:text-medium sm:text-medium xsm:text-medium">Add More</span>
+                                        <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall">Add More</span>
                                     </button>
                                     </div>
                                     )}
@@ -354,7 +354,7 @@ export default function ApplicantDocument ({handleJobClick }) {
                             <div>
                                 <div className="flex flex-col justify-between items-start">
                                     <div className="flex justify-between items-center w-full" onClick={() => setIsAddOpen(!isAddOpen)}>
-                                        <h2 className="lg:text-large mb:text-medium sm:text-medium xsm:text-medium font-semibold text-fontcolor mt-3 cursor-pointer">
+                                        <h2 className="lg:text-large mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-semibold text-fontcolor mt-3 cursor-pointer">
                                             5. Additional Documents
                                         </h2>
                                         <FaChevronDown className={`text-fontcolor transform ${isAddOpen ? "rotate-180" : "rotate-0"} transition-transform`} />
@@ -381,7 +381,7 @@ export default function ApplicantDocument ({handleJobClick }) {
                                     ))}
                                         <button type="button" onClick={() => addAdditionalFile("additionalDocuments")} className="flex items-center space-x-2 text-primary font-semibold" >
                                             <FaPlus className="text-lg" />
-                                            <span className="lg:text-medium mb:text-medium sm:text-medium xsm:text-medium">Add Additional Documents</span>
+                                            <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall">Add Additional Documents</span>
                                         </button>
                                     </div>
                                 )}

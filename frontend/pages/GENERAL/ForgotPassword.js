@@ -118,8 +118,8 @@ export default function ForgotPassword() {
     return (
         <div className='pb-20'>
             <GeneralHeader />
-                <div className="flex items-center justify-center lg:pt-36 mb:pt-24 xsm:pt-24 sm:pt-24 mb:p-5 sm:p-12 xsm:p-14 py-8 mx-auto">
-                    <div className="box-container px-8 py-5">     
+            <div className="flex items-center justify-center lg:pt-36 mb:pt-24 xsm:pt-24 xxsm:pt-24 sm:pt-24 mb:p-8 sm:p-8 xsm:p-8 xxsm:p-4 py-8 mx-auto">
+                    <div className="job-application-box rounded-xs px-8 py-5">     
                         {step === 1 && (
                             // Step 1: Enter your email to reset password.
                             <form onSubmit={getEmail}>
@@ -132,8 +132,8 @@ export default function ForgotPassword() {
                                             alt="Password Icon" 
                                         />
                                     </div>
-                                    <h1 className="lg:text-extralarge mb:text-large sm:text-large text-primary mb-0">Forgot your password?</h1>
-                                    <p className="font-medium lg:text-xsmall mb:text-xsmall sm:text-xsmall pb-5 text-fontcolor">Enter your email to reset password.</p>
+                                    <h1 className="lg:text-extralarge mb:text-large sm:text-large xsm:text-medium xxsm:text-medium text-primary mb-0">Forgot your password?</h1>
+                                    <p className="font-medium lg:text-xsmall mb:text-xsmall sm:text-xsmall xsm:text-xxsmall xxsm:text-xxsmall pb-5 text-fontcolor">Enter your email to reset password.</p>
                                 </div>
   
                                 <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Email Address</p>

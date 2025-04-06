@@ -78,7 +78,7 @@ export default function JobSummary() {
     return (
         <div>
             <CompanyHeader/>
-            <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 mx-auto">
+            <div className="lg:pt-28 mb:pt-24 sm:pt-24 xsm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 xxsm:px-4 mx-auto">
                 <h1 className="lg:text-xl mb:text-xl sm:text-large text-primary"> Job Hiring Summary </h1>
                 <div className="pb-8">
                     <div className="flex pt-2 pb-2">
@@ -87,11 +87,12 @@ export default function JobSummary() {
                         </div>
                     </div>
 
-                    <p className="font-medium lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-5 ">Please take a moment to carefully review all of your Job Hiring Information to ensure everything is accurate and complete, then click 'Publish Job Hiring' to proceed.</p>
+                    <p className="font-medium lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-5 ">Please take a moment to carefully review all of your Job Hiring Information to ensure everything is accurate and complete, then click 'Publish Job Hiring' to proceed.</p>
 
                     <form className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-8">
+                        <div className="flex lg:flex-row mb:flex-col sm:flex-col xsm:flex-col xxsm:flex-col gap-5 ">
                         {/* Job Title Section */}
-                        <div className="sticky top-20 h-max">
+                        <div className="lg:sticky  top-20 h-max">
                             {/*Create Job*/}
                           <div className="flex flex-col h-full">
                                   {/* Top Part of Job Details - Fixed */}
@@ -99,47 +100,45 @@ export default function JobSummary() {
                                     <div className="flex justify-between items-center">
 
                                         
-                                      <p className="font-semibold text-fontcolor text-large">Software Engineer</p>
+                                      <p className="font-semibold text-fontcolor lg:text-large mb:text-large sm:text-medium xsm:text-medium xxsm:text-medium">Software Engineer</p>
                                       <div className="flex items-center gap-2">
-                                        <p className="font-thin text-fontcolor text-xsmall">1/15/2025</p>
+                                        <p className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">1/15/2025</p>
                                         <Image src="/Menu.svg" width={23} height={20} alt="Menu" />
                                       </div>
                                     </div>
-                                    <p className="font-thin text-fontcolor text-xsmall">Adobe</p>
-                                    <p className="font-thin text-fontcolor text-xsmall">
-                                     (Senior Level)
-                                    </p>
+                                    <p className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">Adobe</p>
+                                    <p className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">(Senior Level)</p>
                                     <div className="flex flex-row mt-2">
                                       <div className="flex flex-row">
                                         <Image src="/Location Icon.svg" width={23} height={20} alt="Location Icon" />
-                                        <p className="ml-1.5 font-thin text-xsmall text-fontcolor">Valenzuela City</p>
+                                        <p className="ml-1.5 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">Valenzuela City</p>
                                       </div>
                                       <div className="flex flex-row mx-4">
                                         <Image src="/Work Setup Icon.svg" width={23} height={20} alt="Work Setup Icon" />
-                                        <p className="ml-2 font-thin text-xsmall text-fontcolor">Remote</p>
+                                        <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">Remote</p>
                                       </div>
                                       <div className="flex flex-row">
                                         <Image src="/Schedule Icon.svg" width={18} height={20} alt="Schedule Icon" />
-                                            <p className="ml-2 font-thin text-xsmall text-fontcolor">8 hrs Shift</p>
+                                            <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">8 hrs Shift</p>
                                       </div>
                                     </div>
                                     <div className="flex flex-row mt-2 px-1">
                                       <Image src="/Salary Icon.svg" width={18} height={20} alt="Salary Icon" />
-                                      <p className="ml-2 font-thin text-xsmall pl-px text-fontcolor">Php 17,000-21,000 Monthly</p>
+                                      <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall pl-px text-fontcolor">Php 17,000-21,000 Monthly</p>
                                     </div>
                                   </div>
                             
                                   {/* Main Part of Job Details - Scrollable */}
                                   <div className="job-details-box rounded-b-lg overflow-y-auto bg-white p-4">
                                     {/*Employment Type*/}
-                                    <p className="font-semibold text-xsmall text-fontcolor">Employment Type</p>
-                                    <p  className="font-thin text-xsmall text-fontcolor pb-3">
+                                    <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">Employment Type</p>
+                                    <p  className="font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-3">
                                       Full-Time
                                     </p>
                             
                                     {/*Job Description*/}
-                                    <p className="font-semibold text-xsmall text-fontcolor">Job Description</p>
-                                    <p className="font-thin text-xsmall text-fontcolor pb-3">
+                                    <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">Job Description</p>
+                                    <p className="font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-3">
                                     • We are seeking a skilled Software Engineer to join our dynamic team. The ideal candidate will be responsible for developing, testing, and maintaining software applications, collaborating with cross-functional teams, and ensuring high-quality code delivery. <br></br>
                                     • Develop and maintain software applications: Write clean, efficient, and well-documented code to create and update software products. <br></br>
                                     • Collaborate with cross-functional teams: Work with various departments to gather requirements and develop effective solutions. <br></br>
@@ -147,8 +146,8 @@ export default function JobSummary() {
                                     </p>
                             
                                     {/*Qualifications*/}
-                                    <p className="font-semibold text-xsmall text-fontcolor">Qualifications (Credentials and Skills)</p>
-                                    <p className="font-thin text-xsmall text-fontcolor pb-3">
+                                    <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">Qualifications (Credentials and Skills)</p>
+                                    <p className="font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-3">
                                     • Bachelor's degree in Computer Science, Software Engineering, or a related field. <br></br>
                                     • 1+ years of experience in software development. <br></br>
                                     • Proficiency in at least one programming language (e.g., Java, Python, C#). <br></br>
@@ -160,8 +159,8 @@ export default function JobSummary() {
                                     </p>
                             
                                     {/*Application Requirements*/}
-                                    <p className="font-semibold text-xsmall text-fontcolor">Application Requirements</p>
-                                    <p id='AppliReq' className="font-thin text-xsmall text-fontcolor pb-3"> 
+                                    <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">Application Requirements</p>
+                                    <p id='AppliReq' className="font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-3"> 
                                         {jobDetails.required_documents? (
                                             <>
                                                 {Object.entries(jobDetails.required_documents).map(([key, value]) => (
@@ -177,8 +176,8 @@ export default function JobSummary() {
                                     </p>
                             
                                     {/*Benefits*/}
-                                    <p className="font-semibold text-xsmall text-fontcolor">Benefits</p>
-                                    <p  className="font-thin text-xsmall text-fontcolor pb-3">
+                                    <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">Benefits</p>
+                                    <p  className="font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-3">
                                      • Competitive salary and performance-based bonuses <br></br>
                                      • HMO (Health Maintenance Organization) <br></br>
                                      • Retirement savings plan with company matching <br></br>
@@ -187,21 +186,21 @@ export default function JobSummary() {
                                     </p>
                             
                                     {/*No of Positions*/}
-                                    <p className="font-semibold text-xsmall text-fontcolor">No. of Positions</p>
-                                    <p className="font-thin text-xsmall text-fontcolor pb-3">
+                                    <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">No. of Positions</p>
+                                    <p className="font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-3">
                                         4
                                     </p>
                             
                                     {/*Application Deadline*/}
-                                    <p className="font-semibold text-xsmall text-fontcolor">Application Deadline</p>
-                                    <p className="font-thin text-xsmall text-fontcolor pb-3">
+                                    <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">Application Deadline</p>
+                                    <p className="font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-3">
                                         {new Date(jobDetails.application_deadline).toLocaleDateString("en-US", {
                                         month: "2-digit",day: "2-digit", year: "numeric",})}
                                     </p>
                             
                                     {/*Additional Notes*/}
-                                    <p className="font-semibold text-xsmall text-fontcolor">Additional Notes</p>
-                                    <p className="font-thin text-xsmall text-fontcolor pb-6">
+                                    <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">Additional Notes</p>
+                                    <p className="font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-6">
                                     • This position offers the opportunity to work on cutting-edge projects and make a significant impact on the company's success. <br></br>
                                     • Applicants should be proactive, innovative, and passionate about technology.
                                     </p>
@@ -344,7 +343,8 @@ export default function JobSummary() {
                                     </div>
                                 </div>
                             </div>
-                </div>
+                        </div>
+                    </div>
 
                 {/*Setting*/}
                  </form>

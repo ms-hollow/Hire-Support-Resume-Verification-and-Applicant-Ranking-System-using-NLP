@@ -10,7 +10,7 @@ const GeneralHeader = () => {
   };
 
   return (
-    <header className="fixed top-0 w-full bg-background h-16 lg:px-20 mb:px-20 py-5 flex items-center justify-between sm:px-8 z-50">
+    <header className="fixed top-0 w-full bg-background h-16 lg:px-20 mb:px-20 py-5 flex items-center justify-between sm:px-8 xxsm:px-4 z-50">
       <div className="flex items-center md:hidden absolute right-6">
           <Link href="/GENERAL/Login" className="mr-4">
             <h3>Sign in as Applicant</h3>
