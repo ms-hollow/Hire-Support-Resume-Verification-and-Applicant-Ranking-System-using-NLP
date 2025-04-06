@@ -62,7 +62,7 @@ export const updateCompanyProfile = async (authTokens, formData) => {
     });
 
     if (res.ok) {
-      return true; // Successfully updated
+      return true;
     } else {
       console.error("Error updating profile");
       return false;

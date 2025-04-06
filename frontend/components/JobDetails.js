@@ -12,37 +12,36 @@ import {
 
 const JobDetails = ({ authToken }) => {
     const router = useRouter();
-    const { jobId } = router.query;
+    const { id } = router.query;
     const [jobDetails, setJobDetails] = useState(null);
     const [loading, setLoading] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
 
     useEffect(() => {
-        if (jobId) {
-            sessionStorage.setItem("jobId", jobId);
+        if (id) {
             loadJobDetails();
             checkSavedStatus();
         }
-    }, [jobId]);
+    }, [id]);
 
     const loadJobDetails = async () => {
         setLoading(true);
-        setJobDetails(null); // Clear previous job details while loading
+        setJobDetails(null);
 
-        const jobData = await fetchJobDetails(authToken, jobId);
+        const jobData = await fetchJobDetails(authToken, id);
         setJobDetails(jobData);
         setLoading(false);
     };
 
     const checkSavedStatus = useCallback(async () => {
-        const savedStatus = await checkIfJobIsSaved(authToken, jobId);
+        const savedStatus = await checkIfJobIsSaved(authToken, id);
         setIsSaved(savedStatus);
-    }, [authToken, jobId]);
+    }, [authToken, id]);
 
     const toggleSaveJob = async () => {
         const success = isSaved
-            ? await unsaveJob(authToken, jobId)
-            : await saveJob(authToken, jobId);
+            ? await unsaveJob(authToken, id)
+            : await saveJob(authToken, id);
 
         if (success) {
             setIsSaved(!isSaved);
@@ -51,13 +50,14 @@ const JobDetails = ({ authToken }) => {
                     ? "Job unsaved successfully!"
                     : "Job saved successfully!"
             );
+            await checkSavedStatus();
         }
     };
 
     const navigateToJobApplication = () => {
         router.push({
             pathname: "/APPLICANT/JobApplication",
-            query: { jobId },
+            query: { id },
         });
     };
 
@@ -100,7 +100,8 @@ const JobDetails = ({ authToken }) => {
                             alt="Location Icon"
                         />
                         <p className="ml-1.5 font-thin text-xsmall text-fontcolor">
-                            {jobDetails.work_location}
+                            {jobDetails.region}, {jobDetails.province},{" "}
+                            {jobDetails.region}
                         </p>
                     </div>
                     <div className="flex flex-row mx-4">
@@ -134,7 +135,7 @@ const JobDetails = ({ authToken }) => {
                         alt="Salary Icon"
                     />
                     <p className="ml-2 font-thin text-xsmall pl-px text-fontcolor">
-                        {jobDetails.salary}
+                        {jobDetails.salary_min} - {jobDetails.salary_max}
                     </p>
                 </div>
 
@@ -226,28 +227,7 @@ const JobDetails = ({ authToken }) => {
                     id="Benefits"
                     className="font-thin text-xsmall text-fontcolor pb-3"
                 >
-                    {jobDetails.benefits ? (
-                        <>
-                            {Object.entries(jobDetails.benefits).map(
-                                ([key, value]) => (
-                                    <span key={key}>
-                                        <strong>
-                                            {key
-                                                .replace(/_/g, " ")
-                                                .replace(/\b\w/g, (c) =>
-                                                    c.toUpperCase()
-                                                )}
-                                            :
-                                        </strong>{" "}
-                                        {value}
-                                        <br />
-                                    </span>
-                                )
-                            )}
-                        </>
-                    ) : (
-                        "No benefits information available."
-                    )}
+                    {jobDetails.benefits}
                 </p>
 
                 {/* No of Positions*/}
