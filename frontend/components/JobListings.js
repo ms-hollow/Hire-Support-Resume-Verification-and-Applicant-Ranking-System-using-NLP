@@ -4,14 +4,7 @@ import GeneralFooter from "./GeneralFooter";
 import { useRouter } from "next/router";
 import AuthContext from "@/pages/context/AuthContext";
 import { JLSkeletonLoader } from "./ui/SkeletonLoader";
-import {
-    fetchJobListings,
-    saveJob,
-    unsaveJob,
-    fetchSavedJobs,
-} from "@/pages/api/applicantJobApi";
-
-//TODO Polish save and unsave animation
+import { fetchJobListings, fetchSavedJobs } from "@/pages/api/applicantJobApi";
 
 const JobListings = ({ authToken, onJobClick }) => {
     const [jobListings, setJobListings] = useState([]);
@@ -47,30 +40,13 @@ const JobListings = ({ authToken, onJobClick }) => {
         setSavedStatus(savedJobsMap);
     };
 
-    const toggleSaveJob = async (jobId) => {
-        const isCurrentlySaved = savedStatus[jobId];
-
-        const success = isCurrentlySaved
-            ? await unsaveJob(authToken, jobId)
-            : await saveJob(authToken, jobId);
-
-        if (success) {
-            setSavedStatus((prevStatus) => ({
-                ...prevStatus,
-                [jobId]: !isCurrentlySaved,
-            }));
-
-            alert(
-                isCurrentlySaved
-                    ? "Job unsaved successfully!"
-                    : "Job saved successfully!"
-            );
-        }
-    };
-
     useEffect(() => {
-        getSavedJobs();
         loadJobListings();
+        const interval = setInterval(() => {
+            getSavedJobs();
+        }, 5000);
+
+        return () => clearInterval(interval);
     }, [authToken]);
 
     if (!Array.isArray(jobListings)) {
@@ -98,10 +74,7 @@ const JobListings = ({ authToken, onJobClick }) => {
                                 height={30}
                                 alt="Company Logo"
                             />
-                            <button
-                                className="ml-auto"
-                                onClick={() => toggleSaveJob(job.job_id)} // kukunin yung job id ng selected job hiring
-                            >
+                            <div className="ml-auto">
                                 <Image
                                     src={
                                         savedStatus[job.job_hiring_id] // why job_hiring_id? Kasi galing yan sa na fetch na data
@@ -116,7 +89,7 @@ const JobListings = ({ authToken, onJobClick }) => {
                                             : "Unsave Icon"
                                     }
                                 />
-                            </button>
+                            </div>
                         </div>
                         <p className="font-semibold text-fontcolor text-large mt-2">
                             {job.job_title}
