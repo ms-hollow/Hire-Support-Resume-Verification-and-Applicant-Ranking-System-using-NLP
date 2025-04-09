@@ -80,11 +80,11 @@ def delete_job_hiring(request, pk):
     except JobHiring.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-#* Retrieve all job hirings and filter to only show job hirings with status 'draft'
+#* Retrieve all job hirings and filter to only show job hirings with status 'open'
 @api_view(['GET']) 
 @permission_classes([IsAuthenticated])
 def job_hiring_list(request):
-    job_listings = JobHiring.objects.filter(status='draft')
+    job_listings = JobHiring.objects.filter(status='open')
 
     if not job_listings:
         return Response({"message": "No draft job listings found"}, status=404)

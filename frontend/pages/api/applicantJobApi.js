@@ -20,9 +20,12 @@ export const fetchJobListings = async (authToken) => {
             job_description: job.job_description || "No description available",
             salary_min: job.salary_min,
             salary_max: job.salary_max,
+            salary_frequency: job.salary_frequency,
             schedule: job.schedule,
             location: `${job.region}, ${job.province}, ${job.city}`,
             work_setup: job.work_setup,
+            experience_level: job.experience_level,
+            creation_date: job.creation_date,
         }));
     } catch (error) {
         console.error("Error fetching jobs:", error);
@@ -154,30 +157,5 @@ export const fetchJobDetails = async (authToken, jobId) => {
     } catch (error) {
         console.error("Error fetching job details:", error);
         return null;
-    }
-};
-
-export const checkIfJobIsSaved = async (authToken, jobId) => {
-    if (!jobId) return false;
-
-    try {
-        const response = await fetch(
-            "http://127.0.0.1:8000/applicant/saved-jobs/",
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${authToken}`,
-                },
-            }
-        );
-
-        if (!response.ok) throw new Error("Failed to fetch saved jobs");
-
-        const savedJobs = await response.json();
-        return savedJobs.some((job) => String(job.job_hiring_id) === jobId);
-    } catch (error) {
-        console.error("Error checking saved job status:", error);
-        return false;
     }
 };
