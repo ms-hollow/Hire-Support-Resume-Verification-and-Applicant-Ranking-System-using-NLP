@@ -1,17 +1,17 @@
-import { useState, useContext, useEffect, useCallback } from "react";
+import { useState, useContext, useEffect } from "react";
 import Image from "next/image";
 import GeneralFooter from "./GeneralFooter";
 import { useRouter } from "next/router";
 import AuthContext from "@/pages/context/AuthContext";
 import { JLSkeletonLoader } from "./ui/SkeletonLoader";
-import { fetchJobListings, fetchSavedJobs } from "@/pages/api/applicantJobApi";
+import { fetchJobListings } from "@/pages/api/applicantJobApi";
+import { useJob, JobProvider } from "@/pages/context/JobContext";
 
 const JobListings = ({ authToken, onJobClick }) => {
+    const { savedStatus, toggleSaveJob } = useJob();
     const [jobListings, setJobListings] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [savedStatus, setSavedStatus] = useState({});
     const router = useRouter();
-
     const handleJobClick = (jobId) => {
         router.push(
             {
@@ -31,22 +31,10 @@ const JobListings = ({ authToken, onJobClick }) => {
         setLoading(false);
     };
 
-    const getSavedJobs = async () => {
-        const jobs = await fetchSavedJobs(authToken);
-        const savedJobsMap = {};
-        jobs.forEach((job) => {
-            savedJobsMap[job.job_id] = true;
-        });
-        setSavedStatus(savedJobsMap);
-    };
-
     useEffect(() => {
-        loadJobListings();
-        const interval = setInterval(() => {
-            getSavedJobs();
-        }, 5000);
-
-        return () => clearInterval(interval);
+        if (authToken) {
+            loadJobListings();
+        }
     }, [authToken]);
 
     if (!Array.isArray(jobListings)) {
@@ -63,7 +51,6 @@ const JobListings = ({ authToken, onJobClick }) => {
             ) : jobListings.length > 0 ? (
                 jobListings.map((job) => (
                     <div
-                        key={job.job_id}
                         onClick={() => handleJobClick(job.job_id)}
                         className="job-listing-box flex flex-col p-4 mb-4 mx-auto w-full"
                     >
@@ -74,22 +61,25 @@ const JobListings = ({ authToken, onJobClick }) => {
                                 height={30}
                                 alt="Company Logo"
                             />
-                            <div className="ml-auto">
+                            <button
+                                className="ml-auto"
+                                onClick={() => toggleSaveJob(job.job_id)}
+                            >
                                 <Image
                                     src={
-                                        savedStatus[job.job_hiring_id] // why job_hiring_id? Kasi galing yan sa na fetch na data
+                                        savedStatus[job.job_id]
                                             ? "/Save Icon.svg"
                                             : "/Unsave Icon.svg"
                                     }
                                     width={13}
                                     height={11}
                                     alt={
-                                        savedStatus[job.job_hiring_id]
+                                        savedStatus[job.job_id]
                                             ? "Save Icon"
                                             : "Unsave Icon"
                                     }
                                 />
-                            </div>
+                            </button>
                         </div>
                         <p className="font-semibold text-fontcolor text-large mt-2">
                             {job.job_title}
@@ -179,10 +169,12 @@ const JobListingsWrapper = ({ onJobClick }) => {
     const { authTokens } = useContext(AuthContext);
     return (
         <div className="flex overflow-y-auto border border-none hide-scrollbar p-1 h-[calc(100vh-150px)]">
-            <JobListings
-                authToken={authTokens.access}
-                onJobClick={onJobClick}
-            />
+            <JobProvider authToken={authTokens.access}>
+                <JobListings
+                    authToken={authTokens.access}
+                    onJobClick={onJobClick}
+                />
+            </JobProvider>
             <GeneralFooter />
         </div>
     );

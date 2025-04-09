@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { AuthProvider, JobContext } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
+import { JobProvider } from "./context/JobContext";
 import { useRouter } from "next/router";
 import ProtectedPage from "./utils/ProtectedPage";
 

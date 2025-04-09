@@ -1,26 +1,21 @@
 import Image from "next/image";
-import { useState, useContext, useEffect, useCallback } from "react";
+import { useState, useContext, useEffect } from "react";
 import AuthContext from "@/pages/context/AuthContext";
 import { useRouter } from "next/router";
 import { JDSkeletonLoader } from "./ui/SkeletonLoader";
-import {
-    fetchJobDetails,
-    checkIfJobIsSaved,
-    saveJob,
-    unsaveJob,
-} from "@/pages/api/applicantJobApi";
+import { fetchJobDetails } from "@/pages/api/applicantJobApi";
+import { useJob, JobProvider } from "@/pages/context/JobContext";
 
 const JobDetails = ({ authToken }) => {
+    const { savedStatus, toggleSaveJob } = useJob();
     const router = useRouter();
     const { id } = router.query;
     const [jobDetails, setJobDetails] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [isSaved, setIsSaved] = useState(false);
 
     useEffect(() => {
         if (id) {
             loadJobDetails();
-            checkSavedStatus();
         }
     }, [id]);
 
@@ -31,27 +26,6 @@ const JobDetails = ({ authToken }) => {
         const jobData = await fetchJobDetails(authToken, id);
         setJobDetails(jobData);
         setLoading(false);
-    };
-
-    const checkSavedStatus = useCallback(async () => {
-        const savedStatus = await checkIfJobIsSaved(authToken, id);
-        setIsSaved(savedStatus);
-    }, [authToken, id]);
-
-    const toggleSaveJob = async () => {
-        const success = isSaved
-            ? await unsaveJob(authToken, id)
-            : await saveJob(authToken, id);
-
-        if (success) {
-            setIsSaved(!isSaved);
-            alert(
-                isSaved
-                    ? "Job unsaved successfully!"
-                    : "Job saved successfully!"
-            );
-            await checkSavedStatus();
-        }
     };
 
     const navigateToJobApplication = () => {
@@ -149,11 +123,13 @@ const JobDetails = ({ authToken }) => {
                     </button>
 
                     <button
-                        onClick={toggleSaveJob}
+                        onClick={() => toggleSaveJob(jobDetails.job_hiring_id)}
                         type="button"
                         className="button2 flex items-center justify-center lg:text-medium font-medium"
                     >
-                        {isSaved ? "Unsave" : "Save"}
+                        {savedStatus[jobDetails.job_hiring_id]
+                            ? "Unsave"
+                            : "Save"}
                     </button>
                 </div>
             </div>
@@ -280,10 +256,11 @@ const JobDetails = ({ authToken }) => {
 
 const JobDetailsWrapper = () => {
     const { authTokens } = useContext(AuthContext);
-
     return (
         <div className="flex-1 h-[calc(100vh-150px)] border border-none rounded-lg">
-            <JobDetails authToken={authTokens.access} />
+            <JobProvider authToken={authTokens.access}>
+                <JobDetails authToken={authTokens.access} />
+            </JobProvider>
         </div>
     );
 };
