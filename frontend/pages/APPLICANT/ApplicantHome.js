@@ -7,6 +7,7 @@ import { useState, useEffect, useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
 import { getApplicantProfile } from "../api/applicantApi";
+import phLocation from "../../public/placeHolder/location.json";
 
 //TODO Search
 
@@ -19,6 +20,27 @@ export default function ApplicantHome() {
     const [isSalaryOpen, setIsSalaryOpen] = useState(false);
     const [paymentType, setPaymentType] = useState("Annually");
     const [range, setRange] = useState(0);
+
+    const [keyword, setKeyword] = useState("");
+    const [classification, setClassification] = useState("");
+    const [datePosted, setDatePosted] = useState("");
+    const [location, setLocation] = useState("");
+    const [salaryRange, setSalaryRange] = useState([]);
+    const [experienceLevel, setExperienceLevel] = useState("");
+
+    // // Log filters to console
+    // console.log({
+    //     keyword,
+    //     classification,
+    //     location,
+    //     datePosted,
+    //     salaryRange,
+    //     experienceLevel,
+    // });
+
+    const handleLocationChange = (e) => {
+        setLocation(e.target.value);
+    };
 
     // Only run this after component is mounted to avoid mismatch between server/client render
     useEffect(() => {
@@ -114,6 +136,8 @@ export default function ApplicantHome() {
                                 id="keyword"
                                 name="keyword"
                                 placeholder="Enter Keyword"
+                                value={keyword}
+                                onChange={(e) => setKeyword(e.target.value)}
                                 required
                                 className="w-full h-full border-primarycolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall pl-12"
                             />
@@ -124,6 +148,10 @@ export default function ApplicantHome() {
                                 className="valid:text-fontcolor invalid:text-placeholder lg:flex-grow mb:flex-grow sm:flex-grow xsm:flex-grow lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
                                 id="classification"
                                 name="classification"
+                                value={classification} // Bind to state
+                                onChange={(e) =>
+                                    setClassification(e.target.value)
+                                } // Update state
                                 required
                             >
                                 <option value="" disabled selected hidden>
@@ -148,14 +176,32 @@ export default function ApplicantHome() {
                                     alt="Search Icon"
                                 />
                             </div>
-                            <input
-                                type="text"
+
+                            <select
                                 id="location"
                                 name="location"
-                                placeholder="Metro Manila"
+                                value={location}
+                                onChange={handleLocationChange}
                                 required
                                 className="w-full h-full border-primarycolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall pl-12"
-                            />
+                            >
+                                <option value="" disabled>
+                                    Select a location
+                                </option>
+                                {/* Map through NCR and Regions */}
+                                {Object.keys(phLocation).map((region, index) =>
+                                    phLocation[region].map(
+                                        (city, cityIndex) => (
+                                            <option
+                                                key={`${region}-${cityIndex}`}
+                                                value={city}
+                                            >
+                                                {city}
+                                            </option>
+                                        )
+                                    )
+                                )}
+                            </select>
                         </div>
 
                         <button className="button1 items-center flex justify-center flex-shrink-0 p-5">
@@ -174,6 +220,8 @@ export default function ApplicantHome() {
                                 className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium"
                                 id="date-posted"
                                 name="DatePosted"
+                                value={datePosted} // Bind to state
+                                onChange={(e) => setDatePosted(e.target.value)} // Update state
                                 required
                             >
                                 <option value="" disabled selected hidden>
@@ -232,7 +280,6 @@ export default function ApplicantHome() {
                                           }`}
                                 </div>
                             </div>
-
                             {isSalaryOpen && (
                                 <div className="bg-white mt-2 w-full p-4 rounded-md shadow-lg">
                                     <div className="flex space-x-4 border-b">
@@ -254,8 +301,6 @@ export default function ApplicantHome() {
                                             )
                                         )}
                                     </div>
-
-                                    {/* Label */}
                                     <div className="text-gray-500 text-medium mt-4">
                                         Salary Range (PHP)
                                     </div>
@@ -272,10 +317,16 @@ export default function ApplicantHome() {
                                                             name="salaryRange"
                                                             value={index}
                                                             checked={
-                                                                range === index
-                                                            }
+                                                                salaryRange[0] ===
+                                                                index
+                                                            } // Bind salary range state
                                                             onChange={() => {
-                                                                setRange(index);
+                                                                setSalaryRange([
+                                                                    index,
+                                                                    salaryRanges[
+                                                                        paymentType
+                                                                    ][index],
+                                                                ]);
                                                                 setIsSalaryOpen(
                                                                     false
                                                                 );
@@ -300,6 +351,10 @@ export default function ApplicantHome() {
                                 className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium"
                                 id="exp-level"
                                 name="ExperienceLevel"
+                                value={experienceLevel} // Bind to state
+                                onChange={(e) =>
+                                    setExperienceLevel(e.target.value)
+                                } // Update state
                                 required
                             >
                                 <option value="" disabled selected hidden>
@@ -326,6 +381,12 @@ export default function ApplicantHome() {
                         <JobListings
                             authToken={authTokens?.access}
                             onJobClick={handleJobClick} // Trigger to open job details
+                            keyword={keyword}
+                            classification={classification}
+                            location={location}
+                            datePosted={datePosted}
+                            salaryRange={salaryRange}
+                            experienceLevel={experienceLevel}
                         />
                         {/* Job Details for Desktop */}
                         <div className="hidden md:block flex-grow">

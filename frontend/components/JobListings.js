@@ -7,9 +7,19 @@ import { JLSkeletonLoader } from "./ui/SkeletonLoader";
 import { fetchJobListings } from "@/pages/api/applicantJobApi";
 import { useJob, JobProvider } from "@/pages/context/JobContext";
 
-const JobListings = ({ authToken, onJobClick }) => {
+const JobListings = ({
+    authToken,
+    onJobClick,
+    keyword,
+    classification,
+    location,
+    datePosted,
+    salaryRange,
+    experienceLevel,
+}) => {
     const { savedStatus, toggleSaveJob } = useJob();
     const [jobListings, setJobListings] = useState([]);
+    const [filteredJobs, setFilteredJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     const handleJobClick = (jobId) => {
