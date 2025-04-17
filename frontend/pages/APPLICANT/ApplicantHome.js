@@ -8,46 +8,50 @@ import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
 import { getApplicantProfile } from "../api/applicantApi";
 import phLocation from "../../public/placeHolder/location.json";
+import { fetchJobListings } from "@/pages/api/applicantJobApi";
+import JobListingsWrapper from "@/components/JobListings";
 
-//TODO Search
+//TODO Need to fix
 
-export default function ApplicantHome() {
+export default function ApplicantHome({ onJobClick }) {
     let { authTokens } = useContext(AuthContext);
     const router = useRouter();
+    const [jobListings, setJobListings] = useState([]);
+    const [filteredJobListings, setFilteredJobListings] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [isMounted, setIsMounted] = useState(false);
     const [applicantName, setApplicantName] = useState("");
     const [isJobDetailsOpen, setIsJobDetailsOpen] = useState(false);
     const [isSalaryOpen, setIsSalaryOpen] = useState(false);
     const [paymentType, setPaymentType] = useState("Annually");
     const [range, setRange] = useState(0);
-
-    const [keyword, setKeyword] = useState("");
-    const [classification, setClassification] = useState("");
-    const [datePosted, setDatePosted] = useState("");
     const [location, setLocation] = useState("");
-    const [salaryRange, setSalaryRange] = useState([]);
-    const [experienceLevel, setExperienceLevel] = useState("");
 
-    // // Log filters to console
-    // console.log({
-    //     keyword,
-    //     classification,
-    //     location,
-    //     datePosted,
-    //     salaryRange,
-    //     experienceLevel,
-    // });
+    const [filters, setFilters] = useState({
+        keyword: "",
+        classification: "",
+        location: "",
+        datePosted: "",
+        salaryRange: "",
+        workSetup: "",
+        employmentType: "",
+    });
 
-    const handleLocationChange = (e) => {
-        setLocation(e.target.value);
+    const loadJobListings = async () => {
+        const jobData = await fetchJobListings(authTokens?.access);
+        setJobListings(jobData);
     };
 
-    // Only run this after component is mounted to avoid mismatch between server/client render
+    useEffect(() => {
+        if (authTokens?.access) {
+            loadJobListings();
+        }
+    }, [authTokens?.access]);
+
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
-    // Redirect if authToken is not available, but do it only after mounting
     useEffect(() => {
         if (isMounted && !authTokens) {
             router.push("/GENERAL/Login");
@@ -68,6 +72,95 @@ export default function ApplicantHome() {
     const handleJobClick = () => {
         setIsJobDetailsOpen(true);
     };
+
+    const handleFilterChange = (filterName, value) => {
+        setFilters((prevFilters) => ({
+            ...prevFilters,
+            [filterName]: value,
+        }));
+        console.log("Filter changed:", filterName, value);
+    };
+
+    //TODO Date Posted not working yet
+    //TODO Work setup is not working yet
+    const applyFilters = () => {
+        console.log("Filters applied:", filters);
+
+        const filtered = jobListings.filter((job) => {
+            // Convert creation_date to Date object
+            const jobCreationDate = new Date(job.creation_date);
+            const currentDate = new Date();
+            let isDatePostedValid = false;
+
+            // Handle "Today", "Last Hour", and "Last Week" filters
+            if (filters.datePosted === "") {
+                isDatePostedValid = true;
+            } else if (filters.datePosted === "Today") {
+                isDatePostedValid =
+                    jobCreationDate.toDateString() ===
+                    currentDate.toDateString();
+            } else if (filters.datePosted === "Last Hour") {
+                const oneHourAgo = new Date(
+                    currentDate.getTime() - 60 * 60 * 1000
+                );
+                isDatePostedValid = jobCreationDate >= oneHourAgo;
+            } else if (filters.datePosted === "Last Week") {
+                const oneWeekAgo = new Date(
+                    currentDate.getTime() - 7 * 24 * 60 * 60 * 1000
+                );
+                isDatePostedValid = jobCreationDate >= oneWeekAgo;
+            }
+
+            // Handle salary filter
+            let isSalaryValid = true;
+            if (filters.salaryRange !== "") {
+                const [min, max] = filters.salaryRange.split("-");
+
+                if (min === "below") {
+                    isSalaryValid = parseInt(job.salary_max) < parseInt(max);
+                } else if (max === "above") {
+                    isSalaryValid = parseInt(job.salary_min) > parseInt(min);
+                } else {
+                    isSalaryValid =
+                        parseInt(job.salary_min) >= parseInt(min) &&
+                        parseInt(job.salary_max) <= parseInt(max);
+                }
+            }
+
+            // Handle other filters
+            const isValid =
+                (filters.keyword === "" ||
+                    job.job_title
+                        .toLowerCase()
+                        .includes(filters.keyword.toLowerCase())) &&
+                (filters.classification === "" ||
+                    job.job_industry
+                        ?.toLowerCase()
+                        .includes(filters.classification.toLowerCase())) &&
+                (filters.location === "" ||
+                    job.location
+                        ?.toLowerCase()
+                        .includes(filters.location.toLowerCase())) &&
+                (filters.workSetup === "" ||
+                    job.work_setup
+                        ?.toLowerCase()
+                        .includes(filters.workSetup.toLowerCase())) &&
+                (filters.employmentType === "" ||
+                    job.employment_type
+                        ?.toLowerCase()
+                        .includes(filters.employmentType.toLowerCase()));
+
+            return isDatePostedValid && isSalaryValid && isValid;
+        });
+
+        console.log("Filtered jobs:", filtered);
+        setFilteredJobListings(filtered);
+    };
+
+    useEffect(() => {
+        applyFilters();
+        console.log(filteredJobListings);
+    }, [filters, jobListings]);
 
     // Handle closing job details
     const handleCloseJobDetails = () => {
@@ -114,6 +207,21 @@ export default function ApplicantHome() {
     return (
         <div>
             <ApplicantHeader />
+
+            {loading ? (
+                <p>Loading job listings...</p>
+            ) : (
+                <JobListingsWrapper
+                    jobListings={
+                        filteredJobListings.length > 0
+                            ? filteredJobListings
+                            : jobListings
+                    }
+                    onJobClick={onJobClick}
+                    loading={loading}
+                />
+            )}
+
             <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto">
                 <div>
                     <p className="text-fontcolor">Hi, {applicantName}</p>
@@ -136,8 +244,13 @@ export default function ApplicantHome() {
                                 id="keyword"
                                 name="keyword"
                                 placeholder="Enter Keyword"
-                                value={keyword}
-                                onChange={(e) => setKeyword(e.target.value)}
+                                value={filters.keyword}
+                                onChange={(e) =>
+                                    handleFilterChange(
+                                        "keyword",
+                                        e.target.value
+                                    )
+                                }
                                 required
                                 className="w-full h-full border-primarycolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall pl-12"
                             />
@@ -148,10 +261,13 @@ export default function ApplicantHome() {
                                 className="valid:text-fontcolor invalid:text-placeholder lg:flex-grow mb:flex-grow sm:flex-grow xsm:flex-grow lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
                                 id="classification"
                                 name="classification"
-                                value={classification} // Bind to state
+                                value={filters.classification} // Bind to state
                                 onChange={(e) =>
-                                    setClassification(e.target.value)
-                                } // Update state
+                                    handleFilterChange(
+                                        "classification",
+                                        e.target.value
+                                    )
+                                }
                                 required
                             >
                                 <option value="" disabled selected hidden>
@@ -180,8 +296,13 @@ export default function ApplicantHome() {
                             <select
                                 id="location"
                                 name="location"
-                                value={location}
-                                onChange={handleLocationChange}
+                                value={filters.location}
+                                onChange={(e) =>
+                                    handleFilterChange(
+                                        "location",
+                                        e.target.value
+                                    )
+                                }
                                 required
                                 className="w-full h-full border-primarycolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall pl-12"
                             >
@@ -204,7 +325,10 @@ export default function ApplicantHome() {
                             </select>
                         </div>
 
-                        <button className="button1 items-center flex justify-center flex-shrink-0 p-5">
+                        <button
+                            className="button1 items-center flex justify-center flex-shrink-0 p-5"
+                            onClick={applyFilters}
+                        >
                             <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-center">
                                 Find Job
                             </p>
@@ -220,8 +344,13 @@ export default function ApplicantHome() {
                                 className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium"
                                 id="date-posted"
                                 name="DatePosted"
-                                value={datePosted} // Bind to state
-                                onChange={(e) => setDatePosted(e.target.value)} // Update state
+                                value={filters.datePosted} // Bind to state
+                                onChange={(e) =>
+                                    handleFilterChange(
+                                        "datePosted",
+                                        e.target.value
+                                    )
+                                }
                                 required
                             >
                                 <option value="" disabled selected hidden>
@@ -238,13 +367,21 @@ export default function ApplicantHome() {
                                 className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium"
                                 id="work-setup"
                                 name="WorkSetup"
+                                value={filters.workSetup} // Binding the value to state
+                                onChange={
+                                    (e) =>
+                                        handleFilterChange(
+                                            "workSetup",
+                                            e.target.value
+                                        ) // Updating state on change
+                                }
                                 required
                             >
-                                <option value="" disabled selected hidden>
+                                <option value="" disabled hidden>
                                     Work Setup
                                 </option>
                                 <option value="Remote">Remote</option>
-                                <option value="Onsite">Onsite</option>
+                                <option value="Onsite">On-site</option>
                                 <option value="Hybrid">Hybrid</option>
                             </select>
                         </div>
@@ -254,6 +391,13 @@ export default function ApplicantHome() {
                                 className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium"
                                 id="employ-type"
                                 name="EmployType"
+                                value={filters.employmentType}
+                                onChange={(e) =>
+                                    handleFilterChange(
+                                        "employmentType",
+                                        e.target.value
+                                    )
+                                }
                                 required
                             >
                                 <option value="" disabled selected hidden>
@@ -268,10 +412,10 @@ export default function ApplicantHome() {
 
                         <div className="relative">
                             <div
-                                className="flex flex-col justify-center h-medium rounded-xs bg-secondary flex-grow min-w-[200px] cursor-pointer z-1001"
+                                className="flex flex-col justify-center h-medium rounded-xs bg-secondary flex-grow min-w-[200px] cursor-pointer"
                                 onClick={() => setIsSalaryOpen(!isSalaryOpen)}
                             >
-                                <div className="flex text-fontcolor items-center text-sm px-3">
+                                <div className="flex text-fontcolor items-center lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall px-3">
                                     {isSalaryOpen
                                         ? ""
                                         : ` ${
@@ -280,14 +424,15 @@ export default function ApplicantHome() {
                                           }`}
                                 </div>
                             </div>
+
                             {isSalaryOpen && (
                                 <div className="bg-white mt-2 w-full p-4 rounded-md shadow-lg">
-                                    <div className="flex space-x-4 border-b">
+                                    <div className="flex space-x-4 border-b lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                         {["Annually", "Monthly", "Hourly"].map(
                                             (type) => (
                                                 <button
                                                     key={type}
-                                                    className={`pb-2 text-sm ${
+                                                    className={`pb-2 lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall ${
                                                         paymentType === type
                                                             ? "text-primary border-b-2 border-blue-500"
                                                             : "text-gray-500"
@@ -301,7 +446,9 @@ export default function ApplicantHome() {
                                             )
                                         )}
                                     </div>
-                                    <div className="text-gray-500 text-medium mt-4">
+
+                                    {/* Label */}
+                                    <div className="text-gray-500 lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall mt-4">
                                         Salary Range (PHP)
                                     </div>
                                     <div className="mt-4 space-y-2 max-h-20 overflow-y-auto">
@@ -317,23 +464,17 @@ export default function ApplicantHome() {
                                                             name="salaryRange"
                                                             value={index}
                                                             checked={
-                                                                salaryRange[0] ===
-                                                                index
-                                                            } // Bind salary range state
+                                                                range === index
+                                                            }
                                                             onChange={() => {
-                                                                setSalaryRange([
-                                                                    index,
-                                                                    salaryRanges[
-                                                                        paymentType
-                                                                    ][index],
-                                                                ]);
+                                                                setRange(index);
                                                                 setIsSalaryOpen(
                                                                     false
                                                                 );
                                                             }}
                                                             className=" ml-5 w-5 h-5"
                                                         />
-                                                        <span className="text-medium">
+                                                        <span className="lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                             {formatSalary(
                                                                 index
                                                             )}
@@ -351,10 +492,13 @@ export default function ApplicantHome() {
                                 className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium"
                                 id="exp-level"
                                 name="ExperienceLevel"
-                                value={experienceLevel} // Bind to state
+                                value={filters.experienceLevel}
                                 onChange={(e) =>
-                                    setExperienceLevel(e.target.value)
-                                } // Update state
+                                    handleFilterChange(
+                                        "experienceLevel",
+                                        e.target.value
+                                    )
+                                }
                                 required
                             >
                                 <option value="" disabled selected hidden>
@@ -381,12 +525,11 @@ export default function ApplicantHome() {
                         <JobListings
                             authToken={authTokens?.access}
                             onJobClick={handleJobClick} // Trigger to open job details
-                            keyword={keyword}
-                            classification={classification}
-                            location={location}
-                            datePosted={datePosted}
-                            salaryRange={salaryRange}
-                            experienceLevel={experienceLevel}
+                            jobListings={
+                                filteredJobListings.length > 0
+                                    ? filteredJobListings
+                                    : jobListings
+                            }
                         />
                         {/* Job Details for Desktop */}
                         <div className="hidden md:block flex-grow">

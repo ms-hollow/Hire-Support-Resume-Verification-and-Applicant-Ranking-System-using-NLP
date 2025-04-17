@@ -10,6 +10,8 @@ import { useJob, JobProvider } from "@/pages/context/JobContext";
 const JobListings = ({
     authToken,
     onJobClick,
+    jobListings,
+    loading,
     keyword,
     classification,
     location,
@@ -18,36 +20,20 @@ const JobListings = ({
     experienceLevel,
 }) => {
     const { savedStatus, toggleSaveJob } = useJob();
-    const [jobListings, setJobListings] = useState([]);
-    const [filteredJobs, setFilteredJobs] = useState([]);
-    const [loading, setLoading] = useState(true);
     const router = useRouter();
     const handleJobClick = (jobId) => {
         router.push(
             {
                 pathname: router.pathname,
-                query: { id: jobId }, // Use jobId to pass in query params
+                query: { id: jobId }, 
             },
             undefined,
             { shallow: true }
         );
-        onJobClick(jobId); // Call the onJobClick function with the jobId
+        onJobClick(jobId); 
     };
 
-    const loadJobListings = async () => {
-        setLoading(true);
-        const jobData = await fetchJobListings(authToken);
-        setJobListings(jobData);
-        setLoading(false);
-    };
-
-    useEffect(() => {
-        if (authToken) {
-            loadJobListings();
-        }
-    }, [authToken]);
-
-    if (!Array.isArray(jobListings)) {
+    if (!Array.isArray(jobListings) || jobListings.length === 0) {
         return <p>No job listings available.</p>;
     }
 
@@ -175,7 +161,7 @@ const JobListings = ({
     );
 };
 
-const JobListingsWrapper = ({ onJobClick }) => {
+const JobListingsWrapper = ({ onJobClick, jobListings, loading }) => {
     const { authTokens } = useContext(AuthContext);
     return (
         <div className="flex overflow-y-auto border border-none hide-scrollbar p-1 h-[calc(100vh-150px)]">
@@ -183,6 +169,8 @@ const JobListingsWrapper = ({ onJobClick }) => {
                 <JobListings
                     authToken={authTokens.access}
                     onJobClick={onJobClick}
+                    jobListings={jobListings}
+                    loading={loading}
                 />
             </JobProvider>
             <GeneralFooter />

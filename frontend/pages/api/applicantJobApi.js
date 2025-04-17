@@ -11,6 +11,7 @@ export const fetchJobListings = async (authToken) => {
         if (!response.ok) throw new Error("Failed to fetch job listings");
 
         const data = await response.json();
+        console.log("Job Listings:", data);
 
         return data.map((job) => ({
             job_id: job.job_hiring_id,
@@ -21,6 +22,7 @@ export const fetchJobListings = async (authToken) => {
             salary_min: job.salary_min,
             salary_max: job.salary_max,
             salary_frequency: job.salary_frequency,
+            employment_type: job.employment_type,
             schedule: job.schedule,
             location: `${job.region}, ${job.province}, ${job.city}`,
             work_setup: job.work_setup,
