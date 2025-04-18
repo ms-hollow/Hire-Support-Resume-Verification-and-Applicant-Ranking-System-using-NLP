@@ -1,6 +1,5 @@
 import ApplicantHeader from "@/components/ApplicantHeader";
 import GeneralFooter from "@/components/GeneralFooter";
-import Link from "next/link";
 import Image from 'next/image';
 import { useState, useEffect, useContext, useCallback } from "react";
 import AuthContext from '../context/AuthContext';
@@ -31,7 +30,7 @@ export default function ApplicantDocument ({handleJobClick }) {
     let {authTokens} = useContext(AuthContext);
 
     const [draftJobApplication, setdraftJobApplication] = useState({
-        job_hiring_id: '',
+        job_hiring: '',
         job_application_id: '',
         applicant: '',
         fullName: '',
@@ -45,21 +44,21 @@ export default function ApplicantDocument ({handleJobClick }) {
     });
 
     const [formData, setFormData] = useState({
-    resume: { file: "", option: "upload" },
-    educationaldocs: { file: "", option: "upload" },
-    workcertificate: { file: "", option: "upload" },
-    seminarCertificate: { file: "", option: "upload" },
-    additionalDocuments: { file: "", option: "upload" },
-    additionalDocs: { files: [] }, // Keep additional documents as an array
-});
+        resume: { file: "", option: "upload" },
+        educationaldocs: { file: "", option: "upload" },
+        workcertificate: { file: "", option: "upload" },
+        seminarCertificate: { file: "", option: "upload" },
+        additionalDocuments: { file: "", option: "upload" },
+        additionalDocs: { files: [] }, // Keep additional documents as an array
+    });
 
-    const getTitleFromLocalStorage = () => {
-        const jobTitle = localStorage.getItem('job_title');
+    const getTitle = () => {
+        const jobTitle = sessionStorage.getItem('job_title');
         return jobTitle ? jobTitle : null; 
     };
-
-    const getCompanyFromLocalStorage = () => {
-        const company = localStorage.getItem('company');
+    
+    const getCompany = () => {
+        const company = sessionStorage.getItem('company');
         return company ? company : null; 
     };
 
@@ -95,45 +94,34 @@ export default function ApplicantDocument ({handleJobClick }) {
 
     useEffect(() => {
         // Retrieve the draft job application data from localStorage
-        const savedDraft = localStorage.getItem('draftJobApplication');
-        
+        const savedDraft = sessionStorage.getItem('draftJobApplication'); // use session storage
+
         if (savedDraft) {
-            setdraftJobApplication(JSON.parse(savedDraft));
+            const parsedDraft = JSON.parse(savedDraft);
+            console.log('Draft Loaded:', parsedDraft);
+            console.log(parsedDraft.job_hiring);
+            // console.log(typeof(parsedDraft.job_hiring))
+            setdraftJobApplication(parsedDraft);
         }
+
+        console.log(draftJobApplication);
     }, []);
-    
-    const handleFileUpload = (e, documentType) => {
-        const { files } = e.target;
-        
-        if (files[0]) {
-            setFormData((prevState) => ({
-                ...prevState,
-                [documentType]: {
-                    file: files[0], // Save the file object
-                    option: "upload", // Set option as upload
-                },
-            }));
-        }
-    };
-    
+
     const handleSubmit = async (e) => {
-        if (e) {
-            e.preventDefault();
-        } else {
-            console.error("Event is undefined!");
-        }
+        if (e) e.preventDefault();
     
-        // Prepare the form data for submission
         const applicationData = {
-            ...draftJobApplication,  // personal info retrieved from localStorage
+            ...draftJobApplication,
             documents: Object.keys(formData).map((key) => ({
-                document_type: key,  // document type (e.g., 'resume', 'transcript')
-                document_file: formData[key].file,  // uploaded file object
+                document_type: key,
+                document_file: formData[key].file, // <- This is the actual File object
             })),
         };
+
+        console.log(applicationData);
     
         const formDataToSubmit = new FormData();
-        formDataToSubmit.append('job_hiring', applicationData.job_hiring_id);
+        formDataToSubmit.append('job_hiring', applicationData.job_hiring);
         formDataToSubmit.append('applicant', applicationData.applicant);
         formDataToSubmit.append('fullName', applicationData.fullName);
         formDataToSubmit.append('email', applicationData.email);
@@ -143,41 +131,91 @@ export default function ApplicantDocument ({handleJobClick }) {
         formDataToSubmit.append('application_date', applicationData.application_date);
         formDataToSubmit.append('application_status', applicationData.application_status);
     
-        // Append each document file to FormData
+        // Append each document file and its type to FormData
         applicationData.documents.forEach((doc) => {
-            console.log(doc.document_type, doc.document_file);  
-            formDataToSubmit.append('document_type', doc.document_type);
-            formDataToSubmit.append('document_file', doc.document_file);  // Ensure it's a valid File object
+            if (doc.document_file) {
+                formDataToSubmit.append('document_type', doc.document_type); // Matches 'document_type' in your backend
+                formDataToSubmit.append('document_file', doc.document_file); // Matches 'document_file' in your backend
+            }
         });
     
-        // Log FormData to verify before submission
-        // for (let pair of formDataToSubmit.entries()) {
-        //     console.log(pair[0] + ": " + pair[1]);
-        // }
+        // Debugging: See what's being sent
+        for (let pair of formDataToSubmit.entries()) {
+            console.log(pair[0], pair[1]);
+        }
     
-        // Send the data to the backend
-        const res = await fetch('http://127.0.0.1:8000/job/applications/create', {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${authTokens.access}`,
-            },
-            body: formDataToSubmit,
-        });
-    
-        if (res.ok) {
-            // Handle successful submission
-            alert("Job application submitted successfully!");
-            localStorage.removeItem('draftJobApplication');
-            router.push({
-                pathname: '/APPLICANT/ApplicationConfirmation',
-                query: { jobId },
+        try {
+            const res = await fetch('http://127.0.0.1:8000/job/applications/create', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${authTokens.access}`, // Keep headers minimal for FormData
+                },
+                body: formDataToSubmit,
             });
-        } else {
-            // Handle errors
-            alert("Failed to submit job application.");
+    
+            if (res.ok) {
+                alert('Job application submitted successfully!');
+                localStorage.removeItem('draftJobApplication');
+                router.push({
+                    pathname: '/APPLICANT/ApplicationConfirmation',
+                    query: { jobId },
+                });
+            } else {
+                const errorData = await res.json();
+                console.error('Submission error:', errorData);
+                alert('Failed to submit job application.');
+            }
+        } catch (error) {
+            console.error('Network error:', error);
+            alert('An error occurred. Please try again later.');
         }
     };
-
+    
+    
+    const addAdditionalFile = (category) => {
+        setFormData((prevState) => {
+            const updatedFiles = [...(prevState[category]?.files || [])];
+            updatedFiles.push(""); // Add an empty placeholder for the new file
+            return {
+                ...prevState,
+                [category]: {
+                    ...prevState[category],
+                    files: updatedFiles,
+                },
+            };
+        });
+    };
+    
+    // Remove additional file input for a specific category
+    const removeAdditionalFile = (category, index) => {
+        setFormData((prevState) => {
+            const updatedFiles = (prevState[category]?.files || []).filter((_, i) => i !== index);
+            return {
+                ...prevState,
+                [category]: {
+                    ...prevState[category],
+                    files: updatedFiles,
+                },
+            };
+        });
+    };
+    
+    // Handle file input change for additional files
+    const handleAdditionalFileChange = (e, category, index) => {
+        const { files } = e.target;
+        setFormData((prevState) => {
+            const updatedFiles = [...(prevState[category]?.files || [])];
+            updatedFiles[index] = files[0]; // Store the file object, not just the filename
+            return {
+                ...prevState,
+                [category]: {
+                    ...prevState[category],
+                    files: updatedFiles,
+                },
+            };
+        });
+    };
+    
     return ( 
         <div>
             <ApplicantHeader/>

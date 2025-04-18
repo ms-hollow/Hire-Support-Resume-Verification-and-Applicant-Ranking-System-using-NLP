@@ -1,158 +1,93 @@
 import { useState, useContext, useEffect, useCallback } from "react";
-import Image from 'next/image';
+import Image from "next/image";
 import AuthContext from "@/pages/context/AuthContext";
-
-//TODO Add loader
-//TODO Optimize Dapat mag load muna lahat ng data before mag mount
+import {
+    fetchJobListings,
+    fetchSavedJobs,
+    saveJob,
+    unsaveJob,
+} from "@/pages/api/applicantJobApi";
 
 const SavedJobs = () => {
-  const { authTokens } = useContext(AuthContext);
-  const [savedJobs, setSavedJobs] = useState([]); 
-  const [loading, setLoading] = useState(true);   
-  const [error, setError] = useState(null);       
-  const [jobListings, setJobListings] = useState([]);
-  const [savedStatus, setSavedStatus] = useState({}); 
+    const { authTokens } = useContext(AuthContext);
+    const [savedJobs, setSavedJobs] = useState([]);
+    const [jobListings, setJobListings] = useState([]);
+    const [savedStatus, setSavedStatus] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  // Fetch saved jobs from the backend
-  useEffect(() => {
-    const fetchSavedJobs = async () => {
-      try {
-        const res = await fetch('http://127.0.0.1:8000/applicant/saved-jobs/', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authTokens.access}`, 
-          },
-        });
+    useEffect(() => {
+        const loadSavedJobs = async () => {
+            try {
+                const savedJobsData = await fetchSavedJobs(authTokens.access);
+                setSavedJobs(savedJobsData);
+                const jobHiringIds = savedJobsData.map(
+                    (job) => job.job_hiring_id
+                );
+                const allJobs = await fetchJobListings(authTokens.access);
 
-        if (!res.ok) {
-          throw new Error('Failed to fetch saved jobs');
-        }
-  
-        const data = await res.json();
-        setSavedJobs(data); 
-        // console.log('Saved Jobs Data:', data);
-  
-        // Extract job_hiring_ids from the saved jobs data
-        const jobHiringIds = data.map((job) => job.job_hiring_id);
-        // console.log('Job Hiring IDs:', jobHiringIds);
-  
-        // Kunin yung job listings based sa job Id
-        getJobs(jobHiringIds);
-  
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    // Function to fetch the job listings based on the job IDs
-    const getJobs = async (jobHiringIds) => {
-      try {
-        const response = await fetch('http://127.0.0.1:8000/job/job-hirings/', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${authTokens.access}`,
-          },
-        });
-  
-        const data = await response.json();
-  
-        if (response.status === 200) {
-          // Filter job listings to only include the jobs that match the saved job IDs
-          const filteredJobs = data.filter((job) => jobHiringIds.includes(job.job_hiring_id)).map((job) => ({
-            job_id: job.job_hiring_id,
-            job_title: job.job_title,
-            company_name: job.company_name,
-            job_industry: job.job_industry,
-            job_description: job.job_description || "No description available",
-            salary: job.salary ? `Php ${job.salary.min} - ${job.salary.max}` : "Not specified",
-            schedule: job.schedule,
-            location: job.work_location,
-            work_setup: job.work_setup,
-          }));
+                const filteredJobs = allJobs.filter((job) =>
+                    jobHiringIds.includes(job.job_id)
+                );
 
-          // Set job listings and the initial saved status for each job
-          const initialSavedStatus = filteredJobs.reduce((acc, job) => {
-            acc[job.job_id] = savedJobs.some(savedJob => savedJob.job_hiring_id === job.job_id); // Check if the job is saved
-            return acc;
-          }, {});
+                const initialSavedStatus = filteredJobs.reduce((acc, job) => {
+                    acc[job.job_id] = true;
+                    return acc;
+                }, {});
 
-          setJobListings(filteredJobs);
-          setSavedStatus(initialSavedStatus);  // Initialize the saved status for each job
+                setJobListings(filteredJobs);
+                setSavedStatus(initialSavedStatus);
+            } catch (error) {
+                setError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadSavedJobs();
+    }, [authTokens]);
+
+    const handleSaveJob = useCallback(
+        async (jobId) => {
+            const success = await saveJob(authTokens.access, jobId);
+            if (success) {
+                setSavedStatus((prevState) => ({
+                    ...prevState,
+                    [jobId]: true,
+                }));
+                alert("Job saved successfully!");
+            }
+        },
+        [authTokens]
+    );
+
+    const handleUnsaveJob = useCallback(
+        async (jobId) => {
+            const success = await unsaveJob(authTokens.access, jobId);
+            if (success) {
+                setSavedStatus((prevState) => ({
+                    ...prevState,
+                    [jobId]: false,
+                }));
+                setJobListings((prevJobs) =>
+                    prevJobs.filter((job) => job.job_id !== jobId)
+                );
+                alert("Job unsaved successfully!");
+            }
+        },
+        [authTokens]
+    );
+
+    const toggleSave = async (jobId) => {
+        if (savedStatus[jobId]) {
+            await handleUnsaveJob(jobId);
         } else {
-          console.error("Failed to fetch job listings");
+            await handleSaveJob(jobId);
         }
-      } catch (error) {
-        console.error("Error fetching jobs:", error);
-      }
     };
-  
-    fetchSavedJobs();
-  }, [authTokens, savedJobs]); 
 
-  const handleSaveJob = useCallback(async (jobId) => {
-    try {
-      const savedJobs = await fetch(`http://127.0.0.1:8000/applicant/save-job/${jobId}/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authTokens.access}`,
-        },
-      });
-
-      if (savedJobs.ok) {
-        setSavedStatus(prevState => ({
-          ...prevState,
-          [jobId]: true, // Mark this job as saved
-        }));
-        alert('Job saved successfully!');
-      } else {
-        console.error(`Failed to save job: ${savedJobs.status}`);
-      }
-    } catch (error) {
-      console.error('Failed to save job:', error);
-    }
-  }, [authTokens]);
-
-  // Handle unsave job
-  const handleUnsaveJob = useCallback(async (jobId) => {
-    try {
-      await fetch(`http://127.0.0.1:8000/applicant/unsave-job/${jobId}/`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authTokens.access}`,
-        },
-      });
-      setSavedStatus(prevState => ({
-        ...prevState,
-        [jobId]: false, // Mark this job as unsaved
-      }));
-      alert('Job unsaved successfully!');
-    } catch (error) {
-      console.error('Failed to unsave job:', error);
-    }
-  }, [authTokens]);
-
-  // Toggle save/unsave job
-  const toggleSave = (jobId) => {
-    if (savedStatus[jobId]) {
-      handleUnsaveJob(jobId); // If job is saved, unsave it
-    } else {
-      handleSaveJob(jobId); // If job is not saved, save it
-    }
-  };
-
-  if (loading) {
-    return <div>Loading saved jobs...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+    if (loading) return <div>Loading saved jobs...</div>;
+    if (error) return <div>Error: {error}</div>;
 
   return (
     <div>
@@ -212,7 +147,7 @@ const SavedJobs = () => {
 
                   <div className="flex items-center col-span-1">
                     <Image src="/Salary Icon.svg" width={18} height={20} alt="Salary Icon" />
-                    <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">{job.salary}</p>
+                    <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor"> {job.salary_min} - {job.salary_max}</p>
                   </div>
                 </div>
               </div>
@@ -225,11 +160,11 @@ const SavedJobs = () => {
 };
 
 const SavedJobsWrapper = () => {
-  return (
-    <div className="flex overflow-y-auto border border-none hide-scrollbar p-1 h-[calc(100vh-150px)]">
-      <SavedJobs />
-    </div>
-  );
+    return (
+        <div className="flex overflow-y-auto border border-none hide-scrollbar p-1 h-[calc(100vh-150px)]">
+            <SavedJobs />
+        </div>
+    );
 };
 
 export default SavedJobsWrapper;
