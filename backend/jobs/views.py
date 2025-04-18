@@ -1,10 +1,11 @@
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import JobHiringSerializer, JobApplicationSerializer, JobApplicationDocumentSerializer
-from .models import JobHiring, JobApplication, JobApplicationDocument, RecentSearch
+from .models import JobHiring, JobApplication, JobApplicationDocument, RecentSearch, Company
 from django.db import transaction
 from django.utils import timezone
 from datetime import timedelta
@@ -46,11 +47,11 @@ def list_draft_job_hirings(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def job_hiring_list_company(request):
-    job_listings = JobHiring.objects.all()
-    if not job_listings:
-        return Response({"message": "No job listings found"}, status=404)
+    company = get_object_or_404(Company, user=request.user)
+    job_listings = JobHiring.objects.filter(company=company) 
     serializer = JobHiringSerializer(job_listings, many=True)
     return Response(serializer.data)
+
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
