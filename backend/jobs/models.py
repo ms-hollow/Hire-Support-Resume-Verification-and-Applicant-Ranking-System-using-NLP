@@ -34,7 +34,7 @@ class JobHiring(models.Model):
     salary_min = models.CharField(max_length=300, null=True, blank=True) # Note: change to CharField
     salary_max = models.CharField(max_length=300, null=True, blank=True) # Note: change to CharField
     salary_frequency = models.CharField(max_length=300, null=True, blank=False)
-    creation_date = models.DateField(auto_now_add=True)
+    creation_date = models.DateTimeField(auto_now_add=True)
     
     verification_option = models.CharField(max_length=300, null=True, blank=True)
     required_documents = models.JSONField(null=True, blank=True)

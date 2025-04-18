@@ -232,7 +232,7 @@ export default function CompanySettings() {
             return false;
         }
 
-        if (!formData.additional_notes){
+        if (!formData.additional_notes) {
             alert("Please add additional notes.");
             return false;
         }
