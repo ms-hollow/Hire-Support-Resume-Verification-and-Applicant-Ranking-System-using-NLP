@@ -11,7 +11,6 @@ export const fetchJobListings = async (authToken) => {
         if (!response.ok) throw new Error("Failed to fetch job listings");
 
         const data = await response.json();
-        console.log("Job Listings:", data);
 
         return data.map((job) => ({
             job_id: job.job_hiring_id,
