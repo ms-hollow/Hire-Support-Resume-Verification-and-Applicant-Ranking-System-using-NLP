@@ -25,12 +25,12 @@ const JobListings = ({
         router.push(
             {
                 pathname: router.pathname,
-                query: { id: jobId }, 
+                query: { id: jobId },
             },
             undefined,
             { shallow: true }
         );
-        onJobClick(jobId); 
+        onJobClick(jobId);
     };
 
     if (!Array.isArray(jobListings) || jobListings.length === 0) {

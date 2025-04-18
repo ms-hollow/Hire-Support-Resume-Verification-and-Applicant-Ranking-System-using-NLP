@@ -11,8 +11,6 @@ import phLocation from "../../public/placeHolder/location.json";
 import { fetchJobListings } from "@/pages/api/applicantJobApi";
 import JobListingsWrapper from "@/components/JobListings";
 
-//TODO Need to fix
-
 export default function ApplicantHome({ onJobClick }) {
     let { authTokens } = useContext(AuthContext);
     const router = useRouter();
@@ -78,11 +76,11 @@ export default function ApplicantHome({ onJobClick }) {
             ...prevFilters,
             [filterName]: value,
         }));
-        console.log("Filter changed:", filterName, value);
+        // console.log("Filter changed:", filterName, value);
     };
 
     const applyFilters = () => {
-        console.log("Filters applied:", filters);
+        // console.log("Filters applied:", filters);
 
         const filtered = jobListings.filter((job) => {
             const jobCreationDate = new Date(job.creation_date);
@@ -158,13 +156,13 @@ export default function ApplicantHome({ onJobClick }) {
             return isDatePostedValid && isSalaryValid && isValid;
         });
 
-        console.log("Filtered jobs:", filtered);
+        // console.log("Filtered jobs:", filtered);
         setFilteredJobListings(filtered);
     };
 
     useEffect(() => {
         applyFilters();
-        console.log(filteredJobListings);
+        // console.log(filteredJobListings);
     }, [filters, jobListings]);
 
     // Handle closing job details
