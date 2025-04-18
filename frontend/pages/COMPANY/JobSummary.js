@@ -140,9 +140,9 @@ export default function JobSummary() {
         const response = await createJob(formData, authTokens.access);
 
         if (response) {
-            console.log("Job created successfully.");
+            alert("Job created successfully.");
         } else {
-            console.log("Failed to create job.");
+            alert("Failed to create job.");
         }
 
         Cookies.remove("DRAFT_DATA");
