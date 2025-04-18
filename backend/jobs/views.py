@@ -11,15 +11,16 @@ from datetime import timedelta
 from django.views.decorators.csrf import csrf_exempt
 
 #* Create Job Hiring
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_job_hiring(request):
-    if request.method == 'POST':
-        serializer = JobHiringSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer = JobHiringSerializer(data=request.data)
+
+    if serializer.is_valid():
+        serializer.save(company=request.user.company)  
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #* Edit Job Hiring
 @api_view(['PUT'])
@@ -35,6 +36,39 @@ def edit_job_hiring(request, pk):
     except JobHiring.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_draft_job_hirings(request):
+    drafts = JobHiring.objects.filter(company=request.user.company, status='draft')
+    serializer = JobHiringSerializer(drafts, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def job_hiring_list_company(request):
+    job_listings = JobHiring.objects.all()
+    if not job_listings:
+        return Response({"message": "No job listings found"}, status=404)
+    serializer = JobHiringSerializer(job_listings, many=True)
+    return Response(serializer.data)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_job_hiring(request, job_hiring_id):
+    try:
+        # Retrieve the JobHiring object
+        job_hiring = JobHiring.objects.get(job_hiring_id=job_hiring_id, company=request.user.company)
+    except JobHiring.DoesNotExist:
+        return Response({"message": "Job Hiring not found or you do not have permission to edit it."}, status=status.HTTP_404_NOT_FOUND)
+
+    # Use the serializer to validate and update the data
+    serializer = JobHiringSerializer(job_hiring, data=request.data, partial=True)  # partial=True allows updating specific fields
+
+    if serializer.is_valid():
+        serializer.save()  # Save the updated job hiring
+        return Response(serializer.data)  # Return the updated job hiring data
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 #* Delete Job Hiring
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
@@ -46,13 +80,15 @@ def delete_job_hiring(request, pk):
     except JobHiring.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-#* Retrieve all job hirings
-@api_view(['GET'])
+#* Retrieve all job hirings and filter to only show job hirings with status 'open'
+@api_view(['GET']) 
 @permission_classes([IsAuthenticated])
 def job_hiring_list(request):
-    job_listings = JobHiring.objects.all()
+    job_listings = JobHiring.objects.filter(status='open')
+
     if not job_listings:
-        return Response({"message": "No job listings found"}, status=404)
+        return Response({"message": "No draft job listings found"}, status=404)
+
     serializer = JobHiringSerializer(job_listings, many=True)
     return Response(serializer.data)
     
@@ -190,11 +226,6 @@ def create_job_application(request):
                 
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
-from .models import JobApplication, JobHiring
 
 @api_view(['GET'])
 def check_application(request, pk):
@@ -222,7 +253,6 @@ def check_application(request, pk):
     ).exists()
 
     return Response({"hasApplied": application_exists}, status=status.HTTP_200_OK)
-
 
 #* Delete Job Application
 @api_view(['DELETE'])

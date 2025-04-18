@@ -14,7 +14,7 @@ export default function JobApplication ({handleJobClick}) {
     let {authTokens} = useContext(AuthContext);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
-    const { jobId } = router.query;
+    const { id } = router.query;
     const { convertAddressCodes } = useAddressMapping();
 
     const [showJobDetails, setShowJobDetails] = useState(false);
@@ -67,21 +67,22 @@ export default function JobApplication ({handleJobClick}) {
     };
 
     const saveDraft = async () => {
-        const alreadyApplied = await checkIfAlreadyApplied();
-        if (alreadyApplied) {
-            alert("You have already applied for this job.");
-            return;
-        }
+        //! Need to uncomment this code when done with the document upload feature
+        // const alreadyApplied = await checkIfAlreadyApplied();
+        // if (alreadyApplied) {
+        //     alert("You have already applied for this job.");
+        //     return;
+        // }
     
-        localStorage.setItem('draftJobApplication', JSON.stringify(draftJobApplication));
+        sessionStorage.setItem('draftJobApplication', JSON.stringify(draftJobApplication));
         router.push({
             pathname: '/APPLICANT/ApplicantDocuments',
-            query: { jobId },
+            query: { id },
         });
     };
 
     useEffect(() => {
-        if (!authTokens?.access || !jobId || !convertAddressCodes) return;
+        if (!authTokens?.access || !id || !convertAddressCodes) return;
 
         const decodedToken = jwt.decode(authTokens.access);
         if (!decodedToken) {
@@ -124,7 +125,7 @@ export default function JobApplication ({handleJobClick}) {
                         });
 
                         setdraftJobApplication({
-                            job_hiring: Number(jobId),
+                            job_hiring: Number(id),
                             applicant: Number(applicantKey),
                             fullName: fullName,
                             email: decodedToken.email,
@@ -148,13 +149,13 @@ export default function JobApplication ({handleJobClick}) {
             }
         };
         getApplicantInfo();
-    }, [authTokens, jobId, convertAddressCodes]);
+    }, [authTokens, id, convertAddressCodes]);
 
 
     // Check kung nakapag apply na si applicant or hindi
     const checkIfAlreadyApplied = async () => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/job/applications/check/${jobId}/?applicant_id=${draftJobApplication.applicant}`);
+            const response = await fetch(`http://127.0.0.1:8000/job/applications/check/${id}/?applicant_id=${draftJobApplication.applicant}`);
             if (!response.ok) {
                 throw new Error("Failed to check application status");
             }
@@ -167,13 +168,13 @@ export default function JobApplication ({handleJobClick}) {
         }
     };
 
-    const getTitleFromLocalStorage = () => {
-        const jobTitle = localStorage.getItem('job_title');
+    const getTitle = () => {
+        const jobTitle = sessionStorage.getItem('job_title');
         return jobTitle ? jobTitle : null; 
     };
     
-    const getCompanyFromLocalStorage = () => {
-        const company = localStorage.getItem('company');
+    const getCompany = () => {
+        const company = sessionStorage.getItem('company');
         return company ? company : null; 
     };
 

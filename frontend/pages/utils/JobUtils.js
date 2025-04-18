@@ -7,8 +7,6 @@ const generateJobId = (existingJobs) => {
   const formatSalary = (min, max, frequency) => {
     return `$${min.toLocaleString()} - $${max.toLocaleString()}`;
   };
-
-
   
   // Function to save new job details
   export const saveJobDetails = (formData, existingJobs = []) => {
