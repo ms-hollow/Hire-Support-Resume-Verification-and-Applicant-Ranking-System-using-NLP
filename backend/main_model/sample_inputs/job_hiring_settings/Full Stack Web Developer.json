@@ -1,0 +1,22 @@
+{
+    "job_title": "Full Stack Web Developer",
+    "specialization": "Frontend and Backend Development, APIs, Databases",
+    "experience_weight": 0.35,
+    "skills_weight": 0.30,
+    "education_weight": 0.20,
+    "certifications_weight": 0.15,
+    "directly_relevant_job_titles": "Full Stack Developer, Web Developer, Backend Developer, Frontend Developer",
+    "highly_relevant_job_titles": "Software Engineer, Application Developer, Systems Developer",
+    "moderately_relevant_job_titles": "Database Administrator, DevOps Engineer, IT Specialist",
+    "primary_skills": "JavaScript, React.js, Node.js, Express.js, MongoDB, SQL, REST APIs, Git, Authentication/Authorization (JWT, OAuth)",
+    "secondary_skills": "GraphQL, Docker, TypeScript, Testing Frameworks (Jest, Mocha), Next.js, CI/CD Pipelines",
+    "additional_skills": "Cloud Platforms (AWS, GCP, Azure), Serverless Architecture, Caching (Redis), Elasticsearch, Microservices",
+    "first_choice_field_study": "Computer Science, Software Engineering, Information Technology",
+    "second_choice_field_study": "Computer Engineering, Information Systems, Mathematics",
+    "third_choice_field_study": "Physics, Electrical Engineering, Statistics",
+    "school_preference": "University of the Philippines, Ateneo de Manila University, De La Salle University",
+    "honors": true,
+    "multiple_degrees": false,
+    "certificate_institution_preference": "Microsoft (Azure Developer), AWS, Coursera, Udemy, FreeCodeCamp",
+    "verification_option": 1
+}

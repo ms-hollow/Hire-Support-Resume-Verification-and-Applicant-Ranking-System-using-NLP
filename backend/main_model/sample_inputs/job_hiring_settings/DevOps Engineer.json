@@ -1,0 +1,22 @@
+{
+    "job_title": "DevOps Engineer",
+    "specialization": "CI/CD, Cloud Infrastructure, Automation",
+    "experience_weight": 0.30,
+    "skills_weight": 0.30,
+    "education_weight": 0.20,
+    "certifications_weight": 0.20,
+    "directly_relevant_job_titles": "DevOps Engineer, DevOps Developer, Cloud Engineer, Site Reliability Engineer (SRE)",
+    "highly_relevant_job_titles": "Platform Engineer, Systems Engineer, Build and Release Engineer",
+    "moderately_relevant_job_titles": "Linux Administrator, Network Engineer, Software Engineer",
+    "primary_skills": "CI/CD pipelines, Docker, Kubernetes, AWS, Linux, Infrastructure as Code (IaC) tools like Terraform or Ansible",
+    "secondary_skills": "Monitoring tools (Prometheus, Grafana), Scripting (Python, Bash), GCP, Azure, Jenkins, Git",
+    "additional_skills": "Cloud security, Networking, Databases, Configuration Management Tools, Helm, ELK stack",
+    "first_choice_field_study": "Computer Science, Software Engineering, Information Technology",
+    "second_choice_field_study": "Computer Engineering, Systems Engineering, Information Systems",
+    "third_choice_field_study": "Electrical Engineering, Mathematics, Physics",
+    "school_preference": "University of the Philippines, Ateneo de Manila University, De La Salle University",
+    "honors": true,
+    "multiple_degrees": false,
+    "certificate_institution_preference": "AWS, AWS-, Kubernetes (CKA/CKAD), Google Cloud, Microsoft Azure",
+    "verification_option": 0
+}

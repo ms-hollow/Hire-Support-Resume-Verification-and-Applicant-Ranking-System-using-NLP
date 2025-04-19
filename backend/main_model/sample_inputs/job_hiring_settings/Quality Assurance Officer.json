@@ -1,0 +1,22 @@
+{
+    "job_title": "Quality Assurance Officer",
+    "specialization": "Testing, Quality Control, Defect Management",
+    "experience_weight": 0.30,
+    "skills_weight": 0.35,
+    "education_weight": 0.20,
+    "certifications_weight": 0.15,
+    "directly_relevant_job_titles": "Quality Assurance Officer, QA Tester, QA Analyst, Software Tester",
+    "highly_relevant_job_titles": "QA Engineer, Quality Control Specialist, Systems Tester",
+    "moderately_relevant_job_titles": "Technical Support Engineer, Product Tester, Customer Support Specialist",
+    "primary_skills": "Manual Testing, Automated Testing, Test Planning, Defect Tracking (Jira, Bugzilla), SDLC, STLC",
+    "secondary_skills": "Selenium, Postman, API Testing, Performance Testing, Test Scripts, Regression Testing",
+    "additional_skills": "Load Testing (JMeter), Mobile App Testing, Agile Methodologies, Risk Assessment, Continuous Integration Testing",
+    "first_choice_field_study": "Computer Science, Software Engineering, Information Technology",
+    "second_choice_field_study": "Information Systems, Quality Management, Business Administration",
+    "third_choice_field_study": "Engineering, Mathematics, Communication Technology",
+    "school_preference": "University of the Philippines, Ateneo de Manila University, De La Salle University",
+    "honors": true,
+    "multiple_degrees": false,
+    "certificate_institution_preference": "ISTQB, Certified Software Tester (CSTE), Selenium Certification, Coursera, Udemy",
+    "verification_option": 1
+}

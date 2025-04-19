@@ -1,0 +1,22 @@
+{
+    "job_title": "Software Engineer",
+    "specialization": "Python/Django",
+    "experience_weight": 0.30,
+    "skills_weight": 0.25,
+    "education_weight": 0.25,
+    "certifications_weight": 0.20,
+    "directly_relevant_job_titles": "Senior Software Engineer, Lead Python Developer, Senior Backend Engineer",
+    "highly_relevant_job_titles": "Full Stack Developer, DevOps Engineer, Software Architect",
+    "moderately_relevant_job_titles": "Web Developer, System Analyst, Database Administrator",
+    "primary_skills": "Pythons, Djangor, PostgreSQR, REST APIs, Git, AWS",
+    "secondary_skills": "Docker, AWS, Redis, Celery, Linux, GCP",
+    "additional_skills": "React, Node.js, MongoDB, Kubernetes",
+    "first_choice_field_study": "Computer Science, Software Engineering, Information Technology",
+    "second_choice_field_study": "Computer Engineering, Information Systems",
+    "third_choice_field_study": "Mathematics, Physics, Engineering",
+    "school_preference": "University of the Philippines, De La Salle University",
+    "honors": true,
+    "multiple_degrees": true,
+    "certificate_institution_preference": "AWS, Microsoft, Oracle",
+    "verification_option": 1
+}

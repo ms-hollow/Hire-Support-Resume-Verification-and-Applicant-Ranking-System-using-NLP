@@ -1,0 +1,22 @@
+{
+    "job_title": "Android Developer",
+    "specialization": "Mobile App Development, Android SDK, UI/UX Design",
+    "experience_weight": 0.35,
+    "skills_weight": 0.30,
+    "education_weight": 0.20,
+    "certifications_weight": 0.15,
+    "directly_relevant_job_titles": "Android Developer, Mobile App Developer, Software Engineer",
+    "highly_relevant_job_titles": "Mobile Developer, Java Developer, Kotlin Developer",
+    "moderately_relevant_job_titles": "Software Developer, Full Stack Developer, Systems Analyst",
+    "primary_skills": "Android SDK, Java, Kotlin, RESTful APIs, Android Studio, XML Layouts, MVVM/MVP Architecture",
+    "secondary_skills": "Firebase, SQLite, Jetpack Compose, Unit Testing, Google Play Store Deployment, Git",
+    "additional_skills": "Cross-platform frameworks (Flutter, React Native), Material Design Principles, Push Notifications, App Security",
+    "first_choice_field_study": "Computer Science, Software Engineering, Information Technology",
+    "second_choice_field_study": "Information Systems, Computer Engineering, Electronics Engineering",
+    "third_choice_field_study": "Mathematics, Physics, Digital Arts",
+    "school_preference": "University of the Philippines, De La Salle University, Ateneo de Manila University, Mapúa University",
+    "honors": true,
+    "multiple_degrees": false,
+    "certificate_institution_preference": "Google Developers, Udacity Android Nanodegree, Coursera (Android Specialization), Microsoft Certifications",
+    "verification_option": 2
+}
