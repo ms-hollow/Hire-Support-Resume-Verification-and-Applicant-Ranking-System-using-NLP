@@ -51,7 +51,7 @@ export default function ViewApplication({handleJobClick}) {
 
               {/* Modal */}
               {isModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 lg:px-20 sm:px-8 xsm:px-8 pb-8 mx-auto">
+                <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-white/0 lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 lg:px-20 sm:px-8 xsm:px-8 pb-8 mx-auto">
                   <div className="bg-background rounded-xs shadow-lg p-6 w-50%">
                     <p className="text-center text-gray-700 mb-6">
                       Are you sure you want to <span className="text-accent font-bold ">withdraw your application?</span> Withdrawing

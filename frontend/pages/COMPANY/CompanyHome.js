@@ -26,6 +26,10 @@ export default function CompanyHome() {
     const [companyName, setCompanyName] = useState(null);
     const router = useRouter();
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedJob, setSelectedJob] = useState(null);
+
+
     let { authTokens } = useContext(AuthContext);
 
     const fetchJobLists = async () => {
@@ -44,10 +48,10 @@ export default function CompanyHome() {
     };
 
     const headerRef = useRef(null);
-  const bodyRef = useRef(null);
-  const isSyncing = useRef(false); // Prevent infinite loop
+    const bodyRef = useRef(null);
+    const isSyncing = useRef(false); // Prevent infinite loop
 
-  const syncScroll = (event, source) => {
+    const syncScroll = (event, source) => {
     if (isSyncing.current) return;
     isSyncing.current = true;
 
@@ -92,6 +96,17 @@ export default function CompanyHome() {
             alert("Failed to delete job.");
         }
     };
+
+    const handleOpenModal = (jobId) => {
+        const job = jobLists.find((j) => j.job_hiring_id === jobId);
+        setSelectedJob(job);
+        setIsModalOpen(true);
+      };
+      
+      const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedJob(null);
+      };
 
     return (
         <div>
@@ -175,19 +190,45 @@ export default function CompanyHome() {
                                                     </button>
                                                     <div
                                                         className="cursor-pointer"
-                                                        onClick={() =>
-                                                            handleDelete(
-                                                                job.job_hiring_id
-                                                            )
-                                                        }
-                                                    >
+                                                        onClick={() => handleOpenModal(job.job_hiring_id)}
+                                                        >
                                                         <Image
                                                             src="/Delete.png"
                                                             width={25}
                                                             height={15}
                                                             alt="Delete Icon"
                                                         />
-                                                  </div>
+                                                    </div>
+                                                    {isModalOpen && selectedJob && (
+                                                        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-white/0 lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 lg:px-20 sm:px-8 xsm:px-8 pb-8 mx-auto z-50">
+                                                            <div className="bg-background rounded-xs shadow-lg p-6 w-2/6">
+                                                            <div className="flex justify-center items-center mb-4">
+                                                                <Image src="/Delete.png" width={70} height={50} alt="Delete Icon" />
+                                                            </div>
+
+                                                            <p className="text-center text-gray-700 mb-6">
+                                                                Are you sure you want to delete <span className="text-accent font-bold">{selectedJob.job_title}</span> job hiring? Deleting this job hiring
+                                                                will <span className="text-fontcolor font-bold">permanently delete </span>all applications for this job.
+                                                            </p>
+
+                                                            <div className="flex justify-center space-x-6">
+                                                                <button
+                                                                className="button1 flex items-center justify-center"
+                                                                onClick={() => {
+                                                                    handleDelete(selectedJob.job_hiring_id);
+                                                                    handleCloseModal();
+                                                                }}
+                                                                >
+                                                                <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Yes</p>
+                                                                </button>
+
+                                                                <button className="button2 flex items-center justify-center" onClick={handleCloseModal}>
+                                                                <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">No</p>
+                                                                </button>
+                                                            </div>
+                                                            </div>
+                                                        </div>
+                                                        )}
                                               </div>
                                             </td>
                                         </tr>
