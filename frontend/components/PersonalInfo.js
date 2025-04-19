@@ -403,10 +403,10 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
                                 onChange={handleChange}
                             >
                                 <option value="" disabled selected hidden>Select City</option>
-                                {cities.map((city) => (
-                                    <option key={city.code} value={city.code}>
-                                        {city.name}
-                                    </option>
+                                {cities.map((city, index) => (
+                                        <option key={index} value={city.n}>
+                                            {city.n}
+                                        </option>
                                 ))}
                             </select>
                         </div>
@@ -420,9 +420,9 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
                             <select disabled={!isEditable} className={`valid:text-fontcolor invalid:text-placeholder lg:w-full mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall ${!isEditable ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'text-fontcolor'}`} id="barangay" name="barangay" value={formData.barangay}   required  onChange={handleChange} >
                                 <option value="" disabled selected hidden>Select Barangay</option>
-                                {barangays.map((barangay) => (
-                                    <option key={barangay.code} value={barangay.code}>
-                                        {barangay.name}
+                                {barangays.map((barangay, index) => (
+                                    <option key={index} value={barangay}>
+                                        {barangay}
                                     </option>
                                 ))}
                             </select>

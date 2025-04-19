@@ -53,9 +53,6 @@ export default function CompanyProfile() {
               </button>
             </div>
   
-            {/* Personal Info Content */}
-            {/* Hindi pa naka read0nly yung fields */}
-  
             <div className="flex flex-col items-center">
                 <CompanyInfo isEditable={isEditable} onUpdateComplete={handleUpdateComplete}/>
             </div>
