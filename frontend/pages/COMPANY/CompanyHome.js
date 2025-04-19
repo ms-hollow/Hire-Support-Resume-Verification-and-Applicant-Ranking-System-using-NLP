@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useRef, useState, useContext } from "react";
 import CompanyHeader from "@/components/CompanyHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import Link from "next/link";
@@ -16,7 +16,7 @@ const getStatusClassName = (status) => {
         complete: "text-complete",
         open: "text-fontcolor",
         draft: "text-primary",
-        closed: "text-accent",
+        closed: "text-accent"
     };
     return statusClasses[status] || "text-default";
 };
@@ -105,7 +105,7 @@ export default function CompanyHome() {
                       {/* Wrapper to ensure alignment */}
                       <div className="relative w-full">
                         {/* Header Table */}
-                        <div ref={headerRef} className="overflow-x-auto w-full" onScroll={(e) => syncScroll(e, "header")}>
+                        <div ref={headerRef} className="overflow-x-auto w-full scrollbar-hide" onScroll={(e) => syncScroll(e, "header")} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                           <table className="table-fixed min-w-[800px] w-full border-b-2 border-[#D9D9D9]">
                             <thead className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-primary bg-white">
                               <tr>

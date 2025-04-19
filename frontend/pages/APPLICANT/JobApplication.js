@@ -6,7 +6,6 @@ import { useState, useEffect, useContext, useCallback } from "react";
 import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import jwt from 'jsonwebtoken';
-import { useAddressMapping } from "@/pages/utils/AddressMapping";
 import JobDetailsWrapper from "@/components/JobDetails";
 
 export default function JobApplication ({handleJobClick}) {
@@ -15,7 +14,6 @@ export default function JobApplication ({handleJobClick}) {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     const { id } = router.query;
-    const { convertAddressCodes } = useAddressMapping();
 
     const [showJobDetails, setShowJobDetails] = useState(false);
 
@@ -82,7 +80,7 @@ export default function JobApplication ({handleJobClick}) {
     };
 
     useEffect(() => {
-        if (!authTokens?.access || !id || !convertAddressCodes) return;
+        if (!authTokens?.access || !id) return;
 
         const decodedToken = jwt.decode(authTokens.access);
         if (!decodedToken) {
@@ -149,7 +147,7 @@ export default function JobApplication ({handleJobClick}) {
             }
         };
         getApplicantInfo();
-    }, [authTokens, id, convertAddressCodes]);
+    }, [authTokens, id]);
 
 
     // Check kung nakapag apply na si applicant or hindi

@@ -14,7 +14,7 @@ export default function ApplicantsSummary(){
 
                 <div className="flex flex-row gap-5 ">
                   <CompanyJobDetailsWrapper />
-                    <div className="w-4/6 flex flex-col">
+                    <div className="w-5/6 flex flex-col">
                         <Ranking/>
                     </div>
                 </div>

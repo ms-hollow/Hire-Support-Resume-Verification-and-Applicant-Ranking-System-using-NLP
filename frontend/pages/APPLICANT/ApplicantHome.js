@@ -341,7 +341,7 @@ export default function ApplicantHome({ onJobClick }) {
                     <div className="flex gap-5 pb-5 overflow-x-auto">
                         <div className="h-medium rounded-xs bg-secondary flex flex-grow min-w-[200px]">
                             <select
-                                className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium"
+                                className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall"
                                 id="date-posted"
                                 name="DatePosted"
                                 value={filters.datePosted} // Bind to state

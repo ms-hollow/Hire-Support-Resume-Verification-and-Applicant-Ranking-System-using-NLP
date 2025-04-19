@@ -232,7 +232,7 @@ export default function CompanySettings() {
             return false;
         }
 
-        if (!formData.additional_notes){
+        if (!formData.additional_notes) {
             alert("Please add additional notes.");
             return false;
         }
@@ -469,7 +469,10 @@ export default function CompanySettings() {
                     <p className="font-medium lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-5">
                         Fill out all required job hiring details.
                     </p>
-                    <form onSubmit={handleSettingsSubmit} className="flex gap-6">
+                    <form
+                        onSubmit={handleSettingsSubmit}
+                        className="flex gap-6"
+                    >
                         <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col gap-5">
                         {/* Required Documents */}
                         <div className="lg:w-1/3 md:w-1/3 sm:w-full flex flex-col gap-6 lg:sticky mb:sticky top-20 h-max">

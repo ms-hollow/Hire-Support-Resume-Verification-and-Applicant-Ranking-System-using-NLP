@@ -294,7 +294,7 @@ export default function CreateJob() {
                 </h1>
 
                 <div className="flex items-center justify-center pb-8">
-                    <div className="job-application-box rounded-xs px-8 py-5 mx-auto">
+                    <div className="job-application-box px-8 py-5 mx-auto">
                         <p className="font-semibold lg:text-large mb:text-large sm:text-large text-primary">
                             Job Hiring Information
                         </p>
@@ -323,12 +323,12 @@ export default function CreateJob() {
                                         value={formData.job_title}
                                         onChange={handleInputChange}
                                         placeholder="Job Title"
-                                        className="h-medium rounded-xs border-2 border-fontcolor"
+                                        className="h-medium rounded-xs border-2 border-fontcolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">
+                                    <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall  text-fontcolor font-semibold mb-1">
                                         Job Industry
                                     </label>
                                     <input
@@ -337,18 +337,18 @@ export default function CreateJob() {
                                         value={formData.job_industry}
                                         onChange={handleInputChange}
                                         placeholder="Job Industry"
-                                        className="h-medium rounded-xs border-2 border-fontcolor"
+                                        className="h-medium rounded-xs border-2  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall border-fontcolor"
                                     />
                                 </div>
 
                                 <div className="col-span-2 gap-3">
                                     <div className="mb-4">
                                         <div>
-                                            <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall font-semibold text-fontcolor mb-1">
+                                            <label className="block  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall font-semibold text-fontcolor mb-1">
                                                 Specialization
                                             </label>
                                             <div
-                                                className="w-full border-2 border-black rounded-lg px-4 py-2 lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
+                                                className="w-full border-2 border-black rounded-lg px-4 py-2  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
                                                 onClick={() =>
                                                     setDropdownOpen({
                                                         ...dropdownOpen,
@@ -385,7 +385,7 @@ export default function CreateJob() {
                                                         )
                                                     )
                                                 ) : (
-                                                    <span className="text-fontcolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall" >
+                                                    <span className="text-fontcolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall">
                                                         Select Specialization
                                                     </span>
                                                 )}
@@ -454,7 +454,7 @@ export default function CreateJob() {
                                                                         }
                                                                         className="ml-5 w-5 h-5"
                                                                     />
-                                                                    <span className= "lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall ml-5">
+                                                                    <span className=" lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall ml-5">
                                                                         {option}
                                                                     </span>
                                                                 </label>
@@ -467,7 +467,7 @@ export default function CreateJob() {
                                 </div>
 
                                 <div className="col-span-2 gap-3">
-                                    <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmalll text-fontcolor font-semibold mb-1">
+                                    <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">
                                         Job Description
                                     </label>
                                     <textarea
@@ -476,12 +476,12 @@ export default function CreateJob() {
                                         value={formData.job_description}
                                         onChange={handleInputChange}
                                         placeholder="Job Description"
-                                        className="w-full p-1 rounded-xs border-2 border-fontcolor text-fontcolor h-20"
+                                        className="w-full p-1 rounded-xs border-2 border-fontcolor  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor h-20"
                                     ></textarea>
                                 </div>
 
                                 <div className="col-span-2 gap-3">
-                                    <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmalll text-fontcolor font-semibold mb-1">
+                                    <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">
                                         Company Name
                                     </label>
                                     <input
@@ -490,18 +490,18 @@ export default function CreateJob() {
                                         value={companyName}
                                         onChange={handleInputChange}
                                         placeholder="Company Name"
-                                        className="h-medium rounded-xs border-2 border-fontcolor"
+                                        className="h-medium rounded-xs border-2  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall border-fontcolor"
                                         disabled
                                     />
                                 </div>
 
                                 <div className="flex space-x-2 col-span-2">
                                     <div className="w-1/2">
-                                        <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">
+                                        <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">
                                             Region{" "}
                                         </label>
                                         <select
-                                            className="valid:text-fontcolor invalid:text-placeholder mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall border-2 border-black h-medium rounded-xs w-full text-sm text-gray-500"
+                                            className="valid:text-fontcolor invalid:text-placeholder mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall border-2 border-black h-medium rounded-xs w-full text-sm text-gray-500"
                                             id="region"
                                             name="region"
                                             value={formData.region}
@@ -528,11 +528,11 @@ export default function CreateJob() {
                                     </div>
 
                                     <div className="w-1/2">
-                                        <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmalll text-fontcolor font-semibold mb-1">
+                                        <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">
                                             City/Municipality
                                         </label>
                                         <select
-                                            className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall border-2 border-black h-medium rounded-xs w-full"
+                                            className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall border-2 border-black h-medium rounded-xs w-full"
                                             id="province"
                                             name="province"
                                             value={formData.province}
@@ -557,12 +557,14 @@ export default function CreateJob() {
                                                 )
                                             )}
                                         </select>
-                                        </div>
+                                       </div>
                                     </div>
 
-                                    <div className="col-span-2 gap-3">
+                                    <div className="col-span-2 gap-3" >
                                         <div className="w-full">
-                                            <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">  City</label>
+                                            <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">
+                                                City
+                                            </label>
                                             <select
                                                 className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall border-2 border-black h-medium rounded-xs w-full"
                                                 id="city"
@@ -571,15 +573,22 @@ export default function CreateJob() {
                                                 value={formData.city}
                                                 onChange={handleInputChange}
                                             >
-                                                <option value="" disabled selected hidden>Select City</option>
-                                                {cities.map((city, index) => (
                                                 <option
-                                                    key={index}
-                                                    value={city.n}
+                                                    value=""
+                                                    disabled
+                                                    selected
+                                                    hidden
                                                 >
-                                                    {city.n}
+                                                    Select City
                                                 </option>
-                                            ))}
+                                                {cities.map((city, index) => (
+                                                    <option
+                                                        key={index}
+                                                        value={city.n}
+                                                    >
+                                                        {city.n}
+                                                    </option>
+                                                ))}
                                             </select>
                                         </div>
                                     </div>
@@ -593,7 +602,7 @@ export default function CreateJob() {
                                             name="work_setup"
                                             value={formData.work_setup}
                                             onChange={handleInputChange}
-                                            className="h-medium rounded-xs border-2 border-fontcolor valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
+                                            className="h-medium rounded-xs border-2 border-fontcolor valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall"
                                         >
                                             <option value="" disabled selected>
                                                 Work Setup
@@ -618,7 +627,7 @@ export default function CreateJob() {
                                             name="employment_type"
                                             value={formData.employment_type}
                                             onChange={handleInputChange}
-                                            className="h-medium rounded-xs border-2 border-fontcolor valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
+                                            className="h-medium rounded-xs border-2 border-fontcolor valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall"
                                         >
                                             <option value="" disabled>
                                                 {" "}
@@ -646,7 +655,7 @@ export default function CreateJob() {
                                         placeholder="Qualifications"
                                         value={formData.qualifications}
                                         onChange={handleInputChange}
-                                        className="w-full p-1 rounded-xs border-2 border-fontcolor text-fontcolor h-20"
+                                        className="w-full p-1 rounded-xs border-2 border-fontcolor  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor h-20"
                                     ></textarea>
                                 </div>
                             </div>
@@ -655,7 +664,7 @@ export default function CreateJob() {
                                 <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold pb-2 ">
                                     Schedule
                                 </p>
-                                <div className="grid grid-cols-3 gap-1">
+                                <div className="grid grid-cols-3 gap-1  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall">
                                     {[
                                         "8 hrs shift",
                                         "12 hrs shift",
@@ -692,13 +701,13 @@ export default function CreateJob() {
                                     placeholder="Benefits"
                                     value={formData.benefits}
                                     onChange={handleInputChange}
-                                    className="w-full p-1 rounded-xs border-2 border-fontcolor text-fontcolor h-15"
+                                    className="w-full p-1 rounded-xs border-2 border-fontcolor  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor h-15"
                                 ></textarea>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">
+                                    <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">
                                         Experience Level
                                     </label>
                                     <select
@@ -724,7 +733,7 @@ export default function CreateJob() {
                                 </div>
 
                                 <div>
-                                    <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">
+                                    <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">
                                         No. of Positions
                                     </label>
                                     <input
@@ -733,13 +742,13 @@ export default function CreateJob() {
                                         value={formData.num_positions}
                                         onChange={handleInputChange}
                                         placeholder="No. of Positions"
-                                        className="h-medium rounded-xs border-2 border-fontcolor"
+                                        className="h-medium rounded-xs border-2  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall border-fontcolor"
                                     />
                                 </div>
 
                                 <div className="flex space-x-4 mt-4 col-span-2">
                                     <div className="w-1/2">
-                                        <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">
+                                        <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">
                                             Salary Minimum
                                         </label>
                                         <input
@@ -748,12 +757,12 @@ export default function CreateJob() {
                                             value={formData.salary_min}
                                             onChange={handleInputChange}
                                             placeholder="Salary Minimum"
-                                            className="h-medium rounded-xs border-2 border-fontcolor"
+                                            className="h-medium rounded-xs border-2  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall border-fontcolor"
                                         />
                                     </div>
 
                                     <div className="w-1/2">
-                                        <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall  text-fontcolor font-semibold mb-1">
+                                        <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">
                                             Salary Maximum
                                         </label>
                                         <input
@@ -762,23 +771,39 @@ export default function CreateJob() {
                                             value={formData.salary_max}
                                             onChange={handleInputChange}
                                             placeholder="Salary Maximum"
-                                            className="h-medium rounded-xs border-2 border-fontcolor"
+                                            className="h-medium rounded-xs border-2  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall border-fontcolor"
                                         />
                                     </div>
-                                </div>
+
+                                   </div>
                                 </div>
 
-                                    <div className="col-span-2 mt-3">
-                                        <div className="w-full">
-                                            <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">Salary Frequency</label>
-                                            <select name="salary_frequency" value={formData.salary_frequency} onChange={handleInputChange} className="h-medium rounded-xs border-2 border-fontcolor valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall" >
-                                            <option value="Monthly">Monthly</option>
-                                            <option value="Weekly">Weekly</option>
-                                            <option value="Hourly">Hourly</option>
-                                            </select>
-                                        </div>
+                                <div className="col-span-2 mt-3">
+                                    <div className="w-full">
+                                        <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">
+                                            Salary Frequency
+                                        </label>
+                                        <select
+                                            name="salary_frequency"
+                                            value={formData.salary_frequency}
+                                            onChange={handleInputChange}
+                                            className="h-medium rounded-xs border-2 border-fontcolor valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
+                                        >
+                                            <option value="">
+                                                Select Frequency
+                                            </option>
+                                            <option value="Monthly">
+                                                Monthly
+                                            </option>
+                                            <option value="Weekly">
+                                                Weekly
+                                            </option>
+                                            <option value="Hourly">
+                                                Hourly
+                                            </option>
+                                        </select>
                                     </div>
-              
+                                </div>
 
                             <div className="flex justify-end mt-8">
                                 <button
@@ -797,15 +822,17 @@ export default function CreateJob() {
                                                 height={10}
                                                 alt="Continue Icon"
                                             />
+                                            </div>
                                         </div>
-                                    </div>
-                                </button>
-                            </div>
-                        </form>
+                                    </button>
+                                </div>
+
+                                
+                            </form>
+                            
+                    </div>
                     </div>
                 </div>
-            </div>
-
             <GeneralFooter />
         </div>
     );

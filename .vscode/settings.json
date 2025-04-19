@@ -1,0 +1,20 @@
+{
+    "sqltools.connections": [
+        {
+            "pgOptions": {
+                "connectionTimeoutMillis": 5000,
+                "idleTimeoutMillis": 10000,
+                "max": 10
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "\tLocal PostgreSQL",
+            "database": "main",
+            "username": "postgres",
+            "connectionTimeout": 5000,
+            "password": "admin"
+        }
+    ]
+}
