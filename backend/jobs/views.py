@@ -9,6 +9,7 @@ from django.db import transaction
 from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.csrf import csrf_exempt
+from main_model.utils.file_processors import create_job_hiring_json
 
 #* Create Job Hiring
 
@@ -18,7 +19,12 @@ def create_job_hiring(request):
     serializer = JobHiringSerializer(data=request.data)
 
     if serializer.is_valid():
-        serializer.save(company=request.user.company)  
+        # Save the JobHiring instance
+        job_hiring = serializer.save(company=request.user.company)
+
+        # Generate the JSON file for hire_support.py
+        create_job_hiring_json(job_hiring)
+
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -215,7 +221,7 @@ def create_job_application(request):
         if serializer.is_valid():
             with transaction.atomic():  # Optional, to ensure all-or-nothing saving
                 job_application = serializer.save()
-                
+
                 # Save each file with corresponding document type
                 for doc_type, doc_file in zip(document_types, document_files):
                     JobApplicationDocument.objects.create(
@@ -223,7 +229,7 @@ def create_job_application(request):
                         document_type=doc_type,
                         document_file=doc_file
                     )
-                
+               
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
