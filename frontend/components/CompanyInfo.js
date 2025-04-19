@@ -237,7 +237,7 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                                 <option value="" disabled selected hidden>Select Region</option>
                                 {regions.map((region) => (
                                     <option key={region.id} value={region.id}>
-                                        {region.n}
+                                        {region.n}{" "}
                                     </option>
                                 ))}
                             </select>
@@ -250,21 +250,20 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                         </p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
                             <select
-                                disabled={!isEditable || formData.region === '130000000'}
+                                disabled={!isEditable}
                                 className={`valid:text-fontcolor invalid:text-placeholder lg:w-full mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall 
-                                    ${(!isEditable || formData.region === '130000000') ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'text-fontcolor'}`}
+                                    ${!isEditable ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'text-fontcolor'}`}
                                 id="province"
                                 name="province"
                                 value={formData.province}
                                 onChange={handleChange}
-                                required={formData.region !== '130000000'}
+                                required={formData.region}
                             >
                                 <option value="" disabled selected hidden>Select Province</option>
                                 {provinces.map((province) => (
-                                    <option key={province.code} value={province.code}>
-                                        {province.name}
+                                    <option key={province.n} value={province.n}>
+                                        {province.n}
                                     </option>
-                                ))}
                                 ))}
                             </select>
                         </div>
@@ -273,9 +272,7 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
 
                 <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col flex-grow pb-5">
                     <div className="flex flex-col flex-grow">
-                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
-                            City/Municipality
-                        </p>
+                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">City/Municipality</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
                             <select
                                 disabled={!isEditable}
@@ -293,7 +290,6 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                                         {city.name}
                                     </option>
                                 ))}
-                                ))}
                             </select>
                         </div>
                     </div>
@@ -302,9 +298,7 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
 
                 <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col flex-grow gap-5 pb-5">
                     <div className="flex flex-col flex-grow">
-                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
-                            Barangay
-                        </p>
+                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Barangay</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
                             <select disabled={!isEditable} className={`valid:text-fontcolor invalid:text-placeholder lg:w-full mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall ${!isEditable ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'text-fontcolor'}`} id="barangay" name="barangay" value={formData.barangay}   required  onChange={handleChange} >
                                 <option value="" disabled selected hidden>Select Barangay</option>
@@ -312,7 +306,6 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                                     <option key={barangay.code} value={barangay.code}>
                                         {barangay.name}
                                     </option>
-                                ))}
                                 ))}
                             </select>
                         </div>
@@ -331,15 +324,15 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                 <div className="flex lg:flex-col mb:flex-col sm:flex-col xsm: flex-col flex-grow pb-5">
                     <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-medium pb-1">Lot, Block, Unit, Building, Floor, Street Name, Subdivision</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex ">
-                            <input type="complete"  name="present_address" value={formData.present_address} placeholder="" required onChange={handleChange}   readOnly={!isEditable}
-                                className={`w-full px-2 py-1 outline-none rounded-xs 
+                            <input type="complete" id="present-address" name="present_address" placeholder="" required value={formData.present_address || ''}  onChange={handleChange}   readOnly={!isEditable}
+                                className={`flex-grow w-full px-2 py-1 outline-none rounded-xs 
                                 ${isEditable ? 'text-fontcolor' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}></input>
                         </div>
                         
                     <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-medium pt-5">LinkedIn Profile Link</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <input type="linkedin-link"  name="linkedin_profile" value={formData.linkedin_profile} placeholder="" required onChange={handleChange}   readOnly={!isEditable}
-                                className={`w-full px-2 py-1 outline-none rounded-xs 
+                            <input type="linkedin-link" id="linkedin" name="linkedin_profile" placeholder="" required value={formData.linkedin_profile} onChange={handleChange}   readOnly={!isEditable}
+                                className={`flex-grow w-full px-2 py-1 outline-none rounded-xs 
                                 ${isEditable ? 'text-fontcolor' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}></input>
                         </div>  
                 </div>

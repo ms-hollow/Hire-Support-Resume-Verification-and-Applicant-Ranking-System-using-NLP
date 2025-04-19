@@ -140,9 +140,9 @@ export default function JobSummary() {
         const response = await createJob(formData, authTokens.access);
 
         if (response) {
-            console.log("Job created successfully.");
+            alert("Job created successfully.");
         } else {
-            console.log("Failed to create job.");
+            alert("Failed to create job.");
         }
 
         Cookies.remove("DRAFT_DATA");
@@ -168,12 +168,16 @@ export default function JobSummary() {
                         </div>
                     </div>
 
-                    <p className="font-medium lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-5 ">Please take a moment to carefully review all of your Job Hiring Information to ensure everything is accurate and complete, then click 'Publish Job Hiring' to proceed.</p>
+                    <p className="font-medium llg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-5 ">
+                        Please take a moment to carefully review all of your Job
+                        Hiring Information to ensure everything is accurate and
+                        complete, then click 'Publish Job Hiring' to proceed.
+                    </p>
 
                     <form className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-8">
-                        <div className="flex lg:flex-row mb:flex-col sm:flex-col xsm:flex-col xxsm:flex-col gap-5 ">
-                        {/* Job Title Section */}
-                        <div className="lg:sticky  top-20 h-max">
+                       
+                            {/* Job Title Section */}
+                        <div className="lg:sticky top-20 h-max">
                             {/*Create Job*/}
                             <div className="flex flex-col h-full">
                                 {/* Top Part of Job Details - Fixed */}
@@ -183,7 +187,7 @@ export default function JobSummary() {
                                             {SerializedData?.job_title || ""}
                                         </p>
                                         <div className="flex items-center gap-2">
-                                            <p className="font-thin text-fontcolor lg:text-large mb:text-large sm:text-medium xsm:text-medium xxsm:text-medium">
+                                            <p className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                 {new Date().toLocaleDateString(
                                                     "en-US"
                                                 )}
@@ -196,8 +200,8 @@ export default function JobSummary() {
                                             />
                                         </div>
                                     </div>
-                                    <p className="font-thin text-fontcolor text-xsmall">
-                                        <p className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
+                                    <div className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
+                                        <div className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                             {SerializedData &&
                                             SerializedData.specialization &&
                                             SerializedData.specialization
@@ -211,8 +215,8 @@ export default function JobSummary() {
                                                     available.
                                                 </p>
                                             )}
-                                        </p>
-                                    </p>
+                                        </div>
+                                    </div>
                                     <p className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                         (
                                         {SerializedData?.experience_level || ""}
@@ -359,6 +363,7 @@ export default function JobSummary() {
                                 </div>
                             </div>
                         </div>
+                        
                         <div className="bg-white shadow-md rounded-lg p-6">
                             <h2 className="text-lg font-semibold text-primary mb-4">
                                 Settings
@@ -367,7 +372,7 @@ export default function JobSummary() {
                             <div className="grid grid-cols-2 gap-8">
                                 {/* Left Side - Required Documents */}
                                 <div>
-                                    <h3 className="text-sm font-semibold text-primary mb-2">
+                                    <h3 className=" font-semibold text-primary mb-2">
                                         Required Documents
                                     </h3>
                                     {SerializedData?.required_documents &&
@@ -402,7 +407,7 @@ export default function JobSummary() {
                                         <h3 className="text-sm font-semibold text-primary">
                                             Deadline
                                         </h3>
-                                        <p className="text-fontcolor text-sm">
+                                        <p className="text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                             {SerializedData?.application_deadline
                                                 ? new Date(
                                                       SerializedData.application_deadline
@@ -422,7 +427,7 @@ export default function JobSummary() {
                                         <h3 className="text-sm font-semibold text-primary">
                                             Weight of Criteria
                                         </h3>
-                                        <p className="text-fontcolor text-sm">
+                                        <p className="text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                             {SerializedData?.weight_of_criteria ||
                                                 ""}
                                         </p>
@@ -432,7 +437,7 @@ export default function JobSummary() {
                                         <h3 className="text-sm font-semibold text-primary">
                                             Verification Option
                                         </h3>
-                                        <p className="text-fontcolor text-sm">
+                                        <p className="text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                             {SerializedData?.verification_option ||
                                                 ""}{" "}
                                         </p>
@@ -450,7 +455,7 @@ export default function JobSummary() {
                                         <h4 className="text-sm font-semibold text-primary">
                                             Work Experience
                                         </h4>
-                                        <span className="text-fontcolor text-sm">
+                                        <span className="text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                             {" "}
                                             Weight:{" "}
                                             {SerializedData?.scoring_criteria[0]
@@ -463,27 +468,27 @@ export default function JobSummary() {
                                             <p className="text-fontcolor text-xs">
                                                 Directly Relevant
                                             </p>
-                                            <p className="font-semibold  text-fontcolor text-sm">
+                                            <p className="font-semibold text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                 {SerializedData?.scoring_criteria[0]?.preference?.directlyRelevant?.join(
                                                     " "
                                                 ) || ""}
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
-                                            <li className="text-fontcolor text-xs">
+                                            <p className="text-fontcolor text-xs">
                                                 Highly Relevant
-                                            </li>
-                                            <p className="font-semibold text-fontcolor text-sm">
+                                            </p>
+                                            <p className="font-semibold text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                 {SerializedData?.scoring_criteria[0]?.preference?.highlyRelevant?.join(
                                                     " "
                                                 ) || ""}
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
-                                            <li className="text-fontcolor text-xs">
+                                            <p className="text-fontcolor text-xs">
                                                 Moderately Relevant
-                                            </li>
-                                            <p className="font-semibold text-fontcolor text-sm">
+                                            </p>
+                                            <p className="font-semibold text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                 {SerializedData?.scoring_criteria[0]?.preference?.moderatelyRelevant?.join(
                                                     " "
                                                 ) || ""}
@@ -495,7 +500,7 @@ export default function JobSummary() {
                                         <h4 className="text-sm font-semibold text-primary">
                                             Skills
                                         </h4>
-                                        <span className="text-fontcolor text-sm">
+                                        <span className="text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                             Weight:{" "}
                                             {SerializedData?.scoring_criteria[1]
                                                 ?.weight_percentage || ""}
@@ -504,34 +509,34 @@ export default function JobSummary() {
                                     </div>
                                     <ul className="pl-5 mt-2 space-y-1">
                                         <div className="border-b pb-1">
-                                            <li className="text-fontcolor text-xs">
+                                            <p className="text-fontcolor text-xs">
                                                 Primary Skills
-                                            </li>
-                                            <p className="font-semibold text-fontcolor text-sm">
+                                            </p>
+                                            <p className="font-semibold text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                 {SerializedData?.scoring_criteria[1]?.preference?.primarySkills?.join(
-                                                    " "
+                                                    ", "
                                                 ) || ""}
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
-                                            <li className="text-fontcolor text-xs">
+                                            <p className="text-fontcolor text-xs">
                                                 Secondary Skills
-                                            </li>
-                                            <p className="font-semibold text-fontcolor text-sm">
+                                            </p>
+                                            <p className="font-semibold text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                 {" "}
                                                 {SerializedData?.scoring_criteria[1]?.preference?.secondarySkills?.join(
-                                                    " "
+                                                    ", "
                                                 ) || ""}{" "}
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
-                                            <li className="text-fontcolor text-xs">
+                                            <p className="text-fontcolor text-xs">
                                                 Additional Skills
-                                            </li>
-                                            <p className="font-semibold text-fontcolor text-sm">
+                                            </p>
+                                            <p className="font-semibold text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                 {" "}
                                                 {SerializedData?.scoring_criteria[1]?.preference?.additionalSkills?.join(
-                                                    " "
+                                                    ", "
                                                 ) || ""}{" "}
                                             </p>
                                         </div>
@@ -541,7 +546,7 @@ export default function JobSummary() {
                                         <h4 className="text-sm font-semibold text-primary">
                                             Education
                                         </h4>
-                                        <span className="text-fontcolor text-sm">
+                                        <span className="text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                             Weight:{" "}
                                             {SerializedData?.scoring_criteria[2]
                                                 ?.weight_percentage || ""}
@@ -551,10 +556,10 @@ export default function JobSummary() {
 
                                     <ul className="pl-5 mt-2 space-y-1">
                                         <div className="border-b pb-1">
-                                            <li className="text-fontcolor text-xs">
+                                            <p className="text-fontcolor text-xs">
                                                 1st Choice Field Study
-                                            </li>
-                                            <p className="font-semibold text-fontcolor text-sm">
+                                            </p>
+                                            <p className="font-semibold text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                 {SerializedData
                                                     ?.scoring_criteria[2]
                                                     ?.preference?.firstChoice ||
@@ -562,10 +567,10 @@ export default function JobSummary() {
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
-                                            <li className="text-fontcolor text-xs">
+                                            <p className="text-fontcolor text-xs">
                                                 2nd Choice Field Study
-                                            </li>
-                                            <p className="font-semibold text-fontcolor text-sm">
+                                            </p>
+                                            <p className="font-semibold text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                 {SerializedData
                                                     ?.scoring_criteria[2]
                                                     ?.preference
@@ -573,10 +578,10 @@ export default function JobSummary() {
                                             </p>
                                         </div>
                                         <div className="border-b pb-1">
-                                            <li className="text-fontcolor text-xs">
+                                            <p className="text-fontcolor text-xs">
                                                 3rd Choice Field Study
-                                            </li>
-                                            <p className="font-semibold text-fontcolor text-sm">
+                                            </p>
+                                            <p className="font-semibold text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                 {SerializedData
                                                     ?.scoring_criteria[2]
                                                     ?.preference?.thirdChoice ||
@@ -593,40 +598,40 @@ export default function JobSummary() {
 
                                     <ul className="pl-5 mt-2 space-y-1">
                                         <div className="border-b pb-1">
-                                            <li className="text-fontcolor text-xs">
+                                            <p className="text-fontcolor text-xs">
                                                 School Preference
-                                            </li>
-                                            <li className="font-semibold text-fontcolor text-sm">
+                                            </p>
+                                            <p className="font-semibold text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                 {" "}
                                                 {SerializedData?.scoring_criteria[3]?.preference?.schoolPreference?.join(
-                                                    " "
+                                                    ", "
                                                 ) || ""}{" "}
-                                            </li>
+                                            </p>
                                         </div>
                                         <div className="border-b pb-1">
-                                            <li className="text-fontcolor text-xs">
+                                            <p className="text-fontcolor text-xs">
                                                 Honorsy
-                                            </li>
-                                            <li className="text-semibold text-sm">
+                                            </p>
+                                            <p className="text-semibold lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
                                                 {SerializedData
                                                     ?.scoring_criteria[4]
                                                     ?.preference?.honor === "1"
                                                     ? "Applied"
                                                     : "Not Applied"}
-                                            </li>
+                                            </p>
                                         </div>
                                         <div className="border-b pb-1">
-                                            <li className="text-fontcolor text-xs">
+                                            <p className="text-fontcolor text-xs">
                                                 Multiple Degrees
-                                            </li>
-                                            <li className="text-semibold text-sm">
+                                            </p>
+                                            <p className="text-semibold lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
                                                 {SerializedData
                                                     ?.scoring_criteria[4]
                                                     ?.preference
                                                     ?.multipleDegrees === "1"
                                                     ? "Applied"
                                                     : "Not Applied"}
-                                            </li>
+                                            </p>
                                         </div>
                                     </ul>
                                     <div>
@@ -634,7 +639,7 @@ export default function JobSummary() {
                                             <h4 className="text-sm font-semibold text-primary">
                                                 Certifications
                                             </h4>
-                                            <span className="text-fontcolor text-sm">
+                                            <span className="text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                 Weight:{" "}
                                                 {SerializedData
                                                     ?.scoring_criteria[5]
@@ -643,23 +648,20 @@ export default function JobSummary() {
                                             </span>
                                         </div>
                                         <ul className="pl-5 mt-2 space-y-1">
-                                            <li className="text-fontcolor text-xs">
+                                            <p className="text-fontcolor text-xs">
                                                 Institutional Preference Bonus
-                                            </li>
-                                            <li className="font-semibold text-fontcolor text-sm">
+                                            </p>
+                                            <p className="font-semibold text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                 {" "}
                                                 {SerializedData?.scoring_criteria[5]?.preference?.preferred?.join(
-                                                    " "
+                                                    ", "
                                                 ) || ""}{" "}
-                                            </li>
+                                            </p>
                                         </ul>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        </div>
-
-                        {/*Setting*/}
+                        </div>   
                     </form>
                     <div className="flex justify-between">
                         <button
