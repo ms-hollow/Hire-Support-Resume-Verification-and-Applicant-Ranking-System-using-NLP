@@ -5,6 +5,18 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  
+  transpilePackages: ['gsap'],
+  webpack: (config, { isServer }) => {
+    // Add this to handle ES Module imports correctly
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        stream: false,
+      };
+    }
+    return config;
+  },
   theme: {
     extend: {
       screens: {
@@ -63,6 +75,7 @@ module.exports = {
       },
       overscrollBehavior: ['none', 'auto' ,'contain'],
     },
+    
   },
   plugins: [],
 };
