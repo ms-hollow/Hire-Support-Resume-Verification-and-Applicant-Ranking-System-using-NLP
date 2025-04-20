@@ -10,7 +10,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.csrf import csrf_exempt
 from main_model.utils.file_processors import create_job_hiring_json
-
+from main_model.utils.file_processors import create_job_application_json
 #* Create Job Hiring
 
 @api_view(['POST'])
@@ -229,6 +229,9 @@ def create_job_application(request):
                         document_type=doc_type,
                         document_file=doc_file
                     )
+                
+                # Generate the JSON file for hire_support.py
+                create_job_application_json(job_application)
                
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -172,42 +172,56 @@ def parse_verification_option(verification_option):
 
 
 def create_job_application_json(job_application):
-    """Convert JobApplication model instance to JSON format expected by hire_support.py"""
-    # Get applicant details
+    """
+    Convert JobApplication model instance to JSON format expected by hire_support.py
+    """
+    
+    # Get applicant information
     applicant = job_application.applicant
     
-    # Get paths to documents
-    documents = job_application.documents.all()
-    
-    # Categorize documents
-    resume_link = ""
+    # Get document links organized by document type
+    resume_links = []
     experience_documents_links = []
     educational_documents_links = []
     certifications_documents_links = []
+    additional_documents_links = []
     
-    for doc in documents:
-        file_url = default_storage.url(doc.document_file.name).lstrip('/')
-        
-        if doc.document_type.lower() == 'resume':
-            resume_link = file_url
-        elif 'experience' in doc.document_type.lower():
-            experience_documents_links.append(file_url)
-        elif 'education' in doc.document_type.lower():
-            educational_documents_links.append(file_url)
-        elif 'certification' in doc.document_type.lower():
-            certifications_documents_links.append(file_url)
+    # Group documents by type
+    for document in job_application.documents.all():
+        doc_path = str(document.document_file.url)
+        if doc_path.startswith('/media/'):
+            # Convert relative path to full path for hire_support.py
+            doc_path = f"backend{doc_path}"
+            
+        if document.document_type.lower() == 'resume':
+            resume_links.append(doc_path)
+        elif document.document_type.lower() == 'experience':
+            experience_documents_links.append(doc_path)
+        elif document.document_type.lower() == 'education':
+            educational_documents_links.append(doc_path)
+        elif document.document_type.lower() == 'certifications':
+            certifications_documents_links.append(doc_path)
+        else:
+            # Handle additional documents
+            additional_documents_links.append(doc_path)
     
+    # Prepare application data in format expected by hire_support.py
     application_data = {
-        "first_name": applicant.first_name,
-        "last_name": applicant.last_name,
-        "resume_link": resume_link,
+        "first_name": applicant.first_name if hasattr(applicant, 'first_name') else "",
+        "last_name": applicant.last_name if hasattr(applicant, 'last_name') else "",
+        "resume_link": resume_links[0] if resume_links else "",
         "experience_documents_links": ", ".join(experience_documents_links),
         "educational_documents_links": ", ".join(educational_documents_links),
         "certifications_documents_links": ", ".join(certifications_documents_links)
     }
     
+    # Add additional documents if they exist
+    if additional_documents_links:
+        application_data["additional_documents_links"] = ", ".join(additional_documents_links)
+    
     # Create a temp file path
-    file_path = os.path.join(settings.MEDIA_ROOT, 'temp', f'job_application_{job_application.job_application_id}.json')
+    file_path = os.path.join(settings.MEDIA_ROOT, 'temp', 
+                           f'application_{job_application.job_application_id}.json')
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     
     # Save the JSON file
@@ -215,6 +229,8 @@ def create_job_application_json(job_application):
         json.dump(application_data, f, indent=4)
     
     return file_path
+
+
 
 def process_verification_results(file_path):
     """Read verification results from JSON file"""
