@@ -4,20 +4,12 @@ import GeneralFooter from "./GeneralFooter";
 import { useRouter } from "next/router";
 import AuthContext from "@/pages/context/AuthContext";
 import { JLSkeletonLoader } from "./ui/SkeletonLoader";
-import { fetchJobListings } from "@/pages/api/applicantJobApi";
 import { useJob, JobProvider } from "@/pages/context/JobContext";
 
 const JobListings = ({
-    authToken,
     onJobClick,
     jobListings,
     loading,
-    keyword,
-    classification,
-    location,
-    datePosted,
-    salaryRange,
-    experienceLevel,
 }) => {
     const { savedStatus, toggleSaveJob } = useJob();
     const router = useRouter();

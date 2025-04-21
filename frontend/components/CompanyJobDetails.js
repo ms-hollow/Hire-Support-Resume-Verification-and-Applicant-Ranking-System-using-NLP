@@ -41,7 +41,7 @@ const CompanyJobDetailsWrapper = () => {
                     </p>
                     <div className="flex items-center gap-2">
                         <p className="font-thin text-fontcolor text-xsmall">
-                            {jobDetails.creation_date}
+                            {jobDetails.creation_date?.slice(0, 10)}
                         </p>
                         <Image
                             src="/Menu.svg"
@@ -67,8 +67,7 @@ const CompanyJobDetailsWrapper = () => {
                         />
                         <p className="ml-1.5 font-thin text-xsmall text-fontcolor">
                             {/* {jobDetails.region},  */}
-                            {jobDetails.province},{" "}
-                            {jobDetails.city}
+                            {jobDetails.province}, {jobDetails.city}
                         </p>
                     </div>
                     <div className="flex flex-row mx-4">
@@ -93,7 +92,11 @@ const CompanyJobDetailsWrapper = () => {
                             alt="Salary Icon"
                         />
                         <p className="ml-2 font-thin text-xsmall pl-px text-fontcolor">
-                            {jobDetails.salary_min} - {jobDetails.salary_max}
+                            {`₱${Number(
+                                jobDetails.salary_min
+                            ).toLocaleString()} - ${Number(
+                                jobDetails.salary_max
+                            ).toLocaleString()}`}
                         </p>
                     </div>
 
@@ -108,7 +111,7 @@ const CompanyJobDetailsWrapper = () => {
                             {jobDetails.schedule}
                         </p>
                     </div>
-                </div>   
+                </div>
             </div>
 
             {/* Main Part of Job Details - Scrollable */}
