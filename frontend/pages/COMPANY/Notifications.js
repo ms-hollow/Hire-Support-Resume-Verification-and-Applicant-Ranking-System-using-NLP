@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import ApplicantHeader from "@/components/ApplicantHeader";
 import GeneralFooter from '@/components/GeneralFooter';
 import Image from 'next/image';
+import CompanyHeader from '@/components/CompanyHeader';
 
 
 export default function Notifications() {
@@ -31,7 +31,7 @@ export default function Notifications() {
     
     return (
       <div>
-            <><ApplicantHeader/>
+            <><CompanyHeader/>
                 <div className="lg:pt-28 mb:pt-24 sm:pt-24 xsm:pt-24 xxsm:pt-24 lg:px-20 mb:px-10 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto pb-8">
                     <div className="text-lg text-primary">
                         <b>Notifications</b>
@@ -93,13 +93,10 @@ export default function Notifications() {
                                 <div className="flex items-center justify-between w-full overflow-hidden">
                                     <p className="text-fontcolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall leading-snug truncate">
                                     Hi there,
-                                    <span className="font-bold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall"> [Applicant Name] </span>
+                                    <span className="font-bold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall"> [Company Name] </span>
                                     <span className="text-fontcolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-thin">
                                         {" "}
-                                        - We've received your application for [Position] at [Company Name].
-                                        Our team is currently reviewing your qualifications and experience. 
-                                        We appreciate your interest in joining our team and will update you 
-                                        on next steps within 5-7 business days.
+                                        - There is a new applicantion for [Position]. Check your new applicants!
                                     </span>
                                     </p>
                                     <p className="text-xs text-gray-400 flex-shrink-0 pl-4">10:30 AM</p>
@@ -133,10 +130,7 @@ export default function Notifications() {
                                     <span className="font-bold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall"> [Applicant Name] </span>
                                     <span className="text-fontcolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-thin">
                                         {" "}
-                                        - We've received your application for [Position] at [Company Name].
-                                        Our team is currently reviewing your qualifications and experience. 
-                                        We appreciate your interest in joining our team and will update you 
-                                        on next steps within 5-7 business days.
+                                        - There is a new applicantion for [Position]. Check your new applicants!
                                     </span>
                                     </p>
                                     <p className="text-xs text-gray-400 flex-shrink-0 pl-4">10:30 AM</p>
