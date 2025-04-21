@@ -77,13 +77,13 @@ const JobListings = ({
                                 />
                             </button>
                         </div>
-                        <p className="font-semibold text-fontcolor text-large mt-2">
+                        <p className="font-semibold text-fontcolor lg:text-large mb:text-large sm:text-medium xsm:text-medium xxsm:text-medium mt-2">
                             {job.job_title}
                         </p>
-                        <p className="font-thin text-fontcolor text-xsmall">
+                        <p className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                             {job.company_name}
                         </p>
-                        <p className="font-thin text-fontcolor text-xsmall">
+                        <p className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                             {job.job_industry}
                         </p>
                         <div className="flex flex-row mt-2">
@@ -95,7 +95,7 @@ const JobListings = ({
                             />
                             <p
                                 id="work_location"
-                                className="ml-1.5 font-thin text-fontcolor text-xsmall pl-px"
+                                className="ml-1.5 font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall pl-px"
                             >
                                 {job.location}
                             </p>
@@ -109,7 +109,7 @@ const JobListings = ({
                             />
                             <p
                                 id="work_setup"
-                                className="ml-2 font-thin text-fontcolor text-xsmall pl-px"
+                                className="ml-2 font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall pl-px"
                             >
                                 {job.work_setup}
                             </p>
@@ -123,7 +123,7 @@ const JobListings = ({
                             />
                             <p
                                 id="schedule"
-                                className="ml-2 font-thin text-fontcolor text-xsmall pl-1"
+                                className="ml-2 font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall pl-1"
                             >
                                 {job.schedule}
                             </p>
@@ -137,7 +137,7 @@ const JobListings = ({
                             />
                             <p
                                 id="salary"
-                                className="ml-2 font-thin text-fontcolor text-xsmall pl-px"
+                                className="ml-2 font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall pl-px"
                             >
                                 {job.salary_min} - {job.salary_max}
                             </p>
@@ -145,7 +145,7 @@ const JobListings = ({
                         <div className="flex flex-col mt-2">
                             <p
                                 id="job_description"
-                                className="text-xsmall text-fontcolor"
+                                className="lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor"
                             >
                                 {job.job_description}
                             </p>

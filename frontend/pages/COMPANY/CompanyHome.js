@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useRef, useState, useContext } from "react";
 import CompanyHeader from "@/components/CompanyHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import Link from "next/link";
@@ -16,7 +16,7 @@ const getStatusClassName = (status) => {
         complete: "text-complete",
         open: "text-fontcolor",
         draft: "text-primary",
-        closed: "text-accent",
+        closed: "text-accent"
     };
     return statusClasses[status] || "text-default";
 };
@@ -25,6 +25,10 @@ export default function CompanyHome() {
     const [jobLists, setJobLists] = useState([]);
     const [companyName, setCompanyName] = useState(null);
     const router = useRouter();
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedJob, setSelectedJob] = useState(null);
+
 
     let { authTokens } = useContext(AuthContext);
 
@@ -42,6 +46,23 @@ export default function CompanyHome() {
             setJobLists(jobData);
         }
     };
+
+    const headerRef = useRef(null);
+    const bodyRef = useRef(null);
+    const isSyncing = useRef(false); // Prevent infinite loop
+
+    const syncScroll = (event, source) => {
+    if (isSyncing.current) return;
+    isSyncing.current = true;
+
+    if (source === "header" && bodyRef.current) {
+      bodyRef.current.scrollLeft = event.target.scrollLeft;
+    } else if (source === "body" && headerRef.current) {
+      headerRef.current.scrollLeft = event.target.scrollLeft;
+    }
+
+    isSyncing.current = false;
+  };
 
     useEffect(() => {
         fetchJobLists();
@@ -76,53 +97,57 @@ export default function CompanyHome() {
         }
     };
 
+    const handleOpenModal = (jobId) => {
+        const job = jobLists.find((j) => j.job_hiring_id === jobId);
+        setSelectedJob(job);
+        setIsModalOpen(true);
+      };
+      
+      const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedJob(null);
+      };
+
     return (
         <div>
-            <>
                 <CompanyHeader />
-                <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 mx-auto pb-8">
+                <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 xxsm:px-8 mx-auto pb-8">
                     <div>
-                        <p className="text-fontcolor pb-8">Hi, {companyName}</p>
+                        <p className="text-fontcolor text-large pb-8">Hi, {companyName}</p>
                     </div>
 
-                    <div className="flex items-center justify-center pb-5">
-                        <table className="table-fixed w-full">
-                            <thead className="font-semibold lg:text-medium mb:text-medium sm:text-medium text-primary">
-                                <tr>
-                                    <th className="w-2/6 text-center">
-                                        Job Title
-                                    </th>
-                                    <th className="w-1/12 text-center">
-                                        Status
-                                    </th>
-                                    <th className="w-1/6 text-center">
-                                        No. of Applications
-                                    </th>
-                                    <th className="w-1/12 text-center">
-                                        Deadline
-                                    </th>
-                                    <th className="w-2/6 text-center">
-                                        Job Hiring Details
-                                    </th>
-                                </tr>
+                    <div className="overflow-x-auto w-full">
+                      {/* Wrapper to ensure alignment */}
+                      <div className="relative w-full">
+                        {/* Header Table */}
+                        <div ref={headerRef} className="overflow-x-auto w-full scrollbar-hide" onScroll={(e) => syncScroll(e, "header")} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                          <table className="table-fixed min-w-[800px] w-full border-b-2 border-[#D9D9D9]">
+                            <thead className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-primary bg-white">
+                              <tr>
+                                <th className="w-[200px] text-center p-5">Job Title</th>
+                                <th className="w-[150px] text-center">Status</th>
+                                <th className="w-[200px] text-center">No. of Applications</th>
+                                <th className="w-[200px] text-center">Deadline</th>
+                                <th className="w-[250px] text-center">Job Hiring Details</th>
+                              </tr>
                             </thead>
-                        </table>
-                    </div>
+                          </table>
+                        </div>
 
-                    <div className="flex items-center justify-center overflow-hidden rounded-t-lg rounded-b-lg border border-[#F5F5F5]">
-                        <table className="table-fixed w-full border-collapse text-center">
+                        <div ref={bodyRef} className="overflow-x-auto w-full" onScroll={(e) => syncScroll(e, "body")}>
+                          <table className="table-fixed min-w-[800px] w-full border-collapse text-center">
                             <tbody>
                                 {jobLists.length > 0 ? (
                                     jobLists.map((job, index) => (
                                         <tr
                                             key={index}
-                                            className="px-2 hover:shadow-md border-b border-[#F5F5F5]"
+                                            className="hover:bg-[#F1F1F1] hover:border-primary border-b-2 border-[#D9D9D9]"
                                         >
-                                            <td className="w-2/6 p-5 font-thin text-medium text-fontcolor truncate">
+                                            <td className="w-[200px] p-5 font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall  xxsm:text-xxsmall text-fontcolor">
                                                 {job.job_title}
                                             </td>
                                             <td
-                                                className={`w-1/12 font-thin text-medium truncate ${getStatusClassName(
+                                                className={`w-[150px] font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall  xxsm:text-xxsmall ${getStatusClassName(
                                                     job.status
                                                 )}`}
                                             >
@@ -131,48 +156,42 @@ export default function CompanyHome() {
                                                     .toUpperCase() +
                                                     job.status.slice(1)}
                                             </td>
-                                            <td className="w-1/6 font-thin text-medium text-fontcolor truncate">
+                                            <td className="w-[200px] font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall  xxsm:text-xxsmall text-fontcolor">
                                                 {job.num_applications}
                                             </td>
-                                            <td className="w-1/12 font-thin text-medium text-fontcolor truncate">
+                                            <td className="w-[200px] font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall  xxsm:text-xxsmall text-fontcolor">
                                                 {job.application_deadline}
                                             </td>
-                                            <td className="w-2/6">
-                                                <div className="flex flex-row justify-between px-5">
+                                            <td className="w-[250px]">
+                                              <div className="flex justify-center gap-5 px-5">
                                                     <button
                                                         type="button"
-                                                        className="button1 flex flex-col items-center justify-center"
                                                         onClick={() =>
                                                             handleJobView(
                                                                 job.job_hiring_id
                                                             )
                                                         }
                                                     >
-                                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
-                                                            View Applicants
-                                                        </p>
+                                                        <Link href="/COMPANY/ApplicantsSummary">
+                                                          <Image src="/Eye Icon.svg" width={30} height={15} alt="Eye Icon" />
+                                                        </Link>
                                                     </button>
                                                     <button
                                                         type="button"
-                                                        className="button2 flex items-center justify-center"
                                                         onClick={() =>
                                                             handleEditJob(
                                                                 job.job_hiring_id
                                                             )
                                                         }
                                                     >
-                                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
-                                                            Edit Job Hiring
-                                                        </p>
+                                                        <Link href="/COMPANY/EditJobHiring">
+                                                          <Image src="/Edit Icon.svg" width={30} height={15} alt="Edit Icon" />
+                                                        </Link>
                                                     </button>
                                                     <div
                                                         className="cursor-pointer"
-                                                        onClick={() =>
-                                                            handleDelete(
-                                                                job.job_hiring_id
-                                                            )
-                                                        }
-                                                    >
+                                                        onClick={() => handleOpenModal(job.job_hiring_id)}
+                                                        >
                                                         <Image
                                                             src="/Delete.png"
                                                             width={25}
@@ -180,14 +199,43 @@ export default function CompanyHome() {
                                                             alt="Delete Icon"
                                                         />
                                                     </div>
-                                                </div>
+                                                    {isModalOpen && selectedJob && (
+                                                        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-white/0 lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 lg:px-20 sm:px-8 xsm:px-8 pb-8 mx-auto z-50">
+                                                            <div className="bg-background rounded-xs shadow-lg p-6 w-2/6">
+                                                            <div className="flex justify-center items-center mb-4">
+                                                                <Image src="/Delete.png" width={70} height={50} alt="Delete Icon" />
+                                                            </div>
+
+                                                            <p className="text-center text-gray-700 mb-6">
+                                                                Are you sure you want to delete <span className="text-accent font-bold">{selectedJob.job_title}</span> job hiring? Deleting this job hiring
+                                                                will <span className="text-fontcolor font-bold">permanently delete </span>all applications for this job.
+                                                            </p>
+
+                                                            <div className="flex justify-center space-x-6">
+                                                                <button
+                                                                className="button1 flex items-center justify-center"
+                                                                onClick={() => {
+                                                                    handleDelete(selectedJob.job_hiring_id);
+                                                                    handleCloseModal();
+                                                                }}
+                                                                >
+                                                                <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Yes</p>
+                                                                </button>
+
+                                                                <button className="button2 flex items-center justify-center" onClick={handleCloseModal}>
+                                                                <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">No</p>
+                                                                </button>
+                                                            </div>
+                                                            </div>
+                                                        </div>
+                                                        )}
+                                              </div>
                                             </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td
-                                            colSpan="5"
+                                        <td colSpan="5"
                                             className="p-5 text-center"
                                         >
                                             No job details available.
@@ -196,10 +244,11 @@ export default function CompanyHome() {
                                 )}
                             </tbody>
                         </table>
+                      </div>
                     </div>
+                  </div>
                 </div>
-                <GeneralFooter />
-            </>
+              <GeneralFooter/>
         </div>
     );
 }

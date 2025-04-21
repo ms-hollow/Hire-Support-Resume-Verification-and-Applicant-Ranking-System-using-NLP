@@ -82,7 +82,22 @@ const CompanyJobDetailsWrapper = () => {
                             {jobDetails.work_setup}
                         </p>
                     </div>
-                    <div className="flex flex-row">
+                </div>
+
+                <div className="flex flex-row gap-4">
+                    <div className="flex flex-row mt-2">
+                        <Image
+                            src="/Salary Icon.svg"
+                            width={18}
+                            height={20}
+                            alt="Salary Icon"
+                        />
+                        <p className="ml-2 font-thin text-xsmall pl-px text-fontcolor">
+                            {jobDetails.salary_min} - {jobDetails.salary_max}
+                        </p>
+                    </div>
+
+                    <div className="flex flex-row mt-2">
                         <Image
                             src="/Schedule Icon.svg"
                             width={18}
@@ -93,18 +108,7 @@ const CompanyJobDetailsWrapper = () => {
                             {jobDetails.schedule}
                         </p>
                     </div>
-                </div>
-                <div className="flex flex-row mt-2 px-1">
-                    <Image
-                        src="/Salary Icon.svg"
-                        width={18}
-                        height={20}
-                        alt="Salary Icon"
-                    />
-                    <p className="ml-2 font-thin text-xsmall pl-px text-fontcolor">
-                        {jobDetails.salary_min} - {jobDetails.salary_max}
-                    </p>
-                </div>
+                </div>   
             </div>
 
             {/* Main Part of Job Details - Scrollable */}

@@ -5,6 +5,18 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  
+  transpilePackages: ['gsap'],
+  webpack: (config, { isServer }) => {
+    // Add this to handle ES Module imports correctly
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        stream: false,
+      };
+    }
+    return config;
+  },
   theme: {
     extend: {
       screens: {
@@ -48,10 +60,12 @@ module.exports = {
         extrabold: 800,
       },
       fontSize:{
-        xsmall: '0.75rem', /*12px*/
-        small:'0.8125 rem', /*13px*/
-        medium:'0.875rem', /*14px*/
-        large: '1rem', /*16px'*/
+        xxsmall: '0.75rem',  /*12px*/
+        xsmall: '0.875rem', /*14px*/
+        small:'0.9375rem', /*15px*/
+        medium:'1rem', /*16px*/
+        large: '1.125rem', /*18px'*/
+        xlarge: '1.5rem', /*18px'*/
         extralarge:'2rem', /*32px*/
       },
       height:{
@@ -61,6 +75,7 @@ module.exports = {
       },
       overscrollBehavior: ['none', 'auto' ,'contain'],
     },
+    
   },
   plugins: [],
 };

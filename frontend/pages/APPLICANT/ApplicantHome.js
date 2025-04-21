@@ -231,13 +231,13 @@ export default function ApplicantHome({ onJobClick }) {
 
             <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto">
                 <div>
-                    <p className="text-fontcolor">Hi, {applicantName}</p>
+                    <p className="text-fontcolor text-large ">Hi, {applicantName}</p>
                 </div>
 
                 {/* Search */}
                 <div className="pt-5 flex-wrap w-full">
                     <div className="flex lg:flex-row gap-5 pb-5 mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col">
-                        <div className="relative h-medium rounded-xs border-2 border-fontcolor justify-center flex flex-grow items-center">
+                        <div className="relative h-medium rounded-xs border-2 border-[#A5A5A5] justify-center flex flex-grow items-center">
                             <div className="absolute left-3">
                                 <Image
                                     src="/Search Icon.svg"
@@ -259,13 +259,13 @@ export default function ApplicantHome({ onJobClick }) {
                                     )
                                 }
                                 required
-                                className="w-full h-full border-primarycolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall pl-12"
+                                className="w-full h-full border-primarycolor lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall pl-12"
                             />
                         </div>
 
-                        <div className="h-medium rounded-xs border-2 border-fontcolor flex flex-grow">
+                        <div className="h-medium rounded-xs border-2 border-[#A5A5A5] flex flex-grow">
                             <select
-                                className="valid:text-fontcolor invalid:text-placeholder lg:flex-grow mb:flex-grow sm:flex-grow xsm:flex-grow lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
+                                className="valid:text-fontcolor invalid:text-placeholder lg:flex-grow mb:flex-grow sm:flex-grow xsm:flex-grow lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall"
                                 id="classification"
                                 name="classification"
                                 value={filters.classification} // Bind to state
@@ -290,7 +290,7 @@ export default function ApplicantHome({ onJobClick }) {
                             </select>
                         </div>
 
-                        <div className="relative h-medium rounded-xs border-2 border-fontcolor justify-center flex flex-grow items-center">
+                        <div className="relative h-medium rounded-xs border-2 border-[#A5A5A5] justify-center flex flex-grow items-center">
                             <div className="absolute left-3">
                                 <Image
                                     src="/Location Icon.svg"
@@ -311,7 +311,7 @@ export default function ApplicantHome({ onJobClick }) {
                                     )
                                 }
                                 required
-                                className="w-full h-full border-primarycolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall pl-12"
+                                className="w-full h-full border-primarycolor lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall pl-12"
                             >
                                 <option value="" disabled>
                                     Select a location
@@ -348,7 +348,7 @@ export default function ApplicantHome({ onJobClick }) {
                     <div className="flex gap-5 pb-5 overflow-x-auto">
                         <div className="h-medium rounded-xs bg-secondary flex flex-grow min-w-[200px]">
                             <select
-                                className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium"
+                                className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall"
                                 id="date-posted"
                                 name="DatePosted"
                                 value={filters.datePosted} // Bind to state
@@ -371,7 +371,7 @@ export default function ApplicantHome({ onJobClick }) {
 
                         <div className="h-medium rounded-xs bg-secondary flex flex-grow min-w-[200px]">
                             <select
-                                className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium"
+                                className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall"
                                 id="work-setup"
                                 name="WorkSetup"
                                 value={filters.workSetup} // Binding the value to state
@@ -395,7 +395,7 @@ export default function ApplicantHome({ onJobClick }) {
 
                         <div className="h-medium rounded-xs bg-secondary flex flex-grow min-w-[200px]">
                             <select
-                                className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium"
+                                className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall"
                                 id="employ-type"
                                 name="EmployType"
                                 value={filters.employmentType}
@@ -537,7 +537,7 @@ export default function ApplicantHome({ onJobClick }) {
 
                         <div className="h-medium rounded-xs bg-secondary flex flex-grow min-w-[200px]">
                             <select
-                                className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow text-medium"
+                                className="bg-secondary valid:text-fontcolor invalid:text-fontcolor flex-grow lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall"
                                 id="exp-level"
                                 name="ExperienceLevel"
                                 value={filters.experienceLevel}

@@ -5,320 +5,62 @@ const AppliedJobs = () => {
     
 
     return (
-        <div className="flex flex-col">
-                {/* Applied Job #1 */}
-                <div className="flex flex-col items-center justify-center pt-6 lg:mx-80 md:mx-[12.5rem] sm:mx-[9rem] w-[50vw]">
-                    <div className="justify-center items-center box-container px-8 py-5">
-                        <div className="flex items-center justify-between -mt-4">
-                            <Image src="/Logo.png" width={30} height={30} alt="Company Logo" />
-                            <div className="-ml-2 mt-4">
-                                <b className="font-bold text-large text-fontcolor -mt-5">Job Title</b>
-                                    <div className="text-xsmall font-thin text-fontcolor -mt-.5">
-                                        <p>Company</p>
+        <div>
+        {/* Applied Job #1 */}
+        <div className="flex flex-col pt-4">
+                <div className="box-container px-2 py-2 mb-4">
+                    <div className="grid grid-cols-12  gap-4 p-3">
+                        <div className="col-span-2  justify-center">
+                            <Image src="/Logo.png" width={50} height={30} alt="Company Logo" />
+                        </div>
+                        <div className="col-span-10 flex flex-col w-full"> 
+                            <div className="flex justify-between items-start w-full">
+                                <div>
+                                    <b className="font-bold lg:text-large mb:text-medium sm:text-medium xsm:text-xsmall xxsm:text-xsmall text-fontcolor">Job Title</b>
+                                    <div className="lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall font-thin text-fontcolor">
+                                        <p>Company Name</p>
                                     </div>
+                                </div>
+
+                                <div className="flex items-start ml-5 gap-4"> 
+                                    <div className="flex items-center gap-4">
+                                        <button className="button1 items-center flex justify-center text-center">
+                                            <Link href="/APPLICANT/ViewApplication" className="ml-auto">
+                                                <p className="lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall  text-center">View Application</p>
+                                            </Link>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <button className="button1 items-center flex justify-center flex-shrink-0 text-center ml-40 ">
-                                <Link href="/APPLICANT/ViewApplication" className="ml-auto">
-                                    <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-center">View Application</p>
-                                </Link>
-                            </button>
-                        </div>  
-                        <div className="flex flex-row mt-2 ml-10 text-fontcolor">
-                            <Image 
-                                src="/Location Icon.svg" 
-                                width={23} 
-                                height={20}
-                                alt="Location Icon"
-                            />
-                            <p id='work_location' className="ml-1.5 font-thin text-xsmall pl-px">Location</p>
-                        </div>
 
-                        <div className="flex flex-row mt-2 ml-10 pl-px text-fontcolor">
-                            <Image 
-                                src="/pending icon.png" 
-                                width={23} 
-                                height={20}
-                                alt="Pending Icon"
-                            />
-                            <p id='pending' className="ml-1.5 mt-0.5 font-thin text-xsmall pl-px text-primary">Pending</p>
-                        </div>
+                            <div className="flex flex-col mt-2" >
+                                <div className="flex items-center">
+                                    <Image src="/Location Icon.svg" width={23} height={20} alt="Location Icon" />
+                                    <p className="ml-1 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">Location</p>
+                                </div>
 
-                        <div className="flex flex-row mt-2 px-11">
-                            <Image 
-                                src="/APPLICATION ID ICON.png" 
-                                width={20} 
-                                height={20}
-                                alt="Application Id Icon"
-                            />
-                            <p id='application id' className="ml-2 font-thin text-xsmall pl-px text-fontcolor">Application ID</p>
-                            <div className="flex flex-row ml-20">
-                                <Image src="/CALENDAR ICON.png" width={18} height={20} alt="application id icon" />
-                                <p id='application date' className="ml-2 font-thin text-xsmall text-fontcolor">Application Date</p>
+                                <div className="flex items-center mt-2">
+                                    <Image src="/Status.svg" width={18} height={20} alt="Status Icon" className="-ml-.75" />
+                                    <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-primary">Pending</p>
+                                </div>
+
+                                <div className="flex flex-row justify-between">
+                                    <div className="flex items-center mt-2">
+                                        <Image src="/APPLICATION ID ICON.png" width={23} height={20} alt="Status Icon" className="-ml-.75" />
+                                        <p className="ml-1 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">Applicant ID</p>
+                                    </div>
+
+                                    <div className="flex items-center mt-2">
+                                        <Image src="/CALENDAR ICON.png" width={23} height={20} alt="Status Icon" className="-ml-.75" />
+                                        <p className="ml-1 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">Applicantion Date</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                
-                 {/* Applied Job #2 */}
-                 
-                    <div className="justify-center items-center box-container px-8 py-5 mt-4">
-                        <div className="flex items-center justify-between -mt-3.5">
-                            <Image src="/Logo.png" width={30} height={30} alt="Company Logo" />
-                            <div className="-ml-2 mt-4">
-                                <b className="font-bold text-large text-fontcolor">Job Title</b>
-                                    <div className="text-xsmall font-thin text-fontcolor -mt-.5">
-                                        <p>Company</p>
-                                    </div>
-                            </div>
-                            <button className="button1 items-center flex justify-center flex-shrink-0 text-center ml-40 ">
-                                <Link href="/APPLICANT/ViewApplication" className="ml-auto">
-                                    <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-center">View Application</p>
-                                </Link>
-                            </button>
-                        </div>  
-                        <div className="flex flex-row mt-2 ml-10 text-fontcolor">
-                            <Image 
-                                src="/Location Icon.svg" 
-                                width={23} 
-                                height={20}
-                                alt="Location Icon"
-                            />
-                            <p id='work_location' className="ml-1.5 font-thin text-xsmall pl-px">Location</p>
-                        </div>
-
-                        <div className="flex flex-row mt-2 ml-10 pl-px text-fontcolor">
-                            <Image 
-                                src="/pending icon.png" 
-                                width={23} 
-                                height={20}
-                                alt="Pending Icon"
-                            />
-                            <p id='pending' className="ml-1.5 mt-0.5 font-thin text-xsmall pl-px text-primary">Pending</p>
-                        </div>
-
-                        <div className="flex flex-row mt-2 px-11">
-                            <Image 
-                                src="/APPLICATION ID ICON.png" 
-                                width={20} 
-                                height={20}
-                                alt="Application Id Icon"
-                            />
-                            <p id='application id' className="ml-2 font-thin text-xsmall pl-px text-fontcolor">Application ID</p>
-                            <div className="flex flex-row ml-20">
-                                <Image src="/CALENDAR ICON.png" width={18} height={20} alt="application id icon" />
-                                <p id='application date' className="ml-2 font-thin text-xsmall text-fontcolor">Application Date</p>
-                            </div>
-                        </div>
-                    </div>
-                
-                 {/* Applied Job #3 */}
-                 
-                 <div className="justify-center items-center box-container px-8 py-5 mt-4">
-                        <div className="flex items-center justify-between -mt-3.5">
-                            <Image src="/Logo.png" width={30} height={30} alt="Company Logo" />
-                            <div className="-ml-2 mt-4">
-                                <b className="font-bold text-large text-fontcolor">Job Title</b>
-                                    <div className="text-xsmall font-thin text-fontcolor -mt-.5">
-                                        <p>Company</p>
-                                    </div>
-                            </div>
-                            <button className="button1 items-center flex justify-center flex-shrink-0 text-center ml-40 ">
-                                <Link href="/APPLICANT/ViewApplication" className="ml-auto">
-                                    <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-center">View Application</p>
-                                </Link>
-                            </button>
-                        </div>  
-                        <div className="flex flex-row mt-2 ml-10 text-fontcolor">
-                            <Image 
-                                src="/Location Icon.svg" 
-                                width={23} 
-                                height={20}
-                                alt="Location Icon"
-                            />
-                            <p id='work_location' className="ml-1.5 font-thin text-xsmall pl-px">Location</p>
-                        </div>
-
-                        <div className="flex flex-row mt-2 ml-10 pl-px text-fontcolor">
-                            <Image 
-                                src="/pending icon.png" 
-                                width={23} 
-                                height={20}
-                                alt="Pending Icon"
-                            />
-                            <p id='pending' className="ml-1.5 mt-0.5 font-thin text-xsmall pl-px text-primary">Pending</p>
-                        </div>
-
-                        <div className="flex flex-row mt-2 px-11">
-                            <Image 
-                                src="/APPLICATION ID ICON.png" 
-                                width={20} 
-                                height={20}
-                                alt="Application Id Icon"
-                            />
-                            <p id='application id' className="ml-2 font-thin text-xsmall pl-px text-fontcolor">Application ID</p>
-                            <div className="flex flex-row ml-20">
-                                <Image src="/CALENDAR ICON.png" width={18} height={20} alt="application id icon" />
-                                <p id='application date' className="ml-2 font-thin text-xsmall text-fontcolor">Application Date</p>
-                            </div>
-                        </div>
-                    </div>
-               
-                 {/* Applied Job #4 */}
-                
-                 <div className="justify-center items-center box-container px-8 py-5 mt-4">
-                        <div className="flex items-center justify-between -mt-3.5">
-                            <Image src="/Logo.png" width={30} height={30} alt="Company Logo" />
-                            <div className="-ml-2 mt-4">
-                                <b className="font-bold text-large text-fontcolor">Job Title</b>
-                                    <div className="text-xsmall font-thin text-fontcolor -mt-.5">
-                                        <p>Company</p>
-                                    </div>
-                            </div>
-                            <button className="button1 items-center flex justify-center flex-shrink-0 text-center ml-40 ">
-                                <Link href="/APPLICANT/ViewApplication" className="ml-auto">
-                                    <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-center">View Application</p>
-                                </Link>
-                            </button>
-                        </div>  
-                        <div className="flex flex-row mt-2 ml-10 text-fontcolor">
-                            <Image 
-                                src="/Location Icon.svg" 
-                                width={23} 
-                                height={20}
-                                alt="Location Icon"
-                            />
-                            <p id='work_location' className="ml-1.5 font-thin text-xsmall pl-px">Location</p>
-                        </div>
-
-                        <div className="flex flex-row mt-2 ml-10 pl-px text-fontcolor">
-                            <Image 
-                                src="/pending icon.png" 
-                                width={23} 
-                                height={20}
-                                alt="Pending Icon"
-                            />
-                            <p id='pending' className="ml-1.5 mt-0.5 font-thin text-xsmall pl-px text-primary">Pending</p>
-                        </div>
-
-                        <div className="flex flex-row mt-2 px-11">
-                            <Image 
-                                src="/APPLICATION ID ICON.png" 
-                                width={20} 
-                                height={20}
-                                alt="Application Id Icon"
-                            />
-                            <p id='application id' className="ml-2 font-thin text-xsmall pl-px text-fontcolor">Application ID</p>
-                            <div className="flex flex-row ml-20">
-                                <Image src="/CALENDAR ICON.png" width={18} height={20} alt="application id icon" />
-                                <p id='application date' className="ml-2 font-thin text-xsmall text-fontcolor">Application Date</p>
-                            </div>
-                        </div>
-                    </div>
-                
-                {/* Applied Job #5 */}
-                
-                <div className="justify-center items-center box-container px-8 py-5 mt-4">
-                        <div className="flex items-center justify-between -mt-3.5">
-                            <Image src="/Logo.png" width={30} height={30} alt="Company Logo" />
-                            <div className="-ml-2 mt-4">
-                                <b className="font-bold text-large text-fontcolor">Job Title</b>
-                                    <div className="text-xsmall font-thin text-fontcolor -mt-.5">
-                                        <p>Company</p>
-                                    </div>
-                            </div>
-                            <button className="button1 items-center flex justify-center flex-shrink-0 text-center ml-40 ">
-                                <Link href="/APPLICANT/ViewApplication" className="ml-auto">
-                                    <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-center">View Application</p>
-                                </Link>
-                            </button>
-                        </div>  
-                        <div className="flex flex-row mt-2 ml-10 text-fontcolor">
-                            <Image 
-                                src="/Location Icon.svg" 
-                                width={23} 
-                                height={20}
-                                alt="Location Icon"
-                            />
-                            <p id='work_location' className="ml-1.5 font-thin text-xsmall pl-px">Location</p>
-                        </div>
-
-                        <div className="flex flex-row mt-2 ml-10 pl-px text-fontcolor">
-                            <Image 
-                                src="/pending icon.png" 
-                                width={23} 
-                                height={20}
-                                alt="Pending Icon"
-                            />
-                            <p id='pending' className="ml-1.5 mt-0.5 font-thin text-xsmall pl-px text-primary">Pending</p>
-                        </div>
-
-                        <div className="flex flex-row mt-2 px-11">
-                            <Image 
-                                src="/APPLICATION ID ICON.png" 
-                                width={20} 
-                                height={20}
-                                alt="Application Id Icon"
-                            />
-                            <p id='application id' className="ml-2 font-thin text-xsmall pl-px text-fontcolor">Application ID</p>
-                            <div className="flex flex-row ml-20">
-                                <Image src="/CALENDAR ICON.png" width={18} height={20} alt="application id icon" />
-                                <p id='application date' className="ml-2 font-thin text-xsmall text-fontcolor">Application Date</p>
-                            </div>
-                        </div>
-                    </div>
-                
-                {/* Applied Job #6 */}
-                
-                <div className="justify-center items-center box-container px-8 py-5 mt-4">
-                        <div className="flex items-center justify-between -mt-3.5">
-                            <Image src="/Logo.png" width={30} height={30} alt="Company Logo" />
-                            <div className="-ml-2 mt-4">
-                                <b className="font-bold text-large text-fontcolor">Job Title</b>
-                                    <div className="text-xsmall font-thin text-fontcolor -mt-.5">
-                                        <p>Company</p>
-                                    </div>
-                            </div>
-                            <button className="button1 items-center flex justify-center flex-shrink-0 text-center ml-40 ">
-                                <Link href="/APPLICANT/ViewApplication" className="ml-auto">
-                                    <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-center">View Application</p>
-                                </Link>
-                            </button>
-                        </div>  
-                        <div className="flex flex-row mt-2 ml-10 text-fontcolor">
-                            <Image 
-                                src="/Location Icon.svg" 
-                                width={23} 
-                                height={20}
-                                alt="Location Icon"
-                            />
-                            <p id='work_location' className="ml-1.5 font-thin text-xsmall pl-px">Location</p>
-                        </div>
-
-                        <div className="flex flex-row mt-2 ml-10 pl-px text-fontcolor">
-                            <Image 
-                                src="/pending icon.png" 
-                                width={23} 
-                                height={20}
-                                alt="Pending Icon"
-                            />
-                            <p id='pending' className="ml-1.5 mt-0.5 font-thin text-xsmall pl-px text-primary">Pending</p>
-                        </div>
-
-                        <div className="flex flex-row mt-2 px-11">
-                            <Image 
-                                src="/APPLICATION ID ICON.png" 
-                                width={20} 
-                                height={20}
-                                alt="Application Id Icon"
-                            />
-                            <p id='application id' className="ml-2 font-thin text-xsmall pl-px text-fontcolor">Application ID</p>
-                            <div className="flex flex-row ml-20">
-                                <Image src="/CALENDAR ICON.png" width={18} height={20} alt="application id icon" />
-                                <p id='application date' className="ml-2 font-thin text-xsmall text-fontcolor">Application Date</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-        </div>
+                </div> 
+            </div>
+        </div> 
     );
 }
 

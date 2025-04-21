@@ -198,7 +198,7 @@ const Ranking = () => {
           </thead>
           <tbody>
             {applicantRank.map((applicant, index) => (
-              <tr key={index} className="hover:shadow-md border-b border-[#F5F5F5]"> 
+              <tr key={index} className=" hover:bg-[#F1F1F1] hover:border-primary border-b-2 border-[#D9D9D9]"> 
                 <td className="w-2/12 p-5 font-thin text-medium text-fontcolor truncate"><a href="/COMPANY/IndividualApplicantDetails"onClick={() => handleApplicantSelect(applicant.id)}>{index + 1}</a></td>
                 <td className="w-5/12 font-thin text-medium text-fontcolor truncate"><a href="/COMPANY/IndividualApplicantDetails"onClick={() => handleApplicantSelect(applicant.id)}>{applicant.name}</a></td>
                 <td className="w-2/6 font-thin text-medium text-fontcolor truncate"> <a href="/COMPANY/IndividualApplicantDetails"onClick={() => handleApplicantSelect(applicant.id)}>{applicant.id}</a></td>
