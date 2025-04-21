@@ -71,7 +71,6 @@ export default function CompanyHome() {
     }, [authTokens, router]);
 
     const handleJobView = (id) => {
-        // console.log("selectedJobId", jobId);
         router.push({
             pathname: "/COMPANY/ApplicantsSummary",
             query: { id },
@@ -79,7 +78,6 @@ export default function CompanyHome() {
     };
 
     const handleEditJob = (id) => {
-        // console.log("selectedJobId", jobId);
         router.push({
             pathname: "/COMPANY/EditJobHiring",
             query: { id },
