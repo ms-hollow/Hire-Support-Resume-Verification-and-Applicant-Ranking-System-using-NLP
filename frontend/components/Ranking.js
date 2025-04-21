@@ -122,14 +122,46 @@ const Ranking = () => {
     datasets: datasets,
   };
 
-  const options = {
+  const [options, setChartOptions] = useState({
     responsive: true,
     plugins: {
       legend: {
         position: "bottom",
       },
     },
-  };
+    scales: {
+      x: {
+        ticks: {
+          display: true, // default: show
+        },
+      },
+    },
+  });
+  
+  useEffect(() => {
+    const updateChartOptions = () => {
+      const isSmallScreen = window.innerWidth < 768; 
+      setChartOptions({
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "bottom",
+          },
+        },
+        scales: {
+          x: {
+            ticks: {
+              display: !isSmallScreen, // hide on small screens
+            },
+          },
+        },
+      });
+    };
+  
+    updateChartOptions(); // run once on mount
+    window.addEventListener("resize", updateChartOptions);
+    return () => window.removeEventListener("resize", updateChartOptions);
+  }, []);
 
   return (
     <div className="w-full flex flex-col">
@@ -148,15 +180,15 @@ const Ranking = () => {
 
 
 
-      <div className="flex lg:flex-row mb:flex-row sm:flex-col gap-5 pt-1 pb-4">
+      <div className="flex lg:flex-row mb:flex-col sm:flex-col xsm:flex-col xxsm:flex-col gap-5 pt-1 pb-4">
 
         {/* Overall Bar Chart */}
-        <div style={{ width: "80%" }}>
+        <div className="lg:w-[80%] md:w-full sm:w-full h-full">
           <Bar data={data} options={options} />
         </div>
 
          {/* Top 5 Applicants */}
-        <div className="flex flex-col" style={{ width: "60%" }}>
+        <div className="flex flex-col lg:w-[60%]" >
           <h1 className="lg:text-large mb:text-large sm:text-large text-primary">Top 5 Applicants in {selectedOption}</h1>
           <div className="overflow-hidden rounded-lg border border-[#F5F5F5]">
             <table className="border-collapse w-full">
@@ -166,12 +198,12 @@ const Ranking = () => {
                     <td className="px-4 py-1 flex items-center justify-between">
                       <div className="flex items-center">
                         <Image src="/Avatar.svg" width={25} height={15} alt="Applicant" />
-                        <p className="pl-2 font-thin text-medium text-fontcolor">{applicant.name}</p>
+                        <p className="pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">{applicant.name}</p>
                       </div>
                       <div>
                         <button type="button" className="button1 flex flex-col items-center justify-center"  onClick={() => handleApplicantSelect(applicant.id)}>
                           <Link href="/COMPANY/IndividualApplicantDetails" className="flex items-center space-x-2">
-                            <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">View Applicant</p>
+                            <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-medium text-center">View Applicant</p>
                           </Link>
                         </button>
                       </div>
@@ -187,7 +219,7 @@ const Ranking = () => {
       {/* Rank List */}
       <div className="flex overflow-y-auto" style={{ height: "calc(59vh - 150px)" }}>
         <table className="table-fixed w-full border-collapse text-center">
-          <thead className="font-semibold lg:text-medium mb:text-medium sm:text-medium text-primary bg-background sticky top-0 z-10">    
+          <thead className="font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-primary bg-background sticky top-0 z-10">    
             <tr>
               <th className="w-2/12 text-center">Rank</th>
               <th className="w-5/12 text-center">Name</th>
@@ -199,13 +231,13 @@ const Ranking = () => {
           <tbody>
             {applicantRank.map((applicant, index) => (
               <tr key={index} className=" hover:bg-[#F1F1F1] hover:border-primary border-b-2 border-[#D9D9D9]"> 
-                <td className="w-2/12 p-5 font-thin text-medium text-fontcolor truncate"><a href="/COMPANY/IndividualApplicantDetails"onClick={() => handleApplicantSelect(applicant.id)}>{index + 1}</a></td>
-                <td className="w-5/12 font-thin text-medium text-fontcolor truncate"><a href="/COMPANY/IndividualApplicantDetails"onClick={() => handleApplicantSelect(applicant.id)}>{applicant.name}</a></td>
-                <td className="w-2/6 font-thin text-medium text-fontcolor truncate"> <a href="/COMPANY/IndividualApplicantDetails"onClick={() => handleApplicantSelect(applicant.id)}>{applicant.id}</a></td>
-                <td className="w-2/6 font-thin text-medium text-fontcolor truncate">
+                <td className="w-2/12 p-5 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor truncate"><a href="/COMPANY/IndividualApplicantDetails"onClick={() => handleApplicantSelect(applicant.id)}>{index + 1}</a></td>
+                <td className="w-5/12 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor truncate"><a href="/COMPANY/IndividualApplicantDetails"onClick={() => handleApplicantSelect(applicant.id)}>{applicant.name}</a></td>
+                <td className="w-2/6 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor truncate"> <a href="/COMPANY/IndividualApplicantDetails"onClick={() => handleApplicantSelect(applicant.id)}>{applicant.id}</a></td>
+                <td className="w-2/6 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor truncate">
                   <a href="/COMPANY/IndividualApplicantDetails"onClick={() => handleApplicantSelect(applicant.id)}> {Math.round(applicant[selectedOption] * 100) / 100 || applicant.overall_score}</a>
                 </td>
-                <td className="w-2/6 font-thin text-medium text-fontcolor truncate"> <a href="/COMPANY/IndividualApplicantDetails"onClick={() => handleApplicantSelect(applicant.id)}>{applicant.status}</a></td>
+                <td className="w-2/6 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor truncate"> <a href="/COMPANY/IndividualApplicantDetails"onClick={() => handleApplicantSelect(applicant.id)}>{applicant.status}</a></td>
               </tr>
             ))}
           </tbody>
