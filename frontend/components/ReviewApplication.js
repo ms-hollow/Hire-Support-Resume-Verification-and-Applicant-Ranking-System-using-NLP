@@ -76,7 +76,7 @@ const ReviewApplication = ({showEditButtons = true}) => {
     };
 
     return ( 
-        <div>
+        <div className="job-application-box rounded-xs px-8 py-5 mx-auto">
             <section className=" pb-6">
                  <div className="flex flex-row justify-between items-center pt-3 mb-2">
                     <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium text-primary pb-1">Personal Information</p>
@@ -93,16 +93,16 @@ const ReviewApplication = ({showEditButtons = true}) => {
                             </button>
                         )}
                 </div>
-                <div className="w-full overflow-hidden rounded-t-lg rounded-b-lg border border-[#F5F5F5]">
+                <div className="w-full  rounded-t-lg rounded-b-lg border border-[#F5F5F5]">
                     <table className="w-full border-collapse ">
                     <tbody>
                         <tr className="px-2 border-b border-[#F5F5F5]">
                             <td className="p-2 ">
-                                <p className="flex items-center pl-2 font-thin text-medium text-fontcolor pb-1">Full Name:<span id="" className=" pl-2 font-semibold text-medium text-fontcolor ">{formData.fullName}</span></p>
-                                <p className="flex items-center pl-2 font-thin text-medium text-fontcolor pb-1">Email Address:<span className="pl-2 font-semibold text-medium text-fontcolor ">{formData.email}</span></p>
-                                <p className="flex items-center pl-2 font-thin text-medium text-fontcolor pb-1">Contact No.:<span id="" className="pl-2 font-semibold text-medium text-fontcolor ">{formData.contact_number}</span></p>
-                                <p className="flex items-center pl-2 font-thin text-medium text-fontcolor pb-1">Complete Address: <span id="" className="pl-2 font-semibold text-medium text-fontcolor">{formData.complete}</span></p>
-                                <p className="flex items-center pl-2 font-thin text-medium text-fontcolor pb-1">LinkedIn Profile Link <span id="" className="pl-2 font-semibold text-medium text-fontcolor">{formData.linkedin_profile}</span></p>
+                                <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">Full Name:<span id="" className=" pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">{formData.fullName}</span></p>
+                                <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">Email Address:<span className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">{formData.email}</span></p>
+                                <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">Contact No.:<span id="" className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">{formData.contact_number}</span></p>
+                                <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">Complete Address: <span id="" className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">{formData.complete}</span></p>
+                                <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">LinkedIn Profile Link <span id="" className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">{formData.linkedin_profile}</span></p>
                                 
                             </td>
                         </tr>
@@ -127,42 +127,42 @@ const ReviewApplication = ({showEditButtons = true}) => {
                         </button>
                     )}
                 </div>
-                <div className="w-full overflow-hidden rounded-t-lg rounded-b-lg border border-[#F5F5F5]">
+                <div className="w-full rounded-t-lg rounded-b-lg border border-[#F5F5F5]">
                     <table className="w-full border-collapse ">
                     <tbody>
                         <tr className="px-2 border-b border-[#F5F5F5]">
                             <td className="p-2 ">
-                            <p className="flex items-center pl-2 font-thin text-medium text-fontcolor pb-1">Resume:<span id="" className=" pl-2 font-semibold text-medium text-fontcolor ">{documents.resume}</span></p>
+                            <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">Resume:<span id="" className=" pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">{documents.resume}</span></p>
                             </td>
                         </tr>
 
                         <tr className="px-2 border-b border-[#F5F5F5]">
                             <td className="p-2 ">
-                                <p className="flex items-center pl-2 font-thin text-medium text-fontcolor pb-1">Educational Documents - Diploma:<span id="" className=" pl-2 font-semibold text-medium text-fontcolor ">{documents.diploma}</span></p>   
+                                <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">Educational Documents - Diploma:<span id="" className=" pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">{documents.diploma}</span></p>   
                             </td>
                         </tr>
 
                         <tr className="px-2 border-b border-[#F5F5F5]">
                             <td className="p-2 ">
-                                <p className="flex items-center pl-2 font-thin text-medium text-fontcolor pb-1">Educational Documents - TOR:<span id="" className=" pl-2 font-semibold text-medium text-fontcolor ">{documents.transcript}</span></p>   
+                                <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">Educational Documents - TOR:<span id="" className=" pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">{documents.transcript}</span></p>   
                             </td>
                         </tr>
 
                         <tr className="px-2 border-b border-[#F5F5F5]">
                             <td className="p-2 ">
-                                <p className="flex items-center pl-2 font-thin text-medium text-fontcolor pb-1">Work Experience - Certificate of Employment:<span id="" className=" pl-2 font-semibold text-medium text-fontcolor ">{documents.certificate}</span></p>   
+                                <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">Work Experience - Certificate of Employment:<span id="" className=" pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">{documents.certificate}</span></p>   
                             </td>
                         </tr>
 
                         <tr className="px-2 border-b border-[#F5F5F5]">
                             <td className="p-2 ">
-                                <p className="flex items-center pl-2 font-thin text-medium text-fontcolor pb-1">Certifications- Seminar/Workshop/Skills Certificates:<span id="" className=" pl-2 font-semibold text-medium text-fontcolor ">{documents.seminarCertificate}</span></p>   
+                                <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">Certifications- Seminar/Workshop/Skills Certificates:<span id="" className=" pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">{documents.seminarCertificate}</span></p>   
                             </td>
                         </tr>
 
                         <tr className="px-2 border-b border-[#F5F5F5]">
                             <td className="p-2 ">
-                                <p className="flex items-center pl-2 font-thin text-medium text-fontcolor pb-1">Additional Documents:<span id="" className=" pl-2 font-semibold text-medium text-fontcolor ">{documents.additional}</span></p>   
+                                <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">Additional Documents:<span id="" className=" pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">{documents.additional}</span></p>   
                             </td>
                         </tr>
 

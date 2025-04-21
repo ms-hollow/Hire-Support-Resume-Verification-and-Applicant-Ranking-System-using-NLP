@@ -19,7 +19,7 @@ export default function ViewApplication({handleJobClick}) {
   return (
     <div>
       <ApplicantHeader />
-          <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 lg:px-20 sm:px-8 xsm:px-8 pb-8 mx-auto">
+        <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 xxsm:px-4 py-8 mx-auto">
             <p className="font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1"> You are Applying for</p>
             <p className="font-semibold text-primary text-large pb-1">Job Title</p>
             <p className="font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">Company</p>
@@ -40,7 +40,7 @@ export default function ViewApplication({handleJobClick}) {
           </div>
 
           <div className="flex flex-col items-center justify-center pb-8">
-            <div className="box-container px-8 py-5 mx-auto">
+            <div className=" px-8 py-5 mx-auto">
               <ReviewApplication showEditButtons={false}/>
 
               <div className="flex items-center justify-center pt-4">
@@ -51,7 +51,7 @@ export default function ViewApplication({handleJobClick}) {
 
               {/* Modal */}
               {isModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 lg:px-20 sm:px-8 xsm:px-8 pb-8 mx-auto">
+                <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-white/0 lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 mb:px-20 lg:px-20 sm:px-8 xsm:px-8 pb-8 mx-auto">
                   <div className="bg-background rounded-xs shadow-lg p-6 w-50%">
                     <p className="text-center text-gray-700 mb-6">
                       Are you sure you want to <span className="text-accent font-bold ">withdraw your application?</span> Withdrawing

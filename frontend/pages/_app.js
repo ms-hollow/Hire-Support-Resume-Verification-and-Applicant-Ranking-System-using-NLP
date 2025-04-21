@@ -17,6 +17,9 @@ export default function App({ Component, pageProps }) {
         "/GENERAL/Login",
         "/GENERAL/Register",
         "/GENERAL/ForgotPassword",
+        "/GENERAL/ContactUs",
+        "/GENERAL/FAQs",
+
         // add here yung iba pang pages na hindi required iauthenticate
     ];
 

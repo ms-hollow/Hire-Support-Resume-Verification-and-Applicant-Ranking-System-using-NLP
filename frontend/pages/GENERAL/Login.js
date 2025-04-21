@@ -15,8 +15,8 @@ export default function Login() {
     return (
         <div>
             <GeneralHeader />
-            <div className="flex items-center justify-center lg:pt-36 mb:pt-24 xsm:pt-24 sm:pt-24 mb:p-5 sm:p-12 xsm:p-14 py-8 mx-auto">
-                <div className="box-container px-8 py-5 ">
+            <div className="flex items-center justify-center lg:pt-36 mb:pt-24 xsm:pt-24 xxsm:pt-24 sm:pt-24 mb:p-8 sm:p-8 xsm:p-8 xxsm:p-4 py-8 mx-auto">
+                <div className="job-application-box rounded-xs px-8 py-5 ">
                     <h1 className="lg:text-extralarge mb:text-large sm:text-large text-primary">Sign in</h1>
 
                     <form onSubmit={loginUser}>
