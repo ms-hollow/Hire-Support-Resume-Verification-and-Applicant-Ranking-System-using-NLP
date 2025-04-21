@@ -289,7 +289,6 @@ export default function CompanySettings() {
             application_deadline: formData.application_deadline,
             weight_of_criteria: formData.weight_of_criteria,
             verification_option: formData.verification_option,
-            weight_of_criteria: formData.weight_of_criteria,
             additional_notes: formData.additional_notes,
             scoring_criteria: [
                 {

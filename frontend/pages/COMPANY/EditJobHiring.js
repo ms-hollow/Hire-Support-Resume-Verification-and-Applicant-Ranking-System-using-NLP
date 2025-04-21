@@ -1,15 +1,18 @@
 import CompanyHeader from "@/components/CompanyHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import Image from "next/image";
-import Link from "next/link";
 import { FaChevronDown } from "react-icons/fa";
 import { useRouter } from "next/router";
 import { useState, useEffect, useContext } from "react";
 import phLocations from "@/public/placeHolder/philippines.json";
 import { getCompany } from "../api/companyApi";
 import AuthContext from "../context/AuthContext";
-import Cookies from "js-cookie";
-import { deleteJobHiring } from "../api/companyJobApi";
+import {
+    deleteJobHiring,
+    getJobHiringDetails,
+    updateJobHiring,
+} from "../api/companyJobApi";
+import { validateJobForm } from "../utils/JobHelpers";
 
 export default function EditJobHiring() {
     let { authTokens } = useContext(AuthContext);
@@ -22,7 +25,6 @@ export default function EditJobHiring() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [companyName, setCompanyName] = useState("");
-
 
     const [formData, setFormData] = useState({
         job_title: "",
@@ -86,40 +88,115 @@ export default function EditJobHiring() {
         },
     });
 
+    const getValue = (value, fallback = "") => value ?? fallback;
+
+    const parseSalary = (salary) =>
+        typeof salary === "string"
+            ? salary.replace(/,/g, "")
+            : salary?.toString().replace(/,/g, "") || "";
+
     //* Set ang formdata
     useEffect(() => {
-        function getCookie(name) {
-            const cookieValue = document.cookie
-                .split("; ")
-                .find((row) => row.startsWith(name + "="))
-                ?.split("=")[1];
+        const fetchData = async () => {
+            const jobHiringDetails = await getJobHiringDetails(id, authTokens);
+            if (!jobHiringDetails)
+                return console.error("No job hiring details found.");
 
-            return cookieValue ? decodeURIComponent(cookieValue) : null;
-        }
+            const parsedData =
+                typeof jobHiringDetails === "string"
+                    ? JSON.parse(jobHiringDetails)
+                    : jobHiringDetails;
 
-        const storedData = getCookie("DRAFT_DATA");
+            const scoring = parsedData.scoring_criteria || [];
 
-        if (storedData) {
-            const parsedData = JSON.parse(storedData);
-            setFormData(parsedData);
+            setFormData((prev) => ({
+                ...prev,
+                job_title: getValue(parsedData.job_title),
+                job_industry: getValue(parsedData.job_industry),
+                specialization: getValue(parsedData.specialization, []),
+                job_description: getValue(parsedData.job_description),
+                company_name: getValue(parsedData.company_name),
+                work_setup: getValue(parsedData.work_setup),
+                employment_type: getValue(parsedData.employment_type),
+                qualifications: getValue(parsedData.qualifications),
+                schedule: getValue(parsedData.schedule),
+                benefits: getValue(parsedData.benefits),
+                experience_level: getValue(parsedData.experience_level),
+                num_positions: getValue(parsedData.num_positions),
+                salary_min: parseSalary(parsedData.salary_min),
+                salary_max: parseSalary(parsedData.salary_max),
+                salary_frequency: getValue(parsedData.salary_frequency),
+                required_documents: getValue(parsedData.required_documents, []),
+                application_deadline: getValue(parsedData.application_deadline),
+                verification_option: getValue(parsedData.verification_option),
+                weight_of_criteria: getValue(parsedData.weight_of_criteria),
+                additional_notes: getValue(parsedData.additional_notes),
+                region: getValue(parsedData.region),
+                province: getValue(parsedData.province),
+                city: getValue(parsedData.city),
+                criteria: {
+                    workExperience: {
+                        directlyRelevant:
+                            scoring[0]?.preference?.directlyRelevant || [],
+                        highlyRelevant:
+                            scoring[0]?.preference?.highlyRelevant || [],
+                        moderatelyRelevant:
+                            scoring[0]?.preference?.moderatelyRelevant || [],
+                        weight: scoring[0]?.weight_percentage || "",
+                    },
+                    skills: {
+                        primarySkills:
+                            scoring[1]?.preference?.primarySkills || [],
+                        secondarySkills:
+                            scoring[1]?.preference?.secondarySkills || [],
+                        additionalSkills:
+                            scoring[1]?.preference?.additionalSkills || [],
+                        weight: scoring[1]?.weight_percentage || "",
+                    },
+                    education: {
+                        firstChoice: scoring[2]?.preference?.firstChoice || [],
+                        secondChoice:
+                            scoring[2]?.preference?.secondChoice || [],
+                        thirdChoice: scoring[2]?.preference?.thirdChoice || [],
+                        weight: scoring[2]?.weight_percentage || "",
+                    },
+                    schools: {
+                        schoolPreference:
+                            scoring[3]?.preference?.schoolPreference || [],
+                    },
+                    additionalPoints: {
+                        honor: parsedData.honor || "0",
+                        multipleDegrees:
+                            scoring[4]?.preference?.multipleDegrees || "0",
+                    },
+                    certificates: {
+                        preferred: scoring[5]?.preference?.preferred || [],
+                        weight: scoring[5]?.weight_percentage || "",
+                    },
+                },
+            }));
 
-            // Load provinces and cities based on stored region and province
+            // Load provinces and cities
             if (parsedData.region) {
                 const selectedRegion = phLocations.find(
-                    (region) => region.id === parsedData.region
+                    (r) => r.id === parsedData.region
                 );
-                const provincesList = selectedRegion ? selectedRegion.p : [];
+                const provincesList = selectedRegion?.p || [];
                 setProvinces(provincesList);
 
                 if (parsedData.province) {
                     const selectedProvince = provincesList.find(
-                        (province) => province.n === parsedData.province
+                        (p) => p.n === parsedData.province
                     );
-                    setCities(selectedProvince ? selectedProvince.c : []);
+                    setCities(selectedProvince?.c || []);
                 }
             }
+        };
+
+        if (id && authTokens) {
+            fetchData();
         }
-    }, []);
+    }, [id, authTokens]);
 
     const formatDate = (date) => {
         const month = date.getMonth() + 1; // Months are zero-indexed, so add 1
@@ -207,70 +284,6 @@ export default function EditJobHiring() {
         };
         setFormData(updatedFormData);
     };
-    const validateForm = () => {
-        let errors = {};
-
-        if (!formData.job_title) errors.job_title = "Job title is required.";
-        if (!formData.job_industry)
-            errors.job_industry = "Job industry is required.";
-        if (!formData.specialization.length)
-            errors.specialization = "Specialization is required.";
-        if (!formData.schedule) errors.schedule = "Schedule is required.";
-        if (!formData.job_description)
-            errors.job_description = "Job description is required.";
-        if (!formData.region) errors.region = "Region is required.";
-        if (!formData.province) errors.province = "Province is required.";
-        if (!formData.city) errors.city = "City is required.";
-
-        if (formData.salary_min < 0 || formData.salary_max < 0) {
-            errors.salary = "Salary cannot be negative.";
-        }
-
-        if (formData.salary_min < 20) {
-            errors.salary_min = "Minimum salary must not be less than 20.";
-        }
-
-        if (formData.salary_max > 1000000) {
-            errors.salary_max = "Maximum salary must not exceed 1,000,000.";
-        }
-
-        if (Number(formData.salary_min) >= Number(formData.salary_max)) {
-            errors.salary = "Minimum salary must be less than maximum salary.";
-        }
-
-        return errors;
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const errors = validateForm();
-        if (Object.keys(errors).length > 0) {
-            alert(
-                `Please fix the following errors:\n\n${Object.values(
-                    errors
-                ).join("\n")}`
-            );
-            return;
-        }
-
-        Cookies.set("DRAFT_DATA", JSON.stringify(formData), {
-            expires: 1,
-        });
-        router.push(`/COMPANY/CompanySettings`);
-    };
-
-    //* Pressing the browser's back button will delete the draft data stored in local storage.
-    useEffect(() => {
-        const handleBackButton = () => {
-            Cookies.remove("DRAFT_DATA");
-        };
-
-        window.addEventListener("popstate", handleBackButton);
-
-        return () => {
-            window.removeEventListener("popstate", handleBackButton);
-        };
-    }, []);
 
     useEffect(() => {
         setRegions(phLocations);
@@ -310,7 +323,7 @@ export default function EditJobHiring() {
                 setFormData((prev) => ({ ...prev, city: "" }));
             }
         }
-    }, [formData.province, provinces]); 
+    }, [formData.province, provinces]);
 
     const handleMultiSelectChange = (option) => {
         setFormData((prev) => {
@@ -333,7 +346,7 @@ export default function EditJobHiring() {
     const handleViewApplicantSummary = () => {
         console.log("selectedJobId", id);
         router.push({
-            pathname: "/COMPANY/ApplicantSummary",
+            pathname: "/COMPANY/ApplicantsSummary",
             query: { id },
         });
     };
@@ -348,400 +361,231 @@ export default function EditJobHiring() {
         }
     };
 
-
     const getFilteredOptions = (currentCategory, currentField) => {
-            const allSelectedOptions = new Set([
-                ...formData.criteria.workExperience.directlyRelevant,
-                ...formData.criteria.workExperience.highlyRelevant,
-                ...formData.criteria.workExperience.moderatelyRelevant,
-                ...formData.criteria.skills.primarySkills,
-                ...formData.criteria.skills.secondarySkills,
-                ...formData.criteria.skills.additionalSkills,
-                ...(formData.criteria.education.firstChoice
-                    ? [formData.criteria.education.firstChoice]
-                    : []),
-                ...(formData.criteria.education.secondChoice
-                    ? [formData.criteria.education.secondChoice]
-                    : []),
-                ...(formData.criteria.education.thirdChoice
-                    ? [formData.criteria.education.thirdChoice]
-                    : []),
-                ...formData.criteria.schools.schoolPreference,
-                ...formData.criteria.certificates.preferred,
-            ]);
-    
-            return options[currentCategory].filter((option) => {
-                return (
-                    !allSelectedOptions.has(option) ||
-                    formData.criteria[currentCategory][currentField]?.includes(
-                        option
-                    )
-                );
-            });
-        };
-    
-        useEffect(() => {
-            const fetchData = async () => {
-                try {
-                    // Fetch options
-                    const optionsResponse = await fetch(
-                        "/placeHolder/dummy_options.json"
-                    );
-                    const optionsData = await optionsResponse.json();
-                    setOptions(optionsData);
-    
-                    if (!options) {
-                        return <div>Loading...</div>;
-                    }
-                } catch (error) {
-                    console.error("Error fetching data:", error);
-                }
-            };
-            fetchData();
-        }, []);
-    
-        useEffect(() => {
-            const storedData = Cookies.get("SERIALIZED_DATA");
-    
-            if (!storedData) {
-                console.error("No stored data found.");
-                return;
-            }
-    
-            let parsedStoredData;
-    
+        const allSelectedOptions = new Set([
+            ...formData.criteria.workExperience.directlyRelevant,
+            ...formData.criteria.workExperience.highlyRelevant,
+            ...formData.criteria.workExperience.moderatelyRelevant,
+            ...formData.criteria.skills.primarySkills,
+            ...formData.criteria.skills.secondarySkills,
+            ...formData.criteria.skills.additionalSkills,
+            ...(formData.criteria.education.firstChoice
+                ? [formData.criteria.education.firstChoice]
+                : []),
+            ...(formData.criteria.education.secondChoice
+                ? [formData.criteria.education.secondChoice]
+                : []),
+            ...(formData.criteria.education.thirdChoice
+                ? [formData.criteria.education.thirdChoice]
+                : []),
+            ...formData.criteria.schools.schoolPreference,
+            ...formData.criteria.certificates.preferred,
+        ]);
+
+        return options[currentCategory].filter((option) => {
+            return (
+                !allSelectedOptions.has(option) ||
+                formData.criteria[currentCategory][currentField]?.includes(
+                    option
+                )
+            );
+        });
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
             try {
-                parsedStoredData = JSON.parse(storedData);
+                // Fetch options
+                const optionsResponse = await fetch(
+                    "/placeHolder/dummy_options.json"
+                );
+                const optionsData = await optionsResponse.json();
+                setOptions(optionsData);
+
+                if (!options) {
+                    return <div>Loading...</div>;
+                }
             } catch (error) {
-                console.error("Error parsing stored data:", error);
-                return;
+                console.error("Error fetching data:", error);
             }
-    
-            setFormData((prevData) => ({
-                ...prevData,
-                required_documents: parsedStoredData?.required_documents || [],
-                application_deadline: parsedStoredData?.application_deadline || "",
-                verification_option: parsedStoredData?.verification_option || "",
-                weight_of_criteria: parsedStoredData?.weight_of_criteria || "",
-                additional_notes: parsedStoredData?.additional_notes || "",
-                criteria: {
-                    ...prevData.criteria,
-                    workExperience: {
-                        ...prevData.criteria.workExperience,
+        };
+        fetchData();
+    }, []);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!validateJobForm()) {
+            return;
+        }
+
+        const serializedData = {
+            ...formData,
+            required_documents: formData.required_documents,
+            application_deadline: formData.application_deadline,
+            weight_of_criteria: formData.weight_of_criteria,
+            verification_option: formData.verification_option,
+            additional_notes: formData.additional_notes,
+            scoring_criteria: [
+                {
+                    criteria_name: "Work Experience",
+                    weight_percentage: formData.criteria.workExperience.weight,
+                    preference: {
                         directlyRelevant:
-                            parsedStoredData.scoring_criteria[0]?.preference
-                                ?.directlyRelevant || [],
+                            formData.criteria.workExperience.directlyRelevant,
                         highlyRelevant:
-                            parsedStoredData.scoring_criteria[0]?.preference
-                                ?.highlyRelevant || [],
+                            formData.criteria.workExperience.highlyRelevant,
                         moderatelyRelevant:
-                            parsedStoredData.scoring_criteria[0]?.preference
-                                ?.moderatelyRelevant || [],
-                        weight:
-                            parsedStoredData.scoring_criteria[0]
-                                ?.weight_percentage || "",
-                    },
-                    skills: {
-                        ...prevData.criteria.skills,
-                        primarySkills:
-                            parsedStoredData.scoring_criteria[1]?.preference
-                                ?.primarySkills || [],
-                        secondarySkills:
-                            parsedStoredData.scoring_criteria[1]?.preference
-                                ?.secondarySkills || [],
-                        additionalSkills:
-                            parsedStoredData.scoring_criteria[1]?.preference
-                                ?.additionalSkills || [],
-                        weight:
-                            parsedStoredData.scoring_criteria[1]
-                                ?.weight_percentage || "",
-                    },
-                    education: {
-                        ...prevData.criteria.education,
-                        firstChoice:
-                            parsedStoredData.scoring_criteria[2]?.preference
-                                ?.firstChoice || [],
-                        secondChoice:
-                            parsedStoredData.scoring_criteria[2]?.preference
-                                ?.secondChoice || [],
-                        thirdChoice:
-                            parsedStoredData.scoring_criteria[2]?.preference
-                                ?.thirdChoice || [],
-                        weight:
-                            parsedStoredData.scoring_criteria[2]
-                                ?.weight_percentage || "",
-                    },
-                    schools: {
-                        ...prevData.criteria.schools,
-                        schoolPreference:
-                            parsedStoredData.scoring_criteria[3]?.preference
-                                ?.schoolPreference || [],
-                    },
-                    additionalPoints: {
-                        ...prevData.criteria.additionalPoints,
-                        honor: parsedStoredData.honor || "0",
-                        multipleDegrees:
-                            parsedStoredData.scoring_criteria[4]?.preference
-                                ?.multipleDegrees || "0",
-                    },
-                    certificates: {
-                        ...prevData.criteria.certificates,
-                        preferred:
-                            parsedStoredData.scoring_criteria[5]?.preference
-                                ?.preferred || [],
-                        weight:
-                            parsedStoredData.scoring_criteria[5]
-                                ?.weight_percentage || "",
+                            formData.criteria.workExperience.moderatelyRelevant,
                     },
                 },
-            }));
-        }, []);
-    
-        function validation() {
-            const totalWeight =
-                parseFloat(formData.criteria.workExperience.weight || 0) +
-                parseFloat(formData.criteria.skills.weight || 0) +
-                parseFloat(formData.criteria.education.weight || 0) +
-                parseFloat(formData.criteria.schools.weight || 0) +
-                parseFloat(formData.criteria.certificates.weight || 0);
-    
-            if (totalWeight !== 100) {
-                alert("Total weight of criteria must be equal to 100");
-                return false;
-            }
-    
-            if (!formData.weight_of_criteria) {
-                alert("Please select a weight of criteria.");
-                return false;
-            }
-    
-            if (!formData.verification_option) {
-                alert("Please select a verification option.");
-                return false;
-            }
-    
-            if (!formData.application_deadline) {
-                alert("Please select an application deadline.");
-                return false;
-            }
-    
-            if (!formData.additional_notes) {
-                alert("Please add additional notes.");
-                return false;
-            }
-    
-            //* UNCOMMENT IF APPLIED
-            // const today = new Date();
-            // const selectedDeadline = new Date(formData.application_deadline);
-    
-            // today.setHours(0, 0, 0, 0);
-            // selectedDeadline.setHours(0, 0, 0, 0);
-    
-            // if (selectedDeadline.getTime() === today.getTime()) {
-            //     alert("The application deadline cannot be today's date.");
-            //     return false; // Prevent form submission if the deadline is today's date
-            // }
-    
-            if (formData.required_documents.length === 0) {
-                alert("Please select at least one required document.");
-                return false;
-            }
-    
-            return true;
+                {
+                    criteria_name: "Skills",
+                    weight_percentage: formData.criteria.skills.weight,
+                    preference: {
+                        primarySkills: formData.criteria.skills.primarySkills,
+                        secondarySkills:
+                            formData.criteria.skills.secondarySkills,
+                        additionalSkills:
+                            formData.criteria.skills.additionalSkills,
+                    },
+                },
+                {
+                    criteria_name: "Education",
+                    weight_percentage: formData.criteria.education.weight,
+                    preference: {
+                        firstChoice: formData.criteria.education.firstChoice,
+                        secondChoice: formData.criteria.education.secondChoice,
+                        thirdChoice: formData.criteria.education.thirdChoice,
+                    },
+                },
+                {
+                    criteria_name: "Schools",
+                    weight_percentage: formData.criteria.schools.weight,
+                    preference: {
+                        schoolPreference:
+                            formData.criteria.schools.schoolPreference,
+                    },
+                },
+                {
+                    criteria_name: "Additional Points",
+                    weight_percentage:
+                        formData.criteria.additionalPoints.weight,
+                    preference: {
+                        honor: formData.criteria.additionalPoints.honor,
+                        multipleDegrees:
+                            formData.criteria.additionalPoints.multipleDegrees,
+                    },
+                },
+                {
+                    criteria_name: "Certifications",
+                    weight_percentage: formData.criteria.certificates.weight,
+                    preference: {
+                        preferred: formData.criteria.certificates.preferred,
+                    },
+                },
+            ],
+        };
+
+        const res = await updateJobHiring(id, serializedData, authTokens);
+
+        if (res) {
+            alert("Job successfully updated");
+            router.push("/COMPANY/CompanyHome");
+        } else {
+            alert("Failed to delete job.");
         }
-    
-        const handleSettingsSubmit = (e) => {
-            function getCookie(name) {
-                const cookieValue = document.cookie
-                    .split("; ")
-                    .find((row) => row.startsWith(name + "="))
-                    ?.split("=")[1];
-    
-                return cookieValue ? decodeURIComponent(cookieValue) : null;
-            }
-    
-            const storedData = getCookie("DRAFT_DATA");
-    
-            if (!storedData) {
-                console.error("No stored data found.");
-                return;
-            }
-    
-            let parsedStoredData;
-    
-            try {
-                parsedStoredData = JSON.parse(storedData);
-            } catch (error) {
-                console.error("Error parsing stored data:", error);
-                return;
-            }
-    
-            const mergedData = {
-                ...parsedStoredData,
-                required_documents: formData.required_documents,
-                application_deadline: formData.application_deadline,
-                weight_of_criteria: formData.weight_of_criteria,
-                verification_option: formData.verification_option,
-                weight_of_criteria: formData.weight_of_criteria,
-                additional_notes: formData.additional_notes,
-                scoring_criteria: [
-                    {
-                        criteria_name: "Work Experience",
-                        weight_percentage: formData.criteria.workExperience.weight,
-                        preference: {
-                            directlyRelevant:
-                                formData.criteria.workExperience.directlyRelevant,
-                            highlyRelevant:
-                                formData.criteria.workExperience.highlyRelevant,
-                            moderatelyRelevant:
-                                formData.criteria.workExperience.moderatelyRelevant,
-                        },
-                    },
-                    {
-                        criteria_name: "Skills",
-                        weight_percentage: formData.criteria.skills.weight,
-                        preference: {
-                            primarySkills: formData.criteria.skills.primarySkills,
-                            secondarySkills:
-                                formData.criteria.skills.secondarySkills,
-                            additionalSkills:
-                                formData.criteria.skills.additionalSkills,
-                        },
-                    },
-                    {
-                        criteria_name: "Education",
-                        weight_percentage: formData.criteria.education.weight,
-                        preference: {
-                            firstChoice: formData.criteria.education.firstChoice,
-                            secondChoice: formData.criteria.education.secondChoice,
-                            thirdChoice: formData.criteria.education.thirdChoice,
-                        },
-                    },
-                    {
-                        criteria_name: "Schools",
-                        weight_percentage: formData.criteria.schools.weight,
-                        preference: {
-                            schoolPreference:
-                                formData.criteria.schools.schoolPreference,
-                        },
-                    },
-                    {
-                        criteria_name: "Additional Points",
-                        weight_percentage:
-                            formData.criteria.additionalPoints.weight,
-                        preference: {
-                            honor: formData.criteria.additionalPoints.honor,
-                            multipleDegrees:
-                                formData.criteria.additionalPoints.multipleDegrees,
-                        },
-                    },
-                    {
-                        criteria_name: "Certifications",
-                        weight_percentage: formData.criteria.certificates.weight,
-                        preference: {
-                            preferred: formData.criteria.certificates.preferred,
-                        },
-                    },
-                ],
-            };
-    
-            Cookies.set("SERIALIZED_DATA", JSON.stringify(mergedData), {
-                expires: 1,
-            });
-            if (validation()) {
-                router.push("/COMPANY/JobSummary");
-            }
+    };
+
+    const handleSettingsInputChange = (e) => {
+        const { name, value } = e.target;
+        const updatedFormData = {
+            ...formData,
+            [name]: value,
         };
-    
-        const handleSettingsInputChange = (e) => {
-            const { name, value } = e.target;
-            const updatedFormData = {
-                ...formData,
-                [name]: value,
-            };
-            setFormData(updatedFormData);
-        };
-    
-        const handleSettingsMultiSelect = (category, field, option) => {
-            setFormData((prev) => {
-                const selectedOptions = prev.criteria[category][field] || [];
-                const isSelected = selectedOptions.includes(option);
-                const updatedOptions = isSelected
-                    ? selectedOptions.filter((item) => item !== option)
-                    : [...selectedOptions, option];
-    
-                return {
-                    ...prev,
-                    criteria: {
-                        ...prev.criteria,
-                        [category]: {
-                            ...prev.criteria[category],
-                            [field]: updatedOptions,
-                        },
-                    },
-                };
-            });
-        };
-    
-        const handleAddCustomOption = (category, field, customOption) => {
-            if (!customOption.trim()) return; // Prevent empty input
-    
-            setOptions((prev) => ({
-                ...prev,
-                [category]: prev[category]?.includes(customOption)
-                    ? prev[category]
-                    : [...(prev[category] || []), customOption], // Add only if not exists
-            }));
-    
-            handleSettingsMultiSelect(category, field, customOption);
-    
-            setSearchTerm((prev) => ({ ...prev, [field]: "" })); // Reset only the relevant search field
-        };
-    
-        const handleSettingsRemoveSelectedOption = (category, field, option) => {
-            setFormData((prev) => ({
+        setFormData(updatedFormData);
+    };
+
+    const handleSettingsMultiSelect = (category, field, option) => {
+        setFormData((prev) => {
+            const selectedOptions = prev.criteria[category][field] || [];
+            const isSelected = selectedOptions.includes(option);
+            const updatedOptions = isSelected
+                ? selectedOptions.filter((item) => item !== option)
+                : [...selectedOptions, option];
+
+            return {
                 ...prev,
                 criteria: {
                     ...prev.criteria,
                     [category]: {
                         ...prev.criteria[category],
-                        [field]: prev.criteria[category][field].filter(
-                            (item) => item !== option
-                        ),
+                        [field]: updatedOptions,
                     },
                 },
-            }));
-        };
-    
-        const handleCriteriaChange = (field, subField, value) => {
-            setFormData((prev) => ({
-                ...prev,
-                criteria: {
-                    ...prev.criteria,
-                    [field]: {
-                        ...prev.criteria[field],
-                        [subField]: value,
-                    },
+            };
+        });
+    };
+
+    const handleAddCustomOption = (category, field, customOption) => {
+        if (!customOption.trim()) return; // Prevent empty input
+
+        setOptions((prev) => ({
+            ...prev,
+            [category]: prev[category]?.includes(customOption)
+                ? prev[category]
+                : [...(prev[category] || []), customOption], // Add only if not exists
+        }));
+
+        handleSettingsMultiSelect(category, field, customOption);
+
+        setSearchTerm((prev) => ({ ...prev, [field]: "" })); // Reset only the relevant search field
+    };
+
+    const handleSettingsRemoveSelectedOption = (category, field, option) => {
+        setFormData((prev) => ({
+            ...prev,
+            criteria: {
+                ...prev.criteria,
+                [category]: {
+                    ...prev.criteria[category],
+                    [field]: prev.criteria[category][field].filter(
+                        (item) => item !== option
+                    ),
                 },
-            }));
-        };
-    
-        const handleDocumentChange = (e, doc) => {
-            const isChecked = e.target.checked;
-    
-            setFormData((prevFormData) => {
-                const updatedDocuments = isChecked
-                    ? [...prevFormData.required_documents, doc]
-                    : prevFormData.required_documents.filter(
-                          (item) => item !== doc
-                      );
-    
-                return { ...prevFormData, required_documents: updatedDocuments };
-            });
-        };
-    
-        // Get today's date in YYYY-MM-DD format
-        const currentDate = new Date().toISOString().split("T")[0];
+            },
+        }));
+    };
+
+    const handleCriteriaChange = (field, subField, value) => {
+        setFormData((prev) => ({
+            ...prev,
+            criteria: {
+                ...prev.criteria,
+                [field]: {
+                    ...prev.criteria[field],
+                    [subField]: value,
+                },
+            },
+        }));
+    };
+
+    const handleDocumentChange = (e, doc) => {
+        const isChecked = e.target.checked;
+
+        setFormData((prevFormData) => {
+            const updatedDocuments = isChecked
+                ? [...prevFormData.required_documents, doc]
+                : prevFormData.required_documents.filter(
+                      (item) => item !== doc
+                  );
+
+            return { ...prevFormData, required_documents: updatedDocuments };
+        });
+    };
+
+    // Get today's date in YYYY-MM-DD format
+    const currentDate = new Date().toISOString().split("T")[0];
 
     return (
         <div>
@@ -771,28 +615,26 @@ export default function EditJobHiring() {
                         />
                     </div>
                 </div>
+                <form>
+                    <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col gap-5 pb-8">
+                        <div className="job-application-box px-8 py-5 mx-auto self-start lg:sticky mb:sticky top-20">
+                            <p className="font-semibold lg:text-large mb:text-large sm:text-large text-primary">
+                                Edit Job Hiring Information
+                            </p>
 
-
-                <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col gap-5 pb-8">
-                    <div className="job-application-box px-8 py-5 mx-auto self-start lg:sticky mb:sticky top-20">
-                        <p className="font-semibold lg:text-large mb:text-large sm:text-large text-primary">
-                            Edit Job Hiring Information
-                        </p>
-
-                        <div className="flex items-center pt-2 pb-2">
-                            <div className="w-full bg-background h-.5 border-2 border-primary rounded-full relative">
-                                <div
-                                    className="relative h-.5 rounded-full transition-all duration-300 bg-primary"
-                                    style={{ width: "100%" }}
-                                ></div>
+                            <div className="flex items-center pt-2 pb-2">
+                                <div className="w-full bg-background h-.5 border-2 border-primary rounded-full relative">
+                                    <div
+                                        className="relative h-.5 rounded-full transition-all duration-300 bg-primary"
+                                        style={{ width: "100%" }}
+                                    ></div>
+                                </div>
                             </div>
-                        </div>
 
-                        <p className="font-medium lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-5">
-                            Edit or update  all required job hiring details.
-                        </p>
-                        {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
-                        <form onSubmit={handleSubmit}>
+                            <p className="font-medium lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-5">
+                                Edit or update all required job hiring details.
+                            </p>
+                            {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
                                     <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">
@@ -1037,41 +879,41 @@ export default function EditJobHiring() {
                                                 )
                                             )}
                                         </select>
-                                        </div>
                                     </div>
+                                </div>
 
-                                    <div className="col-span-2 gap-3" >
-                                        <div className="w-full">
-                                            <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">
-                                                City
-                                            </label>
-                                            <select
-                                                className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall border-2 border-black h-medium rounded-xs w-full"
-                                                id="city"
-                                                name="city"
-                                                required
-                                                value={formData.city}
-                                                onChange={handleInputChange}
+                                <div className="col-span-2 gap-3">
+                                    <div className="w-full">
+                                        <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">
+                                            City
+                                        </label>
+                                        <select
+                                            className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall border-2 border-black h-medium rounded-xs w-full"
+                                            id="city"
+                                            name="city"
+                                            required
+                                            value={formData.city}
+                                            onChange={handleInputChange}
+                                        >
+                                            <option
+                                                value=""
+                                                disabled
+                                                selected
+                                                hidden
                                             >
+                                                Select City
+                                            </option>
+                                            {cities.map((city, index) => (
                                                 <option
-                                                    value=""
-                                                    disabled
-                                                    selected
-                                                    hidden
+                                                    key={index}
+                                                    value={city.n}
                                                 >
-                                                    Select City
+                                                    {city.n}
                                                 </option>
-                                                {cities.map((city, index) => (
-                                                    <option
-                                                        key={index}
-                                                        value={city.n}
-                                                    >
-                                                        {city.n}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
+                                            ))}
+                                        </select>
                                     </div>
+                                </div>
 
                                 <div className="flex space-x-6 mt-1 col-span-2">
                                     <div className="w-1/2">
@@ -1254,632 +1096,743 @@ export default function EditJobHiring() {
                                             className="h-medium rounded-xs border-2  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall border-fontcolor"
                                         />
                                     </div>
-
-                                    </div>
                                 </div>
-
-                                <div className="col-span-2 mt-3">
-                                    <div className="w-full">
-                                        <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">
-                                            Salary Frequency
-                                        </label>
-                                        <select
-                                            name="salary_frequency"
-                                            value={formData.salary_frequency}
-                                            onChange={handleInputChange}
-                                            className="h-medium rounded-xs border-2 border-fontcolor valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
-                                        >
-                                            <option value="">
-                                                Select Frequency
-                                            </option>
-                                            <option value="Monthly">
-                                                Monthly
-                                            </option>
-                                            <option value="Weekly">
-                                                Weekly
-                                            </option>
-                                            <option value="Hourly">
-                                                Hourly
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>                    
-                         </form>                 
-                    </div>
-
-                    <div className="w-full flex flex-col">
-                    <div className="pb-8">
-                   
-                    <form
-                        onSubmit={handleSettingsSubmit}
-                        className="flex gap-6"
-                    >
-                        <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col">
-                        
-                        {/* Settings */}
-                        <div className=" bg-white border-[2px] border-[#D9D9D9] shadow-[0_0_5px_2px_rgba(0,0,0,0.1)] rounded-lg p-6">
-
-                        {/* Required Documents */}
-                        <div className="w-full flex flex-col gap-6 h-max">
-                            <div className="">
-                                <h2 className="text-lg font-semibold text-primary mb-2">
-                                    Required Documents
-                                </h2>
-                                <p className="text-sm text-fontcolor mt-1 mb-4">
-                                    Please make sure to upload all the required
-                                    documents before the deadline.
-                                </p>
-                                {[
-                                    "Resume",
-                                    "Educational Documents",
-                                    "Work Experience Documents",
-                                    "Certification Documents",
-                                ].map((doc, index) => (
-                                    <label
-                                        key={index}
-                                        className="flex items-center space-x-2 mb-2 cursor-pointer"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            name="required_documents"
-                                            value={doc}
-                                            checked={formData.required_documents.includes(
-                                                doc
-                                            )}
-                                            onChange={(e) =>
-                                                handleDocumentChange(e, doc)
-                                            }
-                                            className="w-4 h-4 border border-gray-300 rounded text-black focus:ring-0 focus:outline-none"
-                                        />
-                                        <span className="text-fontcolor text-sm">
-                                            {doc}
-                                        </span>
-                                    </label>
-                                ))}
                             </div>
 
-                            {/* Date of Deadline */}
-                            <div className="mb-5">
-                                <h2 className="text-lg font-semibold text-primary mb-2">
-                                    Date of Deadline
-                                </h2>
-                                <p className="text-sm text-fontcolor mt-1 mb-4">
-                                    Select the deadline date for submitting the
-                                    required documents.
-                                </p>
-                                <input
-                                    type="date"
-                                    name="application_deadline"
-                                    value={formData.application_deadline}
-                                    onChange={handleSettingsInputChange}
-                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm text-fontcolor"
-                                    min={currentDate}
-                                />
+                            <div className="col-span-2 mt-3">
+                                <div className="w-full">
+                                    <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">
+                                        Salary Frequency
+                                    </label>
+                                    <select
+                                        name="salary_frequency"
+                                        value={formData.salary_frequency}
+                                        onChange={handleInputChange}
+                                        className="h-medium rounded-xs border-2 border-fontcolor valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
+                                    >
+                                        <option value="">
+                                            Select Frequency
+                                        </option>
+                                        <option value="Monthly">Monthly</option>
+                                        <option value="Weekly">Weekly</option>
+                                        <option value="Hourly">Hourly</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                            <h2 className="text-lg font-semibold text-primary mb-4">
-                                Criteria of Scoring
-                            </h2>
-                            <div className="mb-6">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center">
-                                        {/* <input
+
+                        <div className="w-full flex flex-col">
+                            <div className="pb-8">
+                                <div className="flex gap-6">
+                                    <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col">
+                                        {/* Settings */}
+                                        <div className=" bg-white border-[2px] border-[#D9D9D9] shadow-[0_0_5px_2px_rgba(0,0,0,0.1)] rounded-lg p-6">
+                                            {/* Required Documents */}
+                                            <div className="w-full flex flex-col gap-6 h-max">
+                                                <div className="">
+                                                    <h2 className="text-lg font-semibold text-primary mb-2">
+                                                        Required Documents
+                                                    </h2>
+                                                    <p className="text-sm text-fontcolor mt-1 mb-4">
+                                                        Please make sure to
+                                                        upload all the required
+                                                        documents before the
+                                                        deadline.
+                                                    </p>
+                                                    {[
+                                                        "Resume",
+                                                        "Educational Documents",
+                                                        "Work Experience Documents",
+                                                        "Certification Documents",
+                                                    ].map((doc, index) => (
+                                                        <label
+                                                            key={index}
+                                                            className="flex items-center space-x-2 mb-2 cursor-pointer"
+                                                        >
+                                                            <input
+                                                                type="checkbox"
+                                                                name="required_documents"
+                                                                value={doc}
+                                                                checked={formData.required_documents.includes(
+                                                                    doc
+                                                                )}
+                                                                onChange={(e) =>
+                                                                    handleDocumentChange(
+                                                                        e,
+                                                                        doc
+                                                                    )
+                                                                }
+                                                                className="w-4 h-4 border border-gray-300 rounded text-black focus:ring-0 focus:outline-none"
+                                                            />
+                                                            <span className="text-fontcolor text-sm">
+                                                                {doc}
+                                                            </span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+
+                                                {/* Date of Deadline */}
+                                                <div className="mb-5">
+                                                    <h2 className="text-lg font-semibold text-primary mb-2">
+                                                        Date of Deadline
+                                                    </h2>
+                                                    <p className="text-sm text-fontcolor mt-1 mb-4">
+                                                        Select the deadline date
+                                                        for submitting the
+                                                        required documents.
+                                                    </p>
+                                                    <input
+                                                        type="date"
+                                                        name="application_deadline"
+                                                        value={
+                                                            formData.application_deadline
+                                                        }
+                                                        onChange={
+                                                            handleSettingsInputChange
+                                                        }
+                                                        className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm text-fontcolor"
+                                                        min={currentDate}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <h2 className="text-lg font-semibold text-primary mb-4">
+                                                Criteria of Scoring
+                                            </h2>
+                                            <div className="mb-6">
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <div className="flex items-center">
+                                                        {/* <input
                                             type="checkbox"
                                             className="w-4 h-4 border border-gray-300 rounded text-fontcolor"
                                         /> */}
-                                        <label className="ml-2 block text-sm font-semibold text-primary">
-                                            Work Experience
-                                        </label>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <span className="text-sm font-semibold text-fontcolor mr-2">
-                                            Weight
-                                        </span>
-                                        <input
-                                            type="text"
-                                            value={
-                                                formData.criteria
-                                                    ?.workExperience?.weight ||
-                                                ""
-                                            }
-                                            onChange={(e) => {
-                                                const value = e.target.value;
-                                                if (
-                                                    /^\d*$/.test(value) &&
-                                                    Number(value) <= 100
-                                                ) {
-                                                    handleCriteriaChange(
-                                                        "workExperience",
-                                                        "weight",
-                                                        value
-                                                    ); // Pass the actual value
-                                                }
-                                            }}
-                                            className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-sm text-fontcolor text-center"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Work Experience Directly Relevant */}
-                                <div className="mb-4">
-                                    <div>
-                                        <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                            {" "}
-                                            Directly Relevant{" "}
-                                            <span className="font-medium text-xsmall">
-                                                {" "}
-                                                (Put roles that are exactly
-                                                alike or have equal importance
-                                                for the position)
-                                            </span>
-                                        </label>
-
-                                        <div
-                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
-                                            onClick={() =>
-                                                setDropdownOpen({
-                                                    ...dropdownOpen,
-                                                    directly:
-                                                        !dropdownOpen.directly,
-                                                })
-                                            }
-                                        >
-                                            {formData.criteria.workExperience
-                                                .directlyRelevant?.length >
-                                            0 ? (
-                                                formData.criteria.workExperience.directlyRelevant.map(
-                                                    (selected, index) => (
-                                                        <div
-                                                            key={index}
-                                                            className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
-                                                        >
-                                                            <span className="text-sm">
-                                                                {selected}
-                                                            </span>
-                                                            <button
-                                                                className="ml-2 text-red-600 font-extrabold"
-                                                                onClick={(
-                                                                    e
-                                                                ) => {
-                                                                    e.stopPropagation();
-                                                                    handleSettingsRemoveSelectedOption(
-                                                                        "workExperience",
-                                                                        "directlyRelevant",
-                                                                        selected
-                                                                    );
-                                                                }}
-                                                            >
-                                                                X
-                                                            </button>
-                                                        </div>
-                                                    )
-                                                )
-                                            ) : (
-                                                <span className="text-fontcolor">
-                                                    Select Directly Relevant
-                                                </span>
-                                            )}
-                                            <FaChevronDown
-                                                className={`ml-auto transform ${
-                                                    dropdownOpen.directly
-                                                        ? "rotate-180"
-                                                        : "rotate-0"
-                                                } transition-transform`}
-                                            />
-                                        </div>
-
-                                        {dropdownOpen.directly && (
-                                            <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                                                {/* Search & Add Custom Option */}
-                                                <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Search or add a new option..."
-                                                        value={
-                                                            searchTerm.directly ||
-                                                            ""
-                                                        }
-                                                        onChange={(e) =>
-                                                            setSearchTerm({
-                                                                ...searchTerm,
-                                                                directly:
-                                                                    e.target
-                                                                        .value,
-                                                            })
-                                                        }
-                                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                                                        onKeyDown={(e) => {
-                                                            if (
-                                                                e.key ===
-                                                                "Enter"
-                                                            ) {
-                                                                handleAddCustomOption(
-                                                                    "workExperience",
-                                                                    "directlyRelevant",
-                                                                    e.target
-                                                                        .value
-                                                                );
+                                                        <label className="ml-2 block text-sm font-semibold text-primary">
+                                                            Work Experience
+                                                        </label>
+                                                    </div>
+                                                    <div className="flex items-center">
+                                                        <span className="text-sm font-semibold text-fontcolor mr-2">
+                                                            Weight
+                                                        </span>
+                                                        <input
+                                                            type="text"
+                                                            value={
+                                                                formData
+                                                                    .criteria
+                                                                    ?.workExperience
+                                                                    ?.weight ||
+                                                                ""
                                                             }
-                                                        }}
-                                                    />
-                                                    {searchTerm.directly &&
-                                                        !options.workExperience.includes(
-                                                            searchTerm.directly
-                                                        ) && (
-                                                            <button
-                                                                className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
-                                                                onClick={() =>
-                                                                    handleAddCustomOption(
+                                                            onChange={(e) => {
+                                                                const value =
+                                                                    e.target
+                                                                        .value;
+                                                                if (
+                                                                    /^\d*$/.test(
+                                                                        value
+                                                                    ) &&
+                                                                    Number(
+                                                                        value
+                                                                    ) <= 100
+                                                                ) {
+                                                                    handleCriteriaChange(
                                                                         "workExperience",
-                                                                        "directlyRelevant",
-                                                                        searchTerm.directly
-                                                                    )
+                                                                        "weight",
+                                                                        value
+                                                                    ); // Pass the actual value
                                                                 }
-                                                            >
-                                                                Add "
-                                                                {
-                                                                    searchTerm.directly
-                                                                }
-                                                                "
-                                                            </button>
-                                                        )}
+                                                            }}
+                                                            className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-sm text-fontcolor text-center"
+                                                        />
+                                                    </div>
                                                 </div>
 
-                                                {/* Available Options List */}
-                                                {getFilteredOptions(
-                                                    "workExperience",
-                                                    "directlyRelevant"
-                                                ).map((option, index) => (
-                                                    <label
-                                                        key={index}
-                                                        className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
-                                                    >
-                                                        <input
-                                                            type="checkbox"
-                                                            value={option}
-                                                            checked={formData.criteria.workExperience.directlyRelevant.includes(
-                                                                option
-                                                            )}
-                                                            onChange={() =>
-                                                                handleSettingsMultiSelect(
-                                                                    "workExperience",
-                                                                    "directlyRelevant",
-                                                                    option
+                                                {/* Work Experience Directly Relevant */}
+                                                <div className="mb-4">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-fontcolor mb-1">
+                                                            {" "}
+                                                            Directly Relevant{" "}
+                                                            <span className="font-medium text-xsmall">
+                                                                {" "}
+                                                                (Put roles that
+                                                                are exactly
+                                                                alike or have
+                                                                equal importance
+                                                                for the
+                                                                position)
+                                                            </span>
+                                                        </label>
+
+                                                        <div
+                                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
+                                                            onClick={() =>
+                                                                setDropdownOpen(
+                                                                    {
+                                                                        ...dropdownOpen,
+                                                                        directly:
+                                                                            !dropdownOpen.directly,
+                                                                    }
                                                                 )
                                                             }
-                                                            className="ml-5 w-5 h-5"
-                                                        />
-                                                        <span className="text-medium ml-5">
-                                                            {option}
-                                                        </span>
-                                                    </label>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Work Experience Highly Relevant */}
-                                <div className="mb-4">
-                                    <div>
-                                        <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                            {" "}
-                                            Highly Relevant{" "}
-                                            <span className="font-medium text-xsmall">
-                                                {" "}
-                                                (Put roles with significant
-                                                overlap in core
-                                                responsibilities)
-                                            </span>
-                                        </label>
-
-                                        <div
-                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
-                                            onClick={() =>
-                                                setDropdownOpen({
-                                                    ...dropdownOpen,
-                                                    highly: !dropdownOpen.highly,
-                                                })
-                                            }
-                                        >
-                                            {/* Show selected options inside the input */}
-                                            {formData.criteria.workExperience
-                                                .highlyRelevant?.length > 0 ? (
-                                                formData.criteria.workExperience.highlyRelevant.map(
-                                                    (selected, index) => (
-                                                        <div
-                                                            key={index}
-                                                            className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
                                                         >
-                                                            <span className="text-sm">
-                                                                {selected}
-                                                            </span>
-                                                            <button
-                                                                className="ml-2 text-red-600 font-extrabold"
-                                                                onClick={(
-                                                                    e
-                                                                ) => {
-                                                                    e.stopPropagation();
-                                                                    handleSettingsRemoveSelectedOption(
-                                                                        "workExperience",
-                                                                        "highlyRelevant",
-                                                                        selected
-                                                                    );
-                                                                }}
-                                                            >
-                                                                X
-                                                            </button>
-                                                        </div>
-                                                    )
-                                                )
-                                            ) : (
-                                                <span className="text-fontcolor">
-                                                    Select Highly Relevant
-                                                </span>
-                                            )}
-                                            <FaChevronDown
-                                                className={`ml-auto transform ${
-                                                    dropdownOpen.highly
-                                                        ? "rotate-180"
-                                                        : "rotate-0"
-                                                } transition-transform`}
-                                            />
-                                        </div>
-
-                                        {dropdownOpen.highly && (
-                                            <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                                                {/* Search & Add Custom Option */}
-                                                <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Search or add a new option..."
-                                                        value={
-                                                            searchTerm.highly ||
-                                                            ""
-                                                        }
-                                                        onChange={(e) =>
-                                                            setSearchTerm({
-                                                                ...searchTerm,
-                                                                highly: e.target
-                                                                    .value,
-                                                            })
-                                                        }
-                                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                                                        onKeyDown={(e) => {
-                                                            if (
-                                                                e.key ===
-                                                                "Enter"
-                                                            ) {
-                                                                handleAddCustomOption(
-                                                                    "workExperience",
-                                                                    "highlyRelevant",
-                                                                    e.target
-                                                                        .value
-                                                                );
-                                                            }
-                                                        }}
-                                                    />
-                                                    {searchTerm.highly &&
-                                                        !options.workExperience.includes(
-                                                            searchTerm.highly
-                                                        ) && (
-                                                            <button
-                                                                className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
-                                                                onClick={() =>
-                                                                    handleAddCustomOption(
-                                                                        "workExperience",
-                                                                        "highlyRelevant",
-                                                                        searchTerm.highly
+                                                            {formData.criteria
+                                                                .workExperience
+                                                                .directlyRelevant
+                                                                ?.length > 0 ? (
+                                                                formData.criteria.workExperience.directlyRelevant.map(
+                                                                    (
+                                                                        selected,
+                                                                        index
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
+                                                                        >
+                                                                            <span className="text-sm">
+                                                                                {
+                                                                                    selected
+                                                                                }
+                                                                            </span>
+                                                                            <button
+                                                                                className="ml-2 text-red-600 font-extrabold"
+                                                                                onClick={(
+                                                                                    e
+                                                                                ) => {
+                                                                                    e.stopPropagation();
+                                                                                    handleSettingsRemoveSelectedOption(
+                                                                                        "workExperience",
+                                                                                        "directlyRelevant",
+                                                                                        selected
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                X
+                                                                            </button>
+                                                                        </div>
                                                                     )
-                                                                }
-                                                            >
-                                                                Add "
-                                                                {
-                                                                    searchTerm.highly
-                                                                }
-                                                                "
-                                                            </button>
+                                                                )
+                                                            ) : (
+                                                                <span className="text-fontcolor">
+                                                                    Select
+                                                                    Directly
+                                                                    Relevant
+                                                                </span>
+                                                            )}
+                                                            <FaChevronDown
+                                                                className={`ml-auto transform ${
+                                                                    dropdownOpen.directly
+                                                                        ? "rotate-180"
+                                                                        : "rotate-0"
+                                                                } transition-transform`}
+                                                            />
+                                                        </div>
+
+                                                        {dropdownOpen.directly && (
+                                                            <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                                                                {/* Search & Add Custom Option */}
+                                                                <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                                                                    <input
+                                                                        type="text"
+                                                                        placeholder="Search or add a new option..."
+                                                                        value={
+                                                                            searchTerm.directly ||
+                                                                            ""
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            setSearchTerm(
+                                                                                {
+                                                                                    ...searchTerm,
+                                                                                    directly:
+                                                                                        e
+                                                                                            .target
+                                                                                            .value,
+                                                                                }
+                                                                            )
+                                                                        }
+                                                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                                                        onKeyDown={(
+                                                                            e
+                                                                        ) => {
+                                                                            if (
+                                                                                e.key ===
+                                                                                "Enter"
+                                                                            ) {
+                                                                                handleAddCustomOption(
+                                                                                    "workExperience",
+                                                                                    "directlyRelevant",
+                                                                                    e
+                                                                                        .target
+                                                                                        .value
+                                                                                );
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                    {searchTerm.directly &&
+                                                                        !options.workExperience.includes(
+                                                                            searchTerm.directly
+                                                                        ) && (
+                                                                            <button
+                                                                                className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
+                                                                                onClick={() =>
+                                                                                    handleAddCustomOption(
+                                                                                        "workExperience",
+                                                                                        "directlyRelevant",
+                                                                                        searchTerm.directly
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                Add
+                                                                                "
+                                                                                {
+                                                                                    searchTerm.directly
+                                                                                }
+
+                                                                                "
+                                                                            </button>
+                                                                        )}
+                                                                </div>
+
+                                                                {/* Available Options List */}
+                                                                {getFilteredOptions(
+                                                                    "workExperience",
+                                                                    "directlyRelevant"
+                                                                ).map(
+                                                                    (
+                                                                        option,
+                                                                        index
+                                                                    ) => (
+                                                                        <label
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
+                                                                        >
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                value={
+                                                                                    option
+                                                                                }
+                                                                                checked={formData.criteria.workExperience.directlyRelevant.includes(
+                                                                                    option
+                                                                                )}
+                                                                                onChange={() =>
+                                                                                    handleSettingsMultiSelect(
+                                                                                        "workExperience",
+                                                                                        "directlyRelevant",
+                                                                                        option
+                                                                                    )
+                                                                                }
+                                                                                className="ml-5 w-5 h-5"
+                                                                            />
+                                                                            <span className="text-medium ml-5">
+                                                                                {
+                                                                                    option
+                                                                                }
+                                                                            </span>
+                                                                        </label>
+                                                                    )
+                                                                )}
+                                                            </div>
                                                         )}
+                                                    </div>
                                                 </div>
 
-                                                {/* Available Options List */}
-                                                {getFilteredOptions(
-                                                    "workExperience",
-                                                    "highlyRelevant"
-                                                ).map((option, index) => (
-                                                    <label
-                                                        key={index}
-                                                        className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
-                                                    >
-                                                        <input
-                                                            type="checkbox"
-                                                            value={option}
-                                                            checked={formData.criteria.workExperience.highlyRelevant.includes(
-                                                                option
-                                                            )}
-                                                            onChange={() =>
-                                                                handleSettingsMultiSelect(
-                                                                    "workExperience",
-                                                                    "highlyRelevant",
-                                                                    option
+                                                {/* Work Experience Highly Relevant */}
+                                                <div className="mb-4">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-fontcolor mb-1">
+                                                            {" "}
+                                                            Highly Relevant{" "}
+                                                            <span className="font-medium text-xsmall">
+                                                                {" "}
+                                                                (Put roles with
+                                                                significant
+                                                                overlap in core
+                                                                responsibilities)
+                                                            </span>
+                                                        </label>
+
+                                                        <div
+                                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
+                                                            onClick={() =>
+                                                                setDropdownOpen(
+                                                                    {
+                                                                        ...dropdownOpen,
+                                                                        highly: !dropdownOpen.highly,
+                                                                    }
                                                                 )
                                                             }
-                                                            className="ml-5 w-5 h-5"
-                                                        />
-                                                        <span className="text-medium ml-5">
-                                                            {option}
-                                                        </span>
-                                                    </label>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Work Experience Moderately Relevant */}
-                                <div className="mb-4">
-                                    <div>
-                                        <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                            {" "}
-                                            Moderately Relevant{" "}
-                                            <span className="font-medium text-xsmall">
-                                                {" "}
-                                                (Put roles in the same domain
-                                                with some transferable skills)
-                                            </span>
-                                        </label>
-
-                                        <div
-                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
-                                            onClick={() =>
-                                                setDropdownOpen({
-                                                    ...dropdownOpen,
-                                                    moderately:
-                                                        !dropdownOpen.moderately,
-                                                })
-                                            }
-                                        >
-                                            {/* Show selected options inside the input */}
-                                            {formData.criteria.workExperience
-                                                .moderatelyRelevant?.length >
-                                            0 ? (
-                                                formData.criteria.workExperience.moderatelyRelevant.map(
-                                                    (selected, index) => (
-                                                        <div
-                                                            key={index}
-                                                            className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
                                                         >
-                                                            <span className="text-sm">
-                                                                {selected}
-                                                            </span>
-                                                            <button
-                                                                className="ml-2 text-red-600 font-extrabold"
-                                                                onClick={(
-                                                                    e
-                                                                ) => {
-                                                                    e.stopPropagation();
-                                                                    handleSettingsRemoveSelectedOption(
-                                                                        "workExperience",
-                                                                        "moderatelyRelevant",
-                                                                        selected
-                                                                    );
-                                                                }}
-                                                            >
-                                                                X
-                                                            </button>
-                                                        </div>
-                                                    )
-                                                )
-                                            ) : (
-                                                <span className="text-fontcolor">
-                                                    Select Moderately Relevant
-                                                </span>
-                                            )}
-                                            <FaChevronDown
-                                                className={`ml-auto transform ${
-                                                    dropdownOpen.moderately
-                                                        ? "rotate-180"
-                                                        : "rotate-0"
-                                                } transition-transform`}
-                                            />
-                                        </div>
-
-                                        {dropdownOpen.moderately && (
-                                            <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                                                {/* Search & Add Custom Option */}
-                                                <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Search or add a new option..."
-                                                        value={
-                                                            searchTerm.moderately ||
-                                                            ""
-                                                        }
-                                                        onChange={(e) =>
-                                                            setSearchTerm({
-                                                                ...searchTerm,
-                                                                moderately:
-                                                                    e.target
-                                                                        .value,
-                                                            })
-                                                        }
-                                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                                                        onKeyDown={(e) => {
-                                                            if (
-                                                                e.key ===
-                                                                "Enter"
-                                                            ) {
-                                                                handleAddCustomOption(
-                                                                    "workExperience",
-                                                                    "moderatelyRelevant",
-                                                                    e.target
-                                                                        .value
-                                                                );
-                                                            }
-                                                        }}
-                                                    />
-                                                    {searchTerm.moderately &&
-                                                        !options.workExperience.includes(
-                                                            searchTerm.moderately
-                                                        ) && (
-                                                            <button
-                                                                className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
-                                                                onClick={() =>
-                                                                    handleAddCustomOption(
-                                                                        "workExperience",
-                                                                        "moderatelyRelevant",
-                                                                        searchTerm.moderately
+                                                            {/* Show selected options inside the input */}
+                                                            {formData.criteria
+                                                                .workExperience
+                                                                .highlyRelevant
+                                                                ?.length > 0 ? (
+                                                                formData.criteria.workExperience.highlyRelevant.map(
+                                                                    (
+                                                                        selected,
+                                                                        index
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
+                                                                        >
+                                                                            <span className="text-sm">
+                                                                                {
+                                                                                    selected
+                                                                                }
+                                                                            </span>
+                                                                            <button
+                                                                                className="ml-2 text-red-600 font-extrabold"
+                                                                                onClick={(
+                                                                                    e
+                                                                                ) => {
+                                                                                    e.stopPropagation();
+                                                                                    handleSettingsRemoveSelectedOption(
+                                                                                        "workExperience",
+                                                                                        "highlyRelevant",
+                                                                                        selected
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                X
+                                                                            </button>
+                                                                        </div>
                                                                     )
-                                                                }
-                                                            >
-                                                                Add "
-                                                                {
-                                                                    searchTerm.moderately
-                                                                }
-                                                                "
-                                                            </button>
+                                                                )
+                                                            ) : (
+                                                                <span className="text-fontcolor">
+                                                                    Select
+                                                                    Highly
+                                                                    Relevant
+                                                                </span>
+                                                            )}
+                                                            <FaChevronDown
+                                                                className={`ml-auto transform ${
+                                                                    dropdownOpen.highly
+                                                                        ? "rotate-180"
+                                                                        : "rotate-0"
+                                                                } transition-transform`}
+                                                            />
+                                                        </div>
+
+                                                        {dropdownOpen.highly && (
+                                                            <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                                                                {/* Search & Add Custom Option */}
+                                                                <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                                                                    <input
+                                                                        type="text"
+                                                                        placeholder="Search or add a new option..."
+                                                                        value={
+                                                                            searchTerm.highly ||
+                                                                            ""
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            setSearchTerm(
+                                                                                {
+                                                                                    ...searchTerm,
+                                                                                    highly: e
+                                                                                        .target
+                                                                                        .value,
+                                                                                }
+                                                                            )
+                                                                        }
+                                                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                                                        onKeyDown={(
+                                                                            e
+                                                                        ) => {
+                                                                            if (
+                                                                                e.key ===
+                                                                                "Enter"
+                                                                            ) {
+                                                                                handleAddCustomOption(
+                                                                                    "workExperience",
+                                                                                    "highlyRelevant",
+                                                                                    e
+                                                                                        .target
+                                                                                        .value
+                                                                                );
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                    {searchTerm.highly &&
+                                                                        !options.workExperience.includes(
+                                                                            searchTerm.highly
+                                                                        ) && (
+                                                                            <button
+                                                                                className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
+                                                                                onClick={() =>
+                                                                                    handleAddCustomOption(
+                                                                                        "workExperience",
+                                                                                        "highlyRelevant",
+                                                                                        searchTerm.highly
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                Add
+                                                                                "
+                                                                                {
+                                                                                    searchTerm.highly
+                                                                                }
+
+                                                                                "
+                                                                            </button>
+                                                                        )}
+                                                                </div>
+
+                                                                {/* Available Options List */}
+                                                                {getFilteredOptions(
+                                                                    "workExperience",
+                                                                    "highlyRelevant"
+                                                                ).map(
+                                                                    (
+                                                                        option,
+                                                                        index
+                                                                    ) => (
+                                                                        <label
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
+                                                                        >
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                value={
+                                                                                    option
+                                                                                }
+                                                                                checked={formData.criteria.workExperience.highlyRelevant.includes(
+                                                                                    option
+                                                                                )}
+                                                                                onChange={() =>
+                                                                                    handleSettingsMultiSelect(
+                                                                                        "workExperience",
+                                                                                        "highlyRelevant",
+                                                                                        option
+                                                                                    )
+                                                                                }
+                                                                                className="ml-5 w-5 h-5"
+                                                                            />
+                                                                            <span className="text-medium ml-5">
+                                                                                {
+                                                                                    option
+                                                                                }
+                                                                            </span>
+                                                                        </label>
+                                                                    )
+                                                                )}
+                                                            </div>
                                                         )}
+                                                    </div>
                                                 </div>
 
-                                                {/* Available Options List */}
-                                                {getFilteredOptions(
-                                                    "workExperience",
-                                                    "moderatelyRelevant"
-                                                ).map((option, index) => (
-                                                    <label
-                                                        key={index}
-                                                        className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
-                                                    >
-                                                        <input
-                                                            type="checkbox"
-                                                            value={option}
-                                                            checked={formData.criteria.workExperience.moderatelyRelevant.includes(
-                                                                option
-                                                            )}
-                                                            onChange={() =>
-                                                                handleSettingsMultiSelect(
-                                                                    "workExperience",
-                                                                    "moderatelyRelevant",
-                                                                    option
+                                                {/* Work Experience Moderately Relevant */}
+                                                <div className="mb-4">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-fontcolor mb-1">
+                                                            {" "}
+                                                            Moderately Relevant{" "}
+                                                            <span className="font-medium text-xsmall">
+                                                                {" "}
+                                                                (Put roles in
+                                                                the same domain
+                                                                with some
+                                                                transferable
+                                                                skills)
+                                                            </span>
+                                                        </label>
+
+                                                        <div
+                                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
+                                                            onClick={() =>
+                                                                setDropdownOpen(
+                                                                    {
+                                                                        ...dropdownOpen,
+                                                                        moderately:
+                                                                            !dropdownOpen.moderately,
+                                                                    }
                                                                 )
                                                             }
-                                                            className="ml-5 w-5 h-5"
-                                                        />
-                                                        <span className="text-medium ml-5">
-                                                            {option}
-                                                        </span>
-                                                    </label>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                                                        >
+                                                            {/* Show selected options inside the input */}
+                                                            {formData.criteria
+                                                                .workExperience
+                                                                .moderatelyRelevant
+                                                                ?.length > 0 ? (
+                                                                formData.criteria.workExperience.moderatelyRelevant.map(
+                                                                    (
+                                                                        selected,
+                                                                        index
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
+                                                                        >
+                                                                            <span className="text-sm">
+                                                                                {
+                                                                                    selected
+                                                                                }
+                                                                            </span>
+                                                                            <button
+                                                                                className="ml-2 text-red-600 font-extrabold"
+                                                                                onClick={(
+                                                                                    e
+                                                                                ) => {
+                                                                                    e.stopPropagation();
+                                                                                    handleSettingsRemoveSelectedOption(
+                                                                                        "workExperience",
+                                                                                        "moderatelyRelevant",
+                                                                                        selected
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                X
+                                                                            </button>
+                                                                        </div>
+                                                                    )
+                                                                )
+                                                            ) : (
+                                                                <span className="text-fontcolor">
+                                                                    Select
+                                                                    Moderately
+                                                                    Relevant
+                                                                </span>
+                                                            )}
+                                                            <FaChevronDown
+                                                                className={`ml-auto transform ${
+                                                                    dropdownOpen.moderately
+                                                                        ? "rotate-180"
+                                                                        : "rotate-0"
+                                                                } transition-transform`}
+                                                            />
+                                                        </div>
 
-                                {/* Skills Section */}
-                                <div className="mb-6">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div className="flex items-center">
-                                            {/* <input
+                                                        {dropdownOpen.moderately && (
+                                                            <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                                                                {/* Search & Add Custom Option */}
+                                                                <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                                                                    <input
+                                                                        type="text"
+                                                                        placeholder="Search or add a new option..."
+                                                                        value={
+                                                                            searchTerm.moderately ||
+                                                                            ""
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            setSearchTerm(
+                                                                                {
+                                                                                    ...searchTerm,
+                                                                                    moderately:
+                                                                                        e
+                                                                                            .target
+                                                                                            .value,
+                                                                                }
+                                                                            )
+                                                                        }
+                                                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                                                        onKeyDown={(
+                                                                            e
+                                                                        ) => {
+                                                                            if (
+                                                                                e.key ===
+                                                                                "Enter"
+                                                                            ) {
+                                                                                handleAddCustomOption(
+                                                                                    "workExperience",
+                                                                                    "moderatelyRelevant",
+                                                                                    e
+                                                                                        .target
+                                                                                        .value
+                                                                                );
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                    {searchTerm.moderately &&
+                                                                        !options.workExperience.includes(
+                                                                            searchTerm.moderately
+                                                                        ) && (
+                                                                            <button
+                                                                                className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
+                                                                                onClick={() =>
+                                                                                    handleAddCustomOption(
+                                                                                        "workExperience",
+                                                                                        "moderatelyRelevant",
+                                                                                        searchTerm.moderately
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                Add
+                                                                                "
+                                                                                {
+                                                                                    searchTerm.moderately
+                                                                                }
+
+                                                                                "
+                                                                            </button>
+                                                                        )}
+                                                                </div>
+
+                                                                {/* Available Options List */}
+                                                                {getFilteredOptions(
+                                                                    "workExperience",
+                                                                    "moderatelyRelevant"
+                                                                ).map(
+                                                                    (
+                                                                        option,
+                                                                        index
+                                                                    ) => (
+                                                                        <label
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
+                                                                        >
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                value={
+                                                                                    option
+                                                                                }
+                                                                                checked={formData.criteria.workExperience.moderatelyRelevant.includes(
+                                                                                    option
+                                                                                )}
+                                                                                onChange={() =>
+                                                                                    handleSettingsMultiSelect(
+                                                                                        "workExperience",
+                                                                                        "moderatelyRelevant",
+                                                                                        option
+                                                                                    )
+                                                                                }
+                                                                                className="ml-5 w-5 h-5"
+                                                                            />
+                                                                            <span className="text-medium ml-5">
+                                                                                {
+                                                                                    option
+                                                                                }
+                                                                            </span>
+                                                                        </label>
+                                                                    )
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Skills Section */}
+                                                <div className="mb-6">
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <div className="flex items-center">
+                                                            {/* <input
                                                 type="checkbox"
                                                 className="w-4 h-4 border border-gray-300 rounded text-fontcolor"
                                                 checked={
@@ -1895,1367 +1848,1691 @@ export default function EditJobHiring() {
                                                     )
                                                 } // Toggle the checkbox state
                                             /> */}
-                                            <label className="ml-2 block text-sm font-semibold text-primary">
-                                                Skills
-                                            </label>
-                                        </div>
-                                        <div className="flex items-center">
-                                            <span className="text-sm font-semibold text-fontcolor mr-2">
-                                                Weight
-                                            </span>
-                                            <input
-                                                type="text"
-                                                value={
-                                                    formData.criteria.skills
-                                                        .weight || ""
-                                                }
-                                                onChange={(e) => {
-                                                    const value =
-                                                        e.target.value;
-                                                    if (
-                                                        /^\d*$/.test(value) &&
-                                                        Number(value) <= 100
-                                                    ) {
-                                                        handleCriteriaChange(
-                                                            "skills",
-                                                            "weight",
-                                                            value
-                                                        );
-                                                    }
-                                                }}
-                                                className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-sm text-fontcolor text-center"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Primary Skills Multi-Select */}
-                                    <div className="mb-4">
-                                        <div>
-                                            <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                Primary Skills{" "}
-                                                <span className="font-medium text-xsmall">
-                                                    (Put roles with the most
-                                                    relevant skills and
-                                                    experience){" "}
-                                                </span>
-                                            </label>
-
-                                            <div
-                                                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
-                                                onClick={() =>
-                                                    setDropdownOpen({
-                                                        ...dropdownOpen,
-                                                        primary:
-                                                            !dropdownOpen.primary,
-                                                    })
-                                                }
-                                            >
-                                                {/* Show selected options inside the input */}
-                                                {formData.criteria.skills
-                                                    .primarySkills?.length >
-                                                0 ? (
-                                                    formData.criteria.skills.primarySkills.map(
-                                                        (selected, index) => (
-                                                            <div
-                                                                key={index}
-                                                                className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
-                                                            >
-                                                                <span className="text-sm">
-                                                                    {selected}
-                                                                </span>
-                                                                <button
-                                                                    className="ml-2 text-red-600 font-extrabold"
-                                                                    onClick={(
-                                                                        e
-                                                                    ) => {
-                                                                        e.stopPropagation();
-                                                                        handleSettingsRemoveSelectedOption(
-                                                                            "skills",
-                                                                            "primarySkills",
-                                                                            selected
-                                                                        );
-                                                                    }}
-                                                                >
-                                                                    X
-                                                                </button>
-                                                            </div>
-                                                        )
-                                                    )
-                                                ) : (
-                                                    <span className="text-fontcolor">
-                                                        Select Primary Skills
-                                                    </span>
-                                                )}
-                                                <FaChevronDown
-                                                    className={`ml-auto transform ${
-                                                        dropdownOpen.primary
-                                                            ? "rotate-180"
-                                                            : "rotate-0"
-                                                    } transition-transform`}
-                                                />
-                                            </div>
-
-                                            {dropdownOpen.primary && (
-                                                <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                                                    {/* Search & Add Custom Option */}
-                                                    <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Search or add a new option..."
-                                                            value={
-                                                                searchTerm.primary ||
-                                                                ""
-                                                            }
-                                                            onChange={(e) =>
-                                                                setSearchTerm({
-                                                                    ...searchTerm,
-                                                                    primary:
-                                                                        e.target
-                                                                            .value,
-                                                                })
-                                                            }
-                                                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                                                            onKeyDown={(e) => {
-                                                                if (
-                                                                    e.key ===
-                                                                    "Enter"
-                                                                ) {
-                                                                    handleAddCustomOption(
-                                                                        "skills",
-                                                                        "primarySkills",
-                                                                        e.target
-                                                                            .value
-                                                                    );
+                                                            <label className="ml-2 block text-sm font-semibold text-primary">
+                                                                Skills
+                                                            </label>
+                                                        </div>
+                                                        <div className="flex items-center">
+                                                            <span className="text-sm font-semibold text-fontcolor mr-2">
+                                                                Weight
+                                                            </span>
+                                                            <input
+                                                                type="text"
+                                                                value={
+                                                                    formData
+                                                                        .criteria
+                                                                        .skills
+                                                                        .weight ||
+                                                                    ""
                                                                 }
-                                                            }}
-                                                        />
-                                                        {searchTerm.primary &&
-                                                            !options.skills.includes(
-                                                                searchTerm.primary
-                                                            ) && (
-                                                                <button
-                                                                    className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
-                                                                    onClick={() =>
-                                                                        handleAddCustomOption(
+                                                                onChange={(
+                                                                    e
+                                                                ) => {
+                                                                    const value =
+                                                                        e.target
+                                                                            .value;
+                                                                    if (
+                                                                        /^\d*$/.test(
+                                                                            value
+                                                                        ) &&
+                                                                        Number(
+                                                                            value
+                                                                        ) <= 100
+                                                                    ) {
+                                                                        handleCriteriaChange(
                                                                             "skills",
-                                                                            "primarySkills",
-                                                                            searchTerm.primary
-                                                                        )
+                                                                            "weight",
+                                                                            value
+                                                                        );
                                                                     }
-                                                                >
-                                                                    Add "
-                                                                    {
-                                                                        searchTerm.primary
-                                                                    }
-                                                                    "
-                                                                </button>
-                                                            )}
+                                                                }}
+                                                                className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-sm text-fontcolor text-center"
+                                                            />
+                                                        </div>
                                                     </div>
 
-                                                    {/* Available Options List */}
-                                                    {getFilteredOptions(
-                                                        "skills",
-                                                        "primarySkills"
-                                                    ).map((option, index) => (
-                                                        <label
-                                                            key={index}
-                                                            className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
-                                                        >
-                                                            <input
-                                                                type="checkbox"
-                                                                value={option}
-                                                                checked={formData.criteria.skills.primarySkills.includes(
-                                                                    option
-                                                                )}
-                                                                onChange={() =>
-                                                                    handleSettingsMultiSelect(
-                                                                        "skills",
-                                                                        "primarySkills",
-                                                                        option
+                                                    {/* Primary Skills Multi-Select */}
+                                                    <div className="mb-4">
+                                                        <div>
+                                                            <label className="block text-sm font-semibold text-fontcolor mb-1">
+                                                                Primary Skills{" "}
+                                                                <span className="font-medium text-xsmall">
+                                                                    (Put roles
+                                                                    with the
+                                                                    most
+                                                                    relevant
+                                                                    skills and
+                                                                    experience){" "}
+                                                                </span>
+                                                            </label>
+
+                                                            <div
+                                                                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
+                                                                onClick={() =>
+                                                                    setDropdownOpen(
+                                                                        {
+                                                                            ...dropdownOpen,
+                                                                            primary:
+                                                                                !dropdownOpen.primary,
+                                                                        }
                                                                     )
                                                                 }
-                                                                className="ml-5 w-5 h-5"
-                                                            />
-                                                            <span className="text-medium ml-5">
-                                                                {option}
-                                                            </span>
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Secondary Skills Multi-Select */}
-                                    <div className="mb-4">
-                                        <div>
-                                            <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                Secondary Skills
-                                                <span className="font-medium text-xsmall">
-                                                    {" "}
-                                                    (Put important skills that
-                                                    are frequently used but not
-                                                    absolutely essential){" "}
-                                                </span>
-                                            </label>
-
-                                            <div
-                                                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
-                                                onClick={() =>
-                                                    setDropdownOpen({
-                                                        ...dropdownOpen,
-                                                        secondary:
-                                                            !dropdownOpen.secondary,
-                                                    })
-                                                }
-                                            >
-                                                {/* Show selected options inside the input */}
-                                                {formData.criteria.skills
-                                                    .secondarySkills?.length >
-                                                0 ? (
-                                                    formData.criteria.skills.secondarySkills.map(
-                                                        (selected, index) => (
-                                                            <div
-                                                                key={index}
-                                                                className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
                                                             >
-                                                                <span className="text-sm">
-                                                                    {selected}
-                                                                </span>
-                                                                <button
-                                                                    className="ml-2 text-red-600 font-extrabold"
-                                                                    onClick={(
-                                                                        e
-                                                                    ) => {
-                                                                        e.stopPropagation();
-                                                                        handleSettingsRemoveSelectedOption(
-                                                                            "skills",
-                                                                            "secondarySkills",
-                                                                            selected
-                                                                        );
-                                                                    }}
-                                                                >
-                                                                    X
-                                                                </button>
-                                                            </div>
-                                                        )
-                                                    )
-                                                ) : (
-                                                    <span className="text-fontcolor">
-                                                        Select Secondary Skills
-                                                    </span>
-                                                )}
-                                                <FaChevronDown
-                                                    className={`ml-auto transform ${
-                                                        dropdownOpen.secondary
-                                                            ? "rotate-180"
-                                                            : "rotate-0"
-                                                    } transition-transform`}
-                                                />
-                                            </div>
-
-                                            {dropdownOpen.secondary && (
-                                                <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                                                    {/* Search & Add Custom Option */}
-                                                    <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Search or add a new option..."
-                                                            value={
-                                                                searchTerm.secondary ||
-                                                                ""
-                                                            }
-                                                            onChange={(e) =>
-                                                                setSearchTerm({
-                                                                    ...searchTerm,
-                                                                    secondary:
-                                                                        e.target
-                                                                            .value,
-                                                                })
-                                                            }
-                                                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                                                            onKeyDown={(e) => {
-                                                                if (
-                                                                    e.key ===
-                                                                    "Enter"
-                                                                ) {
-                                                                    handleAddCustomOption(
-                                                                        "skills",
-                                                                        "secondarySkills",
-                                                                        e.target
-                                                                            .value
-                                                                    );
-                                                                }
-                                                            }}
-                                                        />
-                                                        {searchTerm.secondary &&
-                                                            !options.skills.includes(
-                                                                searchTerm.secondary
-                                                            ) && (
-                                                                <button
-                                                                    className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
-                                                                    onClick={() =>
-                                                                        handleAddCustomOption(
-                                                                            "skills",
-                                                                            "secondarySkills",
-                                                                            searchTerm.secondary
+                                                                {/* Show selected options inside the input */}
+                                                                {formData
+                                                                    .criteria
+                                                                    .skills
+                                                                    .primarySkills
+                                                                    ?.length >
+                                                                0 ? (
+                                                                    formData.criteria.skills.primarySkills.map(
+                                                                        (
+                                                                            selected,
+                                                                            index
+                                                                        ) => (
+                                                                            <div
+                                                                                key={
+                                                                                    index
+                                                                                }
+                                                                                className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
+                                                                            >
+                                                                                <span className="text-sm">
+                                                                                    {
+                                                                                        selected
+                                                                                    }
+                                                                                </span>
+                                                                                <button
+                                                                                    className="ml-2 text-red-600 font-extrabold"
+                                                                                    onClick={(
+                                                                                        e
+                                                                                    ) => {
+                                                                                        e.stopPropagation();
+                                                                                        handleSettingsRemoveSelectedOption(
+                                                                                            "skills",
+                                                                                            "primarySkills",
+                                                                                            selected
+                                                                                        );
+                                                                                    }}
+                                                                                >
+                                                                                    X
+                                                                                </button>
+                                                                            </div>
                                                                         )
-                                                                    }
-                                                                >
-                                                                    Add "
-                                                                    {
-                                                                        searchTerm.secondary
-                                                                    }
-                                                                    "
-                                                                </button>
+                                                                    )
+                                                                ) : (
+                                                                    <span className="text-fontcolor">
+                                                                        Select
+                                                                        Primary
+                                                                        Skills
+                                                                    </span>
+                                                                )}
+                                                                <FaChevronDown
+                                                                    className={`ml-auto transform ${
+                                                                        dropdownOpen.primary
+                                                                            ? "rotate-180"
+                                                                            : "rotate-0"
+                                                                    } transition-transform`}
+                                                                />
+                                                            </div>
+
+                                                            {dropdownOpen.primary && (
+                                                                <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                                                                    {/* Search & Add Custom Option */}
+                                                                    <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                                                                        <input
+                                                                            type="text"
+                                                                            placeholder="Search or add a new option..."
+                                                                            value={
+                                                                                searchTerm.primary ||
+                                                                                ""
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                setSearchTerm(
+                                                                                    {
+                                                                                        ...searchTerm,
+                                                                                        primary:
+                                                                                            e
+                                                                                                .target
+                                                                                                .value,
+                                                                                    }
+                                                                                )
+                                                                            }
+                                                                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                                                            onKeyDown={(
+                                                                                e
+                                                                            ) => {
+                                                                                if (
+                                                                                    e.key ===
+                                                                                    "Enter"
+                                                                                ) {
+                                                                                    handleAddCustomOption(
+                                                                                        "skills",
+                                                                                        "primarySkills",
+                                                                                        e
+                                                                                            .target
+                                                                                            .value
+                                                                                    );
+                                                                                }
+                                                                            }}
+                                                                        />
+                                                                        {searchTerm.primary &&
+                                                                            !options.skills.includes(
+                                                                                searchTerm.primary
+                                                                            ) && (
+                                                                                <button
+                                                                                    className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
+                                                                                    onClick={() =>
+                                                                                        handleAddCustomOption(
+                                                                                            "skills",
+                                                                                            "primarySkills",
+                                                                                            searchTerm.primary
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    Add
+                                                                                    "
+                                                                                    {
+                                                                                        searchTerm.primary
+                                                                                    }
+
+                                                                                    "
+                                                                                </button>
+                                                                            )}
+                                                                    </div>
+
+                                                                    {/* Available Options List */}
+                                                                    {getFilteredOptions(
+                                                                        "skills",
+                                                                        "primarySkills"
+                                                                    ).map(
+                                                                        (
+                                                                            option,
+                                                                            index
+                                                                        ) => (
+                                                                            <label
+                                                                                key={
+                                                                                    index
+                                                                                }
+                                                                                className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
+                                                                            >
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    value={
+                                                                                        option
+                                                                                    }
+                                                                                    checked={formData.criteria.skills.primarySkills.includes(
+                                                                                        option
+                                                                                    )}
+                                                                                    onChange={() =>
+                                                                                        handleSettingsMultiSelect(
+                                                                                            "skills",
+                                                                                            "primarySkills",
+                                                                                            option
+                                                                                        )
+                                                                                    }
+                                                                                    className="ml-5 w-5 h-5"
+                                                                                />
+                                                                                <span className="text-medium ml-5">
+                                                                                    {
+                                                                                        option
+                                                                                    }
+                                                                                </span>
+                                                                            </label>
+                                                                        )
+                                                                    )}
+                                                                </div>
                                                             )}
+                                                        </div>
                                                     </div>
 
-                                                    {/* Available Options List */}
-                                                    {getFilteredOptions(
-                                                        "skills",
-                                                        "secondarySkills"
-                                                    ).map((option, index) => (
-                                                        <label
-                                                            key={index}
-                                                            className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
-                                                        >
-                                                            <input
-                                                                type="checkbox"
-                                                                value={option}
-                                                                checked={formData.criteria.skills.secondarySkills.includes(
-                                                                    option
-                                                                )}
-                                                                onChange={() =>
-                                                                    handleSettingsMultiSelect(
-                                                                        "skills",
-                                                                        "secondarySkills",
-                                                                        option
+                                                    {/* Secondary Skills Multi-Select */}
+                                                    <div className="mb-4">
+                                                        <div>
+                                                            <label className="block text-sm font-semibold text-fontcolor mb-1">
+                                                                Secondary Skills
+                                                                <span className="font-medium text-xsmall">
+                                                                    {" "}
+                                                                    (Put
+                                                                    important
+                                                                    skills that
+                                                                    are
+                                                                    frequently
+                                                                    used but not
+                                                                    absolutely
+                                                                    essential){" "}
+                                                                </span>
+                                                            </label>
+
+                                                            <div
+                                                                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
+                                                                onClick={() =>
+                                                                    setDropdownOpen(
+                                                                        {
+                                                                            ...dropdownOpen,
+                                                                            secondary:
+                                                                                !dropdownOpen.secondary,
+                                                                        }
                                                                     )
                                                                 }
-                                                                className="ml-5 w-5 h-5"
-                                                            />
-                                                            <span className="text-medium ml-5">
-                                                                {option}
-                                                            </span>
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Additional Skills Multi-Select */}
-                                    <div className="mb-4">
-                                        <div>
-                                            <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                Additional Skills{" "}
-                                                <span className="font-medium text-xsmall">
-                                                    {" "}
-                                                    (nice-to-have skills that
-                                                    would give a candidate an
-                                                    edge but aren't necessary
-                                                    for the core job functions)
-                                                </span>
-                                            </label>
-
-                                            <div
-                                                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
-                                                onClick={() =>
-                                                    setDropdownOpen({
-                                                        ...dropdownOpen,
-                                                        additional:
-                                                            !dropdownOpen.additional,
-                                                    })
-                                                }
-                                            >
-                                                {/* Show selected options inside the input */}
-                                                {formData.criteria.skills
-                                                    .additionalSkills?.length >
-                                                0 ? (
-                                                    formData.criteria.skills.additionalSkills.map(
-                                                        (selected, index) => (
-                                                            <div
-                                                                key={index}
-                                                                className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
                                                             >
-                                                                <span className="text-sm">
-                                                                    {selected}
-                                                                </span>
-                                                                <button
-                                                                    className="ml-2 text-red-600 font-extrabold"
-                                                                    onClick={(
-                                                                        e
-                                                                    ) => {
-                                                                        e.stopPropagation();
-                                                                        handleSettingsRemoveSelectedOption(
-                                                                            "skills",
-                                                                            "additionalSkills",
-                                                                            selected
-                                                                        );
-                                                                    }}
-                                                                >
-                                                                    X
-                                                                </button>
-                                                            </div>
-                                                        )
-                                                    )
-                                                ) : (
-                                                    <span className="text-fontcolor">
-                                                        Select Additional Skills
-                                                    </span>
-                                                )}
-                                                <FaChevronDown
-                                                    className={`ml-auto transform ${
-                                                        dropdownOpen.additional
-                                                            ? "rotate-180"
-                                                            : "rotate-0"
-                                                    } transition-transform`}
-                                                />
-                                            </div>
-
-                                            {dropdownOpen.additional && (
-                                                <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                                                    {/* Search & Add Custom Option */}
-                                                    <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Search or add a new option..."
-                                                            value={
-                                                                searchTerm.additional ||
-                                                                ""
-                                                            }
-                                                            onChange={(e) =>
-                                                                setSearchTerm({
-                                                                    ...searchTerm,
-                                                                    additional:
-                                                                        e.target
-                                                                            .value,
-                                                                })
-                                                            }
-                                                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                                                            onKeyDown={(e) => {
-                                                                if (
-                                                                    e.key ===
-                                                                    "Enter"
-                                                                ) {
-                                                                    handleAddCustomOption(
-                                                                        "skills",
-                                                                        "additionalSkills",
-                                                                        e.target
-                                                                            .value
-                                                                    );
-                                                                }
-                                                            }}
-                                                        />
-                                                        {searchTerm.additional &&
-                                                            !options.skills.includes(
-                                                                searchTerm.additional
-                                                            ) && (
-                                                                <button
-                                                                    className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
-                                                                    onClick={() =>
-                                                                        handleAddCustomOption(
-                                                                            "skills",
-                                                                            "additionalSkills",
-                                                                            searchTerm.additional
+                                                                {/* Show selected options inside the input */}
+                                                                {formData
+                                                                    .criteria
+                                                                    .skills
+                                                                    .secondarySkills
+                                                                    ?.length >
+                                                                0 ? (
+                                                                    formData.criteria.skills.secondarySkills.map(
+                                                                        (
+                                                                            selected,
+                                                                            index
+                                                                        ) => (
+                                                                            <div
+                                                                                key={
+                                                                                    index
+                                                                                }
+                                                                                className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
+                                                                            >
+                                                                                <span className="text-sm">
+                                                                                    {
+                                                                                        selected
+                                                                                    }
+                                                                                </span>
+                                                                                <button
+                                                                                    className="ml-2 text-red-600 font-extrabold"
+                                                                                    onClick={(
+                                                                                        e
+                                                                                    ) => {
+                                                                                        e.stopPropagation();
+                                                                                        handleSettingsRemoveSelectedOption(
+                                                                                            "skills",
+                                                                                            "secondarySkills",
+                                                                                            selected
+                                                                                        );
+                                                                                    }}
+                                                                                >
+                                                                                    X
+                                                                                </button>
+                                                                            </div>
                                                                         )
-                                                                    }
-                                                                >
-                                                                    Add "
-                                                                    {
-                                                                        searchTerm.additional
-                                                                    }
-                                                                    "
-                                                                </button>
+                                                                    )
+                                                                ) : (
+                                                                    <span className="text-fontcolor">
+                                                                        Select
+                                                                        Secondary
+                                                                        Skills
+                                                                    </span>
+                                                                )}
+                                                                <FaChevronDown
+                                                                    className={`ml-auto transform ${
+                                                                        dropdownOpen.secondary
+                                                                            ? "rotate-180"
+                                                                            : "rotate-0"
+                                                                    } transition-transform`}
+                                                                />
+                                                            </div>
+
+                                                            {dropdownOpen.secondary && (
+                                                                <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                                                                    {/* Search & Add Custom Option */}
+                                                                    <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                                                                        <input
+                                                                            type="text"
+                                                                            placeholder="Search or add a new option..."
+                                                                            value={
+                                                                                searchTerm.secondary ||
+                                                                                ""
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                setSearchTerm(
+                                                                                    {
+                                                                                        ...searchTerm,
+                                                                                        secondary:
+                                                                                            e
+                                                                                                .target
+                                                                                                .value,
+                                                                                    }
+                                                                                )
+                                                                            }
+                                                                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                                                            onKeyDown={(
+                                                                                e
+                                                                            ) => {
+                                                                                if (
+                                                                                    e.key ===
+                                                                                    "Enter"
+                                                                                ) {
+                                                                                    handleAddCustomOption(
+                                                                                        "skills",
+                                                                                        "secondarySkills",
+                                                                                        e
+                                                                                            .target
+                                                                                            .value
+                                                                                    );
+                                                                                }
+                                                                            }}
+                                                                        />
+                                                                        {searchTerm.secondary &&
+                                                                            !options.skills.includes(
+                                                                                searchTerm.secondary
+                                                                            ) && (
+                                                                                <button
+                                                                                    className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
+                                                                                    onClick={() =>
+                                                                                        handleAddCustomOption(
+                                                                                            "skills",
+                                                                                            "secondarySkills",
+                                                                                            searchTerm.secondary
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    Add
+                                                                                    "
+                                                                                    {
+                                                                                        searchTerm.secondary
+                                                                                    }
+
+                                                                                    "
+                                                                                </button>
+                                                                            )}
+                                                                    </div>
+
+                                                                    {/* Available Options List */}
+                                                                    {getFilteredOptions(
+                                                                        "skills",
+                                                                        "secondarySkills"
+                                                                    ).map(
+                                                                        (
+                                                                            option,
+                                                                            index
+                                                                        ) => (
+                                                                            <label
+                                                                                key={
+                                                                                    index
+                                                                                }
+                                                                                className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
+                                                                            >
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    value={
+                                                                                        option
+                                                                                    }
+                                                                                    checked={formData.criteria.skills.secondarySkills.includes(
+                                                                                        option
+                                                                                    )}
+                                                                                    onChange={() =>
+                                                                                        handleSettingsMultiSelect(
+                                                                                            "skills",
+                                                                                            "secondarySkills",
+                                                                                            option
+                                                                                        )
+                                                                                    }
+                                                                                    className="ml-5 w-5 h-5"
+                                                                                />
+                                                                                <span className="text-medium ml-5">
+                                                                                    {
+                                                                                        option
+                                                                                    }
+                                                                                </span>
+                                                                            </label>
+                                                                        )
+                                                                    )}
+                                                                </div>
                                                             )}
+                                                        </div>
                                                     </div>
 
-                                                    {/* Available Options List */}
-                                                    {getFilteredOptions(
-                                                        "skills",
-                                                        "additionalSkills"
-                                                    ).map((option, index) => (
-                                                        <label
-                                                            key={index}
-                                                            className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
-                                                        >
-                                                            <input
-                                                                type="checkbox"
-                                                                value={option}
-                                                                checked={formData.criteria.skills.additionalSkills.includes(
-                                                                    option
-                                                                )}
-                                                                onChange={() =>
-                                                                    handleSettingsMultiSelect(
-                                                                        "skills",
-                                                                        "additionalSkills",
-                                                                        option
+                                                    {/* Additional Skills Multi-Select */}
+                                                    <div className="mb-4">
+                                                        <div>
+                                                            <label className="block text-sm font-semibold text-fontcolor mb-1">
+                                                                Additional
+                                                                Skills{" "}
+                                                                <span className="font-medium text-xsmall">
+                                                                    {" "}
+                                                                    (nice-to-have
+                                                                    skills that
+                                                                    would give a
+                                                                    candidate an
+                                                                    edge but
+                                                                    aren't
+                                                                    necessary
+                                                                    for the core
+                                                                    job
+                                                                    functions)
+                                                                </span>
+                                                            </label>
+
+                                                            <div
+                                                                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
+                                                                onClick={() =>
+                                                                    setDropdownOpen(
+                                                                        {
+                                                                            ...dropdownOpen,
+                                                                            additional:
+                                                                                !dropdownOpen.additional,
+                                                                        }
                                                                     )
                                                                 }
-                                                                className="ml-5 w-5 h-5"
-                                                            />
-                                                            <span className="text-medium ml-5">
-                                                                {option}
-                                                            </span>
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
+                                                            >
+                                                                {/* Show selected options inside the input */}
+                                                                {formData
+                                                                    .criteria
+                                                                    .skills
+                                                                    .additionalSkills
+                                                                    ?.length >
+                                                                0 ? (
+                                                                    formData.criteria.skills.additionalSkills.map(
+                                                                        (
+                                                                            selected,
+                                                                            index
+                                                                        ) => (
+                                                                            <div
+                                                                                key={
+                                                                                    index
+                                                                                }
+                                                                                className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
+                                                                            >
+                                                                                <span className="text-sm">
+                                                                                    {
+                                                                                        selected
+                                                                                    }
+                                                                                </span>
+                                                                                <button
+                                                                                    className="ml-2 text-red-600 font-extrabold"
+                                                                                    onClick={(
+                                                                                        e
+                                                                                    ) => {
+                                                                                        e.stopPropagation();
+                                                                                        handleSettingsRemoveSelectedOption(
+                                                                                            "skills",
+                                                                                            "additionalSkills",
+                                                                                            selected
+                                                                                        );
+                                                                                    }}
+                                                                                >
+                                                                                    X
+                                                                                </button>
+                                                                            </div>
+                                                                        )
+                                                                    )
+                                                                ) : (
+                                                                    <span className="text-fontcolor">
+                                                                        Select
+                                                                        Additional
+                                                                        Skills
+                                                                    </span>
+                                                                )}
+                                                                <FaChevronDown
+                                                                    className={`ml-auto transform ${
+                                                                        dropdownOpen.additional
+                                                                            ? "rotate-180"
+                                                                            : "rotate-0"
+                                                                    } transition-transform`}
+                                                                />
+                                                            </div>
 
-                                    {/* Education Multi-Select */}
-                                    <div className="mb-6">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div className="flex items-center">
-                                                {/* <input
+                                                            {dropdownOpen.additional && (
+                                                                <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                                                                    {/* Search & Add Custom Option */}
+                                                                    <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                                                                        <input
+                                                                            type="text"
+                                                                            placeholder="Search or add a new option..."
+                                                                            value={
+                                                                                searchTerm.additional ||
+                                                                                ""
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                setSearchTerm(
+                                                                                    {
+                                                                                        ...searchTerm,
+                                                                                        additional:
+                                                                                            e
+                                                                                                .target
+                                                                                                .value,
+                                                                                    }
+                                                                                )
+                                                                            }
+                                                                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                                                            onKeyDown={(
+                                                                                e
+                                                                            ) => {
+                                                                                if (
+                                                                                    e.key ===
+                                                                                    "Enter"
+                                                                                ) {
+                                                                                    handleAddCustomOption(
+                                                                                        "skills",
+                                                                                        "additionalSkills",
+                                                                                        e
+                                                                                            .target
+                                                                                            .value
+                                                                                    );
+                                                                                }
+                                                                            }}
+                                                                        />
+                                                                        {searchTerm.additional &&
+                                                                            !options.skills.includes(
+                                                                                searchTerm.additional
+                                                                            ) && (
+                                                                                <button
+                                                                                    className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
+                                                                                    onClick={() =>
+                                                                                        handleAddCustomOption(
+                                                                                            "skills",
+                                                                                            "additionalSkills",
+                                                                                            searchTerm.additional
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    Add
+                                                                                    "
+                                                                                    {
+                                                                                        searchTerm.additional
+                                                                                    }
+
+                                                                                    "
+                                                                                </button>
+                                                                            )}
+                                                                    </div>
+
+                                                                    {/* Available Options List */}
+                                                                    {getFilteredOptions(
+                                                                        "skills",
+                                                                        "additionalSkills"
+                                                                    ).map(
+                                                                        (
+                                                                            option,
+                                                                            index
+                                                                        ) => (
+                                                                            <label
+                                                                                key={
+                                                                                    index
+                                                                                }
+                                                                                className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
+                                                                            >
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    value={
+                                                                                        option
+                                                                                    }
+                                                                                    checked={formData.criteria.skills.additionalSkills.includes(
+                                                                                        option
+                                                                                    )}
+                                                                                    onChange={() =>
+                                                                                        handleSettingsMultiSelect(
+                                                                                            "skills",
+                                                                                            "additionalSkills",
+                                                                                            option
+                                                                                        )
+                                                                                    }
+                                                                                    className="ml-5 w-5 h-5"
+                                                                                />
+                                                                                <span className="text-medium ml-5">
+                                                                                    {
+                                                                                        option
+                                                                                    }
+                                                                                </span>
+                                                                            </label>
+                                                                        )
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Education Multi-Select */}
+                                                    <div className="mb-6">
+                                                        <div className="flex items-center justify-between mb-4">
+                                                            <div className="flex items-center">
+                                                                {/* <input
                                                     type="checkbox"
                                                     className="w-4 h-4 border border-gray-300 rounded text-fontcolor"
                                                 /> */}
-                                                <label className="ml-2 block text-sm font-semibold text-primary">
-                                                    Education
-                                                </label>
-                                            </div>
-                                            <div className="flex items-center">
-                                                <span className="text-sm font-semibold text-fontcolor mr-2">
-                                                    Weight
-                                                </span>
-                                                <input
-                                                    type="text"
-                                                    value={
-                                                        formData.criteria
-                                                            .education.weight ||
-                                                        ""
-                                                    }
-                                                    onChange={(e) => {
-                                                        const value =
-                                                            e.target.value;
-                                                        // Allow only numbers and validate the range
-                                                        if (
-                                                            /^\d*$/.test(
-                                                                value
-                                                            ) &&
-                                                            Number(value) <= 100
-                                                        ) {
-                                                            handleCriteriaChange(
-                                                                "education",
-                                                                "weight",
-                                                                value
-                                                            );
-                                                        }
-                                                    }}
-                                                    className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-sm text-black text-center"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* 1st Choice Field of Study */}
-                                        <div className="mb-4">
-                                            <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                1st Choice Field of Study{" "}
-                                                <span className="font-medium text-xsmall">
-                                                    (Put the most directly
-                                                    relevant fields of study for
-                                                    the position)
-                                                </span>
-                                            </label>
-
-                                            <div
-                                                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
-                                                onClick={() =>
-                                                    setDropdownOpen({
-                                                        ...dropdownOpen,
-                                                        firstChoice:
-                                                            !dropdownOpen.firstChoice,
-                                                    })
-                                                }
-                                            >
-                                                <span>
-                                                    {formData.criteria.education
-                                                        .firstChoice ||
-                                                        "Select 1st Choice Field of Study"}
-                                                </span>
-                                                <FaChevronDown
-                                                    className={`ml-2 transform ${
-                                                        dropdownOpen.firstChoice
-                                                            ? "rotate-180"
-                                                            : "rotate-0"
-                                                    } transition-transform`}
-                                                />
-                                            </div>
-
-                                            {dropdownOpen.firstChoice && (
-                                                <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                                                    <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Search options..."
-                                                            value={
-                                                                searchTerm.firstChoice ||
-                                                                ""
-                                                            }
-                                                            onChange={(e) =>
-                                                                setSearchTerm({
-                                                                    ...searchTerm,
-                                                                    firstChoice:
-                                                                        e.target
-                                                                            .value,
-                                                                })
-                                                            }
-                                                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                                                        />
-                                                    </div>
-
-                                                    {getFilteredOptions(
-                                                        "education",
-                                                        "firstChoice"
-                                                    ).map((option, index) => (
-                                                        <label
-                                                            key={index}
-                                                            className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
-                                                        >
-                                                            <input
-                                                                type="radio"
-                                                                value={option}
-                                                                checked={
-                                                                    formData
-                                                                        .criteria
-                                                                        .education
-                                                                        .firstChoice ===
-                                                                    option
-                                                                }
-                                                                onChange={() =>
-                                                                    handleCriteriaChange(
-                                                                        "education",
-                                                                        "firstChoice",
-                                                                        option
-                                                                    )
-                                                                }
-                                                                className="ml-5 w-5 h-5"
-                                                            />
-                                                            <span className="text-medium ml-5">
-                                                                {option}
-                                                            </span>
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* 2nd Choice Field of Study */}
-                                        <div className="mb-4">
-                                            <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                2nd Choice Field of Study
-                                                <span className="font-medium text-xsmall">
-                                                    (Put closely related fields
-                                                    that have significant
-                                                    overlap with the job
-                                                    requirements)
-                                                </span>
-                                            </label>
-                                            <div
-                                                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
-                                                onClick={() =>
-                                                    setDropdownOpen({
-                                                        ...dropdownOpen,
-                                                        secondChoice:
-                                                            !dropdownOpen.secondChoice,
-                                                    })
-                                                }
-                                            >
-                                                <span>
-                                                    {formData.criteria.education
-                                                        .secondChoice ||
-                                                        "Select 2nd Choice Field of Study"}
-                                                </span>
-                                                <FaChevronDown
-                                                    className={`ml-2 transform ${
-                                                        dropdownOpen.secondChoice
-                                                            ? "rotate-180"
-                                                            : "rotate-0"
-                                                    } transition-transform`}
-                                                />
-                                            </div>
-
-                                            {dropdownOpen.secondChoice && (
-                                                <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                                                    <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Search options..."
-                                                            value={
-                                                                searchTerm.secondChoice ||
-                                                                ""
-                                                            }
-                                                            onChange={(e) =>
-                                                                setSearchTerm({
-                                                                    ...searchTerm,
-                                                                    secondChoice:
-                                                                        e.target
-                                                                            .value,
-                                                                })
-                                                            }
-                                                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                                                        />
-                                                    </div>
-
-                                                    {getFilteredOptions(
-                                                        "education",
-                                                        "secondChoice"
-                                                    ).map((option, index) => (
-                                                        <label
-                                                            key={index}
-                                                            className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
-                                                        >
-                                                            <input
-                                                                type="radio"
-                                                                value={option}
-                                                                checked={
-                                                                    formData
-                                                                        .criteria
-                                                                        .education
-                                                                        .secondChoice ===
-                                                                    option
-                                                                }
-                                                                onChange={() =>
-                                                                    handleCriteriaChange(
-                                                                        "education",
-                                                                        "secondChoice",
-                                                                        option
-                                                                    )
-                                                                }
-                                                                className="ml-5 w-5 h-5"
-                                                            />
-                                                            <span className="text-medium ml-5">
-                                                                {option}
-                                                            </span>
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* 3rd Choice Field of Study */}
-                                        <div className="mb-4">
-                                            <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                3rd Choice Field of Study
-                                                <span className="font-medium text-xsmall">
-                                                    (Put fields that have some
-                                                    relevance or provide useful
-                                                    background knowledge)
-                                                </span>
-                                            </label>
-                                            <div
-                                                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
-                                                onClick={() =>
-                                                    setDropdownOpen({
-                                                        ...dropdownOpen,
-                                                        thirdChoice:
-                                                            !dropdownOpen.thirdChoice,
-                                                    })
-                                                }
-                                            >
-                                                <span>
-                                                    {formData.criteria.education
-                                                        .thirdChoice ||
-                                                        "Select 3rd Choice Field of Study"}
-                                                </span>
-                                                <FaChevronDown
-                                                    className={`ml-2 transform ${
-                                                        dropdownOpen.thirdChoice
-                                                            ? "rotate-180"
-                                                            : "rotate-0"
-                                                    } transition-transform`}
-                                                />
-                                            </div>
-
-                                            {dropdownOpen.thirdChoice && (
-                                                <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                                                    <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Search options..."
-                                                            value={
-                                                                searchTerm.thirdChoice ||
-                                                                ""
-                                                            }
-                                                            onChange={(e) =>
-                                                                setSearchTerm({
-                                                                    ...searchTerm,
-                                                                    thirdChoice:
-                                                                        e.target
-                                                                            .value,
-                                                                })
-                                                            }
-                                                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                                                        />
-                                                    </div>
-
-                                                    {getFilteredOptions(
-                                                        "education",
-                                                        "secondChoice"
-                                                    ).map((option, index) => (
-                                                        <label
-                                                            key={index}
-                                                            className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
-                                                        >
-                                                            <input
-                                                                type="radio"
-                                                                value={option}
-                                                                checked={
-                                                                    formData
-                                                                        .criteria
-                                                                        .education
-                                                                        .thirdChoice ===
-                                                                    option
-                                                                }
-                                                                onChange={() =>
-                                                                    handleCriteriaChange(
-                                                                        "education",
-                                                                        "thirdChoice",
-                                                                        option
-                                                                    )
-                                                                }
-                                                                className="ml-5 w-5 h-5"
-                                                            />
-                                                            <span className="text-medium ml-5">
-                                                                {option}
-                                                            </span>
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <label className="block text-sm font-semibold text-primary mb-2">
-                                    Additional Points
-                                </label>
-
-                                {/* School Preference */}
-                                <div className="mb-4">
-                                    <div>
-                                        <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                            School Preference{" "}
-                                            <span className="font-medium text-xsmall">
-                                                {" "}
-                                                (Put any preferred institutions,
-                                                if applicable){" "}
-                                            </span>
-                                        </label>
-
-                                        <div
-                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
-                                            onClick={() =>
-                                                setDropdownOpen({
-                                                    ...dropdownOpen,
-                                                    school: !dropdownOpen.school,
-                                                })
-                                            }
-                                        >
-                                            {/* Show selected options inside the input */}
-                                            {formData.criteria.schools
-                                                .schoolPreference?.length >
-                                            0 ? (
-                                                formData.criteria.schools.schoolPreference.map(
-                                                    (selected, index) => (
-                                                        <div
-                                                            key={index}
-                                                            className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
-                                                        >
-                                                            <span className="text-sm">
-                                                                {selected}
-                                                            </span>
-                                                            <button
-                                                                className="ml-2 text-red-600 font-extrabold"
-                                                                onClick={(
-                                                                    e
-                                                                ) => {
-                                                                    e.stopPropagation();
-                                                                    handleSettingsRemoveSelectedOption(
-                                                                        "schools",
-                                                                        "schoolPreference",
-                                                                        selected
-                                                                    );
-                                                                }}
-                                                            >
-                                                                X
-                                                            </button>
+                                                                <label className="ml-2 block text-sm font-semibold text-primary">
+                                                                    Education
+                                                                </label>
+                                                            </div>
+                                                            <div className="flex items-center">
+                                                                <span className="text-sm font-semibold text-fontcolor mr-2">
+                                                                    Weight
+                                                                </span>
+                                                                <input
+                                                                    type="text"
+                                                                    value={
+                                                                        formData
+                                                                            .criteria
+                                                                            .education
+                                                                            .weight ||
+                                                                        ""
+                                                                    }
+                                                                    onChange={(
+                                                                        e
+                                                                    ) => {
+                                                                        const value =
+                                                                            e
+                                                                                .target
+                                                                                .value;
+                                                                        // Allow only numbers and validate the range
+                                                                        if (
+                                                                            /^\d*$/.test(
+                                                                                value
+                                                                            ) &&
+                                                                            Number(
+                                                                                value
+                                                                            ) <=
+                                                                                100
+                                                                        ) {
+                                                                            handleCriteriaChange(
+                                                                                "education",
+                                                                                "weight",
+                                                                                value
+                                                                            );
+                                                                        }
+                                                                    }}
+                                                                    className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-sm text-black text-center"
+                                                                />
+                                                            </div>
                                                         </div>
-                                                    )
-                                                )
-                                            ) : (
-                                                <span className="text-fontcolor">
-                                                    Select Preferred School
-                                                </span>
-                                            )}
-                                            <FaChevronDown
-                                                className={`ml-auto transform ${
-                                                    dropdownOpen.school
-                                                        ? "rotate-180"
-                                                        : "rotate-0"
-                                                } transition-transform`}
-                                            />
-                                        </div>
 
-                                        {dropdownOpen.school && (
-                                            <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                                                {/* Search & Add Custom Option */}
-                                                <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Search or add a new option..."
-                                                        value={
-                                                            searchTerm.school ||
-                                                            ""
-                                                        }
-                                                        onChange={(e) =>
-                                                            setSearchTerm({
-                                                                ...searchTerm,
-                                                                school: e.target
-                                                                    .value,
-                                                            })
-                                                        }
-                                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                                                        onKeyDown={(e) => {
-                                                            if (
-                                                                e.key ===
-                                                                "Enter"
-                                                            ) {
-                                                                handleAddCustomOption(
-                                                                    "schools",
-                                                                    "schoolPreference",
-                                                                    e.target
-                                                                        .value
-                                                                );
-                                                            }
-                                                        }}
-                                                    />
-                                                    {searchTerm.school &&
-                                                        !options.schools.includes(
-                                                            searchTerm.school
-                                                        ) && (
-                                                            <button
-                                                                className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
+                                                        {/* 1st Choice Field of Study */}
+                                                        <div className="mb-4">
+                                                            <label className="block text-sm font-semibold text-fontcolor mb-1">
+                                                                1st Choice Field
+                                                                of Study{" "}
+                                                                <span className="font-medium text-xsmall">
+                                                                    (Put the
+                                                                    most
+                                                                    directly
+                                                                    relevant
+                                                                    fields of
+                                                                    study for
+                                                                    the
+                                                                    position)
+                                                                </span>
+                                                            </label>
+
+                                                            <div
+                                                                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
                                                                 onClick={() =>
-                                                                    handleAddCustomOption(
-                                                                        "schools",
-                                                                        "schoolPreference",
-                                                                        searchTerm.school
+                                                                    setDropdownOpen(
+                                                                        {
+                                                                            ...dropdownOpen,
+                                                                            firstChoice:
+                                                                                !dropdownOpen.firstChoice,
+                                                                        }
                                                                     )
                                                                 }
                                                             >
-                                                                Add "
-                                                                {
-                                                                    searchTerm.school
+                                                                <span>
+                                                                    {formData
+                                                                        .criteria
+                                                                        .education
+                                                                        .firstChoice ||
+                                                                        "Select 1st Choice Field of Study"}
+                                                                </span>
+                                                                <FaChevronDown
+                                                                    className={`ml-2 transform ${
+                                                                        dropdownOpen.firstChoice
+                                                                            ? "rotate-180"
+                                                                            : "rotate-0"
+                                                                    } transition-transform`}
+                                                                />
+                                                            </div>
+
+                                                            {dropdownOpen.firstChoice && (
+                                                                <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                                                                    <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                                                                        <input
+                                                                            type="text"
+                                                                            placeholder="Search options..."
+                                                                            value={
+                                                                                searchTerm.firstChoice ||
+                                                                                ""
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                setSearchTerm(
+                                                                                    {
+                                                                                        ...searchTerm,
+                                                                                        firstChoice:
+                                                                                            e
+                                                                                                .target
+                                                                                                .value,
+                                                                                    }
+                                                                                )
+                                                                            }
+                                                                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                                                        />
+                                                                    </div>
+
+                                                                    {getFilteredOptions(
+                                                                        "education",
+                                                                        "firstChoice"
+                                                                    ).map(
+                                                                        (
+                                                                            option,
+                                                                            index
+                                                                        ) => (
+                                                                            <label
+                                                                                key={
+                                                                                    index
+                                                                                }
+                                                                                className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
+                                                                            >
+                                                                                <input
+                                                                                    type="radio"
+                                                                                    value={
+                                                                                        option
+                                                                                    }
+                                                                                    checked={
+                                                                                        formData
+                                                                                            .criteria
+                                                                                            .education
+                                                                                            .firstChoice ===
+                                                                                        option
+                                                                                    }
+                                                                                    onChange={() =>
+                                                                                        handleCriteriaChange(
+                                                                                            "education",
+                                                                                            "firstChoice",
+                                                                                            option
+                                                                                        )
+                                                                                    }
+                                                                                    className="ml-5 w-5 h-5"
+                                                                                />
+                                                                                <span className="text-medium ml-5">
+                                                                                    {
+                                                                                        option
+                                                                                    }
+                                                                                </span>
+                                                                            </label>
+                                                                        )
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* 2nd Choice Field of Study */}
+                                                        <div className="mb-4">
+                                                            <label className="block text-sm font-semibold text-fontcolor mb-1">
+                                                                2nd Choice Field
+                                                                of Study
+                                                                <span className="font-medium text-xsmall">
+                                                                    (Put closely
+                                                                    related
+                                                                    fields that
+                                                                    have
+                                                                    significant
+                                                                    overlap with
+                                                                    the job
+                                                                    requirements)
+                                                                </span>
+                                                            </label>
+                                                            <div
+                                                                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
+                                                                onClick={() =>
+                                                                    setDropdownOpen(
+                                                                        {
+                                                                            ...dropdownOpen,
+                                                                            secondChoice:
+                                                                                !dropdownOpen.secondChoice,
+                                                                        }
+                                                                    )
                                                                 }
-                                                                "
-                                                            </button>
-                                                        )}
+                                                            >
+                                                                <span>
+                                                                    {formData
+                                                                        .criteria
+                                                                        .education
+                                                                        .secondChoice ||
+                                                                        "Select 2nd Choice Field of Study"}
+                                                                </span>
+                                                                <FaChevronDown
+                                                                    className={`ml-2 transform ${
+                                                                        dropdownOpen.secondChoice
+                                                                            ? "rotate-180"
+                                                                            : "rotate-0"
+                                                                    } transition-transform`}
+                                                                />
+                                                            </div>
+
+                                                            {dropdownOpen.secondChoice && (
+                                                                <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                                                                    <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                                                                        <input
+                                                                            type="text"
+                                                                            placeholder="Search options..."
+                                                                            value={
+                                                                                searchTerm.secondChoice ||
+                                                                                ""
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                setSearchTerm(
+                                                                                    {
+                                                                                        ...searchTerm,
+                                                                                        secondChoice:
+                                                                                            e
+                                                                                                .target
+                                                                                                .value,
+                                                                                    }
+                                                                                )
+                                                                            }
+                                                                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                                                        />
+                                                                    </div>
+
+                                                                    {getFilteredOptions(
+                                                                        "education",
+                                                                        "secondChoice"
+                                                                    ).map(
+                                                                        (
+                                                                            option,
+                                                                            index
+                                                                        ) => (
+                                                                            <label
+                                                                                key={
+                                                                                    index
+                                                                                }
+                                                                                className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
+                                                                            >
+                                                                                <input
+                                                                                    type="radio"
+                                                                                    value={
+                                                                                        option
+                                                                                    }
+                                                                                    checked={
+                                                                                        formData
+                                                                                            .criteria
+                                                                                            .education
+                                                                                            .secondChoice ===
+                                                                                        option
+                                                                                    }
+                                                                                    onChange={() =>
+                                                                                        handleCriteriaChange(
+                                                                                            "education",
+                                                                                            "secondChoice",
+                                                                                            option
+                                                                                        )
+                                                                                    }
+                                                                                    className="ml-5 w-5 h-5"
+                                                                                />
+                                                                                <span className="text-medium ml-5">
+                                                                                    {
+                                                                                        option
+                                                                                    }
+                                                                                </span>
+                                                                            </label>
+                                                                        )
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* 3rd Choice Field of Study */}
+                                                        <div className="mb-4">
+                                                            <label className="block text-sm font-semibold text-fontcolor mb-1">
+                                                                3rd Choice Field
+                                                                of Study
+                                                                <span className="font-medium text-xsmall">
+                                                                    (Put fields
+                                                                    that have
+                                                                    some
+                                                                    relevance or
+                                                                    provide
+                                                                    useful
+                                                                    background
+                                                                    knowledge)
+                                                                </span>
+                                                            </label>
+                                                            <div
+                                                                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
+                                                                onClick={() =>
+                                                                    setDropdownOpen(
+                                                                        {
+                                                                            ...dropdownOpen,
+                                                                            thirdChoice:
+                                                                                !dropdownOpen.thirdChoice,
+                                                                        }
+                                                                    )
+                                                                }
+                                                            >
+                                                                <span>
+                                                                    {formData
+                                                                        .criteria
+                                                                        .education
+                                                                        .thirdChoice ||
+                                                                        "Select 3rd Choice Field of Study"}
+                                                                </span>
+                                                                <FaChevronDown
+                                                                    className={`ml-2 transform ${
+                                                                        dropdownOpen.thirdChoice
+                                                                            ? "rotate-180"
+                                                                            : "rotate-0"
+                                                                    } transition-transform`}
+                                                                />
+                                                            </div>
+
+                                                            {dropdownOpen.thirdChoice && (
+                                                                <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                                                                    <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                                                                        <input
+                                                                            type="text"
+                                                                            placeholder="Search options..."
+                                                                            value={
+                                                                                searchTerm.thirdChoice ||
+                                                                                ""
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) =>
+                                                                                setSearchTerm(
+                                                                                    {
+                                                                                        ...searchTerm,
+                                                                                        thirdChoice:
+                                                                                            e
+                                                                                                .target
+                                                                                                .value,
+                                                                                    }
+                                                                                )
+                                                                            }
+                                                                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                                                        />
+                                                                    </div>
+
+                                                                    {getFilteredOptions(
+                                                                        "education",
+                                                                        "secondChoice"
+                                                                    ).map(
+                                                                        (
+                                                                            option,
+                                                                            index
+                                                                        ) => (
+                                                                            <label
+                                                                                key={
+                                                                                    index
+                                                                                }
+                                                                                className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
+                                                                            >
+                                                                                <input
+                                                                                    type="radio"
+                                                                                    value={
+                                                                                        option
+                                                                                    }
+                                                                                    checked={
+                                                                                        formData
+                                                                                            .criteria
+                                                                                            .education
+                                                                                            .thirdChoice ===
+                                                                                        option
+                                                                                    }
+                                                                                    onChange={() =>
+                                                                                        handleCriteriaChange(
+                                                                                            "education",
+                                                                                            "thirdChoice",
+                                                                                            option
+                                                                                        )
+                                                                                    }
+                                                                                    className="ml-5 w-5 h-5"
+                                                                                />
+                                                                                <span className="text-medium ml-5">
+                                                                                    {
+                                                                                        option
+                                                                                    }
+                                                                                </span>
+                                                                            </label>
+                                                                        )
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </div>
 
-                                                {/* Available Options List */}
-                                                {getFilteredOptions(
-                                                    "schools",
-                                                    "schoolPreference"
-                                                ).map((option, index) => (
-                                                    <label
-                                                        key={index}
-                                                        className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
-                                                    >
-                                                        <input
-                                                            type="checkbox"
-                                                            value={option}
-                                                            checked={formData.criteria.schools.schoolPreference?.includes(
-                                                                option
-                                                            )}
-                                                            onChange={() =>
-                                                                handleSettingsMultiSelect(
-                                                                    "schools",
-                                                                    "schoolPreference",
-                                                                    option
+                                                <label className="block text-sm font-semibold text-primary mb-2">
+                                                    Additional Points
+                                                </label>
+
+                                                {/* School Preference */}
+                                                <div className="mb-4">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-fontcolor mb-1">
+                                                            School Preference{" "}
+                                                            <span className="font-medium text-xsmall">
+                                                                {" "}
+                                                                (Put any
+                                                                preferred
+                                                                institutions, if
+                                                                applicable){" "}
+                                                            </span>
+                                                        </label>
+
+                                                        <div
+                                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
+                                                            onClick={() =>
+                                                                setDropdownOpen(
+                                                                    {
+                                                                        ...dropdownOpen,
+                                                                        school: !dropdownOpen.school,
+                                                                    }
                                                                 )
                                                             }
-                                                            className="ml-5 w-5 h-5"
-                                                        />
-                                                        <span className="text-medium ml-5">
-                                                            {option}
-                                                        </span>
+                                                        >
+                                                            {/* Show selected options inside the input */}
+                                                            {formData.criteria
+                                                                .schools
+                                                                .schoolPreference
+                                                                ?.length > 0 ? (
+                                                                formData.criteria.schools.schoolPreference.map(
+                                                                    (
+                                                                        selected,
+                                                                        index
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
+                                                                        >
+                                                                            <span className="text-sm">
+                                                                                {
+                                                                                    selected
+                                                                                }
+                                                                            </span>
+                                                                            <button
+                                                                                className="ml-2 text-red-600 font-extrabold"
+                                                                                onClick={(
+                                                                                    e
+                                                                                ) => {
+                                                                                    e.stopPropagation();
+                                                                                    handleSettingsRemoveSelectedOption(
+                                                                                        "schools",
+                                                                                        "schoolPreference",
+                                                                                        selected
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                X
+                                                                            </button>
+                                                                        </div>
+                                                                    )
+                                                                )
+                                                            ) : (
+                                                                <span className="text-fontcolor">
+                                                                    Select
+                                                                    Preferred
+                                                                    School
+                                                                </span>
+                                                            )}
+                                                            <FaChevronDown
+                                                                className={`ml-auto transform ${
+                                                                    dropdownOpen.school
+                                                                        ? "rotate-180"
+                                                                        : "rotate-0"
+                                                                } transition-transform`}
+                                                            />
+                                                        </div>
+
+                                                        {dropdownOpen.school && (
+                                                            <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                                                                {/* Search & Add Custom Option */}
+                                                                <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                                                                    <input
+                                                                        type="text"
+                                                                        placeholder="Search or add a new option..."
+                                                                        value={
+                                                                            searchTerm.school ||
+                                                                            ""
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            setSearchTerm(
+                                                                                {
+                                                                                    ...searchTerm,
+                                                                                    school: e
+                                                                                        .target
+                                                                                        .value,
+                                                                                }
+                                                                            )
+                                                                        }
+                                                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                                                        onKeyDown={(
+                                                                            e
+                                                                        ) => {
+                                                                            if (
+                                                                                e.key ===
+                                                                                "Enter"
+                                                                            ) {
+                                                                                handleAddCustomOption(
+                                                                                    "schools",
+                                                                                    "schoolPreference",
+                                                                                    e
+                                                                                        .target
+                                                                                        .value
+                                                                                );
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                    {searchTerm.school &&
+                                                                        !options.schools.includes(
+                                                                            searchTerm.school
+                                                                        ) && (
+                                                                            <button
+                                                                                className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
+                                                                                onClick={() =>
+                                                                                    handleAddCustomOption(
+                                                                                        "schools",
+                                                                                        "schoolPreference",
+                                                                                        searchTerm.school
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                Add
+                                                                                "
+                                                                                {
+                                                                                    searchTerm.school
+                                                                                }
+
+                                                                                "
+                                                                            </button>
+                                                                        )}
+                                                                </div>
+
+                                                                {/* Available Options List */}
+                                                                {getFilteredOptions(
+                                                                    "schools",
+                                                                    "schoolPreference"
+                                                                ).map(
+                                                                    (
+                                                                        option,
+                                                                        index
+                                                                    ) => (
+                                                                        <label
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
+                                                                        >
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                value={
+                                                                                    option
+                                                                                }
+                                                                                checked={formData.criteria.schools.schoolPreference?.includes(
+                                                                                    option
+                                                                                )}
+                                                                                onChange={() =>
+                                                                                    handleSettingsMultiSelect(
+                                                                                        "schools",
+                                                                                        "schoolPreference",
+                                                                                        option
+                                                                                    )
+                                                                                }
+                                                                                className="ml-5 w-5 h-5"
+                                                                            />
+                                                                            <span className="text-medium ml-5">
+                                                                                {
+                                                                                    option
+                                                                                }
+                                                                            </span>
+                                                                        </label>
+                                                                    )
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center mb-4">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="w-4 h-4 border border-gray-300 rounded text-black mr-2"
+                                                        checked={
+                                                            formData.criteria
+                                                                .additionalPoints
+                                                                .honor === "1"
+                                                        }
+                                                        onChange={(e) =>
+                                                            setFormData(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    criteria: {
+                                                                        ...prev.criteria,
+                                                                        additionalPoints:
+                                                                            {
+                                                                                ...prev
+                                                                                    .criteria
+                                                                                    .additionalPoints,
+                                                                                honor: e
+                                                                                    .target
+                                                                                    .checked
+                                                                                    ? "1"
+                                                                                    : "0",
+                                                                            },
+                                                                    },
+                                                                })
+                                                            )
+                                                        }
+                                                    />
+                                                    <label className="text-sm text-fontcolor">
+                                                        Honors
                                                     </label>
-                                                ))}
+                                                </div>
+
+                                                <div className="flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="w-4 h-4 border border-gray-300 rounded text-black mr-2"
+                                                        checked={
+                                                            formData.criteria
+                                                                .additionalPoints
+                                                                .multipleDegrees ===
+                                                            "1"
+                                                        }
+                                                        onChange={(e) =>
+                                                            setFormData(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    criteria: {
+                                                                        ...prev.criteria,
+                                                                        additionalPoints:
+                                                                            {
+                                                                                ...prev
+                                                                                    .criteria
+                                                                                    .additionalPoints,
+                                                                                multipleDegrees:
+                                                                                    e
+                                                                                        .target
+                                                                                        .checked
+                                                                                        ? "1"
+                                                                                        : "0",
+                                                                            },
+                                                                    },
+                                                                })
+                                                            )
+                                                        }
+                                                    />
+                                                    <label className="text-sm text-fontcolor">
+                                                        Multiple Degrees
+                                                    </label>
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
-                                </div>
 
-                                <div className="flex items-center mb-4">
-                                    <input
-                                        type="checkbox"
-                                        className="w-4 h-4 border border-gray-300 rounded text-black mr-2"
-                                        checked={
-                                            formData.criteria.additionalPoints
-                                                .honor === "1"
-                                        }
-                                        onChange={(e) =>
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                criteria: {
-                                                    ...prev.criteria,
-                                                    additionalPoints: {
-                                                        ...prev.criteria
-                                                            .additionalPoints,
-                                                        honor: e.target.checked
-                                                            ? "1"
-                                                            : "0",
-                                                    },
-                                                },
-                                            }))
-                                        }
-                                    />
-                                    <label className="text-sm text-fontcolor">
-                                        Honors
-                                    </label>
-                                </div>
-
-                                <div className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        className="w-4 h-4 border border-gray-300 rounded text-black mr-2"
-                                        checked={
-                                            formData.criteria.additionalPoints
-                                                .multipleDegrees === "1"
-                                        }
-                                        onChange={(e) =>
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                criteria: {
-                                                    ...prev.criteria,
-                                                    additionalPoints: {
-                                                        ...prev.criteria
-                                                            .additionalPoints,
-                                                        multipleDegrees: e
-                                                            .target.checked
-                                                            ? "1"
-                                                            : "0",
-                                                    },
-                                                },
-                                            }))
-                                        }
-                                    />
-                                    <label className="text-sm text-fontcolor">
-                                        Multiple Degrees
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div className="mb-6">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center">
-                                        {/* <input
+                                            <div className="mb-6">
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <div className="flex items-center">
+                                                        {/* <input
                                             type="checkbox"
                                             className="w-4 h-4 border border-gray-300 rounded text-black"
                                         /> */}
-                                        <label className="ml-2 block text-sm font-semibold text-primary">
-                                            {" "}
-                                            Certificates
-                                        </label>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <span className="text-sm font-semibold text-fontcolor mr-2">
-                                            Weight
-                                        </span>
-                                        <input
-                                            type="text"
-                                            value={
-                                                formData.criteria.certificates
-                                                    .weight || ""
-                                            }
-                                            onChange={(e) => {
-                                                const value = e.target.value;
-                                                // Allow only numbers and validate the range
-                                                if (
-                                                    /^\d*$/.test(value) &&
-                                                    Number(value) <= 100
-                                                ) {
-                                                    handleCriteriaChange(
-                                                        "certificates",
-                                                        "weight",
-                                                        value
-                                                    );
-                                                }
-                                            }}
-                                            className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-sm text-black text-center"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="mb-4">
-                                    <div>
-                                        <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                            Certificate Preference{" "}
-                                            <span className="font-medium text-xsmall">
-                                                (Select any preferred
-                                                certificates, if applicable)
-                                            </span>
-                                        </label>
-
-                                        <div
-                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
-                                            onClick={() =>
-                                                setDropdownOpen({
-                                                    ...dropdownOpen,
-                                                    certicatePrefered:
-                                                        !dropdownOpen.certicatePrefered,
-                                                })
-                                            }
-                                        >
-                                            {/* Show selected options inside the input */}
-                                            {formData.criteria.certificates
-                                                .preferred?.length > 0 ? (
-                                                formData.criteria.certificates.preferred.map(
-                                                    (selected, index) => (
-                                                        <div
-                                                            key={index}
-                                                            className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
-                                                        >
-                                                            <span className="text-sm">
-                                                                {selected}
-                                                            </span>
-                                                            <button
-                                                                className="ml-2 text-red-600 font-extrabold"
-                                                                onClick={(
-                                                                    e
-                                                                ) => {
-                                                                    e.stopPropagation();
-                                                                    handleSettingsRemoveSelectedOption(
-                                                                        "certificates",
-                                                                        "preferred",
-                                                                        selected
-                                                                    );
-                                                                }}
-                                                            >
-                                                                X
-                                                            </button>
-                                                        </div>
-                                                    )
-                                                )
-                                            ) : (
-                                                <span className="text-fontcolor">
-                                                    Select Preferred Certificate
-                                                </span>
-                                            )}
-                                            <FaChevronDown
-                                                className={`ml-auto transform ${
-                                                    dropdownOpen.certicatePrefered
-                                                        ? "rotate-180"
-                                                        : "rotate-0"
-                                                } transition-transform`}
-                                            />
-                                        </div>
-
-                                        {dropdownOpen.certicatePrefered && (
-                                            <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
-                                                {/* Search & Add Custom Option */}
-                                                <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Search or add a new option..."
-                                                        value={
-                                                            searchTerm.certicatePrefered ||
-                                                            ""
-                                                        }
-                                                        onChange={(e) =>
-                                                            setSearchTerm({
-                                                                ...searchTerm,
-                                                                certicatePrefered:
-                                                                    e.target
-                                                                        .value,
-                                                            })
-                                                        }
-                                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                                                        onKeyDown={(e) => {
-                                                            if (
-                                                                e.key ===
-                                                                "Enter"
-                                                            ) {
-                                                                handleAddCustomOption(
-                                                                    "certificates",
-                                                                    "preferred",
-                                                                    e.target
-                                                                        .value
-                                                                );
+                                                        <label className="ml-2 block text-sm font-semibold text-primary">
+                                                            {" "}
+                                                            Certificates
+                                                        </label>
+                                                    </div>
+                                                    <div className="flex items-center">
+                                                        <span className="text-sm font-semibold text-fontcolor mr-2">
+                                                            Weight
+                                                        </span>
+                                                        <input
+                                                            type="text"
+                                                            value={
+                                                                formData
+                                                                    .criteria
+                                                                    .certificates
+                                                                    .weight ||
+                                                                ""
                                                             }
-                                                        }}
-                                                    />
-                                                    {searchTerm.certicatePrefered &&
-                                                        !options.certificates.includes(
-                                                            searchTerm.certicatePrefered
-                                                        ) && (
-                                                            <button
-                                                                className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
-                                                                onClick={() =>
-                                                                    handleAddCustomOption(
+                                                            onChange={(e) => {
+                                                                const value =
+                                                                    e.target
+                                                                        .value;
+                                                                // Allow only numbers and validate the range
+                                                                if (
+                                                                    /^\d*$/.test(
+                                                                        value
+                                                                    ) &&
+                                                                    Number(
+                                                                        value
+                                                                    ) <= 100
+                                                                ) {
+                                                                    handleCriteriaChange(
                                                                         "certificates",
-                                                                        "preferred",
-                                                                        searchTerm.certicatePrefered
-                                                                    )
+                                                                        "weight",
+                                                                        value
+                                                                    );
                                                                 }
-                                                            >
-                                                                Add "
-                                                                {
-                                                                    searchTerm.certicatePrefered
-                                                                }
-                                                                "
-                                                            </button>
-                                                        )}
+                                                            }}
+                                                            className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-sm text-black text-center"
+                                                        />
+                                                    </div>
                                                 </div>
 
-                                                {/* Available Options List */}
-                                                {getFilteredOptions(
-                                                    "certificates",
-                                                    "preferred"
-                                                ).map((option, index) => (
-                                                    <label
-                                                        key={index}
-                                                        className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
-                                                    >
-                                                        <input
-                                                            type="checkbox"
-                                                            value={option}
-                                                            checked={formData.criteria.certificates.preferred?.includes(
-                                                                option
-                                                            )}
-                                                            onChange={() =>
-                                                                handleSettingsMultiSelect(
-                                                                    "certificates",
-                                                                    "preferred",
-                                                                    option
+                                                <div className="mb-4">
+                                                    <div>
+                                                        <label className="block text-sm font-semibold text-fontcolor mb-1">
+                                                            Certificate
+                                                            Preference{" "}
+                                                            <span className="font-medium text-xsmall">
+                                                                (Select any
+                                                                preferred
+                                                                certificates, if
+                                                                applicable)
+                                                            </span>
+                                                        </label>
+
+                                                        <div
+                                                            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
+                                                            onClick={() =>
+                                                                setDropdownOpen(
+                                                                    {
+                                                                        ...dropdownOpen,
+                                                                        certicatePrefered:
+                                                                            !dropdownOpen.certicatePrefered,
+                                                                    }
                                                                 )
                                                             }
-                                                            className="ml-5 w-5 h-5"
-                                                        />
-                                                        <span className="text-medium ml-5">
-                                                            {option}
-                                                        </span>
-                                                    </label>
-                                                ))}
+                                                        >
+                                                            {/* Show selected options inside the input */}
+                                                            {formData.criteria
+                                                                .certificates
+                                                                .preferred
+                                                                ?.length > 0 ? (
+                                                                formData.criteria.certificates.preferred.map(
+                                                                    (
+                                                                        selected,
+                                                                        index
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
+                                                                        >
+                                                                            <span className="text-sm">
+                                                                                {
+                                                                                    selected
+                                                                                }
+                                                                            </span>
+                                                                            <button
+                                                                                className="ml-2 text-red-600 font-extrabold"
+                                                                                onClick={(
+                                                                                    e
+                                                                                ) => {
+                                                                                    e.stopPropagation();
+                                                                                    handleSettingsRemoveSelectedOption(
+                                                                                        "certificates",
+                                                                                        "preferred",
+                                                                                        selected
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                X
+                                                                            </button>
+                                                                        </div>
+                                                                    )
+                                                                )
+                                                            ) : (
+                                                                <span className="text-fontcolor">
+                                                                    Select
+                                                                    Preferred
+                                                                    Certificate
+                                                                </span>
+                                                            )}
+                                                            <FaChevronDown
+                                                                className={`ml-auto transform ${
+                                                                    dropdownOpen.certicatePrefered
+                                                                        ? "rotate-180"
+                                                                        : "rotate-0"
+                                                                } transition-transform`}
+                                                            />
+                                                        </div>
+
+                                                        {dropdownOpen.certicatePrefered && (
+                                                            <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                                                                {/* Search & Add Custom Option */}
+                                                                <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                                                                    <input
+                                                                        type="text"
+                                                                        placeholder="Search or add a new option..."
+                                                                        value={
+                                                                            searchTerm.certicatePrefered ||
+                                                                            ""
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) =>
+                                                                            setSearchTerm(
+                                                                                {
+                                                                                    ...searchTerm,
+                                                                                    certicatePrefered:
+                                                                                        e
+                                                                                            .target
+                                                                                            .value,
+                                                                                }
+                                                                            )
+                                                                        }
+                                                                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                                                        onKeyDown={(
+                                                                            e
+                                                                        ) => {
+                                                                            if (
+                                                                                e.key ===
+                                                                                "Enter"
+                                                                            ) {
+                                                                                handleAddCustomOption(
+                                                                                    "certificates",
+                                                                                    "preferred",
+                                                                                    e
+                                                                                        .target
+                                                                                        .value
+                                                                                );
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                    {searchTerm.certicatePrefered &&
+                                                                        !options.certificates.includes(
+                                                                            searchTerm.certicatePrefered
+                                                                        ) && (
+                                                                            <button
+                                                                                className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
+                                                                                onClick={() =>
+                                                                                    handleAddCustomOption(
+                                                                                        "certificates",
+                                                                                        "preferred",
+                                                                                        searchTerm.certicatePrefered
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                Add
+                                                                                "
+                                                                                {
+                                                                                    searchTerm.certicatePrefered
+                                                                                }
+
+                                                                                "
+                                                                            </button>
+                                                                        )}
+                                                                </div>
+
+                                                                {/* Available Options List */}
+                                                                {getFilteredOptions(
+                                                                    "certificates",
+                                                                    "preferred"
+                                                                ).map(
+                                                                    (
+                                                                        option,
+                                                                        index
+                                                                    ) => (
+                                                                        <label
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
+                                                                        >
+                                                                            <input
+                                                                                type="checkbox"
+                                                                                value={
+                                                                                    option
+                                                                                }
+                                                                                checked={formData.criteria.certificates.preferred?.includes(
+                                                                                    option
+                                                                                )}
+                                                                                onChange={() =>
+                                                                                    handleSettingsMultiSelect(
+                                                                                        "certificates",
+                                                                                        "preferred",
+                                                                                        option
+                                                                                    )
+                                                                                }
+                                                                                className="ml-5 w-5 h-5"
+                                                                            />
+                                                                            <span className="text-medium ml-5">
+                                                                                {
+                                                                                    option
+                                                                                }
+                                                                            </span>
+                                                                        </label>
+                                                                    )
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="mb-6">
-                                <p className="text-sm font-semibold text-primary mb-2">
-                                    Weight of Criteria
-                                </p>
-                                <div className="space-y-3">
-                                    {[
-                                        "Customize Criteria Weight Percentage",
-                                        "Default Weight Percentage",
-                                        "Experienced-Focused",
-                                        "Education-Focused",
-                                        "Skills-Focused",
-                                    ].map((item, index) => (
-                                        <div
-                                            key={index}
-                                            className="flex items-center space-x-3"
-                                        >
-                                            <input
-                                                type="radio"
-                                                id={`criteria-${index}`}
-                                                name="weight_of_criteria"
-                                                value={item}
-                                                checked={
-                                                    formData.weight_of_criteria ===
-                                                    item
-                                                }
-                                                onChange={handleSettingsInputChange}
-                                                className="h-4 w-4 text-black rounded-full"
-                                            />
-                                            <label
-                                                htmlFor={`criteria-${index}`}
-                                                className="text-sm text-fontcolor font-medium cursor-pointer"
-                                            >
-                                                {item}
-                                            </label>
+                                            <div className="mb-6">
+                                                <p className="text-sm font-semibold text-primary mb-2">
+                                                    Weight of Criteria
+                                                </p>
+                                                <div className="space-y-3">
+                                                    {[
+                                                        "Customize Criteria Weight Percentage",
+                                                        "Default Weight Percentage",
+                                                        "Experienced-Focused",
+                                                        "Education-Focused",
+                                                        "Skills-Focused",
+                                                    ].map((item, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="flex items-center space-x-3"
+                                                        >
+                                                            <input
+                                                                type="radio"
+                                                                id={`criteria-${index}`}
+                                                                name="weight_of_criteria"
+                                                                value={item}
+                                                                checked={
+                                                                    formData.weight_of_criteria ===
+                                                                    item
+                                                                }
+                                                                onChange={
+                                                                    handleSettingsInputChange
+                                                                }
+                                                                className="h-4 w-4 text-black rounded-full"
+                                                            />
+                                                            <label
+                                                                htmlFor={`criteria-${index}`}
+                                                                className="text-sm text-fontcolor font-medium cursor-pointer"
+                                                            >
+                                                                {item}
+                                                            </label>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="mb-6">
+                                                <label
+                                                    htmlFor="verification-option"
+                                                    className="block text-sm font-semibold text-primary mb-2"
+                                                >
+                                                    {" "}
+                                                    Verification Option
+                                                </label>
+                                                <select
+                                                    className=" border border-gray-300 rounded-lg px-4 py-2 text-sm text-fontcolor"
+                                                    name="verification_option"
+                                                    value={
+                                                        formData.verification_option
+                                                    }
+                                                    onChange={
+                                                        handleSettingsInputChange
+                                                    }
+                                                >
+                                                    <option value="Score Unverified Credential Fully">
+                                                        Score Unverified
+                                                        Credential Fully
+                                                    </option>
+                                                    <option value="Score Unverified Credential 50%">
+                                                        Score Unverified
+                                                        Credential 50%
+                                                    </option>
+                                                    <option value="Ignore Unverified Credentials">
+                                                        Ignore Unverified
+                                                        Credentials
+                                                    </option>
+                                                </select>
+                                            </div>
+
+                                            <div className="mb-6">
+                                                <label
+                                                    htmlFor="verification-option"
+                                                    className="block text-sm font-semibold text-primary mb-2"
+                                                >
+                                                    {" "}
+                                                    Additional Notes
+                                                </label>
+
+                                                <textarea
+                                                    name="additional_notes"
+                                                    placeholder="Additional Notes"
+                                                    value={
+                                                        formData.additional_notes
+                                                    }
+                                                    onChange={
+                                                        handleSettingsInputChange
+                                                    }
+                                                    className="w-full p-1 rounded-xs border-2 border-fontcolor text-fontcolor h-20"
+                                                ></textarea>
+                                            </div>
+
+                                            <div className="flex justify-end mt-8">
+                                                <button
+                                                    type="button"
+                                                    onClick={handleSubmit}
+                                                    className="button1 flex items-center justify-center"
+                                                >
+                                                    <div className="flex items-center space-x-2 ml-auto">
+                                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
+                                                            Continue
+                                                        </p>
+                                                        <Image
+                                                            src="/Arrow Right.svg"
+                                                            width={23}
+                                                            height={10}
+                                                            alt="Continue Icon"
+                                                        />
+                                                    </div>
+                                                </button>
+                                            </div>
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="mb-6">
-                                <label
-                                    htmlFor="verification-option"
-                                    className="block text-sm font-semibold text-primary mb-2"
-                                >
-                                    {" "}
-                                    Verification Option
-                                </label>
-                                <select
-                                    className=" border border-gray-300 rounded-lg px-4 py-2 text-sm text-fontcolor"
-                                    name="verification_option"
-                                    value={formData.verification_option}
-                                    onChange={handleSettingsInputChange}
-                                >
-                                    <option value="Score Unverified Credential Fully">
-                                        Score Unverified Credential Fully
-                                    </option>
-                                    <option value="Score Unverified Credential 50%">
-                                        Score Unverified Credential 50%
-                                    </option>
-                                    <option value="Ignore Unverified Credentials">
-                                        Ignore Unverified Credentials
-                                    </option>
-                                </select>
-                            </div>
-
-                            <div className="mb-6">
-                                <label
-                                    htmlFor="verification-option"
-                                    className="block text-sm font-semibold text-primary mb-2"
-                                >
-                                    {" "}
-                                    Additional Notes
-                                </label>
-
-                                <textarea
-                                    name="additional_notes"
-                                    placeholder="Additional Notes"
-                                    value={formData.additional_notes}
-                                    onChange={handleSettingsInputChange}
-                                    className="w-full p-1 rounded-xs border-2 border-fontcolor text-fontcolor h-20"
-                                ></textarea>
-                            </div>
-
-                            <div className="flex justify-end mt-8">
-                                <button
-                                    type="button"
-                                    onClick={(e) =>
-                                        handleSettingsSubmit(e, "draft")
-                                    }
-                                    className="button1 flex items-center justify-center"
-                                >
-                                    <div className="flex items-center space-x-2 ml-auto">
-                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
-                                            Continue
-                                        </p>
-                                        <Image
-                                            src="/Arrow Right.svg"
-                                            width={23}
-                                            height={10}
-                                            alt="Continue Icon"
-                                        />
                                     </div>
-                                    </button>
-                                </div>
                                 </div>
                             </div>
-                        </form>
-                       </div>
+                        </div>
                     </div>
-                </div>
+                </form>
             </div>
             <GeneralFooter />
         </div>
