@@ -41,11 +41,6 @@ const faqs = [
     answer:
       "Verified candidates typically receive 3x more interview requests, as employers prioritize applicants whose credentials have already undergone verification.",
   },
-  {
-    question: "Can I customize the applicant ranking criteria?",
-    answer:
-      "Absolutely! You can set job-specific parameters and weighting to ensure candidates are ranked according to your organization's unique needs and priorities.",
-  },
 ];
 
 export default function FAQs() {
@@ -64,6 +59,7 @@ export default function FAQs() {
     <div>
       <GeneralHeader/>
       <div className={`${Inter.variable} lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-10 sm:px-8 xsm:px-8 xxsm:px-4 mx-auto font-[family-name:var(--font-inter)]`}>
+      
         <div id="FAQs" className="min-h-screen w-full flex flex-col items-center justify-start bg-white">
           <h2 className="text-center lg:text-5xl mb:text-3xl sm:text-xl font-bold tracking-widest text-primary mb-3">FREQUENTLY ASKED QUESTIONS</h2>
           <p className="text-primary font-semibold tracking-wide text-center mb-6">HOW CAN WE HELP YOU?</p>
