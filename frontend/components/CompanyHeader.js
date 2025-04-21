@@ -45,7 +45,7 @@ const CompanyHeader = () => {
       <div className="flex items-center gap-5">
         {/* Notification Icon */}
         <button className="pt-1">
-          <Link href="" className="ml-auto">
+          <Link href="/COMPANY/Notifications" className="ml-auto">
             <Image 
               src="/Notification Icon.svg" 
               width={39} 
@@ -54,6 +54,7 @@ const CompanyHeader = () => {
             />
             </Link>
         </button>
+    
 
         {/* Profile Dropdown */}
         <div className="relative">
