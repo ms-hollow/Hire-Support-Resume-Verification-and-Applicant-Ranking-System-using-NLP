@@ -7,14 +7,21 @@ import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import jwt from 'jsonwebtoken';
 import { useAddressMapping } from "@/pages/utils/AddressMapping";
+import JobDetailsWrapper from "@/components/JobDetails";
 
-export default function JobApplication () {
+export default function JobApplication ({handleJobClick}) {
 
     let {authTokens} = useContext(AuthContext);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
-    const { jobId } = router.query;
+    const { id } = router.query;
     const { convertAddressCodes } = useAddressMapping();
+
+    const [showJobDetails, setShowJobDetails] = useState(false);
+
+    const handleToggleDetails = () => {
+        setShowJobDetails((prev) => !prev); // Toggle visibility
+    };
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -60,21 +67,22 @@ export default function JobApplication () {
     };
 
     const saveDraft = async () => {
-        const alreadyApplied = await checkIfAlreadyApplied();
-        if (alreadyApplied) {
-            alert("You have already applied for this job.");
-            return;
-        }
+        //! Need to uncomment this code when done with the document upload feature
+        // const alreadyApplied = await checkIfAlreadyApplied();
+        // if (alreadyApplied) {
+        //     alert("You have already applied for this job.");
+        //     return;
+        // }
     
-        localStorage.setItem('draftJobApplication', JSON.stringify(draftJobApplication));
+        sessionStorage.setItem('draftJobApplication', JSON.stringify(draftJobApplication));
         router.push({
             pathname: '/APPLICANT/ApplicantDocuments',
-            query: { jobId },
+            query: { id },
         });
     };
 
     useEffect(() => {
-        if (!authTokens?.access || !jobId || !convertAddressCodes) return;
+        if (!authTokens?.access || !id || !convertAddressCodes) return;
 
         const decodedToken = jwt.decode(authTokens.access);
         if (!decodedToken) {
@@ -117,7 +125,7 @@ export default function JobApplication () {
                         });
 
                         setdraftJobApplication({
-                            job_hiring: Number(jobId),
+                            job_hiring: Number(id),
                             applicant: Number(applicantKey),
                             fullName: fullName,
                             email: decodedToken.email,
@@ -141,13 +149,13 @@ export default function JobApplication () {
             }
         };
         getApplicantInfo();
-    }, [authTokens, jobId, convertAddressCodes]);
+    }, [authTokens, id, convertAddressCodes]);
 
 
     // Check kung nakapag apply na si applicant or hindi
     const checkIfAlreadyApplied = async () => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/job/applications/check/${jobId}/?applicant_id=${draftJobApplication.applicant}`);
+            const response = await fetch(`http://127.0.0.1:8000/job/applications/check/${id}/?applicant_id=${draftJobApplication.applicant}`);
             if (!response.ok) {
                 throw new Error("Failed to check application status");
             }
@@ -160,13 +168,13 @@ export default function JobApplication () {
         }
     };
 
-    const getTitleFromLocalStorage = () => {
-        const jobTitle = localStorage.getItem('job_title');
+    const getTitle = () => {
+        const jobTitle = sessionStorage.getItem('job_title');
         return jobTitle ? jobTitle : null; 
     };
     
-    const getCompanyFromLocalStorage = () => {
-        const company = localStorage.getItem('company');
+    const getCompany = () => {
+        const company = sessionStorage.getItem('company');
         return company ? company : null; 
     };
 
@@ -209,15 +217,28 @@ export default function JobApplication () {
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
                     <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>
                     <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompanyFromLocalStorage() || 'No Job Company Available'}</p>
-                    <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-8 font-bold underline"> See job hiring details</p>
-                    
+                    <div className="relative">
+                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-8 font-bold underline cursor-pointer" onClick={handleToggleDetails} >See job hiring details</p>
+                        {showJobDetails && (
+                            <div className="flex items-center justify-center absolute inset-0 bg-background h-screen ">
+                                <div className="relative w-full lg:w-6/12 mb:w-10/12 sm:w-full bg-background rounded ">
+                                    <button onClick={() => setShowJobDetails(false)} className="absolute -top-12 right-0  text-xl text-fontcolor hover:text-gray-700" > ✖ </button>
+                                    <JobDetailsWrapper
+                                    authToken={authTokens?.access}
+                                    onJobClick={handleJobClick}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
                     <div className="flex items-center justify-center ">
                         <div className="box-container px-8 py-5 mx-auto">
                             <p className="font-semibold lg:text-large mb:text-large sm:text-large text-primary">Personal Information</p>
 
                             <div className="flex items-center pt-2">
-                                <div className="w-full bg-background h-1. border-2 border-primary rounded-full relative">
-                                    <div className={`relative h-1 rounded-full transition-all duration-300 bg-primary`} style={{ width: "25%" }}></div>
+                                <div className="w-full bg-background h-1. border-2 border-primary rounded-full ">
+                                    <div className={` h-1 rounded-full transition-all duration-300 bg-primary`} style={{ width: "25%" }}></div>
                                 </div>
                             </div>
 
