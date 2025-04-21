@@ -12,7 +12,6 @@ from datetime import timedelta
 from django.views.decorators.csrf import csrf_exempt
 
 #* Create Job Hiring
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_job_hiring(request):
@@ -52,23 +51,6 @@ def job_hiring_list_company(request):
     serializer = JobHiringSerializer(job_listings, many=True)
     return Response(serializer.data)
 
-
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def update_job_hiring(request, job_hiring_id):
-    try:
-        # Retrieve the JobHiring object
-        job_hiring = JobHiring.objects.get(job_hiring_id=job_hiring_id, company=request.user.company)
-    except JobHiring.DoesNotExist:
-        return Response({"message": "Job Hiring not found or you do not have permission to edit it."}, status=status.HTTP_404_NOT_FOUND)
-
-    # Use the serializer to validate and update the data
-    serializer = JobHiringSerializer(job_hiring, data=request.data, partial=True)  # partial=True allows updating specific fields
-
-    if serializer.is_valid():
-        serializer.save()  # Save the updated job hiring
-        return Response(serializer.data)  # Return the updated job hiring data
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #* Delete Job Hiring
 @api_view(['DELETE'])
