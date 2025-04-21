@@ -4,30 +4,51 @@ from users.models import User
 
 #TODO Need to migrate
 
+STATUS_CHOICES = (
+    ('draft', 'Draft'),
+    ('open', 'Open'),
+    ('closed', 'Closed'),
+    ('complete', 'Complete')
+)
+
 class JobHiring(models.Model): 
     job_hiring_id = models.AutoField(primary_key=True) #PK
     company = models.ForeignKey(Company, on_delete=models.CASCADE) #FK
 
     job_title = models.CharField(max_length=100, null=True, blank=False)
     job_industry = models.CharField(max_length=50, null=True, blank=False)
-    job_description = models.TextField()
+    specialization = models.JSONField(null=True, blank=False)
+    job_description = models.TextField(null=True, blank=False)
     
-    work_location = models.CharField(max_length=300, null=True, blank=False)
+    region = models.CharField(max_length=300, null=True, blank=False)
+    province = models.CharField(max_length=300, null=True, blank=False)
+    city = models.CharField(max_length=300, null=True, blank=False)
+
     work_setup = models.CharField(max_length=300, null=True, blank=False)
     employment_type = models.CharField(max_length=300, null=True, blank=False)
     qualifications = models.TextField()
     schedule = models.CharField(max_length=300)
-    salary = models.JSONField(null=True, blank=True)
-    frequency = models.CharField(max_length=300, null=True, blank=False)
-    benefits = models.JSONField(null=True, blank=True)
+    benefits = models.CharField(max_length=300, null=True, blank=True) # Note: change to CharField
     experience_level = models.CharField(max_length=300, null=True, blank=False)
     num_positions = models.PositiveIntegerField()
-    verification_option = models.CharField(max_length=300, null=True, blank=False)
-    creation_date = models.DateField(auto_now_add=True)
+    salary_min = models.CharField(max_length=300, null=True, blank=True) # Note: change to CharField
+    salary_max = models.CharField(max_length=300, null=True, blank=True) # Note: change to CharField
+    salary_frequency = models.CharField(max_length=300, null=True, blank=False)
+    creation_date = models.DateTimeField(auto_now_add=True)
+    
+    verification_option = models.CharField(max_length=300, null=True, blank=True)
     required_documents = models.JSONField(null=True, blank=True)
-    application_deadline = models.DateField()
-    status = models.CharField(max_length=10, null=True, blank=False)
-    additional_notes = models.TextField(max_length=300, null=True, blank=True)
+    application_deadline = models.DateField(null=True, blank=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, null=True, blank=True)
+
+    weight_of_criteria = models.JSONField(null=True, blank=True)
+    additional_notes = models.TextField(null=True, blank=True) 
+
+    num_applications = models.PositiveIntegerField(default=0)
+
+    def update_num_applications(self): # Method to update the num_applications field.
+        self.num_applications = self.jobapplication_set.count() 
+        self.save()
 
     def get_scoring_criteria(self):
         criteria_list = []
@@ -39,11 +60,11 @@ class JobHiring(models.Model):
             }
             criteria_list.append(criteria_data)
         return criteria_list
-    
+
     def __str__(self):
         return f"{self.job_title} at {self.company.company_name}"
-    
-#Represents the criteria used to evaluate applicants for a specific job posting. This model stores details about each scoring criterion, such as its name, weight, and preference.
+
+
 class ScoringCriteria(models.Model):
     job_hiring = models.ForeignKey(JobHiring, related_name='scoring_criteria', on_delete=models.CASCADE)
     criteria_name = models.CharField(max_length=100, blank=True, null=True)

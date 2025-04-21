@@ -1,124 +1,205 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import CompanyHeader from "@/components/CompanyHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import Link from "next/link";
 import Image from "next/image";
+import AuthContext from "../context/AuthContext";
+import { useRouter } from "next/router";
+import { getCompany } from "../api/companyApi";
+import { fetchJobList, deleteJobHiring } from "../api/companyJobApi";
 
-// Function to dynamically determine className based on status
+//* PAGE STATUS
+// TODO - Pass the job hiring id to query (for edit job hiring & view)
+
 const getStatusClassName = (status) => {
-  switch (status) {
-    case "Complete":
-      return "text-complete";
-    case "Open":
-      return "text-fontcolor";
-    case "Draft":
-      return "text-primary";
-    case "Closed":
-      return "text-accent";
-    default:
-      return "text-default";
-  }
+    const statusClasses = {
+        complete: "text-complete",
+        open: "text-fontcolor",
+        draft: "text-primary",
+        closed: "text-accent",
+    };
+    return statusClasses[status] || "text-default";
 };
 
 export default function CompanyHome() {
-  const [jobs, setJobDetails] = useState([]);
-  const [selectedJobId, setSelectedJobId] = useState(null);
+    const [jobLists, setJobLists] = useState([]);
+    const [companyName, setCompanyName] = useState(null);
+    const router = useRouter();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch("/placeHolder/dummy_JobDetails.json"); 
-        if (!res.ok) {
-          throw new Error("Failed to fetch data");
+    let { authTokens } = useContext(AuthContext);
+
+    const fetchJobLists = async () => {
+        if (!authTokens) {
+            router.push("/GENERAL/Login");
+            return;
         }
-        const json = await res.json();
-        setJobDetails(json); 
-      } catch (error) {
-        console.error("Error fetching job details:", error);
-      }
+
+        const companyData = await getCompany(authTokens);
+        setCompanyName(companyData?.profile_data?.company_name || " ");
+
+        const jobData = await fetchJobList(authTokens);
+        if (jobData) {
+            setJobLists(jobData);
+        }
     };
 
-    fetchData();
-  }, []);
+    useEffect(() => {
+        fetchJobLists();
+    }, [authTokens, router]);
 
-  const handleJobSelect = (jobId) => {
-    setSelectedJobId(jobId);
-    localStorage.setItem('selectedJobId', jobId);
-  };
+    const handleJobView = (id) => {
+        // console.log("selectedJobId", jobId);
+        router.push({
+            pathname: "/COMPANY/ApplicantsSummary",
+            query: { id },
+        });
+    };
 
-  return (
-    <div>
-      <CompanyHeader />
-      <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 mx-auto pb-8">
+    const handleEditJob = (id) => {
+        // console.log("selectedJobId", jobId);
+        router.push({
+            pathname: "/COMPANY/EditJobHiring",
+            query: { id },
+        });
+    };
+
+    const handleDelete = async (jobId) => {
+        const success = await deleteJobHiring(jobId, authTokens);
+        if (success) {
+            alert("Job successfully deleted");
+            setJobLists((prevJobLists) =>
+                prevJobLists.filter((job) => job.id !== jobId)
+            );
+            await fetchJobLists();
+        } else {
+            alert("Failed to delete job.");
+        }
+    };
+
+    return (
         <div>
-          <p className="text-fontcolor pb-8">Hi, Name</p>
-        </div>
+            <>
+                <CompanyHeader />
+                <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 mx-auto pb-8">
+                    <div>
+                        <p className="text-fontcolor pb-8">Hi, {companyName}</p>
+                    </div>
 
-        <div className="flex items-center justify-center pb-5">
-          <table className="table-fixed w-full">
-            <thead className="font-semibold lg:text-medium mb:text-medium sm:text-medium text-primary">
-              <tr>
-                <th className="w-2/6 text-center">Job Title</th>
-                <th className="w-1/12 text-center">Status</th>
-                <th className="w-1/6 text-center">No. of Applications</th>
-                <th className="w-1/12 text-center">Deadline</th>
-                <th className="w-2/6 text-center">Job Hiring Details</th>
-              </tr>
-            </thead>
-          </table>
-        </div>
+                    <div className="flex items-center justify-center pb-5">
+                        <table className="table-fixed w-full">
+                            <thead className="font-semibold lg:text-medium mb:text-medium sm:text-medium text-primary">
+                                <tr>
+                                    <th className="w-2/6 text-center">
+                                        Job Title
+                                    </th>
+                                    <th className="w-1/12 text-center">
+                                        Status
+                                    </th>
+                                    <th className="w-1/6 text-center">
+                                        No. of Applications
+                                    </th>
+                                    <th className="w-1/12 text-center">
+                                        Deadline
+                                    </th>
+                                    <th className="w-2/6 text-center">
+                                        Job Hiring Details
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
 
-        <div className="flex items-center justify-center overflow-hidden rounded-t-lg rounded-b-lg border border-[#F5F5F5]">
-          <table className="table-fixed w-full border-collapse text-center">
-            <tbody>
-              {jobs.length > 0 ? (
-                jobs.map((job, index) => (
-                  <tr key={index} className="px-2 hover:shadow-md border-b border-[#F5F5F5]">
-                    <td className="w-2/6 p-5 font-thin text-medium text-fontcolor truncate">
-                      {job.job_title}
-                    </td>
-                    <td className={`w-1/12 font-thin text-medium truncate ${getStatusClassName(job.status)}`}>
-                      {job.status}
-                    </td>
-                    <td className="w-1/6 font-thin text-medium text-fontcolor truncate">
-                      {job.num_applicants}
-                    </td>
-                    <td className="w-1/12 font-thin text-medium text-fontcolor truncate">
-                      {job.application_deadline}
-                    </td>
-                    <td className="w-2/6">
-                      <div className="flex flex-row justify-between px-5">
-                        <button type="button" className="button1 flex flex-col items-center justify-center"  onClick={() => handleJobSelect(job.Id)}>
-                          <Link href="/COMPANY/ApplicantsSummary" className="flex items-center space-x-2">
-                            <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
-                              View Applicants
-                            </p>
-                          </Link>
-                        </button>
-                        <button type="button" className="button2 flex items-center justify-center" onClick={() => handleJobSelect(job.Id)}>
-                          <Link href="/COMPANY/EditJobHiring" className="flex items-center space-x-2">
-                            <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
-                              Edit Job Hiring
-                            </p>
-                          </Link>
-                        </button>
-                        <Image src="/Delete.png" width={25} height={15} alt="Delete Icon" />
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="p-5 text-center">
-                    No job details available.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                    <div className="flex items-center justify-center overflow-hidden rounded-t-lg rounded-b-lg border border-[#F5F5F5]">
+                        <table className="table-fixed w-full border-collapse text-center">
+                            <tbody>
+                                {jobLists.length > 0 ? (
+                                    jobLists.map((job, index) => (
+                                        <tr
+                                            key={index}
+                                            className="px-2 hover:shadow-md border-b border-[#F5F5F5]"
+                                        >
+                                            <td className="w-2/6 p-5 font-thin text-medium text-fontcolor truncate">
+                                                {job.job_title}
+                                            </td>
+                                            <td
+                                                className={`w-1/12 font-thin text-medium truncate ${getStatusClassName(
+                                                    job.status
+                                                )}`}
+                                            >
+                                                {job.status
+                                                    .charAt(0)
+                                                    .toUpperCase() +
+                                                    job.status.slice(1)}
+                                            </td>
+                                            <td className="w-1/6 font-thin text-medium text-fontcolor truncate">
+                                                {job.num_applications}
+                                            </td>
+                                            <td className="w-1/12 font-thin text-medium text-fontcolor truncate">
+                                                {job.application_deadline}
+                                            </td>
+                                            <td className="w-2/6">
+                                                <div className="flex flex-row justify-between px-5">
+                                                    <button
+                                                        type="button"
+                                                        className="button1 flex flex-col items-center justify-center"
+                                                        onClick={() =>
+                                                            handleJobView(
+                                                                job.job_hiring_id
+                                                            )
+                                                        }
+                                                    >
+                                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
+                                                            View Applicants
+                                                        </p>
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="button2 flex items-center justify-center"
+                                                        onClick={() =>
+                                                            handleEditJob(
+                                                                job.job_hiring_id
+                                                            )
+                                                        }
+                                                    >
+                                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
+                                                            Edit Job Hiring
+                                                        </p>
+                                                    </button>
+                                                    <div
+                                                        className="cursor-pointer"
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                job.job_hiring_id
+                                                            )
+                                                        }
+                                                    >
+                                                        <Image
+                                                            src="/Delete.png"
+                                                            width={25}
+                                                            height={15}
+                                                            alt="Delete Icon"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td
+                                            colSpan="5"
+                                            className="p-5 text-center"
+                                        >
+                                            No job details available.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <GeneralFooter />
+            </>
         </div>
-      </div>
-      <GeneralFooter />
-    </div>
-  );
+    );
 }

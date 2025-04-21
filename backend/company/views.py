@@ -22,6 +22,7 @@ def complete_company_profile(request):
         return Response(serializer.errors, status=400)
     
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def view_company_profile(request):
     company = get_object_or_404(Company, user=request.user)
     serializer = CompanyProfileFormSerializer(company)

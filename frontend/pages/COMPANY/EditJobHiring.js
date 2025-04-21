@@ -1,63 +1,70 @@
-import Link from "next/link";
+import { useEffect, useContext } from "react";
 import Image from "next/image";
 import CompanyHeader from "@/components/CompanyHeader";
 import CompanyJobDetailsWrapper from "@/components/CompanyJobDetails";
 import GeneralFooter from "@/components/GeneralFooter";
-import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import { deleteJobHiring } from "../api/companyJobApi";
+import AuthContext from "../context/AuthContext";
 
-export default function EditJobHiring({ jobId }) {
-    const [jobDetails, setJobDetails] = useState(null);
-    const [selectedJobId, setSelectedJobId] = useState(jobId);
+export default function EditJobHiring() {
+    let { authTokens } = useContext(AuthContext);
+    const router = useRouter();
+    const { id } = router.query;
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const currentJobId = jobId || localStorage.getItem("selectedJobId");
-                if (!currentJobId) {
-                    console.error("No job ID provided");
-                    return;
-                }
+        if (!authTokens) {
+            router.push("/GENERAL/Login");
+            return;
+        }
+    }, []);
 
-                const res = await fetch("/placeHolder/dummy_JobDetails.json");
-                const json = await res.json();
-                const item = json.find((item) => item.Id === parseInt(currentJobId));
+    const handleViewApplicantSummary = () => {
+        console.log("selectedJobId", id);
+        router.push({
+            pathname: "/COMPANY/ApplicantSummary",
+            query: { id },
+        });
+    };
 
-                if (item) {
-                    setJobDetails(item);
-                } else {
-                    console.error("Job not found");
-                }
-            } catch (error) {
-                console.error("Error fetching job details:", error);
-            }
-        };
-
-        fetchData();
-    }, [jobId]);
-
-    const handleJobSelect = (jobId) => {
-        setSelectedJobId(jobId);
-        localStorage.setItem("selectedJobId", jobId);
+    const handleDelete = async () => {
+        const success = await deleteJobHiring(id, authTokens);
+        if (success) {
+            alert("Job successfully deleted");
+            router.push("/COMPANY/CompanyHome");
+        } else {
+            alert("Failed to delete job.");
+        }
     };
 
     return (
         <div>
-        <CompanyHeader />
+            <CompanyHeader />
             <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 mx-auto pb-8">
-                <h1 className="lg:text-xl mb:text-xl sm:text-large text-primary pb-5">Job Hiring Details </h1>
+                <h1 className="lg:text-xl mb:text-xl sm:text-large text-primary pb-5">
+                    Job Hiring Details{" "}
+                </h1>
 
-                {jobDetails ? (
-                    <div className="flex flex-row justify-end px-5">
-                        <button type="button" className="button1 flex flex-col items-center justify-center mr-10" onClick={() => handleJobSelect(jobDetails.Id)} >
-                            <Link href="/COMPANY/ApplicantsSummary" className="flex items-center space-x-2">
-                                <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center"> View Applicants Summary </p> 
-                            </Link>
-                        </button>
-                        <Image src="/Delete.png" width={30} height={15} alt="Delete Icon" />
+                <div className="flex flex-row justify-end px-5">
+                    <button
+                        type="button"
+                        className="button1 flex flex-col items-center justify-center mr-10"
+                        onClick={handleViewApplicantSummary}
+                    >
+                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
+                            {" "}
+                            View Applicants Summary{" "}
+                        </p>
+                    </button>
+                    <div onClick={handleDelete} className="cursor-pointer">
+                        <Image
+                            src="/Delete.png"
+                            width={30}
+                            height={15}
+                            alt="Delete Icon"
+                        />
                     </div>
-                ) : (
-                <p className="p-5 text-center">No job details available.</p>
-                )}
+                </div>
 
                 <div className="flex flex-row gap-5">
                     <CompanyJobDetailsWrapper />
@@ -66,7 +73,7 @@ export default function EditJobHiring({ jobId }) {
                     </div>
                 </div>
             </div>
-        <GeneralFooter />
+            <GeneralFooter />
         </div>
     );
 }
