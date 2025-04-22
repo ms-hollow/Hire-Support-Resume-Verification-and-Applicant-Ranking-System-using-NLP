@@ -8,6 +8,7 @@ import phLocations from "@/public/placeHolder/philippines.json";
 import { getCompany } from "../api/companyApi";
 import AuthContext from "../context/AuthContext";
 import Cookies from "js-cookie";
+import { getCookie } from "../utils/cookieUtils";
 
 export default function CreateJob() {
     const [regions, setRegions] = useState([]);
@@ -43,15 +44,6 @@ export default function CreateJob() {
 
     //* Set ang formdata
     useEffect(() => {
-        function getCookie(name) {
-            const cookieValue = document.cookie
-                .split("; ")
-                .find((row) => row.startsWith(name + "="))
-                ?.split("=")[1];
-
-            return cookieValue ? decodeURIComponent(cookieValue) : null;
-        }
-
         const storedData = getCookie("DRAFT_DATA");
 
         if (storedData) {
