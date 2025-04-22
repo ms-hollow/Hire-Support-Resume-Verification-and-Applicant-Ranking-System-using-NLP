@@ -5,11 +5,11 @@ from docx import Document  # for document files
 import os # for manipulating file paths
 import re # for regex
 #from fontTools.ufoLib import pngSignature
-from multi_column import column_boxes # imports 'multi_column' module which detects columns
+from main_model.multi_column import column_boxes # imports 'multi_column' module which detects columns
 
 #For Pytesseract
 import pytesseract
-import textseg as ts
+from main_model import textseg as ts
 from PyPDF2 import PdfReader
 from pdf2image import convert_from_path
 import cv2
@@ -23,7 +23,7 @@ import re
 from collections import defaultdict
 import spacy
 
-from date_standardizer import date_standardizer
+from main_model.date_standardizer import date_standardizer
 
 
 # Classes for extracting Resume (Pymu and Pytesseract)
@@ -103,7 +103,7 @@ class PytesseractExtractor:
         self.resumes = glob.glob(document_path)
 
         # Define the path to write output files: picture ng resume with bounding box
-        self.path_to_write = r'backend/main_model/Output/'
+        self.path_to_write = r'main_model/Output/'
 
         # Initialize data structures to store results
         self.data = pd.DataFrame()

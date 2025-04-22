@@ -1,9 +1,9 @@
 import re
 from datetime import datetime
-from NER_experience import ner_experience
-from NER_education import ner_education
-from NER_certification import ner_certification
-from skills_parser import parse_skills
+from main_model.NER_experience import ner_experience
+from main_model.NER_education import ner_education
+from main_model.NER_certification import ner_certification
+from main_model.skills_parser import parse_skills
 
 def divide_section(resume_text):
     """

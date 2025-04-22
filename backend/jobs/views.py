@@ -9,8 +9,14 @@ from django.db import transaction
 from django.utils import timezone
 from datetime import timedelta
 from django.views.decorators.csrf import csrf_exempt
-from main_model.utils.file_processors import create_job_hiring_json
-from main_model.utils.file_processors import create_job_application_json
+from main_model.utils.file_processors import extract_hiring_settings
+from main_model.utils.file_processors import extract_application_data
+from main_model.hire_support import process_application
+import logging
+
+# Configure logging
+logger = logging.getLogger(__name__)
+
 #* Create Job Hiring
 
 @api_view(['POST'])
@@ -230,9 +236,25 @@ def create_job_application(request):
                         document_file=doc_file
                     )
                 
-                # Generate the JSON file in the proper location
-                app_json_path = create_job_application_json(job_application)
-               
+                # Get hiring settings and application data as dictionaries
+                hiring_settings = extract_hiring_settings(job_application.job_hiring)
+                application_data = extract_application_data(job_application)
+
+                # Process application directly
+                try:
+                    scores, verification_result = process_application(
+                        hiring_settings, 
+                        application_data
+                    )
+
+                    job_application.scores = scores
+                    job_application.verification_result = verification_result
+                    job_application.save()
+                    
+                except Exception as e:
+                    # Log the error
+                    logger.error(f"Error processing application: {str(e)}")
+                
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

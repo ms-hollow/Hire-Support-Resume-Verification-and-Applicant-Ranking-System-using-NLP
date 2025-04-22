@@ -125,7 +125,7 @@ def get_text_seg(frame, image):
     nmsThreshold = 0.7 # value to text region separation
     inpWidth = 2048
     inpHeight = 2048
-    model = r"backend/main_model/frozen_east_text_detection.pb"
+    model = r"main_model/frozen_east_text_detection.pb"
 
     # Load network
     net = cv2.dnn.readNet(model)

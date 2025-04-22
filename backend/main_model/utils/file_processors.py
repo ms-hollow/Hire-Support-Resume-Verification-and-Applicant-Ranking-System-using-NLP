@@ -3,8 +3,8 @@ import os
 from django.conf import settings
 from django.core.files.storage import default_storage
 
-def create_job_hiring_json(job_hiring):
-    """Convert JobHiring model instance to JSON format expected by hire_support.py"""
+def extract_hiring_settings(job_hiring):
+    """Extract hiring settings from a JobHiring model instance as a dictionary"""
     
     # Parse weight_of_criteria if it's a JSON string
     weight_of_criteria = job_hiring.weight_of_criteria or {}
@@ -145,7 +145,10 @@ def create_job_hiring_json(job_hiring):
         # Parse verification option
         "verification_option": parse_verification_option(job_hiring.verification_option)
     }
+
+    return hiring_settings  # Return dictionary directly instead of saving to file
     
+    ''''
     # Create job hiring directory
     from main_model.utils.file_structure import get_job_hiring_dir
     job_hiring_dir = get_job_hiring_dir(job_hiring.job_hiring_id)
@@ -158,6 +161,7 @@ def create_job_hiring_json(job_hiring):
         json.dump(hiring_settings, f, indent=4)
     
     return file_path
+    '''
 
 def parse_verification_option(verification_option):
     """Convert verification_option string to numerical value"""
@@ -174,41 +178,32 @@ def parse_verification_option(verification_option):
         return 0  # Default value
 
 
-def create_job_application_json(job_application):
-    """
-    Convert JobApplication model instance to JSON format expected by hire_support.py
-    """
+def extract_application_data(job_application):
+    """Extract application data from a JobApplication model instance as a dictionary"""
     
     # Get applicant information
     applicant = job_application.applicant
-    job_hiring_id = job_application.job_hiring.job_hiring_id
-    applicant_id = applicant.id
     
     # Get document links organized by document type
     resume_links = []
     experience_documents_links = []
     educational_documents_links = []
     certifications_documents_links = []
-    additional_documents_links = []
     
     # Group documents by type
     for document in job_application.documents.all():
-        doc_path = str(document.document_file.url)
-        if doc_path.startswith('/media/'):
-            # Convert relative path to full path for hire_support.py
-            doc_path = f"backend{doc_path}"
+        # Use actual filesystem path
+        if document.document_file:
+            doc_path = document.document_file.path  # This gives the full system path
             
-        if document.document_type.lower() == 'resume':
-            resume_links.append(doc_path)
-        elif document.document_type.lower() == 'experience':
-            experience_documents_links.append(doc_path)
-        elif document.document_type.lower() == 'education':
-            educational_documents_links.append(doc_path)
-        elif document.document_type.lower() == 'certifications':
-            certifications_documents_links.append(doc_path)
-        else:
-            # Handle additional documents
-            additional_documents_links.append(doc_path)
+            if document.document_type.lower() == 'resume':
+                resume_links.append(doc_path)
+            elif document.document_type.lower() == 'experience':
+                experience_documents_links.append(doc_path)
+            elif document.document_type.lower() == 'education':
+                educational_documents_links.append(doc_path)
+            elif document.document_type.lower() == 'certifications':
+                certifications_documents_links.append(doc_path)
     
     # Prepare application data in format expected by hire_support.py
     application_data = {
@@ -220,19 +215,7 @@ def create_job_application_json(job_application):
         "certifications_documents_links": ", ".join(certifications_documents_links)
     }
     
-    # Get the applicant directory
-    from main_model.utils.file_structure import get_applicant_dir
-    applicant_dir = get_applicant_dir(job_hiring_id, applicant_id)
-    
-    # Create a file path in the applicant directory
-    file_path = os.path.join(applicant_dir, 'application.json')
-    
-    # Save the JSON file
-    with open(file_path, 'w') as f:
-        json.dump(application_data, f, indent=4)
-    
-    return file_path
-
+    return application_data
 
 # ----------------------------DI PA NAGAGAMIT ------------- #
 

@@ -29,7 +29,7 @@ class ResumeNER:
                                                            label2id=self.label2id)
 
         # Load the trained model weights
-        model.load_state_dict(torch.load(r'backend/main_model/experience_ner_model.pt', map_location=torch.device('cpu')))
+        model.load_state_dict(torch.load(r'main_model/experience_ner_model.pt', map_location=torch.device('cpu')))
         model.eval()
         return model, tokenizer
 
