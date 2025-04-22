@@ -22,6 +22,7 @@ import os
 import re
 from collections import defaultdict
 import spacy
+import numpy as np
 
 from main_model.date_standardizer import date_standardizer
 
@@ -103,7 +104,7 @@ class PytesseractExtractor:
         self.resumes = glob.glob(document_path)
 
         # Define the path to write output files: picture ng resume with bounding box
-        self.path_to_write = r'main_model/Output/'
+        self.path_to_write = None
 
         # Initialize data structures to store results
         self.data = pd.DataFrame()
@@ -148,31 +149,25 @@ class PytesseractExtractor:
             resumes_img = []
             # Save each page as a separate JPEG image
             for j, image in enumerate(images):
-                    image_path = os.path.join(self.path_to_write, f"{os.path.splitext(fname)[0]}_{j}.jpg")
-                    image.save(image_path, 'JPEG')
-                    resumes_img.append(image_path)
+                resumes_img.append(image)
 
             # Initialize variables for current document
             name_list = f"{os.path.splitext(fname)[0]}_.jpg"
             text_opencv = []
             text_tesseract = []
 
-            # Process each page image
-            for img_path in resumes_img:
-                frame = cv2.imread(img_path)
-                os.remove(img_path)
-                img = os.path.basename(img_path)
-
-                output_img, label, dilate, c_dict, df1, split_img = ts.get_text_seg(frame, img)
-                cv2.imwrite(os.path.join(self.path_to_write, f"{os.path.splitext(img)[0]}.png"), output_img)
-
-                # print the visualization
-                for i, split in enumerate(split_img):
-                    if i == '0' and not '00':
-                        cv2.imwrite(os.path.join(self.path_to_write, f"{os.path.splitext(img)[0]}{i}.png"), split)
-                        break
-
-                text_opencv.append(c_dict)              # Store OpenCV text extraction results
+            for j, img in enumerate(resumes_img):
+                # Convert PIL Image to OpenCV format
+                img_array = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+                
+                # Use a dummy name for processing
+                img_name = f"temp_{j}"
+                
+                # Process without saving
+                output_img, label, dilate, c_dict, df1, split_img = ts.get_text_seg(img_array, img_name)
+                
+                # No saving of output images
+                text_opencv.append(c_dict)
 
             # Join all extracted text with proper spacing
             tesseract_str = '\n\n'.join(filter(None, text_tesseract))
