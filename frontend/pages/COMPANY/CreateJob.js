@@ -102,6 +102,11 @@ export default function CreateJob() {
                     "Unknown Company";
                 setCompanyName(fetchedCompanyName);
 
+                //* Remove this if you don't want to alert the user once mount
+                if (companyData?.profile_data?.company_name === null) {
+                    alert("Please complete your company profile.");
+                }
+
                 const currentDate = new Date();
                 const formattedDate = formatDate(currentDate);
 
@@ -198,6 +203,12 @@ export default function CreateJob() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (companyName === "Unknown Company") {
+            alert("Please complete your company profile.");
+            return;
+        }
+
         const errors = validateForm();
         if (Object.keys(errors).length > 0) {
             alert(
@@ -265,7 +276,7 @@ export default function CreateJob() {
                 setFormData((prev) => ({ ...prev, city: "" }));
             }
         }
-    }, [formData.province, provinces]); 
+    }, [formData.province, provinces]);
 
     const handleMultiSelectChange = (option) => {
         setFormData((prev) => {
@@ -557,41 +568,41 @@ export default function CreateJob() {
                                                 )
                                             )}
                                         </select>
-                                       </div>
                                     </div>
+                                </div>
 
-                                    <div className="col-span-2 gap-3" >
-                                        <div className="w-full">
-                                            <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">
-                                                City
-                                            </label>
-                                            <select
-                                                className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall border-2 border-black h-medium rounded-xs w-full"
-                                                id="city"
-                                                name="city"
-                                                required
-                                                value={formData.city}
-                                                onChange={handleInputChange}
+                                <div className="col-span-2 gap-3">
+                                    <div className="w-full">
+                                        <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">
+                                            City
+                                        </label>
+                                        <select
+                                            className="valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall border-2 border-black h-medium rounded-xs w-full"
+                                            id="city"
+                                            name="city"
+                                            required
+                                            value={formData.city}
+                                            onChange={handleInputChange}
+                                        >
+                                            <option
+                                                value=""
+                                                disabled
+                                                selected
+                                                hidden
                                             >
+                                                Select City
+                                            </option>
+                                            {cities.map((city, index) => (
                                                 <option
-                                                    value=""
-                                                    disabled
-                                                    selected
-                                                    hidden
+                                                    key={index}
+                                                    value={city.n}
                                                 >
-                                                    Select City
+                                                    {city.n}
                                                 </option>
-                                                {cities.map((city, index) => (
-                                                    <option
-                                                        key={index}
-                                                        value={city.n}
-                                                    >
-                                                        {city.n}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </div>
+                                            ))}
+                                        </select>
                                     </div>
+                                </div>
 
                                 <div className="flex space-x-6 mt-1 col-span-2">
                                     <div className="w-1/2">
@@ -774,36 +785,29 @@ export default function CreateJob() {
                                             className="h-medium rounded-xs border-2  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall border-fontcolor"
                                         />
                                     </div>
-
-                                   </div>
                                 </div>
+                            </div>
 
-                                <div className="col-span-2 mt-3">
-                                    <div className="w-full">
-                                        <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">
-                                            Salary Frequency
-                                        </label>
-                                        <select
-                                            name="salary_frequency"
-                                            value={formData.salary_frequency}
-                                            onChange={handleInputChange}
-                                            className="h-medium rounded-xs border-2 border-fontcolor valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
-                                        >
-                                            <option value="">
-                                                Select Frequency
-                                            </option>
-                                            <option value="Monthly">
-                                                Monthly
-                                            </option>
-                                            <option value="Weekly">
-                                                Weekly
-                                            </option>
-                                            <option value="Hourly">
-                                                Hourly
-                                            </option>
-                                        </select>
-                                    </div>
+                            <div className="col-span-2 mt-3">
+                                <div className="w-full">
+                                    <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-semibold mb-1">
+                                        Salary Frequency
+                                    </label>
+                                    <select
+                                        name="salary_frequency"
+                                        value={formData.salary_frequency}
+                                        onChange={handleInputChange}
+                                        className="h-medium rounded-xs border-2 border-fontcolor valid:text-fontcolor invalid:text-placeholder lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"
+                                    >
+                                        <option value="">
+                                            Select Frequency
+                                        </option>
+                                        <option value="Monthly">Monthly</option>
+                                        <option value="Weekly">Weekly</option>
+                                        <option value="Hourly">Hourly</option>
+                                    </select>
                                 </div>
+                            </div>
 
                             <div className="flex justify-end mt-8">
                                 <button
@@ -822,17 +826,14 @@ export default function CreateJob() {
                                                 height={10}
                                                 alt="Continue Icon"
                                             />
-                                            </div>
                                         </div>
-                                    </button>
-                                </div>
-
-                                
-                            </form>
-                            
-                    </div>
+                                    </div>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
+            </div>
             <GeneralFooter />
         </div>
     );
