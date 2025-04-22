@@ -226,7 +226,12 @@ def create_job_application(request):
         
         if serializer.is_valid():
             with transaction.atomic():  # Optional, to ensure all-or-nothing saving
-                job_application = serializer.save()
+                # Save application with submitted status
+                job_application = serializer.save(application_status='submitted')
+
+                # Set initial status
+                job_application.application_status = 'new'
+                job_application.save()
 
                 # Save each file with corresponding document type in proper location
                 for doc_type, doc_file in zip(document_types, document_files):
@@ -236,28 +241,44 @@ def create_job_application(request):
                         document_file=doc_file
                     )
                 
-                # Get hiring settings and application data as dictionaries
-                hiring_settings = extract_hiring_settings(job_application.job_hiring)
-                application_data = extract_application_data(job_application)
-
-                # Process application directly
-                try:
-                    scores, verification_result = process_application(
-                        hiring_settings, 
-                        application_data
-                    )
-
-                    job_application.scores = scores
-                    job_application.verification_result = verification_result
-                    job_application.save()
-                    
-                except Exception as e:
-                    # Log the error
-                    logger.error(f"Error processing application: {str(e)}")
+                # Start processing in background
+                from .tasks import run_in_background
+                run_in_background(job_application.job_application_id)
                 
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                # Return immediately with processing status and ID
+                return Response({
+                    "message": "Your application has been submitted and is being processed.",
+                    "application_id": job_application.job_application_id,
+                    "status": "submitted",
+                    "data": serializer.data
+                }, status=status.HTTP_202_ACCEPTED)
+                
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def get_application_status(request, application_id):
+    try:
+        job_application = JobApplication.objects.get(job_application_id=application_id)
+        
+        response_data = {
+            'application_id': job_application.job_application_id,
+            'status': job_application.application_status,
+            'job_title': job_application.job_hiring.job_title,
+            'application_date': job_application.application_date,
+        }
+        
+        # Include results if processing is complete
+        if job_application.application_status == 'processed':
+            response_data['scores'] = job_application.scores
+            response_data['verification_result'] = job_application.verification_result
+            
+        return Response(response_data, status=status.HTTP_200_OK)
+        
+    except JobApplication.DoesNotExist:
+        return Response({
+            "error": "Job application not found."
+        }, status=status.HTTP_404_NOT_FOUND)
+    
 @api_view(['GET'])
 def check_application(request, pk):
     applicant_id = request.query_params.get('applicant_id')

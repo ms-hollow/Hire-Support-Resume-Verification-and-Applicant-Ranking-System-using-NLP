@@ -1,6 +1,7 @@
 from django.db import models
 from company.models import Company
 from users.models import User
+import os
 
 #TODO Need to migrate
 
@@ -64,7 +65,6 @@ class JobHiring(models.Model):
     def __str__(self):
         return f"{self.job_title} at {self.company.company_name}"
 
-
 class ScoringCriteria(models.Model):
     job_hiring = models.ForeignKey(JobHiring, related_name='scoring_criteria', on_delete=models.CASCADE)
     criteria_name = models.CharField(max_length=100, blank=True, null=True)
@@ -81,19 +81,62 @@ class JobApplication(models.Model):
     applicant = models.ForeignKey('applicant.Applicant', on_delete=models.CASCADE)  
     email = models.EmailField()  
     application_date = models.DateField(auto_now_add=True)
-    application_status = models.CharField(max_length=20, default='draft')
+    
+    # Updated status choices
+    APPLICATION_STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('processing', 'Processing'),
+        ('processed', 'Processed Successfully'),
+        ('error', 'Processing Failed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    
+    application_status = models.CharField(
+        max_length=20, 
+        choices=APPLICATION_STATUS_CHOICES,
+        default='draft'
+    )
     scores = models.JSONField(blank=True, null=True)
     verification_result = models.JSONField(blank=True, null=True)
-
+    
     def __str__(self):
         return f"Application for {self.job_hiring.job_title}"
 
 
+def get_resume_upload_path(instance, filename):
+    """Define upload path for resume files"""
+    job_hiring_id = instance.job_application.job_hiring.job_hiring_id
+    applicant_id = instance.job_application.applicant.id
+    
+    # Ensure directory exists
+    from main_model.utils.file_structure import get_applicant_dir
+    applicant_dir = get_applicant_dir(job_hiring_id, applicant_id)
+    
+    # Create a new filename with original extension
+    name, ext = os.path.splitext(filename)
+    new_filename = f"resume{ext}"
+    
+    return os.path.join(f'job_hirings/job_hiring_{job_hiring_id}/applications/applicant_{applicant_id}', new_filename)
+
+def get_document_upload_path(instance, filename):
+    """Define upload path for document files based on document type"""
+    job_hiring_id = instance.job_application.job_hiring.job_hiring_id
+    applicant_id = instance.job_application.applicant.id
+    doc_type = instance.document_type.lower()
+    
+    # Ensure directory exists
+    from main_model.utils.file_structure import get_document_type_dir
+    doc_dir = get_document_type_dir(job_hiring_id, applicant_id, doc_type)
+    
+    # Keep original filename
+    return os.path.join(f'job_hirings/job_hiring_{job_hiring_id}/applications/applicant_{applicant_id}/documents/{doc_type}', filename)
+
 class JobApplicationDocument(models.Model):
     job_application = models.ForeignKey(JobApplication, related_name='documents', on_delete=models.CASCADE)
     document_type = models.CharField(max_length=255)
-    document_file = models.FileField(upload_to='documents/') # location kung saan siya iuupload #TODO modify ang path
-
+    document_file = models.FileField(upload_to=get_document_upload_path)
+    
     def __str__(self):
         return self.document_type
 
