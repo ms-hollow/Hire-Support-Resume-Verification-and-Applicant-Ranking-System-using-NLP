@@ -4,12 +4,37 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import JobHiringSerializer, JobApplicationSerializer, JobApplicationDocumentSerializer
-from .models import JobHiring, JobApplication, JobApplicationDocument, RecentSearch, Company
+from .serializers import JobHiringSerializer, JobApplicationSerializer, JobApplicationDocumentSerializer, NotificationSerializer
+from .models import JobHiring, JobApplication, JobApplicationDocument, RecentSearch, Company, Notification
 from django.db import transaction
 from django.utils import timezone
 from datetime import timedelta
-from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_notifications(request):
+    user = request.user 
+    notifications = Notification.objects.filter(recipient=user).order_by('-created_at')
+    serializer = NotificationSerializer(notifications, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_notification_as_read(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
+    notification.is_read = True
+    notification.save()
+    return JsonResponse({'success': True, 'message': 'Notification marked as read.'})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def unread_notifications(request):
+    notifications = Notification.objects.filter(recipient=request.user, is_read=False)
+    notifications_list = [
+        {"message": notification.message, "created_at": notification.created_at} for notification in notifications
+    ]
+    return JsonResponse({"notifications": notifications_list})
 
 #* Create Job Hiring
 @api_view(['POST'])
@@ -183,6 +208,8 @@ def show_recent_searches(request):
 
     return Response(result_data)
 
+#TODO Note need to add checker if nakapag apply na ba si applicant sa specific job hiring 
+#TODO If yes, dapat hindi niya ito tanggapin
 @api_view(['POST'])
 def create_job_application(request):
     if request.method == 'POST':
@@ -206,9 +233,40 @@ def create_job_application(request):
                         document_type=doc_type,
                         document_file=doc_file
                     )
+
+                # After saving the job application, check for applicant count and create notifications
+                job_hiring = job_application.job_hiring
+                job_hiring.check_applicant_count() # Check if any thresholds are met and send notification
                 
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def change_application_status(request, application_id):
+    user = request.user  
+    job_application = get_object_or_404(JobApplication, job_application_id=application_id)
+
+    # Ensure that the user is the applicant associated with this application
+    if job_application.applicant.user != user:
+        return Response({'error': 'You cannot update this application.'}, status=403)
+
+    # Get the new status from the request data
+    new_status = request.data.get('status')
+    if not new_status:
+        return Response({'error': 'Status is required.'}, status=400)
+
+  
+    job_application.application_status = new_status
+    job_application.save()
+
+    Notification.objects.create(
+        recipient=user,
+        message=f"Your application for '{job_application.job_hiring.position}' has been {new_status}.",
+        is_read=False,
+    )
+
+    return Response({'message': 'Application status updated and notification sent.'})
 
 @api_view(['GET'])
 def check_application(request, pk):

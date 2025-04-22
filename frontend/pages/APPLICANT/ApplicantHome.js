@@ -23,7 +23,6 @@ export default function ApplicantHome({ onJobClick }) {
     const [isSalaryOpen, setIsSalaryOpen] = useState(false);
     const [paymentType, setPaymentType] = useState("Annually");
     const [range, setRange] = useState(0);
-    const [location, setLocation] = useState("");
 
     const [filters, setFilters] = useState({
         keyword: "",
@@ -131,6 +130,15 @@ export default function ApplicantHome({ onJobClick }) {
                 }
             }
 
+            const locationParts = filters.location
+                .toLowerCase()
+                .split(",")
+                .map((part) => part.trim());
+
+            const isLocationValid = locationParts.every((part) =>
+                job.location?.toLowerCase().includes(part)
+            );
+
             const isValid =
                 (filters.keyword === "" ||
                     job.job_title
@@ -140,10 +148,7 @@ export default function ApplicantHome({ onJobClick }) {
                     job.job_industry
                         ?.toLowerCase()
                         .includes(filters.classification.toLowerCase())) &&
-                (filters.location === "" ||
-                    job.location
-                        ?.toLowerCase()
-                        .includes(filters.location.toLowerCase())) &&
+                isLocationValid &&
                 (filters.workSetup === "" ||
                     job.work_setup
                         ?.toLowerCase()
@@ -231,7 +236,9 @@ export default function ApplicantHome({ onJobClick }) {
 
             <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto">
                 <div>
-                    <p className="text-fontcolor text-large ">Hi, {applicantName}</p>
+                    <p className="text-fontcolor text-large ">
+                        Hi, {applicantName}
+                    </p>
                 </div>
 
                 {/* Search */}
