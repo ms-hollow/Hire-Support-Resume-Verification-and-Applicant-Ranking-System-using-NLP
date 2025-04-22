@@ -146,9 +146,12 @@ def create_job_hiring_json(job_hiring):
         "verification_option": parse_verification_option(job_hiring.verification_option)
     }
     
-    # Create a temp file path
-    file_path = os.path.join(settings.MEDIA_ROOT, 'temp', f'hiring_settings_{job_hiring.job_hiring_id}.json')
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    # Create job hiring directory
+    from main_model.utils.file_structure import get_job_hiring_dir
+    job_hiring_dir = get_job_hiring_dir(job_hiring.job_hiring_id)
+    
+    # Save the JSON file in the job hiring directory
+    file_path = os.path.join(job_hiring_dir, 'hiring_settings.json')
     
     # Save the JSON file
     with open(file_path, 'w') as f:
@@ -178,6 +181,8 @@ def create_job_application_json(job_application):
     
     # Get applicant information
     applicant = job_application.applicant
+    job_hiring_id = job_application.job_hiring.job_hiring_id
+    applicant_id = applicant.id
     
     # Get document links organized by document type
     resume_links = []
@@ -215,14 +220,12 @@ def create_job_application_json(job_application):
         "certifications_documents_links": ", ".join(certifications_documents_links)
     }
     
-    # Add additional documents if they exist
-    if additional_documents_links:
-        application_data["additional_documents_links"] = ", ".join(additional_documents_links)
+    # Get the applicant directory
+    from main_model.utils.file_structure import get_applicant_dir
+    applicant_dir = get_applicant_dir(job_hiring_id, applicant_id)
     
-    # Create a temp file path
-    file_path = os.path.join(settings.MEDIA_ROOT, 'temp', 
-                           f'application_{job_application.job_application_id}.json')
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    # Create a file path in the applicant directory
+    file_path = os.path.join(applicant_dir, 'application.json')
     
     # Save the JSON file
     with open(file_path, 'w') as f:
@@ -231,6 +234,7 @@ def create_job_application_json(job_application):
     return file_path
 
 
+# ----------------------------DI PA NAGAGAMIT ------------- #
 
 def process_verification_results(file_path):
     """Read verification results from JSON file"""

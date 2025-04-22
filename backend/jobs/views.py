@@ -22,8 +22,8 @@ def create_job_hiring(request):
         # Save the JobHiring instance
         job_hiring = serializer.save(company=request.user.company)
 
-        # Generate the JSON file for hire_support.py
-        create_job_hiring_json(job_hiring)
+        # Generate the JSON file for hire_support.py in the proper location
+        job_hiring_json_path = create_job_hiring_json(job_hiring)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -222,7 +222,7 @@ def create_job_application(request):
             with transaction.atomic():  # Optional, to ensure all-or-nothing saving
                 job_application = serializer.save()
 
-                # Save each file with corresponding document type
+                # Save each file with corresponding document type in proper location
                 for doc_type, doc_file in zip(document_types, document_files):
                     JobApplicationDocument.objects.create(
                         job_application=job_application,
@@ -230,8 +230,8 @@ def create_job_application(request):
                         document_file=doc_file
                     )
                 
-                # Generate the JSON file for hire_support.py
-                create_job_application_json(job_application)
+                # Generate the JSON file in the proper location
+                app_json_path = create_job_application_json(job_application)
                
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
