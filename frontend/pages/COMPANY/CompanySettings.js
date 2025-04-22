@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import CompanyHeader from "@/components/CompanyHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import Image from "next/image";
@@ -6,55 +6,21 @@ import { FaChevronDown } from "react-icons/fa";
 import { useRouter } from "next/router";
 import Cookies from "js-cookie";
 import Link from "next/link";
+import { initialFormData, mergeData } from "@/constants/companySettingForm";
+import {
+    validateFormData,
+    handleInputChange,
+} from "../utils/companySettingsUtils";
+import { getCookie } from "../utils/cookieUtils";
+import useFetchOptions from "@/hooks/companySettingsHooks";
+import { useFormData } from "@/hooks/companySettingsHooks";
 
 export default function CompanySettings() {
-    const [options, setOptions] = useState(null);
+    const [options, setOptions] = useFetchOptions();
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const router = useRouter();
-
-    const [formData, setFormData] = useState({
-        required_documents: [],
-        application_deadline: "",
-        weight_of_criteria: "",
-        verification_option: "",
-        additional_notes: "",
-        criteria: {
-            workExperience: {
-                directlyRelevant: [],
-                highlyRelevant: [],
-                moderatelyRelevant: [],
-                weight: "",
-            },
-            skills: {
-                primarySkills: [],
-                secondarySkills: [],
-                additionalSkills: [],
-                weight: "",
-            },
-            education: {
-                weight: "",
-                firstChoice: [],
-                secondChoice: [],
-                thirdChoice: [],
-            },
-            schools: {
-                schoolPreference: [],
-            },
-            additionalPoints: { honor: "", multipleDegrees: "" },
-            certificates: {
-                preferred: [],
-                weight: "",
-            },
-        },
-        criteria_weights: {
-            work_experience: 100,
-            skills: 100,
-            education: 100,
-            additional_points: 100,
-            certifications: 100,
-        },
-    });
+    const [formData, setFormData] = useState(initialFormData);
 
     const getFilteredOptions = (currentCategory, currentField) => {
         const allSelectedOptions = new Set([
@@ -87,171 +53,10 @@ export default function CompanySettings() {
         });
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                // Fetch options
-                const optionsResponse = await fetch(
-                    "/placeHolder/dummy_options.json"
-                );
-                const optionsData = await optionsResponse.json();
-                setOptions(optionsData);
-
-                if (!options) {
-                    return <div>Loading...</div>;
-                }
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-        fetchData();
-    }, []);
-
-    useEffect(() => {
-        const storedData = Cookies.get("SERIALIZED_DATA");
-        let parsedStoredData;
-
-        if (!storedData) {
-            return;
-        }
-
-        try {
-            parsedStoredData = JSON.parse(storedData);
-        } catch (error) {
-            console.error("Error parsing stored data:", error);
-            return;
-        }
-
-        setFormData((prevData) => ({
-            ...prevData,
-            required_documents: parsedStoredData?.required_documents || [],
-            application_deadline: parsedStoredData?.application_deadline || "",
-            verification_option: parsedStoredData?.verification_option || "",
-            weight_of_criteria: parsedStoredData?.weight_of_criteria || "",
-            additional_notes: parsedStoredData?.additional_notes || "",
-            criteria: {
-                ...prevData.criteria,
-                workExperience: {
-                    ...prevData.criteria.workExperience,
-                    directlyRelevant:
-                        parsedStoredData.scoring_criteria[0]?.preference
-                            ?.directlyRelevant || [],
-                    highlyRelevant:
-                        parsedStoredData.scoring_criteria[0]?.preference
-                            ?.highlyRelevant || [],
-                    moderatelyRelevant:
-                        parsedStoredData.scoring_criteria[0]?.preference
-                            ?.moderatelyRelevant || [],
-                    weight:
-                        parsedStoredData.scoring_criteria[0]
-                            ?.weight_percentage || "",
-                },
-                skills: {
-                    ...prevData.criteria.skills,
-                    primarySkills:
-                        parsedStoredData.scoring_criteria[1]?.preference
-                            ?.primarySkills || [],
-                    secondarySkills:
-                        parsedStoredData.scoring_criteria[1]?.preference
-                            ?.secondarySkills || [],
-                    additionalSkills:
-                        parsedStoredData.scoring_criteria[1]?.preference
-                            ?.additionalSkills || [],
-                    weight:
-                        parsedStoredData.scoring_criteria[1]
-                            ?.weight_percentage || "",
-                },
-                education: {
-                    ...prevData.criteria.education,
-                    firstChoice:
-                        parsedStoredData.scoring_criteria[2]?.preference
-                            ?.firstChoice || [],
-                    secondChoice:
-                        parsedStoredData.scoring_criteria[2]?.preference
-                            ?.secondChoice || [],
-                    thirdChoice:
-                        parsedStoredData.scoring_criteria[2]?.preference
-                            ?.thirdChoice || [],
-                    weight:
-                        parsedStoredData.scoring_criteria[2]
-                            ?.weight_percentage || "",
-                },
-                schools: {
-                    ...prevData.criteria.schools,
-                    schoolPreference:
-                        parsedStoredData.scoring_criteria[3]?.preference
-                            ?.schoolPreference || [],
-                },
-                additionalPoints: {
-                    ...prevData.criteria.additionalPoints,
-                    honor: parsedStoredData.honor || "0",
-                    multipleDegrees:
-                        parsedStoredData.scoring_criteria[4]?.preference
-                            ?.multipleDegrees || "0",
-                },
-                certificates: {
-                    ...prevData.criteria.certificates,
-                    preferred:
-                        parsedStoredData.scoring_criteria[5]?.preference
-                            ?.preferred || [],
-                    weight:
-                        parsedStoredData.scoring_criteria[5]
-                            ?.weight_percentage || "",
-                },
-            },
-        }));
-    }, []);
-
-    function validation() {
-        const totalWeight =
-            parseFloat(formData.criteria.workExperience.weight || 0) +
-            parseFloat(formData.criteria.skills.weight || 0) +
-            parseFloat(formData.criteria.education.weight || 0) +
-            parseFloat(formData.criteria.schools.weight || 0) +
-            parseFloat(formData.criteria.certificates.weight || 0);
-
-        if (totalWeight !== 100) {
-            alert("Total weight of criteria must be equal to 100");
-            return false;
-        }
-
-        if (!formData.weight_of_criteria) {
-            alert("Please select a weight of criteria.");
-            return false;
-        }
-
-        if (!formData.verification_option) {
-            alert("Please select a verification option.");
-            return false;
-        }
-
-        if (!formData.application_deadline) {
-            alert("Please select an application deadline.");
-            return false;
-        }
-
-        if (!formData.additional_notes) {
-            alert("Please add additional notes.");
-            return false;
-        }
-
-        if (formData.required_documents.length === 0) {
-            alert("Please select at least one required document.");
-            return false;
-        }
-
-        return true;
-    }
+    useFormData(setFormData);
 
     const handleSettingsSubmit = (e) => {
-        function getCookie(name) {
-            const cookieValue = document.cookie
-                .split("; ")
-                .find((row) => row.startsWith(name + "="))
-                ?.split("=")[1];
-
-            return cookieValue ? decodeURIComponent(cookieValue) : null;
-        }
+        if (!validateFormData(formData)) return;
 
         const storedData = getCookie("DRAFT_DATA");
 
@@ -269,128 +74,17 @@ export default function CompanySettings() {
             return;
         }
 
-        const mergedData = {
-            ...parsedStoredData,
-            required_documents: formData.required_documents,
-            application_deadline: formData.application_deadline,
-            weight_of_criteria: formData.weight_of_criteria,
-            verification_option: formData.verification_option,
-            additional_notes: formData.additional_notes,
-            scoring_criteria: [
-                {
-                    criteria_name: "Work Experience",
-                    weight_percentage: formData.criteria.workExperience.weight,
-                    preference: {
-                        directlyRelevant:
-                            formData.criteria.workExperience.directlyRelevant,
-                        highlyRelevant:
-                            formData.criteria.workExperience.highlyRelevant,
-                        moderatelyRelevant:
-                            formData.criteria.workExperience.moderatelyRelevant,
-                    },
-                },
-                {
-                    criteria_name: "Skills",
-                    weight_percentage: formData.criteria.skills.weight,
-                    preference: {
-                        primarySkills: formData.criteria.skills.primarySkills,
-                        secondarySkills:
-                            formData.criteria.skills.secondarySkills,
-                        additionalSkills:
-                            formData.criteria.skills.additionalSkills,
-                    },
-                },
-                {
-                    criteria_name: "Education",
-                    weight_percentage: formData.criteria.education.weight,
-                    preference: {
-                        firstChoice: formData.criteria.education.firstChoice,
-                        secondChoice: formData.criteria.education.secondChoice,
-                        thirdChoice: formData.criteria.education.thirdChoice,
-                    },
-                },
-                {
-                    criteria_name: "Schools",
-                    weight_percentage: formData.criteria.schools.weight,
-                    preference: {
-                        schoolPreference:
-                            formData.criteria.schools.schoolPreference,
-                    },
-                },
-                {
-                    criteria_name: "Additional Points",
-                    weight_percentage:
-                        formData.criteria.additionalPoints.weight,
-                    preference: {
-                        honor: formData.criteria.additionalPoints.honor,
-                        multipleDegrees:
-                            formData.criteria.additionalPoints.multipleDegrees,
-                    },
-                },
-                {
-                    criteria_name: "Certifications",
-                    weight_percentage: formData.criteria.certificates.weight,
-                    preference: {
-                        preferred: formData.criteria.certificates.preferred,
-                    },
-                },
-            ],
-        };
+        const mergedData = mergeData(formData, parsedStoredData);
 
         Cookies.set("SERIALIZED_DATA", JSON.stringify(mergedData), {
             expires: 1,
         });
-        if (validation()) {
-            router.push("/COMPANY/JobSummary");
-        }
+
+        router.push("/COMPANY/JobSummary");
     };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-
-        const updatedFormData = {
-            ...formData,
-            [name]: value,
-        };
-
-        if (name === "weight_of_criteria") {
-            switch (value) {
-                case "Default Weight Percentage":
-                    updatedFormData.criteria.workExperience.weight = 25;
-                    updatedFormData.criteria.skills.weight = 25;
-                    updatedFormData.criteria.education.weight = 25;
-                    updatedFormData.criteria.certificates.weight = 25;
-                    break;
-                case "Customize Criteria Weight Percentage":
-                    updatedFormData.criteria.workExperience.weight = "";
-                    updatedFormData.criteria.skills.weight = "";
-                    updatedFormData.criteria.education.weight = "";
-                    updatedFormData.criteria.certificates.weight = "";
-                    break;
-                case "Experienced-Focused":
-                    updatedFormData.criteria.workExperience.weight = 40;
-                    updatedFormData.criteria.skills.weight = 20;
-                    updatedFormData.criteria.education.weight = 20;
-                    updatedFormData.criteria.certificates.weight = 20;
-                    break;
-                case "Education-Focused":
-                    updatedFormData.criteria.workExperience.weight = 20;
-                    updatedFormData.criteria.skills.weight = 20;
-                    updatedFormData.criteria.education.weight = 40;
-                    updatedFormData.criteria.certificates.weight = 20;
-                    break;
-                case "Skills-Focused":
-                    updatedFormData.criteria.workExperience.weight = 20;
-                    updatedFormData.criteria.skills.weight = 40;
-                    updatedFormData.criteria.education.weight = 20;
-                    updatedFormData.criteria.certificates.weight = 20;
-                    break;
-                default:
-                    updatedFormData.weight_value = "";
-            }
-        }
-
-        setFormData(updatedFormData);
+    const onInputChange = (e) => {
+        handleInputChange(e, formData, setFormData);
     };
 
     const handleMultiSelectChange = (category, field, option) => {
@@ -550,7 +244,7 @@ export default function CompanySettings() {
                                         type="date"
                                         name="application_deadline"
                                         value={formData.application_deadline}
-                                        onChange={handleInputChange}
+                                        onChange={onInputChange}
                                         className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm text-fontcolor"
                                         min={currentDate}
                                     />
@@ -2482,7 +2176,7 @@ export default function CompanySettings() {
                                                         formData.weight_of_criteria ===
                                                         item
                                                     }
-                                                    onChange={handleInputChange}
+                                                    onChange={onInputChange}
                                                     className="h-4 w-4 text-black rounded-full"
                                                 />
                                                 <label
@@ -2508,7 +2202,7 @@ export default function CompanySettings() {
                                         className="border border-gray-300 rounded-lg px-4 py-2 text-sm text-fontcolor"
                                         name="verification_option"
                                         value={formData.verification_option}
-                                        onChange={handleInputChange}
+                                        onChange={onInputChange}
                                     >
                                         <option value="" disabled>
                                             Select a verification option
@@ -2538,7 +2232,7 @@ export default function CompanySettings() {
                                         name="additional_notes"
                                         placeholder="Additional Notes"
                                         value={formData.additional_notes}
-                                        onChange={handleInputChange}
+                                        onChange={onInputChange}
                                         className="w-full p-1 rounded-xs border-2 border-fontcolor text-fontcolor h-20"
                                     ></textarea>
                                 </div>
