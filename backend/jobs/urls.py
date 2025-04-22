@@ -12,6 +12,10 @@ urlpatterns = [
     path('hirings/search/', views.search_job_hiring_list, name='search_job_hiring_list'),
     path('hirings/search_job/', views.search_job, name='search_job'),
     path('hirings/recent-search/', views.show_recent_searches, name='show_recent_searches'),
+
+    path('notifications/', views.get_notifications, name='get_notifications'),
+    path('notifications/<int:notification_id>/read/', views.mark_notification_as_read, name='mark_notification_as_read'),
+    path('notifications/unread/', views.unread_notifications, name='unread_notifications'),
     
     path('applications/', views.job_application_list, name='job_application_list'), # list of all job applications
     path('applications/<int:pk>', views.job_application_details, name='job_application_details'),
@@ -19,6 +23,7 @@ urlpatterns = [
     path('applications/create', views.create_job_application, name='create_job_application'),
     path('applications/edit/<int:pk>', views.edit_job_application, name='edit_job_application'),
     path('applications/delete/<int:pk>', views.delete_job_application, name='delete_job_application'),
-    path('applications/cancel/<int:application_id>/', views.cancel_job_application, name='cancel-job-application')
+    path('applications/cancel/<int:application_id>/', views.cancel_job_application, name='cancel-job-application'),
+    path('applications/update-application-status/<int:application_id>/', views.change_application_status, name='change-application-status')
 ]
 
