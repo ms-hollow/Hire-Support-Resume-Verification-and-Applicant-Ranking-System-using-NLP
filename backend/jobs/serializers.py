@@ -78,8 +78,8 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             'email',
             'application_date',
             'application_status',
-            # 'scores',
-            # 'verification_result',
+            'scores',
+            'verification_result',
             'documents',  # Include nested documents
         ]
  
