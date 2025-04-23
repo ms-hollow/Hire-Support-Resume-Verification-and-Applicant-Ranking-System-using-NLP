@@ -5,12 +5,9 @@ import { useRouter } from "next/router";
 import AuthContext from "@/pages/context/AuthContext";
 import { JLSkeletonLoader } from "./ui/SkeletonLoader";
 import { useJob, JobProvider } from "@/pages/context/JobContext";
+import { toTitleCase } from "@/pages/utils/functions";
 
-const JobListings = ({
-    onJobClick,
-    jobListings,
-    loading,
-}) => {
+const JobListings = ({ onJobClick, jobListings, loading }) => {
     const { savedStatus, toggleSaveJob } = useJob();
     const router = useRouter();
     const handleJobClick = (jobId) => {
@@ -89,7 +86,7 @@ const JobListings = ({
                                 id="work_location"
                                 className="ml-1.5 font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall pl-px"
                             >
-                                {job.location}
+                                {toTitleCase(job.location)}
                             </p>
                         </div>
                         <div className="flex flex-row mt-2 pl-px">

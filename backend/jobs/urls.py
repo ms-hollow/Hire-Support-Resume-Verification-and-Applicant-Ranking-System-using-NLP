@@ -25,6 +25,7 @@ urlpatterns = [
     path('applications/edit/<int:pk>', views.edit_job_application, name='edit_job_application'),
     path('applications/delete/<int:pk>', views.delete_job_application, name='delete_job_application'),
     path('applications/cancel/<int:application_id>/', views.cancel_job_application, name='cancel-job-application'),
-    path('applications/update-application-status/<int:application_id>/', views.change_application_status, name='change-application-status')
+    path('applications/update-application-status/<int:application_id>/', views.change_application_status, name='change-application-status'),
+    path('applications/get-all-applications/', views.get_all_application_applicant, name='get_all_application_applicant')
 ]
 

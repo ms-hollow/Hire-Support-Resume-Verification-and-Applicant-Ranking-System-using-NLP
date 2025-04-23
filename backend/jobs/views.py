@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import JobHiringSerializer, JobApplicationSerializer, JobApplicationDocumentSerializer, NotificationSerializer
 from .models import JobHiring, JobApplication, JobApplicationDocument, RecentSearch, Company, Notification
+from applicant.models import Applicant
 from django.db import transaction
 from django.utils import timezone
 from datetime import timedelta
@@ -39,14 +40,6 @@ def unread_notifications(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_notification(request):
-    # try:
-    #     notification = Notification.objects.get(id=notification_id, recipient=request.user)
-    # except Notification.DoesNotExist:
-    #     return Response({'detail': 'Notification not found.'}, status=status.HTTP_404_NOT_FOUND)
-
-    # notification.delete()
-    # return Response({'detail': 'Notification deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
-    # Get the list of notification IDs from the request body
     notification_ids = request.data.get('notification_ids', [])
 
     if not notification_ids:
@@ -100,7 +93,6 @@ def job_hiring_list_company(request):
     job_listings = JobHiring.objects.filter(company=company) 
     serializer = JobHiringSerializer(job_listings, many=True)
     return Response(serializer.data)
-
 
 #* Delete Job Hiring
 @api_view(['DELETE'])
@@ -266,32 +258,28 @@ def create_job_application(request):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+#? For company side kapag papalitan na ang status
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def change_application_status(request, application_id):
     user = request.user  
     job_application = get_object_or_404(JobApplication, job_application_id=application_id)
 
-    # Allow the company who owns the job to update the application
     if job_application.job_hiring.company.user != user:
         return Response({'error': 'You are not authorized to update this application.'}, status=403)
 
-    # Get the new status from the request data
     new_status = request.data.get('application_status')
     if not new_status:
         return Response({'error': 'Status is required.'}, status=400)
   
     job_application.application_status = new_status
+    # Set a flag to indicate that a notification is being created in the view
+    job_application._notification_created = True
     job_application.save()
 
-    Notification.objects.create(
-        recipient=user,
-        message=f"Your application for '{job_application.job_hiring.job_title}' has been {new_status}.",
-        is_read=False,
-    )
+    return Response({'message': 'Application status updated.'})
 
-    return Response({'message': 'Application status updated and notification sent.'})
-
+#? Check specific application
 @api_view(['GET'])
 def check_application(request, pk):
     applicant_id = request.query_params.get('applicant_id')
@@ -303,7 +291,6 @@ def check_application(request, pk):
         )
 
     try:
-        # Retrieve the specific job posting
         job_hiring = JobHiring.objects.get(pk=pk)
     except JobHiring.DoesNotExist:
         return Response(
@@ -311,13 +298,20 @@ def check_application(request, pk):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    # Check if there's already an application for this job by this applicant
     application_exists = JobApplication.objects.filter(
         job_hiring=job_hiring,
         applicant_id=applicant_id
     ).exists()
 
     return Response({"hasApplied": application_exists}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_application_applicant(request):
+    applicant = get_object_or_404(Applicant, user=request.user)
+    job_applications = JobApplication.objects.filter(applicant=applicant)
+    serializer = JobApplicationSerializer(job_applications, many=True)
+    return Response(serializer.data)
 
 #* Delete Job Application
 @api_view(['DELETE'])

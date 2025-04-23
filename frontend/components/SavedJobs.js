@@ -7,6 +7,7 @@ import {
     saveJob,
     unsaveJob,
 } from "@/pages/api/applicantJobApi";
+import { toTitleCase } from "@/pages/utils/functions";
 
 const SavedJobs = () => {
     const { authTokens } = useContext(AuthContext);
@@ -132,7 +133,7 @@ const SavedJobs = () => {
                <div className="grid grid-cols-2 gap-y-2 gap-x-4 mt-2">
                   <div className="flex items-center">
                     <Image src="/Location Icon.svg" width={23} height={20} alt="Location Icon" />
-                    <p className="ml-1 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">{job.location}</p>
+                    <p className="ml-1 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">{toTitleCase(job.location)}</p>
                   </div>
 
                   <div className="flex items-center">

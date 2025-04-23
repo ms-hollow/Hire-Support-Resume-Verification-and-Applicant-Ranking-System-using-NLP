@@ -167,3 +167,32 @@ export const fetchJobDetails = async (authToken, jobId) => {
         return null;
     }
 };
+
+export const getAllJobApplications = async (authToken) => {
+    try {
+        const res = await fetch(
+            "http://127.0.0.1:8000/job/applications/get-all-applications/",
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+
+        if (!res.ok) throw new Error("Failed to fetch job applications");
+
+        const data = await res.json();
+
+        const sortedData = [...data].sort(
+            (a, b) =>
+                new Date(b.application_date) - new Date(a.application_date)
+        );
+
+        return sortedData;
+    } catch (error) {
+        console.log("Error fetching job details:", error);
+        return null;
+    }
+};

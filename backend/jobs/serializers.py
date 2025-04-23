@@ -72,6 +72,10 @@ class JobApplicationSerializer(serializers.ModelSerializer):
 
     documents = JobApplicationDocumentSerializer(many=True, required=False)
     applicant_name = serializers.CharField(source='applicant.applicant_name', read_only=True) # kunin ang applicant name
+    job_title = serializers.CharField(source='job_hiring.job_title', read_only=True)
+    region = serializers.CharField(source='job_hiring.region', read_only=True)
+    province = serializers.CharField(source='job_hiring.province', read_only=True)
+    city = serializers.CharField(source='job_hiring.city', read_only=True)
 
     class Meta:
         model = JobApplication
@@ -86,6 +90,10 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             # 'scores',
             # 'verification_result',
             'documents',  # Include nested documents
+            'job_title',
+            'region',
+            'province',
+            'city'
         ]
  
     def create(self, validated_data):
