@@ -14,8 +14,9 @@ urlpatterns = [
     path('hirings/recent-search/', views.show_recent_searches, name='show_recent_searches'),
 
     path('notifications/', views.get_notifications, name='get_notifications'),
-    path('notifications/<int:notification_id>/read/', views.mark_notification_as_read, name='mark_notification_as_read'),
+    path('notifications/mark-as-read/<int:notification_id>/', views.mark_notification_as_read, name='mark_notification_as_read'),
     path('notifications/unread/', views.unread_notifications, name='unread_notifications'),
+    path('notifications/delete-notification/', views.delete_notification, name='delete_notification'),
     
     path('applications/', views.job_application_list, name='job_application_list'), # list of all job applications
     path('applications/<int:pk>', views.job_application_details, name='job_application_details'),

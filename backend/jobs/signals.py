@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
-from .models import JobApplication, Notification
+from .models import JobApplication, Notification, Company
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -16,26 +16,28 @@ def create_application_notification(sender, instance, created, **kwargs):
     job_hiring = instance.job_hiring
     applicant = instance.applicant
     company_user = job_hiring.company.user
+    company = Company.objects.get(id=job_hiring.company_id)
 
     if created:
+        applicant_full_name = f"{applicant.first_name} {applicant.middle_name} {applicant.last_name}"
         # Prevent duplicate notifications for the same job application
         if not Notification.objects.filter(
             recipient=applicant.user,
-            message=f"You have successfully applied for '{job_hiring.job_title}'."
+            message=f"You have successfully applied for {job_hiring.job_title} in {company.company_name}."
         ).exists():
             Notification.objects.create(
                 recipient=applicant.user,
-                message=f"You have successfully applied for '{job_hiring.job_title}'."
+                message=f"You have successfully applied for {job_hiring.job_title} in {company.company_name}."
             )
 
         if not Notification.objects.filter(
             recipient=company_user,
-            message=f"New application received for '{job_hiring.job_title}' from {applicant.user.get_full_name()}."
+            message=f"New application received for {job_hiring.job_title} from {applicant_full_name}."
         ).exists():
             # Notify the company
             Notification.objects.create(
                 recipient=company_user,
-                message=f"New application received for '{job_hiring.job_title}' from {applicant.user.get_full_name()}."
+                message=f"New application received for {job_hiring.job_title} from {applicant_full_name}."
             )
 
         # Update count + check thresholds

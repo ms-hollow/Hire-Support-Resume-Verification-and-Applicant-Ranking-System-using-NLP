@@ -122,7 +122,6 @@ class JobApplication(models.Model):
         super().save(*args, **kwargs)
 
         if is_new:
-            self.notify_applicant(f"You have successfully applied for '{self.job_hiring.job_title}'.")
             self.job_hiring.update_num_applications()
             self.job_hiring.check_applicant_count()
         elif old_status != self.application_status:
