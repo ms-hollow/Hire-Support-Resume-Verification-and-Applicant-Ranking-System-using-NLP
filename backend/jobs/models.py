@@ -70,7 +70,7 @@ class JobHiring(models.Model):
     
     def check_applicant_count(self):
         applicant_count = self.jobapplication_set.count()
-        thresholds = [10, 20, 30]
+        thresholds = [5] # Pwede palitan or dagdagan
 
         for threshold in thresholds:
             if applicant_count == threshold:
@@ -125,7 +125,7 @@ class JobApplication(models.Model):
             self.job_hiring.update_num_applications()
             self.job_hiring.check_applicant_count()
         elif old_status != self.application_status:
-            self.notify_applicant(f"Your application for '{self.job_hiring.job_title}' was {self.application_status.lower()}.")
+            self.notify_applicant(f"Your application for {self.job_hiring.job_title} was {self.application_status.lower()}.")
 
     def __str__(self):
         return f"Application for {self.job_hiring.job_title}"
