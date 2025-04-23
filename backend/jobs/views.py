@@ -36,6 +36,31 @@ def unread_notifications(request):
     ]
     return JsonResponse({"notifications": notifications_list})
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_notification(request):
+    # try:
+    #     notification = Notification.objects.get(id=notification_id, recipient=request.user)
+    # except Notification.DoesNotExist:
+    #     return Response({'detail': 'Notification not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    # notification.delete()
+    # return Response({'detail': 'Notification deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+    # Get the list of notification IDs from the request body
+    notification_ids = request.data.get('notification_ids', [])
+
+    if not notification_ids:
+        return Response({"error": "No notification IDs provided"}, status=400)
+
+    notifications = Notification.objects.filter(id__in=notification_ids)
+    
+    if not notifications.exists():
+        return Response({"error": "Some or all notifications not found"}, status=404)
+
+    deleted_count, _ = notifications.delete()
+
+    return Response({"message": f"{deleted_count} notification(s) deleted successfully"}, status=200)
+
 #* Create Job Hiring
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -247,22 +272,21 @@ def change_application_status(request, application_id):
     user = request.user  
     job_application = get_object_or_404(JobApplication, job_application_id=application_id)
 
-    # Ensure that the user is the applicant associated with this application
-    if job_application.applicant.user != user:
-        return Response({'error': 'You cannot update this application.'}, status=403)
+    # Allow the company who owns the job to update the application
+    if job_application.job_hiring.company.user != user:
+        return Response({'error': 'You are not authorized to update this application.'}, status=403)
 
     # Get the new status from the request data
-    new_status = request.data.get('status')
+    new_status = request.data.get('application_status')
     if not new_status:
         return Response({'error': 'Status is required.'}, status=400)
-
   
     job_application.application_status = new_status
     job_application.save()
 
     Notification.objects.create(
         recipient=user,
-        message=f"Your application for '{job_application.job_hiring.position}' has been {new_status}.",
+        message=f"Your application for '{job_application.job_hiring.job_title}' has been {new_status}.",
         is_read=False,
     )
 

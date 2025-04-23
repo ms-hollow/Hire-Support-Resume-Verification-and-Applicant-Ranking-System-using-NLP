@@ -12,22 +12,29 @@ export const fetchJobListings = async (authToken) => {
 
         const data = await response.json();
 
-        return data.map((job) => ({
-            job_id: job.job_hiring_id,
-            job_title: job.job_title,
-            company_name: job.company_name,
-            job_industry: job.job_industry,
-            job_description: job.job_description || "No description available",
-            salary_min: job.salary_min,
-            salary_max: job.salary_max,
-            salary_frequency: job.salary_frequency,
-            employment_type: job.employment_type,
-            schedule: job.schedule,
-            location: `${job.region}, ${job.province}, ${job.city}`,
-            work_setup: job.work_setup,
-            experience_level: job.experience_level,
-            creation_date: job.creation_date,
-        }));
+        const sortedData = data
+            .map((job) => ({
+                job_id: job.job_hiring_id,
+                job_title: job.job_title,
+                company_name: job.company_name,
+                job_industry: job.job_industry,
+                job_description:
+                    job.job_description || "No description available",
+                salary_min: job.salary_min,
+                salary_max: job.salary_max,
+                salary_frequency: job.salary_frequency,
+                employment_type: job.employment_type,
+                schedule: job.schedule,
+                location: `${job.region}, ${job.province}, ${job.city}`,
+                work_setup: job.work_setup,
+                experience_level: job.experience_level,
+                creation_date: job.creation_date,
+            }))
+            .sort(
+                (a, b) => new Date(b.creation_date) - new Date(a.creation_date)
+            );
+
+        return sortedData;
     } catch (error) {
         console.error("Error fetching jobs:", error);
         return [];
