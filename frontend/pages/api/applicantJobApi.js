@@ -11,24 +11,30 @@ export const fetchJobListings = async (authToken) => {
         if (!response.ok) throw new Error("Failed to fetch job listings");
 
         const data = await response.json();
-        console.log("Job Listings:", data);
 
-        return data.map((job) => ({
-            job_id: job.job_hiring_id,
-            job_title: job.job_title,
-            company_name: job.company_name,
-            job_industry: job.job_industry,
-            job_description: job.job_description || "No description available",
-            salary_min: job.salary_min,
-            salary_max: job.salary_max,
-            salary_frequency: job.salary_frequency,
-            employment_type: job.employment_type,
-            schedule: job.schedule,
-            location: `${job.region}, ${job.province}, ${job.city}`,
-            work_setup: job.work_setup,
-            experience_level: job.experience_level,
-            creation_date: job.creation_date,
-        }));
+        const sortedData = data
+            .map((job) => ({
+                job_id: job.job_hiring_id,
+                job_title: job.job_title,
+                company_name: job.company_name,
+                job_industry: job.job_industry,
+                job_description:
+                    job.job_description || "No description available",
+                salary_min: job.salary_min,
+                salary_max: job.salary_max,
+                salary_frequency: job.salary_frequency,
+                employment_type: job.employment_type,
+                schedule: job.schedule,
+                location: `${job.region}, ${job.province}, ${job.city}`,
+                work_setup: job.work_setup,
+                experience_level: job.experience_level,
+                creation_date: job.creation_date,
+            }))
+            .sort(
+                (a, b) => new Date(b.creation_date) - new Date(a.creation_date)
+            );
+
+        return sortedData;
     } catch (error) {
         console.error("Error fetching jobs:", error);
         return [];
@@ -158,6 +164,35 @@ export const fetchJobDetails = async (authToken, jobId) => {
         };
     } catch (error) {
         console.error("Error fetching job details:", error);
+        return null;
+    }
+};
+
+export const getAllJobApplications = async (authToken) => {
+    try {
+        const res = await fetch(
+            "http://127.0.0.1:8000/job/applications/get-all-applications/",
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${authToken}`,
+                },
+            }
+        );
+
+        if (!res.ok) throw new Error("Failed to fetch job applications");
+
+        const data = await res.json();
+
+        const sortedData = [...data].sort(
+            (a, b) =>
+                new Date(b.application_date) - new Date(a.application_date)
+        );
+
+        return sortedData;
+    } catch (error) {
+        console.log("Error fetching job details:", error);
         return null;
     }
 };

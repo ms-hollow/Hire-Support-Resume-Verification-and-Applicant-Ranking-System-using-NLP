@@ -3,14 +3,21 @@ from company.models import Company
 from users.models import User
 import os
 
-#TODO Need to migrate
-
 STATUS_CHOICES = (
     ('draft', 'Draft'),
     ('open', 'Open'),
     ('closed', 'Closed'),
     ('complete', 'Complete')
 )
+
+class Notification(models.Model):
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Notification to {self.recipient}"
 
 class JobHiring(models.Model): 
     job_hiring_id = models.AutoField(primary_key=True) #PK
@@ -35,7 +42,7 @@ class JobHiring(models.Model):
     salary_min = models.CharField(max_length=300, null=True, blank=True) # Note: change to CharField
     salary_max = models.CharField(max_length=300, null=True, blank=True) # Note: change to CharField
     salary_frequency = models.CharField(max_length=300, null=True, blank=False)
-    creation_date = models.DateField(auto_now_add=True)
+    creation_date = models.DateTimeField(auto_now_add=True)
     
     verification_option = models.CharField(max_length=300, null=True, blank=True)
     required_documents = models.JSONField(null=True, blank=True)
@@ -61,6 +68,20 @@ class JobHiring(models.Model):
             }
             criteria_list.append(criteria_data)
         return criteria_list
+    
+    def check_applicant_count(self):
+        applicant_count = self.jobapplication_set.count()
+        thresholds = [5] # Pwede palitan or dagdagan
+
+        for threshold in thresholds:
+            if applicant_count == threshold:
+                message = f"Your job hiring for {self.job_title} has reached number of applicants."
+                
+                # Create a notification for the company
+                Notification.objects.create(
+                    recipient=self.company.user,  
+                    message=message
+                )
 
     def __str__(self):
         return f"{self.job_title} at {self.company.company_name}"
@@ -75,7 +96,6 @@ class ScoringCriteria(models.Model):
         return f"{self.criteria_name} for {self.job_hiring.job_title}"
 
 class JobApplication(models.Model):
-
     job_application_id = models.AutoField(primary_key=True)
     job_hiring = models.ForeignKey(JobHiring, on_delete=models.CASCADE)
     applicant = models.ForeignKey('applicant.Applicant', on_delete=models.CASCADE)  
@@ -99,6 +119,33 @@ class JobApplication(models.Model):
     scores = models.JSONField(blank=True, null=True)
     verification_result = models.JSONField(blank=True, null=True)
     
+    application_date = models.DateTimeField(auto_now_add=True)
+    application_status = models.CharField(max_length=20, default='draft')
+    scores = models.JSONField(blank=True, null=True)
+    verification_result = models.JSONField(blank=True, null=True)
+
+    def notify_applicant(self, message):
+        Notification.objects.create(
+            recipient=self.applicant.user,
+            message=message
+        )
+
+    def save(self, *args, **kwargs):
+        is_new = self._state.adding
+        old_status = None
+
+        if not is_new:
+            old_instance = JobApplication.objects.get(pk=self.pk)
+            old_status = old_instance.application_status
+
+        super().save(*args, **kwargs)
+
+        if is_new:
+            self.job_hiring.update_num_applications()
+            self.job_hiring.check_applicant_count()
+        elif old_status != self.application_status:
+            self.notify_applicant(f"Your application for {self.job_hiring.job_title} was {self.application_status.lower()}.")
+
     def __str__(self):
         return f"Application for {self.job_hiring.job_title}"
 

@@ -1,10 +1,12 @@
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import JobHiringSerializer, JobApplicationSerializer, JobApplicationDocumentSerializer
-from .models import JobHiring, JobApplication, JobApplicationDocument, RecentSearch
+from .serializers import JobHiringSerializer, JobApplicationSerializer, JobApplicationDocumentSerializer, NotificationSerializer
+from .models import JobHiring, JobApplication, JobApplicationDocument, RecentSearch, Company, Notification
+from applicant.models import Applicant
 from django.db import transaction
 from django.utils import timezone
 from datetime import timedelta
@@ -16,9 +18,51 @@ import logging
 
 # Configure logging
 logger = logging.getLogger(__name__)
+from django.http import JsonResponse
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_notifications(request):
+    user = request.user 
+    notifications = Notification.objects.filter(recipient=user).order_by('-created_at')
+    serializer = NotificationSerializer(notifications, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_notification_as_read(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
+    notification.is_read = True
+    notification.save()
+    return JsonResponse({'success': True, 'message': 'Notification marked as read.'})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def unread_notifications(request):
+    notifications = Notification.objects.filter(recipient=request.user, is_read=False)
+    notifications_list = [
+        {"message": notification.message, "created_at": notification.created_at} for notification in notifications
+    ]
+    return JsonResponse({"notifications": notifications_list})
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_notification(request):
+    notification_ids = request.data.get('notification_ids', [])
+
+    if not notification_ids:
+        return Response({"error": "No notification IDs provided"}, status=400)
+
+    notifications = Notification.objects.filter(id__in=notification_ids)
+    
+    if not notifications.exists():
+        return Response({"error": "Some or all notifications not found"}, status=404)
+
+    deleted_count, _ = notifications.delete()
+
+    return Response({"message": f"{deleted_count} notification(s) deleted successfully"}, status=200)
 
 #* Create Job Hiring
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_job_hiring(request):
@@ -58,28 +102,10 @@ def list_draft_job_hirings(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def job_hiring_list_company(request):
-    job_listings = JobHiring.objects.all()
-    if not job_listings:
-        return Response({"message": "No job listings found"}, status=404)
+    company = get_object_or_404(Company, user=request.user)
+    job_listings = JobHiring.objects.filter(company=company) 
     serializer = JobHiringSerializer(job_listings, many=True)
     return Response(serializer.data)
-
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def update_job_hiring(request, job_hiring_id):
-    try:
-        # Retrieve the JobHiring object
-        job_hiring = JobHiring.objects.get(job_hiring_id=job_hiring_id, company=request.user.company)
-    except JobHiring.DoesNotExist:
-        return Response({"message": "Job Hiring not found or you do not have permission to edit it."}, status=status.HTTP_404_NOT_FOUND)
-
-    # Use the serializer to validate and update the data
-    serializer = JobHiringSerializer(job_hiring, data=request.data, partial=True)  # partial=True allows updating specific fields
-
-    if serializer.is_valid():
-        serializer.save()  # Save the updated job hiring
-        return Response(serializer.data)  # Return the updated job hiring data
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #* Delete Job Hiring
 @api_view(['DELETE'])
@@ -212,6 +238,8 @@ def show_recent_searches(request):
 
     return Response(result_data)
 
+#TODO Note need to add checker if nakapag apply na ba si applicant sa specific job hiring 
+#TODO If yes, dapat hindi niya ito tanggapin
 @api_view(['POST'])
 def create_job_application(request):
     if request.method == 'POST':
@@ -240,6 +268,10 @@ def create_job_application(request):
                         document_type=doc_type,
                         document_file=doc_file
                     )
+
+                # After saving the job application, check for applicant count and create notifications
+                job_hiring = job_application.job_hiring
+                job_hiring.check_applicant_count() # Check if any thresholds are met and send notification
                 
                 # Start processing in background
                 from .tasks import run_in_background
@@ -255,6 +287,28 @@ def create_job_application(request):
                 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+#? For company side kapag papalitan na ang status
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def change_application_status(request, application_id):
+    user = request.user  
+    job_application = get_object_or_404(JobApplication, job_application_id=application_id)
+
+    if job_application.job_hiring.company.user != user:
+        return Response({'error': 'You are not authorized to update this application.'}, status=403)
+
+    new_status = request.data.get('application_status')
+    if not new_status:
+        return Response({'error': 'Status is required.'}, status=400)
+  
+    job_application.application_status = new_status
+    # Set a flag to indicate that a notification is being created in the view
+    job_application._notification_created = True
+    job_application.save()
+
+    return Response({'message': 'Application status updated.'})
+
+#? Check specific application
 @api_view(['GET'])
 def get_application_status(request, application_id):
     try:
@@ -290,7 +344,6 @@ def check_application(request, pk):
         )
 
     try:
-        # Retrieve the specific job posting
         job_hiring = JobHiring.objects.get(pk=pk)
     except JobHiring.DoesNotExist:
         return Response(
@@ -298,13 +351,20 @@ def check_application(request, pk):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    # Check if there's already an application for this job by this applicant
     application_exists = JobApplication.objects.filter(
         job_hiring=job_hiring,
         applicant_id=applicant_id
     ).exists()
 
     return Response({"hasApplied": application_exists}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_application_applicant(request):
+    applicant = get_object_or_404(Applicant, user=request.user)
+    job_applications = JobApplication.objects.filter(applicant=applicant)
+    serializer = JobApplicationSerializer(job_applications, many=True)
+    return Response(serializer.data)
 
 #* Delete Job Application
 @api_view(['DELETE'])

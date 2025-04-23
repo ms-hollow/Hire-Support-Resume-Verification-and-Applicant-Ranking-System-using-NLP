@@ -90,24 +90,24 @@ const ApplicantDetails = ({applicantId}) => {
     return (
       <div className="flex flex-col h-full">
         {/* Top Part of applicant Details - Fixed */}
-        <div className="job-details-box border-b-8 top rounded-t-lg p-4">
+        <div className="job-details-box border-b-8 top rounded-t-lg p-4 ">
           <p className="font-medium text-fontcolor text-medium">Applied For</p>  
           <p className="font-semibold text-fontcolor text-large">Job Title</p>
 
           <div className='flex flex-col items-center justify-center'>
             <p className="font-semibold text-primary text-large">  {individualApplicants.name}</p>
-            <p className="font-thin text-fontcolor text-medium">Applicant ID:  {individualApplicants.id}</p>
+            <p className="font-thin text-fontcolor lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall">Applicant ID:  {individualApplicants.id}</p>
           </div>
         
           <div className="flex justify-between gap-5 mt-2">
             <button type="button" className="button1 flex flex-col items-center justify-center">
                 <Link href="" className="flex items-center space-x-2">
-                <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">View Resume</p>
+                <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-medium text-center">View Resume</p>
                 </Link>
             </button>
             <button type="button" className="button2 flex flex-col items-center justify-center">
                 <Link href="" className="flex items-center space-x-2">
-                <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Supporting Documents</p>
+                <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-medium text-center">Supporting Documents</p>
                 </Link>
             </button>
           </div>
@@ -189,7 +189,7 @@ const ApplicantDetailsWrapper = () => {
   return (
     <div className="flex-1 h-[calc(100vh-150px)] border border-none rounded-lg">
       <ApplicantDetails  applicantId={selectedApplicantId}/>
-        <div className="flex flex-grow items-center -mt-40">
+        <div className="flex flex-grow items-center lg:-mt-36 mb:-mt-16 ">
           <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 mr-2 font-medium">Hiring Decision: </p>
           <div className="flex h-medium rounded-xs border-2 border-fontcolor">
             <select className="valid:bg-primary invalid:bg-background valid:text-background invalid:text-fontcolor lg:w-auto mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall"  id="hiring-decision"    name="hiring-decision"  value={hiringDecision}  required onChange={handleChange} >

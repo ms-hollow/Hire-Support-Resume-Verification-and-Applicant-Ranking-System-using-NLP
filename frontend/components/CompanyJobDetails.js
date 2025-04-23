@@ -41,7 +41,7 @@ const CompanyJobDetailsWrapper = () => {
                     </p>
                     <div className="flex items-center gap-2">
                         <p className="font-thin text-fontcolor text-xsmall">
-                            {jobDetails.creation_date}
+                            {jobDetails.creation_date?.slice(0, 10)}
                         </p>
                         <Image
                             src="/Menu.svg"
@@ -67,8 +67,7 @@ const CompanyJobDetailsWrapper = () => {
                         />
                         <p className="ml-1.5 font-thin text-xsmall text-fontcolor">
                             {/* {jobDetails.region},  */}
-                            {jobDetails.province},{" "}
-                            {jobDetails.city}
+                            {jobDetails.province}, {jobDetails.city}
                         </p>
                     </div>
                     <div className="flex flex-row mx-4">
@@ -82,7 +81,26 @@ const CompanyJobDetailsWrapper = () => {
                             {jobDetails.work_setup}
                         </p>
                     </div>
-                    <div className="flex flex-row">
+                </div>
+
+                <div className="flex flex-row gap-4">
+                    <div className="flex flex-row mt-2">
+                        <Image
+                            src="/Salary Icon.svg"
+                            width={18}
+                            height={20}
+                            alt="Salary Icon"
+                        />
+                        <p className="ml-2 font-thin text-xsmall pl-px text-fontcolor">
+                            {`₱${Number(
+                                jobDetails.salary_min
+                            ).toLocaleString()} - ${Number(
+                                jobDetails.salary_max
+                            ).toLocaleString()}`}
+                        </p>
+                    </div>
+
+                    <div className="flex flex-row mt-2">
                         <Image
                             src="/Schedule Icon.svg"
                             width={18}
@@ -93,17 +111,6 @@ const CompanyJobDetailsWrapper = () => {
                             {jobDetails.schedule}
                         </p>
                     </div>
-                </div>
-                <div className="flex flex-row mt-2 px-1">
-                    <Image
-                        src="/Salary Icon.svg"
-                        width={18}
-                        height={20}
-                        alt="Salary Icon"
-                    />
-                    <p className="ml-2 font-thin text-xsmall pl-px text-fontcolor">
-                        {jobDetails.salary_min} - {jobDetails.salary_max}
-                    </p>
                 </div>
             </div>
 

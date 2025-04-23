@@ -9,15 +9,9 @@ export const fetchJobList = async (authTokens) => {
                 "Content-Type": "application/json",
             },
         });
-
-        if (!res.ok) {
-            throw new Error(`HTTP error! Status: ${res.status}`);
-        }
-
         return await res.json();
-    } catch (error) {
-        console.error("Error fetching job list:", error);
-        return null;
+    } catch {
+        console.log("No job list available.");
     }
 };
 
@@ -46,10 +40,9 @@ export const getJobHiringDetails = async (id, authTokens) => {
         return await res.json();
     } catch (error) {
         console.error("Error fetching job details:", error);
-        return null; 
+        return null;
     }
 };
-
 
 export const createJob = async (formData, token) => {
     try {
@@ -89,7 +82,7 @@ export const deleteJobHiring = async (id, authTokens) => {
         const res = await fetch(
             `http://127.0.0.1:8000/job/hirings/delete/${id}`,
             {
-                method: "DELETE", // Use DELETE method for deleting resources
+                method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${authTokens.access}`,
                     "Content-Type": "application/json",
@@ -109,6 +102,38 @@ export const deleteJobHiring = async (id, authTokens) => {
         return data;
     } catch (error) {
         console.error("Error deleting job.", error);
+        return null;
+    }
+};
+
+export const updateJobHiring = async (id, formData, authTokens) => {
+    if (!authTokens?.access) return null;
+
+    try {
+        const res = await fetch(
+            `http://127.0.0.1:8000/job/hirings/edit/${id}/`,
+            {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${authTokens.access}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            }
+        );
+
+        if (!res.ok) {
+            throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+
+        if (res.status === 204) {
+            return true;
+        }
+
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        console.error("Error updating job hiring:", error);
         return null;
     }
 };

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from 'next/router';
 
 const GeneralHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,8 +10,12 @@ const GeneralHeader = () => {
     setIsOpen(!isOpen);
   };
 
+
+  
+  const router = useRouter();
+
   return (
-    <header className="fixed top-0 w-full bg-background h-16 lg:px-20 mb:px-20 py-5 flex items-center justify-between sm:px-8 z-50">
+    <header className="fixed top-0 w-full bg-background h-16 lg:px-20 mb:px-10 py-5 flex items-center justify-between sm:px-8 xxsm:px-4 z-50">
       <div className="flex items-center md:hidden absolute right-6">
           <Link href="/GENERAL/Login" className="mr-4">
             <h3>Sign in as Applicant</h3>
@@ -30,11 +35,12 @@ const GeneralHeader = () => {
                   />
           </div>
 
-          <ul className="justify-center items-center mt-1 hidden mb:flex lg:space-x-20 mb:space-x-16">
+          <ul className="justify-center items-center mt-1 hidden mb:flex lg:space-x-20 mb:space-x-10">
             <li><a href="/#Home"onClick={toggleMenu}>Home</a></li>
             <li><a href="/#AboutUs"onClick={toggleMenu}>About Us</a></li>
-            <li><a href="/#FAQS"onClick={toggleMenu}>FAQs</a></li>
-            <li><a href="/#ContactUs" onClick={toggleMenu}>Contact Us</a></li>
+            <li><a href="/#Features"onClick={toggleMenu}>Features</a></li>
+            <li><a href="/GENERAL/FAQs"onClick={toggleMenu}>FAQs</a></li>
+            <li><a href="/GENERAL/ContactUs" onClick={toggleMenu}>Contact Us</a></li>
           </ul>
       </div>
         
@@ -54,8 +60,10 @@ const GeneralHeader = () => {
         <ul className="flex flex-col items-center justify-center space-y-4 p-4 m-0">
         <li><a href="/#Home"onClick={toggleMenu}>Home</a></li>
           <li><a href="/#AboutUs"onClick={toggleMenu}>About Us</a></li>
-          <li><a href="/#FAQS"onClick={toggleMenu}>FAQs</a></li>
-          <li><a href="/#contactUs" onClick={toggleMenu}>Contact Us</a></li>
+          <li><a href="/#Features"onClick={toggleMenu}>Features</a></li>
+          <li><a href="/GENERAL/FAQs"onClick={toggleMenu}>FAQs</a></li>
+          <li><a href="/GENERAL/ContactUs" onClick={toggleMenu}>Contact Us</a></li>
+         
         </ul>
       </div>
     </header>

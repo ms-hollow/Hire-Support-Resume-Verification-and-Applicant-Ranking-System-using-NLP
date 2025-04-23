@@ -19,7 +19,7 @@ const CompanyHeader = () => {
   };
 
   return (
-    <header className="fixed top-0 w-full bg-background h-16 lg:px-20 mb:px-20 py-5 flex items-center justify-between sm:px-8 xsm:px-8 z-50">
+    <header className="fixed top-0 w-full bg-background h-16 lg:px-20 mb:px-20 py-5 flex items-center justify-between sm:px-8 xxsm:px-4 z-50">
       <div className="flex items-center">
         <div className="logo mr-4">
           <Image 
@@ -45,7 +45,7 @@ const CompanyHeader = () => {
       <div className="flex items-center gap-5">
         {/* Notification Icon */}
         <button className="pt-1">
-          <Link href="" className="ml-auto">
+          <Link href="/COMPANY/Notifications" className="ml-auto">
             <Image 
               src="/Notification Icon.svg" 
               width={39} 
@@ -54,6 +54,7 @@ const CompanyHeader = () => {
             />
             </Link>
         </button>
+    
 
         {/* Profile Dropdown */}
         <div className="relative">

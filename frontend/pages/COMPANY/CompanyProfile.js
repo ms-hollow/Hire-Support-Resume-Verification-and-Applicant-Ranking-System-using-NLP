@@ -36,7 +36,7 @@ export default function CompanyProfile() {
           <h1 className="lg:text-xl mb:text-xl sm:text-large text-primary pb-12">Account Profile</h1>
   
           <div className="flex items-center justify-center ">
-          <div className="box-container px-8 py-5 mx-auto">
+          <div className="job-application-box rounded-xs px-8 py-5 mx-auto">
             {/* Header Section */}
             <div className="flex flex-row justify-between items-center pt-3 mb-5">
               <p className="font-semibold lg:text-large mb:text-large sm:text-small  text-primary">Company Information</p>
@@ -52,9 +52,6 @@ export default function CompanyProfile() {
                 />
               </button>
             </div>
-  
-            {/* Personal Info Content */}
-            {/* Hindi pa naka read0nly yung fields */}
   
             <div className="flex flex-col items-center">
                 <CompanyInfo isEditable={isEditable} onUpdateComplete={handleUpdateComplete}/>
