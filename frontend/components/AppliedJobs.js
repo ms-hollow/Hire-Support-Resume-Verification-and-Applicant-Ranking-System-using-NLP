@@ -112,7 +112,11 @@ const AppliedJobs = () => {
                                             alt="Calendar Icon"
                                         />
                                         <p className="ml-1 font-thin text-fontcolor">
-                                            {job.application_date}
+                                            {
+                                                new Date(job.application_date)
+                                                    .toISOString()
+                                                    .split("T")[0]
+                                            }
                                         </p>
                                     </div>
                                 </div>
