@@ -207,7 +207,7 @@ export default function Notifications() {
                                                 height={30}
                                                 alt="Notification Icon"
                                             />
-                                            <div className="flex items-center justify-between w-full overflow-hidden cursor-default">
+                                            <div className="flex items-center justify-between w-full overflow-hidden cursor-pointer">
                                                 <p className="text-fontcolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall leading-snug truncate">
                                                     Hi there,
                                                     <span className="font-bold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall">

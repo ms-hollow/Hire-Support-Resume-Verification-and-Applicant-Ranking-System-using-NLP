@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { JDSkeletonLoader } from "./ui/SkeletonLoader";
 import { fetchJobDetails } from "@/pages/api/applicantJobApi";
 import { useJob, JobProvider } from "@/pages/context/JobContext";
+import { toTitleCase } from "@/pages/utils/functions";
 
 const JobDetails = ({ authToken }) => {
     const { savedStatus, toggleSaveJob } = useJob();
@@ -74,8 +75,9 @@ const JobDetails = ({ authToken }) => {
                             alt="Location Icon"
                         />
                         <p className="ml-1.5 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
-                            {jobDetails.region}, {jobDetails.province},{" "}
-                            {jobDetails.city}
+                            {toTitleCase(jobDetails.region)},{" "}
+                            {toTitleCase(jobDetails.province)},{" "}
+                            {toTitleCase(jobDetails.city)}
                         </p>
                     </div>
                     <div className="flex flex-row mx-4">

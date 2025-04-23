@@ -48,11 +48,12 @@ def create_application_notification(sender, instance, created, **kwargs):
 @receiver(pre_save, sender=JobApplication)
 def notify_application_status_change(sender, instance, **kwargs):
     if not instance.pk:
-        return  # Skip new records, only handle updates
+        return 
 
     old_instance = JobApplication.objects.get(pk=instance.pk)
     if old_instance.application_status != instance.application_status:
-        Notification.objects.create(
-            recipient=instance.applicant.user,
-            message=f"Your application for '{instance.job_hiring.job_title}' was {instance.application_status.lower()}."
-        )
+        if not getattr(instance, '_notification_created', False):
+            Notification.objects.create(
+                recipient=instance.applicant.user,
+                message=f"Your application for {instance.job_hiring.job_title} was {instance.application_status.lower()}."
+            )
