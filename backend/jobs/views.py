@@ -255,7 +255,7 @@ def create_job_application(request):
         if serializer.is_valid():
             with transaction.atomic():  # Optional, to ensure all-or-nothing saving
                 # Save application with submitted status
-                job_application = serializer.save(application_status='submitted')
+                job_application = serializer.save(application_status='processing')
 
                 # Set initial status
                 job_application.application_status = 'new'
@@ -281,7 +281,7 @@ def create_job_application(request):
                 return Response({
                     "message": "Your application has been submitted and is being processed.",
                     "application_id": job_application.job_application_id,
-                    "status": "submitted",
+                    "status": "processing",
                     "data": serializer.data
                 }, status=status.HTTP_202_ACCEPTED)
                 

@@ -105,9 +105,8 @@ class JobApplication(models.Model):
     # Updated status choices
     APPLICATION_STATUS_CHOICES = [
         ('draft', 'Draft'),
-        ('submitted', 'Submitted'),
         ('processing', 'Processing'),
-        ('processed', 'Processed Successfully'),
+        ('processed', 'Submitted'),
         ('error', 'Processing Failed'),
         ('cancelled', 'Cancelled'),
     ]
