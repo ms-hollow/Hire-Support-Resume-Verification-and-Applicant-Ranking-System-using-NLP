@@ -399,11 +399,11 @@ export default function CompanySettings() {
                                                                     {selected}
                                                                 </span>
                                                                 <button
+                                                                    type="button" 
                                                                     className="ml-2 text-red-600 font-extrabold"
-                                                                    onClick={(
-                                                                        e
-                                                                    ) => {
+                                                                    onClick={(e) => {
                                                                         e.stopPropagation();
+                                                                        e.preventDefault(); 
                                                                         handleRemoveSelectedOption(
                                                                             "workExperience",
                                                                             "directlyRelevant",
@@ -559,11 +559,11 @@ export default function CompanySettings() {
                                                                     {selected}
                                                                 </span>
                                                                 <button
+                                                                    type="button"  
                                                                     className="ml-2 text-red-600 font-extrabold"
-                                                                    onClick={(
-                                                                        e
-                                                                    ) => {
+                                                                    onClick={(e) => {
                                                                         e.stopPropagation();
+                                                                        e.preventDefault();
                                                                         handleRemoveSelectedOption(
                                                                             "workExperience",
                                                                             "highlyRelevant",
@@ -720,11 +720,11 @@ export default function CompanySettings() {
                                                                     {selected}
                                                                 </span>
                                                                 <button
+                                                                    type="button" 
                                                                     className="ml-2 text-red-600 font-extrabold"
-                                                                    onClick={(
-                                                                        e
-                                                                    ) => {
+                                                                    onClick={(e) => {
                                                                         e.stopPropagation();
+                                                                        e.preventDefault(); 
                                                                         handleRemoveSelectedOption(
                                                                             "workExperience",
                                                                             "moderatelyRelevant",
@@ -1479,10 +1479,10 @@ export default function CompanySettings() {
                                                 </div>
                                             </div>
 
-                                            {/* 1st Choice Field of Study */}
+                                            {/* 1st Preference Field of Study */}
                                             <div className="mb-4">
                                                 <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                    1st Choice Field of Study{" "}
+                                                    1st Preference Field of Study{" "}
                                                     <span className="font-medium text-xsmall">
                                                         (Put the most directly
                                                         relevant fields of study
@@ -1580,16 +1580,16 @@ export default function CompanySettings() {
                                                 )}
                                             </div>
 
-                                            {/* 2nd Choice Field of Study */}
+                                            {/* 2nd Preference Field of Study */}
                                             <div className="mb-4">
                                                 <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                    2nd Choice Field of Study
-                                                    <span className="font-medium text-xsmall">
-                                                        (Put closely related
-                                                        fields that have
-                                                        significant overlap with
-                                                        the job requirements)
-                                                    </span>
+                                                    2nd Preference Field of Study{" "}
+                                                        <span className="font-medium text-xsmall">
+                                                            (Put closely related
+                                                            fields that have
+                                                            significant overlap with
+                                                            the job requirements)
+                                                        </span>
                                                 </label>
                                                 <div
                                                     className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
@@ -1681,10 +1681,10 @@ export default function CompanySettings() {
                                                 )}
                                             </div>
 
-                                            {/* 3rd Choice Field of Study */}
+                                            {/* 3rd Preference Field of Study */}
                                             <div className="mb-4">
                                                 <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                    3rd Choice Field of Study
+                                                    3rd Preference Field of Study {" "}
                                                     <span className="font-medium text-xsmall">
                                                         (Put fields that have
                                                         some relevance or
