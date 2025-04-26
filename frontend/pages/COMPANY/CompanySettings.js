@@ -446,6 +446,7 @@ export default function CompanySettings() {
             return { ...prevFormData, required_documents: updatedDocuments };
         });
     };
+    
 
     // Get today's date in YYYY-MM-DD format
     const currentDate = new Date().toISOString().split("T")[0];
@@ -1631,7 +1632,7 @@ export default function CompanySettings() {
                                         {/* 1st Choice Field of Study */}
                                         <div className="mb-4">
                                             <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                1st Choice Field of Study{" "}
+                                                1st Preference Field of Study{" "}
                                                 <span className="font-medium text-xsmall">
                                                     (Put the most directly
                                                     relevant fields of study for
@@ -1724,7 +1725,7 @@ export default function CompanySettings() {
                                         {/* 2nd Choice Field of Study */}
                                         <div className="mb-4">
                                             <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                2nd Choice Field of Study
+                                                2nd Preference Field of Study
                                                 <span className="font-medium text-xsmall">
                                                     (Put closely related fields
                                                     that have significant
@@ -1817,7 +1818,7 @@ export default function CompanySettings() {
                                         {/* 3rd Choice Field of Study */}
                                         <div className="mb-4">
                                             <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                3rd Choice Field of Study
+                                                3rd Preference Field of Study
                                                 <span className="font-medium text-xsmall">
                                                     (Put fields that have some
                                                     relevance or provide useful

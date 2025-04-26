@@ -118,6 +118,7 @@
     "Linux",
     "Agile Methodologies"
   ],
+
   "education": [
       "Computer Science",
       "Information Technology",
@@ -332,5 +333,175 @@
     "Adobe Illustrator",
     "Adobe Photoshop"
     
+  ],
+
+  "jobIndustries": [
+    {
+      "industry": "Executive & IT Leadership",
+      "roles": [
+        "Chief Information Officer (CIO)",
+        "Chief Information Security Officer (CISO)",
+        "Chief Technology Officer (CTO)",
+        "IT Director",
+        "IT Manager"
+      ]
+    },
+    {
+      "industry": "Architecture & Infrastructure",
+      "roles": [
+        "Cloud Infrastructure Architect",
+        "Enterprise Architect",
+        "Solutions Architect",
+        "Technical Architect",
+        "Data Architect",
+        "Infrastructure Engineer",
+        "Site Reliability Engineer"
+      ]
+    },
+    {
+      "industry": "Networking & Systems Administration",
+      "roles": [
+        "Network Engineer",
+        "Systems Administrator",
+        "Network Security Specialist",
+        "Systems Analyst"
+      ]
+    },
+    {
+      "industry": "Database Administration",
+      "roles": [
+        "Database Administrator",
+        "Data Quality Manager",
+        "Database Security Specialist",
+        "Cloud Database Administrator"
+      ]
+    },
+    {
+      "industry": "Business Intelligence & Data Analytics",
+      "roles": [
+        "Business Intelligence Analyst",
+        "Business Systems Analyst",
+        "Data Analyst",
+        "Data Scientist",
+        "Machine Learning Engineer",
+        "AI Engineer"
+      ]
+    },
+    {
+      "industry": "Software Development",
+      "roles": [
+        "Software Engineer",
+        "Backend Developer",
+        "Frontend Developer",
+        "Full Stack Developer",
+        "DevOps Engineer",
+        "Platform Engineer",
+        "Software Architect",
+        "Quality Assurance Engineer",
+        "Performance Engineer"
+      ]
+    },
+    {
+      "industry": "UI/UX & Design",
+      "roles": [
+        {
+          "title": "UI/UX Designer",
+          "relevance": {
+            "directly_relevant": [
+              "User Interface Designer",
+              "User Experience Designer",
+              "Product Designer",
+              "Digital Product Designer",
+              "Interaction Designer",
+              "UX/UI Designer"
+            ],
+            "highly_relevant": [
+              "Web Designer",
+              "Visual Designer",
+              "Interface Designer",
+              "Experience Designer",
+              "Digital Designer",
+              "Product Experience Designer"
+            ],
+            "moderately_relevant": [
+              "Frontend Developer",
+              "Web Developer",
+              "Graphic Designer",
+              "Creative Designer",
+              "UX Researcher",
+              "Information Architect"
+            ]
+          }
+        },
+        {
+          "title": "UX Researcher"
+        },
+        {
+          "title": "Accessibility Specialist"
+        }
+      ]
+    },
+    
+    {
+      "industry": "Cybersecurity",
+      "roles": [
+        "Security Engineer",
+        "Cloud Security Architect",
+        "Digital Forensics Analyst",
+        "Penetration Tester",
+        "Threat Intelligence Analyst",
+        "Security Operations Center (SOC) Analyst",
+        "Incident Response Specialist",
+        "Cybersecurity Consultant"
+      ]
+    },
+    {
+      "industry": "IT Support & Services",
+      "roles": [
+        "IT Support Specialist",
+        "IT Service Desk Manager",
+        "Technical Trainer",
+        "IT Asset Manager"
+      ]
+    },
+    {
+      "industry": "Product & Project Management",
+      "roles": [
+        "Technical Product Manager",
+        "Project Manager",
+        "Program Manager",
+        "Digital Transformation Manager",
+        "Agile Coach",
+        "Scrum Master"
+      ]
+    },
+    {
+      "industry": "Web & Mobile Development",
+      "roles": [
+        "Web Developer",
+        "Mobile Developer",
+        "Web Analytics Specialist",
+        "SEO Specialist",
+        "CMS Specialist"
+      ]
+    },
+    {
+      "industry": "Emerging Technologies",
+      "roles": [
+        "Blockchain Developer",
+        "IoT Developer"
+      ]
+    },
+    {
+      "industry": "Sales & Consulting",
+      "roles": [
+        "Solutions Engineer",
+        "Technical Account Manager",
+        "IT Sales Executive",
+        "Cloud Solutions Consultant",
+        "IT Strategy Consultant"
+      ]
+    }
   ]
+
 }
