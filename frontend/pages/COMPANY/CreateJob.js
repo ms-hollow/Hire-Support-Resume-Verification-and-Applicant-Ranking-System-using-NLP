@@ -294,11 +294,43 @@ export default function CreateJob() {
             ...prev,
             [field]: value,
         }));
+    
+        if (field === "job_title") {
+            const foundIndustry = options?.jobIndustries?.find((industry) =>
+                industry.roles?.some((role) =>
+                    typeof role === "object"
+                        ? role.title === value
+                        : role === value
+                )
+            );
+    
+            const selectedRole = foundIndustry?.roles?.find((role) =>
+                typeof role === "object" ? role.title === value : role === value
+            );
+    
+            // Set Job Industry
+            if (foundIndustry) {
+                setFormData((prev) => ({
+                    ...prev,
+                    job_industry: foundIndustry.industry,
+                }));
+            }
+    
+            // Save relevant roles to cookies or local storage for use in CompanySettings
+            if (typeof selectedRole === "object" && selectedRole.relevance) {
+                const relevanceData = selectedRole.relevance;
+                Cookies.set("RELEVANT_ROLES", JSON.stringify(relevanceData), { expires: 1 });
+            } else {
+                Cookies.remove("RELEVANT_ROLES");
+            }
+        }
+    
         setDropdownOpen((prev) => ({
             ...prev,
             [field]: false,
         }));
     };
+    
 
     const allJobTitles = (options?.jobIndustries || []).flatMap((industryObj) =>
         industryObj.roles.map((role) => ({

@@ -1,84 +1,224 @@
 {
   "workExperience": [
-      "Chief Information Officer (CIO)",
-      "Chief Information Security Officer (CISO)",
-      "Chief Technology Officer (CTO)",
-      "IT Director",
-      "IT Manager",
-
-      "Cloud Infrastructure Architect",
-      "Enterprise Architect",
-      "Solutions Architect",
-      "Technical Architect",
-      "Data Architect",
-
-      "Network Engineer",
-      "Systems Administrator",
-      "Site Reliability Engineer",
-      "Infrastructure Engineer",
-      "Network Security Specialist",
-      "Systems Analyst",
-
-      "Database Administrator",
-      "Data Quality Manager",
-      "Database Security Specialist",
-      "Cloud Database Administrator",
-
-      "Business Intelligence Analyst",
-      "Business Systems Analyst",
-      "Data Analyst",
-      "Data Scientist",
-      "Machine Learning Engineer",
-      "AI Engineer",
-
-      "Software Engineer",
-      "Backend Developer",
-      "Frontend Developer",
-      "Full Stack Developer",
-      "DevOps Engineer",
-      "Platform Engineer",
-      "Software Architect",
-      "Quality Assurance Engineer",
-      "UI/UX Designer",
-      "Blockchain Developer",
-      "IoT Developer",
-      "Performance Engineer",
-
-      "Security Engineer",
-      "Cloud Security Architect",
-      "Digital Forensics Analyst",
-      "Penetration Tester",
-      "Threat Intelligence Analyst",
-      "Security Operations Center (SOC) Analyst",
-      "Incident Response Specialist",
-      "Cybersecurity Consultant", 
-
-      "IT Support Specialist",
-      "IT Service Desk Manager",
-      "Technical Trainer",
-      "IT Asset Manager",
-
-      "Technical Product Manager",
-      "Project Manager",
-      "Program Manager",
-      "Digital Transformation Manager",
-      "Agile Coach",
-      "Scrum Master",
-
-      "Web Developer",
-      "Mobile Developer",
-      "Web Analytics Specialist",
-      "SEO Specialist",
-      "UX Researcher",
-      "Accessibility Specialist",
-      "CMS Specialist",
-
-      "Solutions Engineer",
-      "Technical Account Manager",
-      "IT Sales Executive",
-      "Cloud Solutions Consultant",
-      "IT Strategy Consultant"
-  ],
+  "Software Developer",
+  "Applications Engineer",
+  "Computer Software Engineer",
+  "Applications Developer",
+  "Programmer Analyst",
+  "Software Programmer",
+  "Computer Programmer",
+  "Systems Engineer",
+  "Solutions Engineer",
+  "Software Architect",
+  "Technical Lead",
+  "Development Engineer",
+  "Platform Engineer",
+  "Cloud Engineer",
+  "Quality Engineer",
+  "Integration Engineer",
+  "DevOps Engineer",
+  "Site Reliability Engineer",
+  "Cloud Developer",
+  "Systems Analyst",
+  "Technical Consultant",
+  "Application Support Engineer",
+  "Backend Engineer",
+  "Server Side Developer",
+  "API Developer",
+  "API Engineer",
+  "Database Developer",
+  "Systems Developer",
+  "Cloud Backend Developer",
+  "Backend Solutions Engineer",
+  "Backend Integration Engineer",
+  "Core Systems Developer",
+  "Full Stack Developer",
+  "Software Engineer",
+  "Data Engineer",
+  "Frontend Engineer",
+  "Client Side Developer",
+  "UI Developer",
+  "Web Frontend Developer",
+  "Web Developer",
+  "UI Engineer",
+  "JavaScript Developer",
+  "Web Application Developer",
+  "UI/UX Developer",
+  "Website Developer",
+  "UX Designer",
+  "UI Designer",
+  "Web Designer",
+  "Mobile Frontend Developer",
+  "Full Stack Engineer",
+  "End to End Developer",
+  "Full Stack Web Developer",
+  "Application Developer",
+  "Full Stack Solutions Engineer",
+  "Stack Agnostic Developer",
+  "Development Operations Engineer",
+  "DevOps Specialist",
+  "CI/CD Engineer",
+  "Release Engineer",
+  "Build and Release Engineer",
+  "Cloud Operations Engineer",
+  "Infrastructure Engineer",
+  "Cloud DevOps Engineer",
+  "DevSecOps Engineer",
+  "Automation Engineer",
+  "Release Manager",
+  "Deployment Engineer",
+  "Infrastructure Developer",
+  "Operations Engineer",
+  "Infrastructure Platform Engineer",
+  "Cloud Platform Engineer",
+  "Systems Platform Engineer",
+  "Platform Developer",
+  "Platform Solutions Engineer",
+  "Cloud Infrastructure Engineer",
+  "Cloud Architect",
+  "Systems Administrator",
+  "Solutions Architect",
+  "Infrastructure Architect",
+  "Technical Architect",
+  "Systems Architect",
+  "Application Architect",
+  "Enterprise Software Architect",
+  "Lead Software Engineer",
+  "Principal Engineer",
+  "Enterprise Architect",
+  "Systems Designer",
+  "Development Manager",
+  "Engineering Manager",
+  "Integration Architect",
+  "Platform Architect",
+  "QA Engineer",
+  "Software Tester",
+  "Test Engineer",
+  "Software Quality Engineer",
+  "QA Analyst",
+  "Quality Analyst",
+  "Test Automation Engineer",
+  "Software Development Engineer in Test",
+  "QA Automation Engineer",
+  "Performance Test Engineer",
+  "Integration Test Engineer",
+  "Blockchain Engineer",
+  "Smart Contract Developer",
+  "Blockchain Solutions Developer",
+  "Distributed Ledger Developer",
+  "Cryptocurrency Developer",
+  "Smart Contract Engineer",
+  "Web3 Developer",
+  "Solidity Developer",
+  "DApp Developer",
+  "Cryptocurrency Engineer",
+  "Blockchain Protocol Engineer",
+  "IoT Engineer",
+  "Internet of Things Developer",
+  "IoT Solutions Developer",
+  "Connected Devices Developer",
+  "IoT Applications Developer",
+  "Embedded Systems Developer",
+  "Embedded Software Engineer",
+  "IoT Solutions Architect",
+  "IoT Systems Engineer",
+  "Connected Products Developer",
+  "Firmware Developer",
+  "Performance Testing Engineer",
+  "Systems Performance Engineer",
+  "Application Performance Engineer",
+  "Software Performance Engineer",
+  "Performance Optimization Engineer",
+  "Load Test Engineer",
+  "Performance Architect",
+  "Capacity Planning Engineer",
+  "Network Administrator",
+  "Network Infrastructure Engineer",
+  "Network Systems Engineer",
+  "Network Architect",
+  "Communications Engineer",
+  "Network Operations Engineer",
+  "Cloud Network Engineer",
+  "Network Solutions Engineer",
+  "System Engineer",
+  "Telecommunications Engineer",
+  "NOC Engineer",
+  "System Admin",
+  "Systems Operations Engineer",
+  "IT Systems Administrator",
+  "Computer Systems Administrator",
+  "Windows Systems Administrator",
+  "Linux Systems Administrator",
+  "Infrastructure Administrator",
+  "Server Administrator",
+  "Platform Administrator",
+  "Cloud Systems Administrator",
+  "IT Operations Engineer",
+  "SRE",
+  "Reliability Engineer",
+  "Systems Reliability Engineer",
+  "Production Engineer",
+  "Site Operations Engineer",
+  "Production Operations Engineer",
+  "IT Infrastructure Engineer",
+  "Infrastructure Systems Engineer",
+  "Systems Infrastructure Engineer",
+  "Technical Infrastructure Engineer",
+  "Network Security Engineer",
+  "Network Security Administrator",
+  "Network Security Analyst",
+  "Information Security Engineer",
+  "Cyber Security Network Engineer",
+  "Security Engineer",
+  "Information Security Analyst",
+  "Cyber Security Engineer",
+  "Security Operations Engineer",
+  "Network Defense Engineer",
+  "Network Engineer",
+  "Security Analyst",
+  "IT Auditor",
+  "Cybersecurity Engineer",
+  "Application Security Engineer",
+  "Cloud Security Engineer",
+  "Penetration Tester",
+  "Security Architect",
+  "Vulnerability Management Engineer",
+  "Compliance Analyst",
+  "Cloud Solutions Engineer",
+  "Cloud Systems Engineer",
+  "Cloud Solutions Architect",
+  "Enterprise Cloud Architect",
+  "Cloud Infrastructure Architect",
+  "Cloud Applications Architect",
+  "Cloud Platform Architect",
+  "DevOps Security Engineer",
+  "DevOps Security Specialist",
+  "Secure DevOps Engineer",
+  "Security-Focused DevOps Engineer",
+  "DevSecOps Specialist",
+  "SQL Database Administrator",
+  "Oracle DBA",
+  "MySQL DBA",
+  "NoSQL Database Administrator",
+  "Database Operations Engineer",
+  "Database Engineer",
+  "Data Analyst",
+  "BI Developer",
+  "IT Systems Analyst",
+  "Business Systems Analyst",
+  "Computer Systems Analyst",
+  "Technical Systems Analyst",
+  "Solutions Analyst",
+  "Technical Analyst",
+  "IT Analyst",
+  "Business Analyst",
+  "Technology Analyst",
+  "Applications Analyst",
+  "Business Systems Consultant",
+  "IT Consultant",
+  "Process Analyst"
+]
+,
   "skills": [
     "React.js",
     "Node.js",
@@ -339,39 +479,394 @@
     {
       "industry": "Executive & IT Leadership",
       "roles": [
-        "Chief Information Officer (CIO)",
-        "Chief Information Security Officer (CISO)",
-        "Chief Technology Officer (CTO)",
-        "IT Director",
-        "IT Manager"
+        {
+          "title": "Chief Information Officer (CIO)",
+          "relevance": {
+            "directly_relevant": [
+              "IT Director",
+              "IT Manager",
+              "Chief Technology Officer (CTO)",
+              "Chief Information Security Officer (CISO)"
+            ],
+            "highly_relevant": [
+              "Solutions Architect",
+              "Enterprise Architect",
+              "Development Manager",
+              "Engineering Manager",
+              "Information Security Manager"
+            ],
+            "moderately_relevant": [
+              "Business Systems Analyst",
+              "Technical Consultant",
+              "Data Analyst",
+              "Systems Analyst",
+              "IT Consultant"
+            ]
+          }
+        },
+        {
+          "title": "Chief Information Security Officer (CISO)",
+          "relevance": {
+            "directly_relevant": [
+              "Security Architect",
+              "Information Security Analyst",
+              "Cybersecurity Engineer",
+              "Network Security Engineer",
+              "IT Security Manager"
+            ],
+            "highly_relevant": [
+              "Penetration Tester",
+              "Security Analyst",
+              "Compliance Analyst",
+              "DevSecOps Engineer",
+              "IT Auditor"
+            ],
+            "moderately_relevant": [
+              "Systems Administrator",
+              "Cloud Security Engineer",
+              "Network Administrator",
+              "Site Reliability Engineer",
+              "Infrastructure Engineer"
+            ]
+          }
+        },
+        {
+          "title": "Chief Technology Officer (CTO)",
+          "relevance": {
+            "directly_relevant": [
+              "Lead Software Engineer",
+              "Principal Engineer",
+              "Technical Architect",
+              "Development Manager",
+              "Engineering Manager"
+            ],
+            "highly_relevant": [
+              "Solutions Architect",
+              "Full Stack Engineer",
+              "Platform Architect",
+              "Enterprise Architect",
+              "Cloud Solutions Architect"
+            ],
+            "moderately_relevant": [
+              "Systems Engineer",
+              "DevOps Engineer",
+              "Backend Engineer",
+              "Software Developer",
+              "QA Engineer"
+            ]
+          }
+        },
+        {
+          "title": "IT Director",
+          "relevance": {
+            "directly_relevant": [
+              "IT Manager",
+              "Chief Information Officer (CIO)",
+              "Chief Technology Officer (CTO)",
+              "Technical Architect",
+              "Infrastructure Architect"
+            ],
+            "highly_relevant": [
+              "Systems Architect",
+              "Enterprise Architect",
+              "Solutions Architect",
+              "Development Manager",
+              "IT Consultant"
+            ],
+            "moderately_relevant": [
+              "Systems Administrator",
+              "Systems Engineer",
+              "Network Architect",
+              "Database Administrator",
+              "QA Manager"
+            ]
+          }
+        },
+        {
+          "title": "IT Manager",
+          "relevance": {
+            "directly_relevant": [
+              "Systems Administrator",
+              "Network Administrator",
+              "Development Manager",
+              "Infrastructure Engineer",
+              "Technical Lead"
+            ],
+            "highly_relevant": [
+              "Systems Engineer",
+              "IT Consultant",
+              "QA Lead",
+              "Solutions Engineer",
+              "Database Administrator"
+            ],
+            "moderately_relevant": [
+              "Software Developer",
+              "Data Analyst",
+              "Technical Support Engineer",
+              "Test Engineer",
+              "Business Analyst"
+            ]
+          }
+        }
       ]
     },
     {
       "industry": "Architecture & Infrastructure",
       "roles": [
-        "Cloud Infrastructure Architect",
+        {
+          "title": "Cloud Infrastructure Architect",
+          "relevance": {
+            "directly_relevant": [
+              "Enterprise Architect",
+              "Cloud Architect",
+              "Solutions Architect",
+              "Technical Architect",
+              "Cloud Platform Architect"
+            ],
+            "highly_relevant": [
+              "Infrastructure Architect",
+              "Systems Architect",
+              "Cloud Infrastructure Engineer",
+              "DevOps Architect",
+              "IT Architect"
+            ],
+            "moderately_relevant": [
+              "Network Architect",
+              "Platform Engineer",
+              "Systems Engineer",
+              "Site Reliability Engineer",
+              "IT Manager"
+            ]
+          }
+        },
         "Enterprise Architect",
         "Solutions Architect",
         "Technical Architect",
         "Data Architect",
-        "Infrastructure Engineer",
-        "Site Reliability Engineer"
+        {
+          "title": "Infrastructure Engineer",
+          "relevance": {
+            "directly_relevant": [
+              "IT Infrastructure Engineer",
+              "Infrastructure Systems Engineer",
+              "Cloud Infrastructure Engineer",
+              "Systems Infrastructure Engineer",
+              "Technical Infrastructure Engineer"
+            ],
+            "highly_relevant": [
+              "Platform Engineer",
+              "Cloud Engineer",
+              "Systems Engineer",
+              "DevOps Engineer",
+              "Network Engineer"
+            ],
+            "moderately_relevant": [
+              "Systems Administrator",
+              "Site Reliability Engineer",
+              "Solutions Architect",
+              "Cloud Architect",
+              "Network Architect"
+            ]
+          }
+        },
+        {
+          "title": "Site Reliability Engineer",
+          "relevance": {
+            "directly_relevant": [
+              "SRE",
+              "Reliability Engineer",
+              "Systems Reliability Engineer",
+              "Production Engineer",
+              "Site Operations Engineer"
+            ],
+            "highly_relevant": [
+              "DevOps Engineer",
+              "Platform Engineer",
+              "Infrastructure Engineer",
+              "Cloud Operations Engineer",
+              "Systems Engineer",
+              "Production Operations Engineer"
+            ],
+            "moderately_relevant": [
+              "Systems Administrator",
+              "Cloud Engineer",
+              "Software Engineer",
+              "Network Engineer",
+              "Performance Engineer"
+            ]
+          }
+        }
       ]
     },
     {
       "industry": "Networking & Systems Administration",
       "roles": [
-        "Network Engineer",
-        "Systems Administrator",
-        "Network Security Specialist",
-        "Systems Analyst"
+        {
+          "title": "Network Engineer",
+          "relevance": {
+            "directly_relevant": [
+              "Network Administrator",
+              "Network Infrastructure Engineer",
+              "Network Systems Engineer",
+              "Network Architect",
+              "Communications Engineer",
+              "Network Operations Engineer"
+            ],
+            "highly_relevant": [
+              "Cloud Network Engineer",
+              "Network Solutions Engineer",
+              "System Engineer",
+              "Infrastructure Engineer",
+              "Telecommunications Engineer",
+              "NOC Engineer"
+            ],
+            "moderately_relevant": [
+              "Systems Administrator",
+              "Network Security Engineer",
+              "Cloud Engineer",
+              "DevOps Engineer",
+              "Infrastructure Architect"
+            ]
+          }
+        },
+        {
+          "title": "Systems Administrator",
+          "relevance": {
+            "directly_relevant": [
+              "System Admin",
+              "Systems Engineer",
+              "Systems Operations Engineer",
+              "IT Systems Administrator",
+              "Computer Systems Administrator",
+              "Windows Systems Administrator",
+              "Linux Systems Administrator"
+            ],
+            "highly_relevant": [
+              "Infrastructure Administrator",
+              "Server Administrator",
+              "Platform Administrator",
+              "Cloud Systems Administrator",
+              "IT Operations Engineer"
+            ],
+            "moderately_relevant": [
+              "Network Administrator",
+              "DevOps Engineer",
+              "Cloud Engineer",
+              "Support Engineer",
+              "Infrastructure Engineer"
+            ]
+          }
+        },
+        {
+          "title": "Network Security Specialist",
+          "relevance": {
+            "directly_relevant": [
+              "Network Security Engineer",
+              "Network Security Administrator",
+              "Network Security Analyst",
+              "Information Security Engineer",
+              "Cyber Security Network Engineer"
+            ],
+            "highly_relevant": [
+              "Security Engineer",
+              "Information Security Analyst",
+              "Cyber Security Engineer",
+              "Security Operations Engineer",
+              "Network Defense Engineer"
+            ],
+            "moderately_relevant": [
+              "Network Engineer",
+              "Systems Administrator",
+              "Security Analyst",
+              "IT Auditor",
+              "DevOps Engineer"
+            ]
+          }
+        },
+        {
+          "title": "Systems Analyst",
+          "relevance": {
+            "directly_relevant": [
+              "IT Systems Analyst",
+              "Business Systems Analyst",
+              "Computer Systems Analyst",
+              "Systems Engineer",
+              "Technical Systems Analyst"
+            ],
+            "highly_relevant": [
+              "Solutions Analyst",
+              "Technical Analyst",
+              "IT Analyst",
+              "Business Analyst",
+              "Technology Analyst",
+              "Applications Analyst"
+            ],
+            "moderately_relevant": [
+              "Systems Administrator",
+              "Business Systems Consultant",
+              "IT Consultant",
+              "Technical Consultant",
+              "Process Analyst"
+            ]
+          }
+        }        
       ]
     },
     {
       "industry": "Database Administration",
       "roles": [
-        "Database Administrator",
-        "Data Quality Manager",
+        {
+          "title": "Database Administrator",
+          "relevance": {
+            "directly_relevant": [
+              "SQL Database Administrator",
+              "Oracle DBA",
+              "MySQL DBA",
+              "NoSQL Database Administrator",
+              "Database Operations Engineer"
+            ],
+            "highly_relevant": [
+              "Data Engineer",
+              "Database Engineer",
+              "Systems Administrator",
+              "Data Analyst",
+              "Infrastructure Engineer"
+            ],
+            "moderately_relevant": [
+              "Software Engineer",
+              "DevOps Engineer",
+              "Cloud Engineer",
+              "IT Support Specialist",
+              "BI Developer"
+            ]
+          }
+        },
+        {
+          "title": "Data Quality Manager",
+          "relevance": {
+            "directly_relevant": [
+              "Database Security Specialist",
+              "Data Governance Manager",
+              "Data Steward",
+              "Data Compliance Manager",
+              "Data Operations Manager"
+            ],
+            "highly_relevant": [
+              "Database Administrator",
+              "BI Developer",
+              "Data Engineer",
+              "Data Analyst",
+              "ETL Developer"
+            ],
+            "moderately_relevant": [
+              "QA Analyst",
+              "Software Tester",
+              "System Analyst",
+              "IT Auditor",
+              "IT Manager"
+            ]
+          }
+        },
         "Database Security Specialist",
         "Cloud Database Administrator"
       ]
@@ -379,26 +874,421 @@
     {
       "industry": "Business Intelligence & Data Analytics",
       "roles": [
-        "Business Intelligence Analyst",
-        "Business Systems Analyst",
-        "Data Analyst",
-        "Data Scientist",
-        "Machine Learning Engineer",
-        "AI Engineer"
+        {
+          "title": "Business Intelligence Analyst",
+          "relevance": {
+            "directly_relevant": [
+              "Data Analyst",
+              "BI Developer",
+              "Data Scientist",
+              "Reporting Analyst",
+              "Business Systems Analyst"
+            ],
+            "highly_relevant": [
+              "Data Engineer",
+              "ETL Developer",
+              "Insights Analyst",
+              "Market Analyst",
+              "Financial Analyst"
+            ],
+            "moderately_relevant": [
+              "Software Engineer",
+              "IT Analyst",
+              "Project Manager",
+              "Business Analyst",
+              "CRM Specialist"
+            ]
+          }
+        },
+        {
+          "title": "Business Systems Analyst",
+          "relevance": {
+            "directly_relevant": [
+              "Systems Analyst",
+              "Enterprise Systems Analyst",
+              "Business Process Analyst",
+              "IT Business Analyst",
+              "Business Systems Consultant"
+            ],
+            "highly_relevant": [
+              "Data Analyst",
+              "Operations Analyst",
+              "Product Analyst",
+              "Solutions Architect",
+              "Project Manager"
+            ],
+            "moderately_relevant": [
+              "Business Intelligence Analyst",
+              "Data Scientist",
+              "Database Administrator",
+              "Quality Assurance Analyst",
+              "Software Engineer"
+            ]
+          }
+        },
+        {
+          "title": "Data Analyst",
+          "relevance": {
+            "directly_relevant": [
+              "Business Intelligence Analyst",
+              "Data Analyst",
+              "Quantitative Analyst",
+              "Data Visualization Specialist",
+              "Data Mining Specialist"
+            ],
+            "highly_relevant": [
+              "Data Scientist",
+              "Data Engineer",
+              "Business Systems Analyst",
+              "Database Administrator",
+              "Machine Learning Engineer"
+            ],
+            "moderately_relevant": [
+              "Statistical Analyst",
+              "Operations Analyst",
+              "Market Research Analyst",
+              "Software Engineer",
+              "IT Consultant"
+            ]
+          }
+        },
+        {
+          "title": "Data Scientist",
+          "relevance": {
+            "directly_relevant": [
+              "Machine Learning Scientist",
+              "AI Scientist",
+              "Data Engineer",
+              "Data Analyst",
+              "Quantitative Data Scientist"
+            ],
+            "highly_relevant": [
+              "Data Analyst",
+              "Data Architect",
+              "Business Intelligence Analyst",
+              "Software Engineer",
+              "Research Scientist"
+            ],
+            "moderately_relevant": [
+              "Statistician",
+              "Operations Research Analyst",
+              "Business Systems Analyst",
+              "DevOps Engineer",
+              "Cloud Data Engineer"
+            ]
+          }
+        },
+        {
+          "title": "Machine Learning Engineer",
+          "relevance": {
+            "directly_relevant": [
+              "ML Engineer",
+              "AI Engineer",
+              "Data Scientist",
+              "Artificial Intelligence Engineer",
+              "Deep Learning Engineer"
+            ],
+            "highly_relevant": [
+              "Software Engineer",
+              "Data Engineer",
+              "Big Data Engineer",
+              "Data Analyst",
+              "Research Engineer"
+            ],
+            "moderately_relevant": [
+              "Business Systems Analyst",
+              "Data Architect",
+              "Cloud Engineer",
+              "Data Analyst",
+              "DevOps Engineer"
+            ]
+          }
+        },
+        {
+          "title": "AI Engineer",
+          "relevance": {
+            "directly_relevant": [
+              "Artificial Intelligence Engineer",
+              "AI Research Engineer",
+              "AI Software Engineer",
+              "Machine Learning Engineer",
+              "Deep Learning Engineer"
+            ],
+            "highly_relevant": [
+              "Data Scientist",
+              "Data Engineer",
+              "AI Specialist",
+              "Software Engineer",
+              "Research Scientist"
+            ],
+            "moderately_relevant": [
+              "Business Intelligence Analyst",
+              "Operations Analyst",
+              "Cloud Engineer",
+              "Data Architect",
+              "DevOps Engineer"
+            ]
+          }
+        }
       ]
     },
     {
       "industry": "Software Development",
       "roles": [
-        "Software Engineer",
-        "Backend Developer",
-        "Frontend Developer",
-        "Full Stack Developer",
-        "DevOps Engineer",
-        "Platform Engineer",
-        "Software Architect",
-        "Quality Assurance Engineer",
-        "Performance Engineer"
+        {
+          "title": "Software Engineer",
+          "relevance": {
+            "directly_relevant": [
+              "Software Developer",
+              "Applications Engineer",
+              "Computer Software Engineer",
+              "Applications Developer",
+              "Programmer Analyst",
+              "Software Programmer",
+              "Computer Programmer"
+            ],
+            "highly_relevant": [
+              "Systems Engineer",
+              "Solutions Engineer",
+              "Software Architect",
+              "Technical Lead",
+              "Development Engineer",
+              "Platform Engineer",
+              "Cloud Engineer",
+              "Quality Engineer",
+              "Integration Engineer"
+            ],
+            "moderately_relevant": [
+              "DevOps Engineer",
+              "Site Reliability Engineer",
+              "Cloud Developer",
+              "Systems Analyst",
+              "Technical Consultant",
+              "Application Support Engineer"
+            ]
+          }
+        },
+        {
+          "title": "Backend Developer",
+          "relevance": {
+            "directly_relevant": [
+              "Backend Engineer",
+              "Server Side Developer",
+              "API Developer",
+              "API Engineer"
+            ],
+            "highly_relevant": [
+              "Database Developer",
+              "Systems Developer",
+              "Cloud Backend Developer",
+              "Backend Solutions Engineer",
+              "Backend Integration Engineer",
+              "Core Systems Developer"
+            ],
+            "moderately_relevant": [
+              "Full Stack Developer",
+              "Software Engineer",
+              "DevOps Engineer",
+              "Data Engineer",
+              "Cloud Engineer",
+              "Systems Engineer"
+            ]
+          }
+        },
+        {
+          "title": "Frontend Developer",
+          "relevance": {
+            "directly_relevant": [
+              "Frontend Engineer",
+              "Client Side Developer",
+              "UI Developer",
+              "Web Frontend Developer"
+            ],
+            "highly_relevant": [
+              "Web Developer",
+              "UI Engineer",
+              "JavaScript Developer",
+              "Web Application Developer",
+              "UI/UX Developer",
+              "Website Developer"
+            ],
+            "moderately_relevant": [
+              "Full Stack Developer",
+              "UX Designer",
+              "UI Designer",
+              "Web Designer",
+              "Mobile Frontend Developer"
+            ]
+          }
+        },
+        {
+          "title": "Full Stack Developer",
+          "relevance": {
+            "directly_relevant": [
+              "Full Stack Engineer",
+              "End to End Developer",
+              "Full Stack Web Developer"
+            ],
+            "highly_relevant": [
+              "Software Engineer",
+              "Web Developer",
+              "Application Developer",
+              "Full Stack Solutions Engineer",
+              "Web Application Developer",
+              "Stack Agnostic Developer"
+            ],
+            "moderately_relevant": [
+              "Backend Developer",
+              "Frontend Developer",
+              "DevOps Engineer",
+              "Solutions Engineer",
+              "Web Solutions Developer",
+              "Cloud Developer"
+            ]
+          }
+        },
+        {
+          "title": "DevOps Engineer",
+          "relevance": {
+            "directly_relevant": [
+              "Development Operations Engineer",
+              "DevOps Specialist",
+              "CI/CD Engineer",
+              "Release Engineer",
+              "Build and Release Engineer"
+            ],
+            "highly_relevant": [
+              "Site Reliability Engineer",
+              "Platform Engineer",
+              "Cloud Operations Engineer",
+              "Infrastructure Engineer",
+              "Systems Engineer",
+              "Cloud DevOps Engineer",
+              "DevSecOps Engineer",
+              "Automation Engineer"
+            ],
+            "moderately_relevant": [
+              "System Administrator",
+              "Cloud Engineer",
+              "Software Engineer",
+              "Release Manager",
+              "Deployment Engineer",
+              "Infrastructure Developer",
+              "Operations Engineer"
+            ]
+          }
+        },
+        {
+          "title": "Platform Engineer",
+          "relevance": {
+            "directly_relevant": [
+              "Infrastructure Platform Engineer",
+              "Cloud Platform Engineer",
+              "Systems Platform Engineer",
+              "Platform Developer",
+              "Platform Solutions Engineer"
+            ],
+            "highly_relevant": [
+              "Infrastructure Engineer",
+              "Cloud Engineer",
+              "Site Reliability Engineer",
+              "DevOps Engineer",
+              "Systems Engineer",
+              "Cloud Infrastructure Engineer"
+            ],
+            "moderately_relevant": [
+              "Software Engineer",
+              "Cloud Architect",
+              "Systems Administrator",
+              "Solutions Architect",
+              "Infrastructure Architect"
+            ]
+          }
+        },
+        {
+          "title": "Software Architect",
+          "relevance": {
+            "directly_relevant": [
+              "Solutions Architect",
+              "Technical Architect",
+              "Systems Architect",
+              "Application Architect",
+              "Enterprise Software Architect"
+            ],
+            "highly_relevant": [
+              "Lead Software Engineer",
+              "Principal Engineer",
+              "Enterprise Architect",
+              "Cloud Architect",
+              "Systems Designer",
+              "Technical Lead"
+            ],
+            "moderately_relevant": [
+              "Software Engineer",
+              "Development Manager",
+              "Engineering Manager",
+              "Solutions Engineer",
+              "Integration Architect",
+              "Platform Architect"
+            ]
+          }
+        },
+    
+        {
+          "title": "Quality Assurance Engineer",
+          "relevance": {
+            "directly_relevant": [
+              "QA Engineer",
+              "Software Tester",
+              "Test Engineer",
+              "Quality Engineer",
+              "Software Quality Engineer",
+              "QA Analyst",
+              "Quality Analyst"
+            ],
+            "highly_relevant": [
+              "Test Automation Engineer",
+              "Software Development Engineer in Test",
+              "QA Automation Engineer",
+              "Performance Test Engineer",
+              "Integration Test Engineer"
+            ],
+            "moderately_relevant": [
+              "Software Engineer",
+              "Software Developer",
+              "Development Engineer",
+              "Release Engineer",
+              "Build Engineer"
+            ]
+          }
+        },
+        {
+          "title": "Performance Engineer",
+          "relevance": {
+            "directly_relevant": [
+              "Performance Testing Engineer",
+              "Systems Performance Engineer",
+              "Application Performance Engineer",
+              "Software Performance Engineer",
+              "Performance Optimization Engineer"
+            ],
+            "highly_relevant": [
+              "Site Reliability Engineer",
+              "Systems Engineer",
+              "Quality Engineer",
+              "Load Test Engineer",
+              "Performance Architect",
+              "Capacity Planning Engineer"
+            ],
+            "moderately_relevant": [
+              "Software Engineer",
+              "DevOps Engineer",
+              "Backend Developer",
+              "Platform Engineer",
+              "Database Engineer"
+            ]
+          }
+        }
       ]
     },
     {
@@ -445,61 +1335,814 @@
     {
       "industry": "Cybersecurity",
       "roles": [
-        "Security Engineer",
-        "Cloud Security Architect",
-        "Digital Forensics Analyst",
-        "Penetration Tester",
-        "Threat Intelligence Analyst",
-        "Security Operations Center (SOC) Analyst",
-        "Incident Response Specialist",
-        "Cybersecurity Consultant"
+        {
+          "title": "Security Engineer",
+          "relevance": {
+            "directly_relevant": [
+              "Cybersecurity Engineer",
+              "Information Security Engineer",
+              "Application Security Engineer",
+              "Cloud Security Engineer",
+              "Security Operations Engineer"
+            ],
+            "highly_relevant": [
+              "Penetration Tester",
+              "Security Analyst",
+              "Security Architect",
+              "DevSecOps Engineer",
+              "Vulnerability Management Engineer"
+            ],
+            "moderately_relevant": [
+              "Systems Engineer",
+              "Network Engineer",
+              "IT Auditor",
+              "Compliance Analyst",
+              "DevOps Engineer"
+            ]
+          }
+        },
+        {
+          "title": "Cloud Engineer",
+          "relevance": {
+            "directly_relevant": [
+              "Cloud Infrastructure Engineer",
+              "Cloud Operations Engineer",
+              "Cloud Solutions Engineer",
+              "Cloud DevOps Engineer",
+              "Cloud Systems Engineer"
+            ],
+            "highly_relevant": [
+              "Platform Engineer",
+              "DevOps Engineer",
+              "Site Reliability Engineer",
+              "Infrastructure Engineer",
+              "Cloud Architect"
+            ],
+            "moderately_relevant": [
+              "Systems Administrator",
+              "Network Engineer",
+              "Software Engineer",
+              "Security Engineer",
+              "Solutions Architect"
+            ]
+          }
+        },
+        {
+          "title": "Cloud Security Architect",
+          "relevance": {
+            "directly_relevant": [
+              "Cloud Solutions Architect",
+              "Enterprise Cloud Architect",
+              "Cloud Infrastructure Architect",
+              "Cloud Applications Architect",
+              "Cloud Platform Architect"
+            ],
+            "highly_relevant": [
+              "Solutions Architect",
+              "Technical Architect",
+              "DevOps Architect",
+              "Systems Architect",
+              "Platform Architect"
+            ],
+            "moderately_relevant": [
+              "Cloud Engineer",
+              "Software Architect",
+              "Infrastructure Engineer",
+              "Network Architect",
+              "Site Reliability Engineer"
+            ]
+          }
+        },
+        {
+          "title": "Digital Forensics Analyst",
+          "relevance": {
+            "directly_relevant": [
+              "Penetration Tester",
+              "Security Operations Center (SOC) Analyst",
+              "Incident Response Specialist",
+              "Threat Intelligence Analyst",
+              "Cybersecurity Consultant"
+            ],
+            "highly_relevant": [
+              "Security Analyst",
+              "Information Security Analyst",
+              "Security Engineer",
+              "Forensics Investigator",
+              "Malware Analyst"
+            ],
+            "moderately_relevant": [
+              "IT Auditor",
+              "Compliance Analyst",
+              "Systems Administrator",
+              "Network Security Analyst",
+              "Technical Consultant"
+            ]
+          }
+        },
+        {
+          "title": "Penetration Tester",
+          "relevance": {
+            "directly_relevant": [
+              "Ethical Hacker",
+              "Red Team Specialist",
+              "Cybersecurity Penetration Tester",
+              "Vulnerability Assessment Specialist",
+              "Application Security Tester"
+            ],
+            "highly_relevant": [
+              "Security Consultant",
+              "Cybersecurity Analyst",
+              "Incident Response Specialist",
+              "Network Security Engineer",
+              "Security Operations Engineer"
+            ],
+            "moderately_relevant": [
+              "Security Architect",
+              "IT Security Manager",
+              "Network Engineer",
+              "Systems Administrator",
+              "Cloud Security Engineer"
+            ]
+          }
+        },
+        {
+          "title": "Threat Intelligence Analyst",
+          "relevance": {
+            "directly_relevant": [
+              "Cyber Threat Intelligence Analyst",
+              "Cybersecurity Threat Analyst",
+              "Security Intelligence Analyst",
+              "Malware Analyst",
+              "Incident Detection Specialist"
+            ],
+            "highly_relevant": [
+              "SOC Analyst",
+              "Security Operations Center Analyst",
+              "Cybersecurity Analyst",
+              "Threat Hunter",
+              "Security Consultant"
+            ],
+            "moderately_relevant": [
+              "Risk Analyst",
+              "IT Security Analyst",
+              "Network Security Analyst",
+              "Security Operations Engineer",
+              "Vulnerability Management Analyst"
+            ]
+          }
+        },
+        {
+          "title": "Security Operations Center (SOC) Analyst",
+          "relevance": {
+            "directly_relevant": [
+              "SOC Tier 1 Analyst",
+              "SOC Tier 2 Analyst",
+              "SOC Tier 3 Analyst",
+              "Security Incident Response Specialist",
+              "Security Operations Engineer"
+            ],
+            "highly_relevant": [
+              "Cybersecurity Analyst",
+              "Threat Intelligence Analyst",
+              "Incident Response Analyst",
+              "Security Consultant",
+              "Network Security Analyst"
+            ],
+            "moderately_relevant": [
+              "System Administrator",
+              "Cloud Security Engineer",
+              "DevOps Engineer",
+              "Security Architect",
+              "Penetration Tester"
+            ]
+          }
+        },
+        {
+          "title": "Incident Response Specialist",
+          "relevance": {
+            "directly_relevant": [
+              "Incident Response Analyst",
+              "Cybersecurity Incident Responder",
+              "Forensic Investigator",
+              "Malware Incident Responder",
+              "Security Incident Coordinator"
+            ],
+            "highly_relevant": [
+              "Cybersecurity Consultant",
+              "SOC Analyst",
+              "Threat Intelligence Analyst",
+              "Network Security Engineer",
+              "IT Security Manager"
+            ],
+            "moderately_relevant": [
+              "Penetration Tester",
+              "Security Operations Engineer",
+              "Network Architect",
+              "Cloud Security Engineer",
+              "Forensics Analyst"
+            ]
+          }
+        },
+        {
+          "title": "Cybersecurity Consultant",
+          "relevance": {
+            "directly_relevant": [
+              "Information Security Consultant",
+              "IT Security Consultant",
+              "Cybersecurity Engineer",
+              "Security Systems Consultant",
+              "Cloud Security Consultant"
+            ],
+            "highly_relevant": [
+              "Risk Analyst",
+              "Security Architect",
+              "SOC Analyst",
+              "Incident Response Specialist",
+              "Penetration Tester"
+            ],
+            "moderately_relevant": [
+              "Network Security Engineer",
+              "IT Manager",
+              "Systems Administrator",
+              "Security Operations Engineer",
+              "Solutions Architect"
+            ]
+          }
+        }
       ]
     },
     {
       "industry": "IT Support & Services",
       "roles": [
-        "IT Support Specialist",
-        "IT Service Desk Manager",
-        "Technical Trainer",
-        "IT Asset Manager"
+        {
+          "title": "IT Support Specialist",
+          "relevance": {
+            "directly_relevant": [
+              "IT Service Desk Manager",
+              "IT Support Technician",
+              "Help Desk Analyst",
+              "Desktop Support Specialist",
+              "Field Support Technician"
+            ],
+            "highly_relevant": [
+              "Technical Trainer",
+              "Systems Administrator",
+              "Network Administrator",
+              "IT Asset Manager",
+              "Technical Support Engineer"
+            ],
+            "moderately_relevant": [
+              "IT Consultant",
+              "Operations Support Analyst",
+              "IT Coordinator",
+              "End-User Support Specialist",
+              "Infrastructure Support Engineer"
+            ]
+          }
+        },
+        {
+          "title": "IT Service Desk Manager",
+          "relevance": {
+            "directly_relevant": [
+              "Help Desk Manager",
+              "IT Support Manager",
+              "Technical Support Manager",
+              "Service Desk Supervisor",
+              "Service Desk Lead"
+            ],
+            "highly_relevant": [
+              "IT Service Manager",
+              "Technical Support Engineer",
+              "IT Operations Manager",
+              "Service Desk Analyst",
+              "IT Support Specialist"
+            ],
+            "moderately_relevant": [
+              "IT Director",
+              "Systems Administrator",
+              "Infrastructure Manager",
+              "Network Administrator",
+              "Cloud Support Engineer"
+            ]
+          }
+        },
+        {
+          "title": "Technical Trainer",
+          "relevance": {
+            "directly_relevant": [
+              "IT Trainer",
+              "Technical Instructor",
+              "Cybersecurity Trainer",
+              "Cloud Computing Trainer",
+              "Systems Training Specialist"
+            ],
+            "highly_relevant": [
+              "IT Support Specialist",
+              "Learning and Development Manager",
+              "Training Coordinator",
+              "Education Specialist",
+              "Corporate Trainer"
+            ],
+            "moderately_relevant": [
+              "HR Specialist",
+              "Instructional Designer",
+              "Technical Writer",
+              "Technology Specialist",
+              "IT Project Manager"
+            ]
+          }
+        },
+        {
+          "title": "IT Asset Manager",
+          "relevance": {
+            "directly_relevant": [
+              "IT Asset Management Specialist",
+              "Asset Lifecycle Manager",
+              "Technology Asset Manager",
+              "Hardware Asset Manager",
+              "Software Asset Manager"
+            ],
+            "highly_relevant": [
+              "IT Procurement Specialist",
+              "Asset Management Coordinator",
+              "IT Support Manager",
+              "IT Operations Manager",
+              "Inventory Manager"
+            ],
+            "moderately_relevant": [
+              "IT Director",
+              "Facilities Manager",
+              "Business Operations Manager",
+              "Procurement Manager",
+              "IT Auditor"
+            ]
+          }
+        }
       ]
     },
     {
       "industry": "Product & Project Management",
       "roles": [
-        "Technical Product Manager",
-        "Project Manager",
-        "Program Manager",
-        "Digital Transformation Manager",
-        "Agile Coach",
-        "Scrum Master"
+        {
+          "title": "Technical Product Manager",
+          "relevance": {
+            "directly_relevant": [
+              "Product Manager",
+              "Technical Project Manager",
+              "Product Owner",
+              "Software Product Manager",
+              "Technical Solutions Manager"
+            ],
+            "highly_relevant": [
+              "Agile Project Manager",
+              "Scrum Master",
+              "Product Development Manager",
+              "Program Manager",
+              "Business Analyst"
+            ],
+            "moderately_relevant": [
+              "Product Marketing Manager",
+              "UX Designer",
+              "Engineering Manager",
+              "System Architect",
+              "UI Designer"
+            ]
+          }
+        },
+        {
+          "title": "Project Manager",
+          "relevance": {
+            "directly_relevant": [
+              "Technical Project Manager",
+              "IT Project Manager",
+              "Program Manager",
+              "Software Development Manager",
+              "Product Manager"
+            ],
+            "highly_relevant": [
+              "Business Analyst",
+              "Scrum Master",
+              "Project Coordinator",
+              "Agile Project Manager",
+              "Operations Manager"
+            ],
+            "moderately_relevant": [
+              "Product Owner",
+              "Client Success Manager",
+              "Team Lead",
+              "Product Marketing Manager",
+              "Consultant"
+            ]
+          }
+        },
+        {
+          "title": "Program Manager",
+          "relevance": {
+            "directly_relevant": [
+              "Senior Program Manager",
+              "Program Director",
+              "Project Portfolio Manager",
+              "IT Program Manager",
+              "Enterprise Program Manager"
+            ],
+            "highly_relevant": [
+              "Project Manager",
+              "Product Manager",
+              "Agile Coach",
+              "Program Coordinator",
+              "Business Program Manager"
+            ],
+            "moderately_relevant": [
+              "Consultant",
+              "Scrum Master",
+              "Client Relations Manager",
+              "Operations Manager",
+              "Change Manager"
+            ]
+          }
+        },
+        {
+          "title": "Digital Transformation Manager",
+          "relevance": {
+            "directly_relevant": [
+              "Digital Strategy Manager",
+              "Transformation Consultant",
+              "Change Management Consultant",
+              "Innovation Manager",
+              "Digital Transformation Lead"
+            ],
+            "highly_relevant": [
+              "Enterprise Architect",
+              "Business Transformation Manager",
+              "Product Development Manager",
+              "Agile Transformation Coach",
+              "Operations Manager"
+            ],
+            "moderately_relevant": [
+              "Project Manager",
+              "Business Analyst",
+              "IT Project Manager",
+              "Client Success Manager",
+              "Product Owner"
+            ]
+          }
+        },
+        {
+          "title": "Agile Coach",
+          "relevance": {
+            "directly_relevant": [
+              "Scrum Master",
+              "Agile Project Manager",
+              "Agile Transformation Lead",
+              "Agile Consultant",
+              "Agile Trainer"
+            ],
+            "highly_relevant": [
+              "Scrum Coach",
+              "Project Manager",
+              "Product Owner",
+              "Business Analyst",
+              "Agile Practice Lead"
+            ],
+            "moderately_relevant": [
+              "Product Manager",
+              "Change Manager",
+              "Operations Manager",
+              "Team Lead",
+              "Agile Business Analyst"
+            ]
+          }
+        },
+        {
+          "title": "Scrum Master",
+          "relevance": {
+            "directly_relevant": [
+              "Agile Coach",
+              "Scrum Practitioner",
+              "Scrum Trainer",
+              "Agile Project Manager",
+              "Agile Transformation Consultant"
+            ],
+            "highly_relevant": [
+              "Project Manager",
+              "Program Manager",
+              "Product Owner",
+              "Business Analyst",
+              "Change Manager"
+            ],
+            "moderately_relevant": [
+              "Operations Manager",
+              "Team Lead",
+              "Consultant",
+              "Product Manager",
+              "Client Success Manager"
+            ]
+          }
+        }
       ]
     },
     {
       "industry": "Web & Mobile Development",
       "roles": [
-        "Web Developer",
-        "Mobile Developer",
-        "Web Analytics Specialist",
-        "SEO Specialist",
-        "CMS Specialist"
+        {
+          "title": "Web Developer",
+          "relevance": {
+            "directly_relevant": [
+              "Front-End Developer",
+              "Back-End Developer",
+              "Full Stack Developer",
+              "JavaScript Developer",
+              "Web Application Developer"
+            ],
+            "highly_relevant": [
+              "Mobile Developer",
+              "UI Developer",
+              "Web Designer",
+              "Front-End Engineer",
+              "Web Accessibility Specialist"
+            ],
+            "moderately_relevant": [
+              "UX Designer",
+              "SEO Specialist",
+              "Content Developer",
+              "Web Analytics Specialist",
+              "Technical Writer"
+            ]
+          }
+        },
+        {
+          "title": "Mobile Developer",
+          "relevance": {
+            "directly_relevant": [
+              "iOS Developer",
+              "Android Developer",
+              "Mobile App Developer",
+              "Mobile Application Developer",
+              "Mobile Software Engineer"
+            ],
+            "highly_relevant": [
+              "Full Stack Developer",
+              "Frontend Developer",
+              "React Native Developer",
+              "Cross-Platform Developer",
+              "UX/UI Designer"
+            ],
+            "moderately_relevant": [
+              "Backend Developer",
+              "DevOps Engineer",
+              "Software Engineer",
+              "QA Tester",
+              "Mobile Architect"
+            ]
+          }
+        },
+        {
+          "title": "Web Analytics Specialist",
+          "relevance": {
+            "directly_relevant": [
+              "Digital Analyst",
+              "Web Analyst",
+              "SEO Specialist",
+              "Google Analytics Specialist",
+              "Marketing Analyst"
+            ],
+            "highly_relevant": [
+              "Data Scientist",
+              "Business Intelligence Analyst",
+              "Product Analyst",
+              "Conversion Optimization Specialist",
+              "SEO Manager"
+            ],
+            "moderately_relevant": [
+              "Digital Marketing Specialist",
+              "Content Manager",
+              "Marketing Research Analyst",
+              "UX Researcher",
+              "Digital Strategist"
+            ]
+          }
+        },
+        {
+          "title": "SEO Specialist",
+          "relevance": {
+            "directly_relevant": [
+              "SEO Manager",
+              "SEO Consultant",
+              "Digital Marketing Specialist",
+              "Search Engine Optimization Expert",
+              "Organic Search Specialist"
+            ],
+            "highly_relevant": [
+              "Content Marketing Manager",
+              "Web Analytics Specialist",
+              "SEM Specialist",
+              "PPC Specialist",
+              "Marketing Manager"
+            ],
+            "moderately_relevant": [
+              "UX Designer",
+              "Product Marketing Specialist",
+              "Social Media Manager",
+              "Content Strategist",
+              "Digital Strategist"
+            ]
+          }
+        },
+        {
+          "title": "CMS Specialist",
+          "relevance": {
+            "directly_relevant": [
+              "WordPress Developer",
+              "Drupal Developer",
+              "Content Management Systems Specialist",
+              "Web Developer",
+              "Frontend Developer"
+            ],
+            "highly_relevant": [
+              "Web Content Manager",
+              "Digital Content Manager",
+              "SEO Specialist",
+              "UX/UI Designer",
+              "Content Editor"
+            ],
+            "moderately_relevant": [
+              "Web Designer",
+              "Content Strategist",
+              "Marketing Specialist",
+              "Project Manager",
+              "Content Analyst"
+            ]
+          }
+        }
       ]
     },
     {
       "industry": "Emerging Technologies",
       "roles": [
-        "Blockchain Developer",
-        "IoT Developer"
+        {
+          "title": "Blockchain Developer",
+          "relevance": {
+            "directly_relevant": [
+              "Blockchain Engineer",
+              "Smart Contract Developer",
+              "Blockchain Solutions Developer",
+              "Distributed Ledger Developer",
+              "Cryptocurrency Developer"
+            ],
+            "highly_relevant": [
+              "Smart Contract Engineer",
+              "Web3 Developer",
+              "Solidity Developer",
+              "DApp Developer",
+              "Cryptocurrency Engineer",
+              "Blockchain Protocol Engineer"
+            ],
+            "moderately_relevant": [
+              "Software Engineer",
+              "Backend Developer",
+              "Security Engineer",
+              "Full Stack Developer",
+              "Systems Engineer"
+            ]
+          }
+        },
+        {
+          "title": "IoT Developer",
+          "relevance": {
+            "directly_relevant": [
+              "IoT Engineer",
+              "Internet of Things Developer",
+              "IoT Solutions Developer",
+              "Connected Devices Developer",
+              "IoT Applications Developer"
+            ],
+            "highly_relevant": [
+              "Embedded Systems Developer",
+              "Embedded Software Engineer",
+              "IoT Solutions Architect",
+              "IoT Systems Engineer",
+              "Connected Products Developer"
+            ],
+            "moderately_relevant": [
+              "Software Engineer",
+              "Hardware Engineer",
+              "Systems Engineer",
+              "Firmware Developer",
+              "Network Engineer",
+              "Cloud Developer"
+            ]
+          }
+        }
       ]
     },
     {
       "industry": "Sales & Consulting",
       "roles": [
-        "Solutions Engineer",
+        {
+          "title": "Solutions Engineer",
+          "relevance": {
+            "directly_relevant": [
+              "Application Support Engineer",
+              "Pre-Sales Engineer",
+              "System Integration Engineer",
+              "Enterprise Solutions Architect",
+              "Technical Solutions Consultant"
+            ],
+            "highly_relevant": [
+              "Systems Engineer",
+              "Cloud Solutions Consultant",
+              "Sales Engineer",
+              "IT Consultant",
+              "Infrastructure Engineer"
+            ],
+            "moderately_relevant": [
+              "Business Analyst",
+              "Project Manager",
+              "Solutions Architect",
+              "IT Strategy Consultant",
+              "Service Delivery Manager"
+            ]
+          }
+        },
         "Technical Account Manager",
-        "IT Sales Executive",
-        "Cloud Solutions Consultant",
-        "IT Strategy Consultant"
+        {
+          "title": "IT Sales Executive",
+          "relevance": {
+            "directly_relevant": [
+              "Cloud Solutions Consultant",
+              "IT Account Executive",
+              "Software Sales Executive",
+              "Business Development Executive",
+              "Sales Engineer"
+            ],
+            "highly_relevant": [
+              "Sales Manager",
+              "Regional Sales Manager",
+              "Sales Director",
+              "Key Account Manager",
+              "Solution Sales Consultant"
+            ],
+            "moderately_relevant": [
+              "Marketing Manager",
+              "Product Marketing Manager",
+              "Customer Relationship Manager",
+              "Inside Sales Representative",
+              "Sales Support Specialist"
+            ]
+          }
+        },
+        {
+          "title": "Cloud Solutions Consultant",
+          "relevance": {
+            "directly_relevant": [
+              "Cloud Architect",
+              "Cloud Engineer",
+              "Cloud Solutions Engineer",
+              "Cloud Consultant",
+              "Cloud Integration Specialist"
+            ],
+            "highly_relevant": [
+              "DevOps Engineer",
+              "IT Solutions Architect",
+              "Infrastructure Architect",
+              "Enterprise Architect",
+              "Platform Solutions Architect"
+            ],
+            "moderately_relevant": [
+              "Sales Engineer",
+              "Business Development Manager",
+              "Systems Engineer",
+              "Network Engineer",
+              "Project Manager"
+            ]
+          }
+        },
+        {
+          "title": "IT Strategy Consultant",
+          "relevance": {
+            "directly_relevant": [
+              "IT Consultant",
+              "Enterprise IT Consultant",
+              "Digital Transformation Consultant",
+              "Business Technology Consultant",
+              "Technology Strategy Consultant"
+            ],
+            "highly_relevant": [
+              "IT Project Manager",
+              "Business Analyst",
+              "Program Manager",
+              "Digital Transformation Manager",
+              "Enterprise Architect"
+            ],
+            "moderately_relevant": [
+              "Solutions Architect",
+              "IT Director",
+              "CTO",
+              "IT Manager",
+              "Product Manager"
+            ]
+          }
+        }
       ]
     }
   ]

@@ -95,7 +95,7 @@ export default function CompanySettings() {
                 ? selectedOptions.filter((item) => item !== option)
                 : [...selectedOptions, option];
 
-            return {
+            const updatedFormData = {
                 ...prev,
                 criteria: {
                     ...prev.criteria,
@@ -105,37 +105,72 @@ export default function CompanySettings() {
                     },
                 },
             };
+            
+            if (category === 'workExperience' && 
+                (field === 'directlyRelevant' || 
+                 field === 'highlyRelevant' || 
+                 field === 'moderatelyRelevant')) {
+                
+                const relevantRoles = {
+                    directly_relevant: updatedFormData.criteria.workExperience.directlyRelevant || [],
+                    highly_relevant: updatedFormData.criteria.workExperience.highlyRelevant || [],
+                    moderately_relevant: updatedFormData.criteria.workExperience.moderatelyRelevant || []
+                };
+                
+                Cookies.set('RELEVANT_ROLES', JSON.stringify(relevantRoles), { expires: 7 });
+            }
+    
+            return updatedFormData;
         });
     };
 
     const handleAddCustomOption = (category, field, customOption) => {
-        if (!customOption.trim()) return; // Prevent empty input
-
+        if (!customOption.trim()) return; 
         setOptions((prev) => ({
             ...prev,
             [category]: prev[category]?.includes(customOption)
                 ? prev[category]
-                : [...(prev[category] || []), customOption], // Add only if not exists
+                : [...(prev[category] || []), customOption], 
         }));
-
+    
         handleMultiSelectChange(category, field, customOption);
-
-        setSearchTerm((prev) => ({ ...prev, [field]: "" })); // Reset only the relevant search field
+    
+        setSearchTerm((prev) => ({ ...prev, [field]: "" })); 
     };
-
+    
     const handleRemoveSelectedOption = (category, field, option) => {
-        setFormData((prev) => ({
-            ...prev,
-            criteria: {
-                ...prev.criteria,
-                [category]: {
-                    ...prev.criteria[category],
-                    [field]: prev.criteria[category][field].filter(
-                        (item) => item !== option
-                    ),
+        setFormData((prev) => {
+            const updatedOptions = prev.criteria[category][field].filter(
+                (item) => item !== option
+            );
+            
+            const updatedFormData = {
+                ...prev,
+                criteria: {
+                    ...prev.criteria,
+                    [category]: {
+                        ...prev.criteria[category],
+                        [field]: updatedOptions,
+                    },
                 },
-            },
-        }));
+            };
+            
+            if (category === 'workExperience' && 
+                (field === 'directlyRelevant' || 
+                 field === 'highlyRelevant' || 
+                 field === 'moderatelyRelevant')) {
+                
+                const relevantRoles = {
+                    directly_relevant: updatedFormData.criteria.workExperience.directlyRelevant || [],
+                    highly_relevant: updatedFormData.criteria.workExperience.highlyRelevant || [],
+                    moderately_relevant: updatedFormData.criteria.workExperience.moderatelyRelevant || []
+                };
+                
+                Cookies.set('RELEVANT_ROLES', JSON.stringify(relevantRoles), { expires: 7 });
+            }
+    
+            return updatedFormData;
+        });
     };
 
     const handleCriteriaChange = (field, subField, value) => {
@@ -164,7 +199,31 @@ export default function CompanySettings() {
             return { ...prevFormData, required_documents: updatedDocuments };
         });
     };
+
+    useEffect(() => {
+        const relevantRolesCookie = Cookies.get("RELEVANT_ROLES");
+        if (relevantRolesCookie) {
+            try {
+                const parsedRelevance = JSON.parse(relevantRolesCookie);
+                setFormData((prev) => ({
+                    ...prev,
+                    criteria: {
+                        ...prev.criteria,
+                        workExperience: {
+                            ...prev.criteria.workExperience,
+                            directlyRelevant: parsedRelevance.directly_relevant || [],
+                            highlyRelevant: parsedRelevance.highly_relevant || [],
+                            moderatelyRelevant: parsedRelevance.moderately_relevant || [],
+                        },
+                    },
+                }));
+            } catch (err) {
+                console.error("Failed to parse RELEVANT_ROLES", err);
+            }
+        }
+    }, []);
     
+
 
     // Get today's date in YYYY-MM-DD format
     const currentDate = new Date().toISOString().split("T")[0];
@@ -1420,16 +1479,16 @@ export default function CompanySettings() {
                                                 </div>
                                             </div>
 
-                                        {/* 1st Choice Field of Study */}
-                                        <div className="mb-4">
-                                            <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                1st Preference Field of Study{" "}
-                                                <span className="font-medium text-xsmall">
-                                                    (Put the most directly
-                                                    relevant fields of study for
-                                                    the position)
-                                                </span>
-                                            </label>
+                                            {/* 1st Choice Field of Study */}
+                                            <div className="mb-4">
+                                                <label className="block text-sm font-semibold text-fontcolor mb-1">
+                                                    1st Choice Field of Study{" "}
+                                                    <span className="font-medium text-xsmall">
+                                                        (Put the most directly
+                                                        relevant fields of study
+                                                        for the position)
+                                                    </span>
+                                                </label>
 
                                                 <div
                                                     className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
@@ -1521,40 +1580,41 @@ export default function CompanySettings() {
                                                 )}
                                             </div>
 
-                                        {/* 2nd Choice Field of Study */}
-                                        <div className="mb-4">
-                                            <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                2nd Preference Field of Study
-                                                <span className="font-medium text-xsmall">
-                                                    (Put closely related fields
-                                                    that have significant
-                                                    overlap with the job
-                                                    requirements)
-                                                </span>
-                                            </label>
-                                            <div
-                                                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
-                                                onClick={() =>
-                                                    setDropdownOpen({
-                                                        ...dropdownOpen,
-                                                        secondChoice:
-                                                            !dropdownOpen.secondChoice,
-                                                    })
-                                                }
-                                            >
-                                                <span>
-                                                    {formData.criteria.education
-                                                        .secondChoice ||
-                                                        "Select 2nd Choice Field of Study"}
-                                                </span>
-                                                <FaChevronDown
-                                                    className={`ml-2 transform ${
-                                                        dropdownOpen.secondChoice
-                                                            ? "rotate-180"
-                                                            : "rotate-0"
-                                                    } transition-transform`}
-                                                />
-                                            </div>
+                                            {/* 2nd Choice Field of Study */}
+                                            <div className="mb-4">
+                                                <label className="block text-sm font-semibold text-fontcolor mb-1">
+                                                    2nd Choice Field of Study
+                                                    <span className="font-medium text-xsmall">
+                                                        (Put closely related
+                                                        fields that have
+                                                        significant overlap with
+                                                        the job requirements)
+                                                    </span>
+                                                </label>
+                                                <div
+                                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
+                                                    onClick={() =>
+                                                        setDropdownOpen({
+                                                            ...dropdownOpen,
+                                                            secondChoice:
+                                                                !dropdownOpen.secondChoice,
+                                                        })
+                                                    }
+                                                >
+                                                    <span>
+                                                        {formData.criteria
+                                                            .education
+                                                            .secondChoice ||
+                                                            "Select 2nd Choice Field of Study"}
+                                                    </span>
+                                                    <FaChevronDown
+                                                        className={`ml-2 transform ${
+                                                            dropdownOpen.secondChoice
+                                                                ? "rotate-180"
+                                                                : "rotate-0"
+                                                        } transition-transform`}
+                                                    />
+                                                </div>
 
                                                 {dropdownOpen.secondChoice && (
                                                     <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
@@ -1621,39 +1681,41 @@ export default function CompanySettings() {
                                                 )}
                                             </div>
 
-                                        {/* 3rd Choice Field of Study */}
-                                        <div className="mb-4">
-                                            <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                3rd Preference Field of Study
-                                                <span className="font-medium text-xsmall">
-                                                    (Put fields that have some
-                                                    relevance or provide useful
-                                                    background knowledge)
-                                                </span>
-                                            </label>
-                                            <div
-                                                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
-                                                onClick={() =>
-                                                    setDropdownOpen({
-                                                        ...dropdownOpen,
-                                                        thirdChoice:
-                                                            !dropdownOpen.thirdChoice,
-                                                    })
-                                                }
-                                            >
-                                                <span>
-                                                    {formData.criteria.education
-                                                        .thirdChoice ||
-                                                        "Select 3rd Choice Field of Study"}
-                                                </span>
-                                                <FaChevronDown
-                                                    className={`ml-2 transform ${
-                                                        dropdownOpen.thirdChoice
-                                                            ? "rotate-180"
-                                                            : "rotate-0"
-                                                    } transition-transform`}
-                                                />
-                                            </div>
+                                            {/* 3rd Choice Field of Study */}
+                                            <div className="mb-4">
+                                                <label className="block text-sm font-semibold text-fontcolor mb-1">
+                                                    3rd Choice Field of Study
+                                                    <span className="font-medium text-xsmall">
+                                                        (Put fields that have
+                                                        some relevance or
+                                                        provide useful
+                                                        background knowledge)
+                                                    </span>
+                                                </label>
+                                                <div
+                                                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
+                                                    onClick={() =>
+                                                        setDropdownOpen({
+                                                            ...dropdownOpen,
+                                                            thirdChoice:
+                                                                !dropdownOpen.thirdChoice,
+                                                        })
+                                                    }
+                                                >
+                                                    <span>
+                                                        {formData.criteria
+                                                            .education
+                                                            .thirdChoice ||
+                                                            "Select 3rd Choice Field of Study"}
+                                                    </span>
+                                                    <FaChevronDown
+                                                        className={`ml-2 transform ${
+                                                            dropdownOpen.thirdChoice
+                                                                ? "rotate-180"
+                                                                : "rotate-0"
+                                                        } transition-transform`}
+                                                    />
+                                                </div>
 
                                                 {dropdownOpen.thirdChoice && (
                                                     <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
