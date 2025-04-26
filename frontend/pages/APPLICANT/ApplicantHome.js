@@ -11,8 +11,6 @@ import phLocation from "../../public/placeHolder/location.json";
 import { fetchJobListings } from "@/pages/api/applicantJobApi";
 import JobListingsWrapper from "@/components/JobListings";
 
-//TODO Need to fix
-
 export default function ApplicantHome({ onJobClick }) {
     let { authTokens } = useContext(AuthContext);
     const router = useRouter();
@@ -25,7 +23,6 @@ export default function ApplicantHome({ onJobClick }) {
     const [isSalaryOpen, setIsSalaryOpen] = useState(false);
     const [paymentType, setPaymentType] = useState("Annually");
     const [range, setRange] = useState(0);
-    const [location, setLocation] = useState("");
 
     const [filters, setFilters] = useState({
         keyword: "",
@@ -78,27 +75,25 @@ export default function ApplicantHome({ onJobClick }) {
             ...prevFilters,
             [filterName]: value,
         }));
-        console.log("Filter changed:", filterName, value);
+        // console.log("Filter changed:", filterName, value);
     };
 
-    //TODO Date Posted not working yet
-    //TODO Work setup is not working yet
     const applyFilters = () => {
-        console.log("Filters applied:", filters);
+        // console.log("Filters applied:", filters);
 
         const filtered = jobListings.filter((job) => {
-            // Convert creation_date to Date object
             const jobCreationDate = new Date(job.creation_date);
             const currentDate = new Date();
             let isDatePostedValid = false;
 
-            // Handle "Today", "Last Hour", and "Last Week" filters
             if (filters.datePosted === "") {
                 isDatePostedValid = true;
             } else if (filters.datePosted === "Today") {
                 isDatePostedValid =
-                    jobCreationDate.toDateString() ===
-                    currentDate.toDateString();
+                    jobCreationDate.getFullYear() ===
+                        currentDate.getFullYear() &&
+                    jobCreationDate.getMonth() === currentDate.getMonth() &&
+                    jobCreationDate.getDate() === currentDate.getDate();
             } else if (filters.datePosted === "Last Hour") {
                 const oneHourAgo = new Date(
                     currentDate.getTime() - 60 * 60 * 1000
@@ -111,23 +106,39 @@ export default function ApplicantHome({ onJobClick }) {
                 isDatePostedValid = jobCreationDate >= oneWeekAgo;
             }
 
-            // Handle salary filter
             let isSalaryValid = true;
-            if (filters.salaryRange !== "") {
-                const [min, max] = filters.salaryRange.split("-");
 
-                if (min === "below") {
-                    isSalaryValid = parseInt(job.salary_max) < parseInt(max);
-                } else if (max === "above") {
-                    isSalaryValid = parseInt(job.salary_min) > parseInt(min);
+            if (filters.salaryRange && filters.salaryFrequency) {
+                const jobSalaryMax = parseInt(job.salary_max.replace(/,/g, ""));
+
+                let [minRange, maxRange] = filters.salaryRange.split("-");
+
+                if (minRange === "below") {
+                    // For "below-X" ranges, check if salary is below the maximum
+                    const maxValue = parseInt(maxRange);
+                    isSalaryValid = jobSalaryMax <= maxValue;
+                } else if (maxRange === "above") {
+                    // For "X-above" ranges, check if salary is above the minimum
+                    const minValue = parseInt(minRange);
+                    isSalaryValid = jobSalaryMax >= minValue;
                 } else {
+                    // For standard ranges "X-Y", check if salary is between min and max
+                    const minValue = parseInt(minRange);
+                    const maxValue = parseInt(maxRange);
                     isSalaryValid =
-                        parseInt(job.salary_min) >= parseInt(min) &&
-                        parseInt(job.salary_max) <= parseInt(max);
+                        jobSalaryMax >= minValue && jobSalaryMax <= maxValue;
                 }
             }
 
-            // Handle other filters
+            const locationParts = filters.location
+                .toLowerCase()
+                .split(",")
+                .map((part) => part.trim());
+
+            const isLocationValid = locationParts.every((part) =>
+                job.location?.toLowerCase().includes(part)
+            );
+
             const isValid =
                 (filters.keyword === "" ||
                     job.job_title
@@ -137,10 +148,7 @@ export default function ApplicantHome({ onJobClick }) {
                     job.job_industry
                         ?.toLowerCase()
                         .includes(filters.classification.toLowerCase())) &&
-                (filters.location === "" ||
-                    job.location
-                        ?.toLowerCase()
-                        .includes(filters.location.toLowerCase())) &&
+                isLocationValid &&
                 (filters.workSetup === "" ||
                     job.work_setup
                         ?.toLowerCase()
@@ -153,13 +161,13 @@ export default function ApplicantHome({ onJobClick }) {
             return isDatePostedValid && isSalaryValid && isValid;
         });
 
-        console.log("Filtered jobs:", filtered);
+        // console.log("Filtered jobs:", filtered);
         setFilteredJobListings(filtered);
     };
 
     useEffect(() => {
         applyFilters();
-        console.log(filteredJobListings);
+        // console.log(filteredJobListings);
     }, [filters, jobListings]);
 
     // Handle closing job details
@@ -188,8 +196,12 @@ export default function ApplicantHome({ onJobClick }) {
         }).format(amount);
     };
 
-    const handleRangeChange = (e) => {
-        setRange(Number(e.target.value));
+    const handleSalaryTypeSelect = (type) => {
+        setPaymentType(type);
+        setFilters((prev) => ({
+            ...prev,
+            salaryFrequency: type,
+        }));
     };
 
     // Fetch applicant data after mounting
@@ -224,7 +236,9 @@ export default function ApplicantHome({ onJobClick }) {
 
             <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto">
                 <div>
-                    <p className="text-fontcolor text-large ">Hi, {applicantName}</p>
+                    <p className="text-fontcolor text-large ">
+                        Hi, {applicantName}
+                    </p>
                 </div>
 
                 {/* Search */}
@@ -381,7 +395,7 @@ export default function ApplicantHome({ onJobClick }) {
                                     Work Setup
                                 </option>
                                 <option value="Remote">Remote</option>
-                                <option value="Onsite">On-site</option>
+                                <option value="On-site">On-site</option>
                                 <option value="Hybrid">Hybrid</option>
                             </select>
                         </div>
@@ -418,7 +432,7 @@ export default function ApplicantHome({ onJobClick }) {
                                 <div className="flex text-fontcolor items-center lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall px-3">
                                     {isSalaryOpen
                                         ? ""
-                                        : ` ${
+                                        : `${
                                               paymentType ||
                                               "Select Salary Type"
                                           }`}
@@ -438,7 +452,9 @@ export default function ApplicantHome({ onJobClick }) {
                                                             : "text-gray-500"
                                                     }`}
                                                     onClick={() =>
-                                                        setPaymentType(type)
+                                                        handleSalaryTypeSelect(
+                                                            type
+                                                        )
                                                     }
                                                 >
                                                     {type}
@@ -467,7 +483,46 @@ export default function ApplicantHome({ onJobClick }) {
                                                                 range === index
                                                             }
                                                             onChange={() => {
+                                                                const min =
+                                                                    index === 0
+                                                                        ? "below"
+                                                                        : salaryRanges[
+                                                                              paymentType
+                                                                          ][
+                                                                              index -
+                                                                                  1
+                                                                          ];
+
+                                                                const max =
+                                                                    index ===
+                                                                    salaryRanges[
+                                                                        paymentType
+                                                                    ].length
+                                                                        ? "above"
+                                                                        : salaryRanges[
+                                                                              paymentType
+                                                                          ][
+                                                                              index
+                                                                          ];
+
+                                                                const rangeValue =
+                                                                    min ===
+                                                                    "below"
+                                                                        ? `below-${max}`
+                                                                        : max ===
+                                                                          "above"
+                                                                        ? `${min}-above`
+                                                                        : `${min}-${max}`;
                                                                 setRange(index);
+                                                                setFilters(
+                                                                    (prev) => ({
+                                                                        ...prev,
+                                                                        salaryRange:
+                                                                            rangeValue,
+                                                                        salaryFrequency:
+                                                                            paymentType,
+                                                                    })
+                                                                );
                                                                 setIsSalaryOpen(
                                                                     false
                                                                 );
