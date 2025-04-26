@@ -1479,7 +1479,6 @@ export default function CompanySettings() {
                                                 </div>
                                             </div>
 
-                                            {/* 1st Preference  Field of Study */}
                                             {/* 1st Preference Field of Study */}
                                             <div className="mb-4">
                                                 <label className="block text-sm font-semibold text-fontcolor mb-1">
@@ -1582,7 +1581,6 @@ export default function CompanySettings() {
                                             </div>
 
                                             {/* 2nd Preference Field of Study */}
-                                            {/* 2nd Preference Field of Study */}
                                             <div className="mb-4">
                                                 <label className="block text-sm font-semibold text-fontcolor mb-1">
                                                     2nd Preference Field of Study{" "}
@@ -1683,7 +1681,6 @@ export default function CompanySettings() {
                                                 )}
                                             </div>
 
-                                            {/* 3rd Preference Field of Study */}
                                             {/* 3rd Preference Field of Study */}
                                             <div className="mb-4">
                                                 <label className="block text-sm font-semibold text-fontcolor mb-1">

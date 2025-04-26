@@ -470,7 +470,7 @@ export default function JobSummary() {
                                             </p>
                                             <p className="font-semibold text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                 {SerializedData?.scoring_criteria[0]?.preference?.directlyRelevant?.join(
-                                                    " "
+                                                    ", "
                                                 ) || ""}
                                             </p>
                                         </div>
@@ -480,7 +480,7 @@ export default function JobSummary() {
                                             </p>
                                             <p className="font-semibold text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                 {SerializedData?.scoring_criteria[0]?.preference?.highlyRelevant?.join(
-                                                    " "
+                                                    ", "
                                                 ) || ""}
                                             </p>
                                         </div>
@@ -490,7 +490,7 @@ export default function JobSummary() {
                                             </p>
                                             <p className="font-semibold text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                                                 {SerializedData?.scoring_criteria[0]?.preference?.moderatelyRelevant?.join(
-                                                    " "
+                                                    ", "
                                                 ) || ""}
                                             </p>
                                         </div>
