@@ -1479,10 +1479,10 @@ export default function CompanySettings() {
                                                 </div>
                                             </div>
 
-                                            {/* 1st Choice Field of Study */}
+                                            {/* 1st Preference  Field of Study */}
                                             <div className="mb-4">
                                                 <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                    1st Choice Field of Study{" "}
+                                                    1st Preference Field of Study{" "}
                                                     <span className="font-medium text-xsmall">
                                                         (Put the most directly
                                                         relevant fields of study
@@ -1580,10 +1580,10 @@ export default function CompanySettings() {
                                                 )}
                                             </div>
 
-                                            {/* 2nd Choice Field of Study */}
+                                            {/* 2nd Preference Field of Study */}
                                             <div className="mb-4">
                                                 <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                    2nd Choice Field of Study
+                                                    2nd Preference Field of Study
                                                     <span className="font-medium text-xsmall">
                                                         (Put closely related
                                                         fields that have
@@ -1681,10 +1681,10 @@ export default function CompanySettings() {
                                                 )}
                                             </div>
 
-                                            {/* 3rd Choice Field of Study */}
+                                            {/* 3rd Preference Field of Study */}
                                             <div className="mb-4">
                                                 <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                    3rd Choice Field of Study
+                                                    3rd Preference Field of Study
                                                     <span className="font-medium text-xsmall">
                                                         (Put fields that have
                                                         some relevance or
