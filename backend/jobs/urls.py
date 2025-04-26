@@ -20,7 +20,7 @@ urlpatterns = [
     
     path('applications/', views.job_application_list, name='job_application_list'), # list of all job applications
     path('applications/<int:pk>', views.job_application_details, name='job_application_details'),
-    path('applications/<int:application_id>/status/', views.get_application_status, name='application-status'), # see result ng application (makikita rin sa applications, pero no documents ang json nito)  / dito rin makikita ang readable ng status ng application if processed na. 
+    path('applications/<int:application_id>/status/', views.get_application_status, name='application-status'),
     path('applications/check/<int:pk>/', views.check_application, name='check-application'),
     path('applications/create', views.create_job_application, name='create_job_application'),
     path('applications/edit/<int:pk>', views.edit_job_application, name='edit_job_application'),
