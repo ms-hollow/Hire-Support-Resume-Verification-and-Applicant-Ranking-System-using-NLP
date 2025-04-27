@@ -78,7 +78,7 @@ module.exports = {
     keyframes: {
        bar1: {
         '0%, 100%': { transform: 'scaleY(0.6)' },
-        '50%': { transform: 'scaleY(0.2)' },
+        '50%': { transform: 'scaleY(0.0)' },
       },
       bar2: {
         '0%, 100%': { transform: 'scaleY(0.6)' },
@@ -90,11 +90,11 @@ module.exports = {
       },
       bar4: {
         '0%, 100%': { transform: 'scaleY(1)' },
-        '50%': { transform: 'scaleY(0.8)' },
+        '50%': { transform: 'scaleY(0.6)' },
       },
       bar5: {
         '0%, 100%': { transform: 'scaleY(1.2)' },
-        '50%': { transform: 'scaleY(0.8)' },
+        '50%': { transform: 'scaleY(0.6)' },
       },
     },
     animation: {
