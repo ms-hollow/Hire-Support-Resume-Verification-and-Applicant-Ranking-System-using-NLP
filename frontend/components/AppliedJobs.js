@@ -26,15 +26,7 @@ const AppliedJobs = () => {
         <div className="flex flex-col pt-4">
             {jobApplications.map((job, index) => (
                 <div key={index} className="box-container px-2 py-2 mb-4">
-                    <div className="grid grid-cols-12 gap-4 p-3">
-                        <div className="col-span-2 justify-center">
-                            <Image
-                                src="/Logo.png"
-                                width={50}
-                                height={30}
-                                alt="Company Logo"
-                            />
-                        </div>
+                    <div className="grid grid-cols-3 gap-4 p-3">
                         <div className="col-span-10 flex flex-col w-full">
                             <div className="flex justify-between items-start w-full">
                                 <div>

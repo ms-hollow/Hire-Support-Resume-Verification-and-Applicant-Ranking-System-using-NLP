@@ -40,12 +40,9 @@ const JobListings = ({ onJobClick, jobListings, loading }) => {
                         className="job-listing-box flex flex-col p-4 mb-4 mx-auto w-full"
                     >
                         <div className="flex flex-row justify-between items-center">
-                            <Image
-                                src="/Logo.png"
-                                width={30}
-                                height={30}
-                                alt="Company Logo"
-                            />
+                            <p className="font-semibold text-fontcolor lg:text-large mb:text-large sm:text-medium xsm:text-medium xxsm:text-medium mt-2">
+                                {job.job_title}
+                            </p>
                             <button
                                 className="ml-auto"
                                 onClick={() => toggleSaveJob(job.job_id)}
@@ -66,9 +63,7 @@ const JobListings = ({ onJobClick, jobListings, loading }) => {
                                 />
                             </button>
                         </div>
-                        <p className="font-semibold text-fontcolor lg:text-large mb:text-large sm:text-medium xsm:text-medium xxsm:text-medium mt-2">
-                            {job.job_title}
-                        </p>
+                       
                         <p className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                             {job.company_name}
                         </p>
@@ -153,7 +148,7 @@ const JobListings = ({ onJobClick, jobListings, loading }) => {
 const JobListingsWrapper = ({ onJobClick, jobListings, loading }) => {
     const { authTokens } = useContext(AuthContext);
     return (
-        <div className="flex overflow-y-auto border border-none hide-scrollbar p-1 h-[calc(100vh-150px)]">
+        <div className="flex overflow-y-auto border border-none hide-scrollbar h-[calc(100vh)]">
             <JobProvider authToken={authTokens.access}>
                 <JobListings
                     authToken={authTokens.access}

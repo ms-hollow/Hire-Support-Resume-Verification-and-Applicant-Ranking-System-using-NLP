@@ -99,16 +99,7 @@ const SavedJobs = () => {
             {jobListings.map((job) => (
                 <div key={job.job_id} className="flex flex-col pt-4">
                     <div className="box-container px-2 py-2 mb-4">
-                        <div className="grid grid-cols-12  gap-4 p-3">
-                            <div className="col-span-2  justify-center">
-                                <Image
-                                    src="/Logo.png"
-                                    width={50}
-                                    height={30}
-                                    alt="Company Logo"
-                                />
-                            </div>
-
+                        <div className="grid grid-cols-3  gap-4 p-3">
                             <div className="col-span-10 flex flex-col w-full">
                                 <div className="flex justify-between items-start w-full">
                                     <div>
@@ -155,55 +146,63 @@ const SavedJobs = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-y-2 gap-x-4 mt-2">
-                                    <div className="flex items-center">
-                                        <Image
-                                            src="/Location Icon.svg"
-                                            width={23}
-                                            height={20}
-                                            alt="Location Icon"
-                                        />
-                                        <p className="ml-1 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
-                                            {toTitleCase(job.location)}
-                                        </p>
+                                <div className="justify-between mt-2">
+                                    <div className="flex justify-between items-center w-full mb-2">
+                                        <div className="flex items-center w-5/6">
+                                            <Image
+                                                src="/Location Icon.svg"
+                                                width={23}
+                                                height={20}
+                                                alt="Location Icon"
+                                            />
+                                            <p className="ml-1 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
+                                                {toTitleCase(job.location)}
+                                            </p>
+                                        </div>
+
+                                        <div className="flex items-center justify-end w-1/6">
+                                            <Image
+                                                src="/Work Setup Icon.svg"
+                                                width={23}
+                                                height={20}
+                                                alt="Work Setup Icon"
+                                            />
+                                            <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
+                                                {job.work_setup}
+                                            </p>
+                                        </div>
                                     </div>
 
-                                    <div className="flex items-center">
-                                        <Image
-                                            src="/Work Setup Icon.svg"
-                                            width={23}
-                                            height={20}
-                                            alt="Work Setup Icon"
-                                        />
-                                        <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
-                                            {job.work_setup}
-                                        </p>
+                                    <div className="flex justify-between items-center w-full">
+                                        {/* schedule (Left) */}
+                                        <div className="flex items-center w-5/6">
+                                            <Image
+                                                src="/Schedule Icon.svg"
+                                                width={18}
+                                                height={20}
+                                                alt="Schedule Icon"
+                                            />
+                                            <p className="ml-1 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
+                                                {toTitleCase(job.schedule)}
+                                            </p>
+                                        </div>
+
+                                        {/*  salary (Right) */}
+                                        <div className="flex items-center justify-end w-5/6">
+                                            <Image
+                                                src="/Salary Icon.svg"
+                                                width={18}
+                                                height={20}
+                                                alt="Salary Icon"
+                                            />
+                                            <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
+                                                {" "}
+                                                {job.salary_min} - {job.salary_max}
+                                            </p>
+                                        </div>
                                     </div>
 
-                                    <div className="flex items-center">
-                                        <Image
-                                            src="/Schedule Icon.svg"
-                                            width={18}
-                                            height={20}
-                                            alt="Schedule Icon"
-                                        />
-                                        <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
-                                            {job.schedule}
-                                        </p>
-                                    </div>
-
-                                    <div className="flex items-center col-span-1">
-                                        <Image
-                                            src="/Salary Icon.svg"
-                                            width={18}
-                                            height={20}
-                                            alt="Salary Icon"
-                                        />
-                                        <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
-                                            {" "}
-                                            {job.salary_min} - {job.salary_max}
-                                        </p>
-                                    </div>
+                                  
                                 </div>
                             </div>
                         </div>

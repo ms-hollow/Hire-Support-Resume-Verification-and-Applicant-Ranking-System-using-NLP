@@ -42,7 +42,7 @@ const JobDetails = ({ authToken }) => {
     return (
         <div className="flex flex-col h-full">
             {/* Top Part of Job Details - Fixed */}
-            <div className="job-details-box border-b-8 top rounded-t-lg p-4">
+            <div className=" sticky top-0 z-10 bg-background job-details-box border-b-8 top rounded-t-lg p-4">
                 <div className="flex justify-between items-center">
                     <p className="font-semibold text-fontcolor lg:text-xlarge mb:text-large sm:text-large xsm:text-large xxsm:text-large">
                         {jobDetails.job_title}
@@ -137,7 +137,7 @@ const JobDetails = ({ authToken }) => {
             </div>
 
             {/* Main Part of Job Details - Scrollable */}
-            <div className="job-details-box rounded-b-lg overflow-y-auto bg-white p-4">
+            <div className="flex-1 job-details-box rounded-b-lg overflow-y-auto bg-white p-4">
                 {/*Employment Type*/}
                 <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">
                     Employment Type
@@ -259,7 +259,7 @@ const JobDetails = ({ authToken }) => {
 const JobDetailsWrapper = () => {
     const { authTokens } = useContext(AuthContext);
     return (
-        <div className="flex-1 h-[calc(100vh-150px)] border border-none rounded-lg">
+        <div className="flex-1 overflow-y-auto h-[calc(100vh)] border border-none  hide-scrollbar rounded-lg">
             <JobProvider authToken={authTokens.access}>
                 <JobDetails authToken={authTokens.access} />
             </JobProvider>
