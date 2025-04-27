@@ -180,6 +180,14 @@ def parse_verification_option(verification_option):
 
 def extract_application_data(job_application):
     """Extract application data from a JobApplication model instance as a dictionary"""
+    import tempfile
+    import os
+    from django.conf import settings
+    from google_drive.utils import download_file_from_drive, authenticate_service_account
+    
+    # Create a temporary directory for downloaded files
+    temp_dir = tempfile.mkdtemp()
+    print(f"Created temporary directory: {temp_dir}")
     
     # Get applicant information
     applicant = job_application.applicant
@@ -190,20 +198,60 @@ def extract_application_data(job_application):
     educational_documents_links = []
     certifications_documents_links = []
     
+    # Initialize Google Drive service
+    service = None
+    if getattr(settings, 'GDRIVE_ENABLED', False):
+        try:
+            service = authenticate_service_account()
+            print("Google Drive service authenticated")
+        except Exception as e:
+            print(f"Error authenticating Google Drive service: {str(e)}")
+    
     # Group documents by type
     for document in job_application.documents.all():
-        # Use actual filesystem path
         if document.document_file:
-            doc_path = document.document_file.path  # This gives the full system path
+            local_path = None
             
+            # Debug output
+            print(f"Processing document: {document.document_type}, File: {document.document_file.name}")
+            print(f"Google Drive ID: {document.google_drive_id}")
+            
+            # If we have a Google Drive ID and Google Drive is enabled
+            if document.google_drive_id and service:
+                # Create a local file with the same name
+                file_name = os.path.basename(document.document_file.name)
+                local_path = os.path.join(temp_dir, file_name)
+                
+                # Download file from Google Drive
+                try:
+                    print(f"Downloading file from Google Drive: {document.google_drive_id} to {local_path}")
+                    download_file_from_drive(service, document.google_drive_id, local_path)
+                    print(f"Successfully downloaded file: {local_path}")
+                except Exception as e:
+                    print(f"Error downloading file from Google Drive: {str(e)}")
+                    local_path = None
+            
+            # If we couldn't download from Google Drive, try using the name as a local path
+            if local_path is None or not os.path.exists(local_path):
+                # Try to use the local path if file exists
+                local_path = os.path.join(settings.MEDIA_ROOT, document.document_file.name)
+                if not os.path.exists(local_path):
+                    print(f"Warning: File does not exist locally: {local_path}")
+                    continue
+            
+            # Add file to appropriate category
             if document.document_type.lower() == 'resume':
-                resume_links.append(doc_path)
+                resume_links.append(local_path)
+                print(f"Added resume: {local_path}")
             elif document.document_type.lower() == 'experience':
-                experience_documents_links.append(doc_path)
+                experience_documents_links.append(local_path)
+                print(f"Added experience document: {local_path}")
             elif document.document_type.lower() == 'education':
-                educational_documents_links.append(doc_path)
+                educational_documents_links.append(local_path)
+                print(f"Added education document: {local_path}")
             elif document.document_type.lower() == 'certifications':
-                certifications_documents_links.append(doc_path)
+                certifications_documents_links.append(local_path)
+                print(f"Added certification document: {local_path}")
     
     # Prepare application data in format expected by hire_support.py
     application_data = {
@@ -212,9 +260,11 @@ def extract_application_data(job_application):
         "resume_link": resume_links[0] if resume_links else "",
         "experience_documents_links": ", ".join(experience_documents_links),
         "educational_documents_links": ", ".join(educational_documents_links),
-        "certifications_documents_links": ", ".join(certifications_documents_links)
+        "certifications_documents_links": ", ".join(certifications_documents_links),
+        "_temp_dir": temp_dir  # Store the temp dir so it can be cleaned up later
     }
     
+    print(f"Application data prepared: {application_data}")
     return application_data
 
 # ----------------------------DI PA NAGAGAMIT ------------- #

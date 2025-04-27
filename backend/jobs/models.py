@@ -2,6 +2,8 @@ from django.db import models
 from company.models import Company
 from users.models import User
 import os
+from google_drive.storage import GoogleDriveStorage
+from django.conf import settings
 
 STATUS_CHOICES = (
     ('draft', 'Draft'),
@@ -175,16 +177,28 @@ def get_document_upload_path(instance, filename):
     from main_model.utils.file_structure import get_document_type_dir
     doc_dir = get_document_type_dir(job_hiring_id, applicant_id, doc_type)
     
-    # Keep original filename
-    return os.path.join(f'job_hirings/job_hiring_{job_hiring_id}/applications/applicant_{applicant_id}/documents/{doc_type}', filename)
+    # Build path and ensure it's relative (no leading slash)
+    path = f'job_hirings/job_hiring_{job_hiring_id}/applications/applicant_{applicant_id}/documents/{doc_type}/{filename}'
+    return path.lstrip('/')  # Remove leading slash if present
+
+# Create a single instance to be reused
+google_drive_storage = GoogleDriveStorage() if getattr(settings, 'GDRIVE_ENABLED', False) else None
 
 class JobApplicationDocument(models.Model):
     job_application = models.ForeignKey(JobApplication, related_name='documents', on_delete=models.CASCADE)
     document_type = models.CharField(max_length=255)
-    document_file = models.FileField(upload_to=get_document_upload_path)
+    
+    # Use a callable for upload_to
+    document_file = models.FileField(
+        upload_to=get_document_upload_path,
+        storage=google_drive_storage if getattr(settings, 'GDRIVE_ENABLED', False) else None
+    )
+    
+    # Add a field to store Google Drive file ID
+    google_drive_id = models.CharField(max_length=255, blank=True, null=True)
     
     def __str__(self):
-        return self.document_type
+        return f"{self.document_type} for {self.job_application}"
 
 class RecentSearch(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -212,3 +226,4 @@ class RecentSearch(models.Model):
             "salary": self.salary,
             "experience_level": self.experience_level,
         }
+

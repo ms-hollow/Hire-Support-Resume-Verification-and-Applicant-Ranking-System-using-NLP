@@ -15,6 +15,7 @@ from main_model.utils.file_processors import extract_hiring_settings
 from main_model.utils.file_processors import extract_application_data
 from main_model.hire_support import process_application
 import logging
+from django.conf import settings
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -257,18 +258,38 @@ def create_job_application(request):
                 # Save application with submitted status
                 job_application = serializer.save(application_status='processing')
 
-                # Set initial status
-                job_application.application_status = 'new'
-                job_application.save()
-
                 # Save each file with corresponding document type in proper location
-                for doc_type, doc_file in zip(document_types, document_files):
-                    JobApplicationDocument.objects.create(
+                for i, doc_file in enumerate(document_files):
+                    # Make sure index is valid
+                    doc_type = document_types[i] if i < len(document_types) else 'other'
+                    
+                    # Create and save the document
+                    document = JobApplicationDocument(
                         job_application=job_application,
                         document_type=doc_type,
                         document_file=doc_file
                     )
 
+                    # Save the document
+                    if settings.GDRIVE_ENABLED:
+                        # Save the document which will upload to Google Drive
+                        document.save()
+                        
+                        # If the GoogleDriveStorage._save method returned a Google Drive ID
+                        # it should be accessible from the file object
+                        if hasattr(doc_file, 'google_drive_id'):
+                            document.google_drive_id = doc_file.google_drive_id
+                            print(f"Setting Google Drive ID: {document.google_drive_id}")
+                            document.save(update_fields=['google_drive_id'])
+                        else:
+                            print("No Google Drive ID found in file object")
+                    else:
+                        document.save()
+                
+                # Update status and run background tasks
+                job_application.application_status = 'processing'
+                job_application.save()
+                
                 # After saving the job application, check for applicant count and create notifications
                 job_hiring = job_application.job_hiring
                 job_hiring.check_applicant_count() # Check if any thresholds are met and send notification
