@@ -24,7 +24,7 @@ export default function ApplicantDocument({ handleJobClick }) {
     };
 
     const router = useRouter();
-    const { jobId } = router.query;
+    const { id, jobHiringTitle, companyName } = router.query;
     let { authTokens } = useContext(AuthContext);
 
     const [draftJobApplication, setdraftJobApplication] = useState({
@@ -53,7 +53,7 @@ export default function ApplicantDocument({ handleJobClick }) {
     const goBack = () => {
         router.push({
             pathname: "/APPLICANT/JobApplication",
-            query: { jobId },
+            query: { id, jobHiringTitle, companyName },
         });
     };
 
@@ -82,7 +82,10 @@ export default function ApplicantDocument({ handleJobClick }) {
 
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
-        router.push("/APPLICANT/ApplicationConfirmation");
+        router.push({
+            pathname: "/APPLICANT/ApplicationConfirmation",
+            query: { id, jobHiringTitle, companyName },
+        });
     };
 
     const addAdditionalFile = (category) => {
@@ -139,10 +142,10 @@ export default function ApplicantDocument({ handleJobClick }) {
                     You are Applying for{" "}
                 </p>
                 <p className="font-semibold text-primary text-large pb-1">
-                    No Job Title Available
+                    {jobHiringTitle}
                 </p>
                 <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">
-                    No Job Company Available
+                    {companyName}
                 </p>
                 <div className="relative">
                     <p

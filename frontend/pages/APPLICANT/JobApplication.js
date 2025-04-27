@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import JobDetailsWrapper from "@/components/JobDetails";
 import { getApplicantProfile } from "../api/applicantApi";
 import { fetchJobDetails } from "../api/applicantJobApi";
+import { toTitleCase } from "../utils/functions";
 
 export default function JobApplication({ handleJobClick }) {
     let { authTokens } = useContext(AuthContext);
@@ -46,7 +47,6 @@ export default function JobApplication({ handleJobClick }) {
     useEffect(() => {
         const applicantProfile = async () => {
             const data = await getApplicantProfile(authTokens);
-            console.log(data);
             setFormData(data);
         };
 
@@ -54,7 +54,6 @@ export default function JobApplication({ handleJobClick }) {
             const jobHiringData = await fetchJobDetails(authTokens?.access, id);
             setJobHiringTitle(jobHiringData.job_title);
             setCompanyName(jobHiringData.company_name);
-            console.log(jobHiringData);
         };
 
         applicantProfile();
@@ -78,7 +77,10 @@ export default function JobApplication({ handleJobClick }) {
     };
 
     const handleNext = () => {
-        router.push("/APPLICANT/ApplicantDocuments");
+        router.push({
+            pathname: "/APPLICANT/ApplicantDocuments",
+            query: { id, jobHiringTitle, companyName },
+        });
     };
 
     // if (loading) {
@@ -93,10 +95,10 @@ export default function JobApplication({ handleJobClick }) {
                     You are Applying for{" "}
                 </p>
                 <p className="font-semibold text-primary text-large pb-1">
-                    {jobHiringTitle}
+                    {jobHiringTitle || ""}
                 </p>
                 <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">
-                    {companyName}
+                    {companyName || ""}
                 </p>
                 <div className="relative">
                     <p
@@ -233,14 +235,20 @@ export default function JobApplication({ handleJobClick }) {
                                                     id=""
                                                     className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor"
                                                 >
-                                                    {formData.present_address}{" "}
-                                                    {formData.region}
-                                                    {""}
-                                                    {formData.province}
-                                                    {""}
-                                                    {formData.city}
-                                                    {""}
-                                                    {formData.barangay}
+                                                    {formData.present_address},{" "}
+                                                    {toTitleCase(
+                                                        formData.region
+                                                    )}
+                                                    ,{" "}
+                                                    {toTitleCase(
+                                                        formData.province
+                                                    )}
+                                                    ,{" "}
+                                                    {toTitleCase(formData.city)}
+                                                    ,{" "}
+                                                    {toTitleCase(
+                                                        formData.barangay
+                                                    )}
                                                 </p>
                                             </td>
                                         </tr>
