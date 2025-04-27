@@ -75,7 +75,35 @@ module.exports = {
       },
       overscrollBehavior: ['none', 'auto' ,'contain'],
     },
-    
+    keyframes: {
+       bar1: {
+        '0%, 100%': { transform: 'scaleY(0.6)' },
+        '50%': { transform: 'scaleY(0.2)' },
+      },
+      bar2: {
+        '0%, 100%': { transform: 'scaleY(0.6)' },
+        '50%': { transform: 'scaleY(0.4)' },
+      },
+      bar3: {
+        '0%, 100%': { transform: 'scaleY(0.8)' },
+        '50%': { transform: 'scaleY(0.6)' },
+      },
+      bar4: {
+        '0%, 100%': { transform: 'scaleY(1)' },
+        '50%': { transform: 'scaleY(0.8)' },
+      },
+      bar5: {
+        '0%, 100%': { transform: 'scaleY(1.2)' },
+        '50%': { transform: 'scaleY(0.8)' },
+      },
+    },
+    animation: {
+      bar1: 'bar1 1.2s ease-in-out infinite',
+      bar2: 'bar2 1.2s ease-in-out infinite 0.1s',
+      bar3: 'bar3 1.2s ease-in-out infinite 0.2s',
+      bar4: 'bar4 1.2s ease-in-out infinite 0.3s',
+      bar5: 'bar5 1.2s ease-in-out infinite 0.4s',
+    },
   },
   plugins: [],
 };

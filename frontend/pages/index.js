@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import GeneralHeader from "@/components/GeneralHeader"; 
 import GeneralFooter from "@/components/GeneralFooter";
 import { useEffect, useRef, useState } from "react";
+import Loading from "./GENERAL/Loading";
 
 const Inter = localFont({
 src: './fonts/Inter.ttf',  
@@ -60,8 +61,18 @@ const imageOneRef = useRef(null);
 const imageTwoRef = useRef(null);
 const imageThreeRef = useRef(null);
 const [scrolled, setScrolled] = useState(false);
+const [isLoading, setIsLoading] = useState(true);
 
 const [active, setActive] = useState("applicant");
+
+useEffect(() => {
+  const timer = setTimeout(() => {
+    setIsLoading(false);
+  }, 5000); 
+
+  return () => clearTimeout(timer);
+}, []);
+
 
 useEffect(() => {
   const interval = setInterval(() => {
@@ -80,6 +91,11 @@ useEffect(() => {
   window.addEventListener("scroll", handleScroll);
   return () => window.removeEventListener("scroll", handleScroll);
 }, []);
+
+if (isLoading) {
+  return <Loading/>;
+}
+
 
 return (
   <div>

@@ -19,6 +19,7 @@ export default function App({ Component, pageProps }) {
         "/GENERAL/ForgotPassword",
         "/GENERAL/ContactUs",
         "/GENERAL/FAQs",
+        "/GENERAL/Loading",
     ];
 
     const isNoAuthRequired = noAuthRequiredPages.includes(router.pathname);

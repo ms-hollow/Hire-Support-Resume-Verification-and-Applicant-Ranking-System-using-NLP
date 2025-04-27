@@ -9,6 +9,7 @@ import jwt from 'jsonwebtoken';
 import JobDetailsWrapper from "@/components/JobDetails";
 import { toast } from 'react-toastify';
 import ToastWrapper from "@/components/ToastWrapper";
+import Loading from "../GENERAL/Loading";
 
 export default function JobApplication ({handleJobClick}) {
 
@@ -178,9 +179,17 @@ export default function JobApplication ({handleJobClick}) {
         return company ? company : null; 
     };
 
-    if (loading) {
-        return <p className="text-accent">Loading... (temporary) </p>;
-    }
+    useEffect(() => {
+        const timer = setTimeout(() => {
+          setLoading(false);
+        }, 3000); 
+    
+        return () => clearTimeout(timer);
+      }, []);
+    
+      if (loading) {
+        return <Loading/>;
+      }
 
     // const saveDraft = async () => {
     //     localStorage.setItem('draftJobApplication', JSON.stringify(draftJobApplication));
