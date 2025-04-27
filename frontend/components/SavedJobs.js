@@ -8,6 +8,8 @@ import {
     unsaveJob,
 } from "@/pages/api/applicantJobApi";
 import { toTitleCase } from "@/pages/utils/functions";
+import { toast } from 'react-toastify';
+import ToastWrapper from "./ToastWrapper";
 
 const SavedJobs = () => {
     const { authTokens } = useContext(AuthContext);
@@ -56,7 +58,7 @@ const SavedJobs = () => {
                     ...prevState,
                     [jobId]: true,
                 }));
-                alert("Job saved successfully!");
+                toast.success("Job saved successfully!");
             }
         },
         [authTokens]
@@ -73,7 +75,8 @@ const SavedJobs = () => {
                 setJobListings((prevJobs) =>
                     prevJobs.filter((job) => job.job_id !== jobId)
                 );
-                alert("Job unsaved successfully!");
+                toast.success("Job unsaved successfully!");
+              
             }
         },
         [authTokens]
@@ -207,6 +210,7 @@ const SavedJobs = () => {
                     </div>
                 </div>
             ))}
+            <ToastWrapper/>
         </div>
     );
 };
@@ -215,6 +219,7 @@ const SavedJobsWrapper = () => {
     return (
         <div className="flex overflow-y-auto border border-none hide-scrollbar p-1 h-[calc(100vh-150px)]">
             <SavedJobs />
+            <ToastWrapper/>
         </div>
     );
 };

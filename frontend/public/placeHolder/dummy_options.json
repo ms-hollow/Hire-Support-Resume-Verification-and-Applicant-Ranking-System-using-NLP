@@ -389,7 +389,6 @@
     "React.js",
     "Vue.js",
     "Angular",
-    "Svelte",
     "Next.js",
     "Nuxt.js",
     "HTML",
@@ -639,10 +638,84 @@
             ]
           }
         },
-        "Enterprise Architect",
-        "Solutions Architect",
-        "Technical Architect",
-        "Data Architect",
+        {
+          "title": "Enterprise Architect",
+          "relevance": {
+            "directly_relevant": [
+              "Enterprise Solutions Architect",
+              "Enterprise Systems Architect",
+              "Enterprise Infrastructure Architect",
+              "Enterprise Application Architect",
+              "Enterprise Cloud Architect"
+            ],
+            "highly_relevant": [
+              "Solutions Architect",
+              "Technical Architect",
+              "Cloud Architect",
+              "Systems Architect",
+              "Infrastructure Architect"
+            ],
+            "moderately_relevant": [
+              "IT Strategy Consultant",
+              "IT Project Manager",
+              "Business Systems Analyst",
+              "IT Manager",
+              "Technical Program Manager"
+            ]
+          }
+        },
+        {
+          "title": "Solutions Architect",
+          "relevance": {
+            "directly_relevant": [
+              "Cloud Solutions Architect",
+              "Software Solutions Architect",
+              "Infrastructure Solutions Architect",
+              "Enterprise Solutions Architect",
+              "Technical Solutions Architect"
+            ],
+            "highly_relevant": [
+              "Technical Architect",
+              "Enterprise Architect",
+              "Systems Architect",
+              "Cloud Architect",
+              "Application Architect"
+            ],
+            "moderately_relevant": [
+              "IT Consultant",
+              "Solutions Engineer",
+              "Business Systems Analyst",
+              "Technical Project Manager",
+              "Product Manager"
+            ]
+          }
+        },
+        {
+          "title": "Technical Architect",
+          "relevance": {
+            "directly_relevant": [
+              "Software Architect",
+              "Systems Architect",
+              "Technical Solutions Architect",
+              "Infrastructure Architect",
+              "Cloud Technical Architect"
+            ],
+            "highly_relevant": [
+              "Solutions Architect",
+              "Enterprise Architect",
+              "Cloud Architect",
+              "DevOps Architect",
+              "Application Architect"
+            ],
+            "moderately_relevant": [
+              "Lead Software Engineer",
+              "IT Consultant",
+              "Senior Developer",
+              "Business Systems Analyst",
+              "Technical Project Manager"
+            ]
+          }
+        },
         {
           "title": "Infrastructure Engineer",
           "relevance": {

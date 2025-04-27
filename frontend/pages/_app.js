@@ -19,8 +19,6 @@ export default function App({ Component, pageProps }) {
         "/GENERAL/ForgotPassword",
         "/GENERAL/ContactUs",
         "/GENERAL/FAQs",
-
-        // add here yung iba pang pages na hindi required iauthenticate
     ];
 
     const isNoAuthRequired = noAuthRequiredPages.includes(router.pathname);
@@ -39,3 +37,4 @@ export default function App({ Component, pageProps }) {
         </GoogleOAuthProvider>
     );
 }
+

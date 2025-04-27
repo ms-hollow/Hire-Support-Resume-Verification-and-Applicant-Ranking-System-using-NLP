@@ -13,6 +13,8 @@ import {
     updateJobHiring,
 } from "../api/companyJobApi";
 import { validateJobForm } from "../utils/JobHelpers";
+import { toast } from 'react-toastify';
+import ToastWrapper from "@/components/ToastWrapper";
 
 export default function EditJobHiring() {
     let { authTokens } = useContext(AuthContext);
@@ -354,10 +356,12 @@ export default function EditJobHiring() {
     const handleDelete = async () => {
         const success = await deleteJobHiring(id, authTokens);
         if (success) {
-            alert("Job successfully deleted");
-            router.push("/COMPANY/CompanyHome");
+            toast.success("Job successfully deleted");
+            setTimeout(() => {
+                router.push("/COMPANY/CompanyHome");
+            }, 3000); 
         } else {
-            alert("Failed to delete job.");
+            toast.error("Failed to delete job.");
         }
     };
 
@@ -490,10 +494,13 @@ export default function EditJobHiring() {
         const res = await updateJobHiring(id, serializedData, authTokens);
 
         if (res) {
-            alert("Job successfully updated");
-            router.push("/COMPANY/CompanyHome");
+            toast.success("Job successfully updated");
+            setTimeout(() => {
+                router.push("/COMPANY/CompanyHome");
+            }, 3000); 
+
         } else {
-            alert("Failed to delete job.");
+            toast.error("Failed to delete job.");
         }
     };
 
@@ -590,6 +597,7 @@ export default function EditJobHiring() {
     return (
         <div>
             <CompanyHeader />
+            <ToastWrapper/>
             <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto">
                 <h1 className="lg:text-xl mb:text-xl sm:text-large text-primary pb-5">
                     Job Hiring Details{" "}

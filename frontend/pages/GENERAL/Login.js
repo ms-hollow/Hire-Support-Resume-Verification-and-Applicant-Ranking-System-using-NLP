@@ -6,6 +6,7 @@ import GeneralHeader from '@/components/GeneralHeader';
 import GeneralFooter from '@/components/GeneralFooter';
 import { GoogleLogin } from '@react-oauth/google'; //npm install react-google-login 
 import AuthContext from '../context/AuthContext';
+import { toast, ToastContainer } from 'react-toastify';
 
 export default function Login() {
 
@@ -15,6 +16,7 @@ export default function Login() {
     return (
         <div>
             <GeneralHeader />
+            <ToastContainer/>
             <div className="flex items-center justify-center lg:pt-36 mb:pt-24 xsm:pt-24 xxsm:pt-24 sm:pt-24 mb:p-8 sm:p-8 xsm:p-8 xxsm:p-4 py-8 mx-auto">
                 <div className="job-application-box rounded-xs px-8 py-5 ">
                     <h1 className="lg:text-extralarge mb:text-large sm:text-large text-primary">Sign in</h1>
@@ -73,7 +75,7 @@ export default function Login() {
                     <div className='flex justify-center w-full px-5'>
                         <GoogleLogin 
                             onSuccess={loginWithGoogle}
-                            onError={() => alert('Google login failed!')} 
+                            onError={() => toast.error('Google login failed!')} 
                             size='large'
                         />
                     </div>

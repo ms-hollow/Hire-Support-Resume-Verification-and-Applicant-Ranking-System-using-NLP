@@ -7,6 +7,8 @@ import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
 import { getCompany } from "../api/companyApi";
 import { fetchJobList, deleteJobHiring } from "../api/companyJobApi";
+import { toast } from 'react-toastify';
+import ToastWrapper from "@/components/ToastWrapper";
 
 //* PAGE STATUS
 // TODO - Pass the job hiring id to query (for edit job hiring & view)
@@ -87,13 +89,13 @@ export default function CompanyHome() {
     const handleDelete = async (jobId) => {
         const success = await deleteJobHiring(jobId, authTokens);
         if (success) {
-            alert("Job successfully deleted");
+            toast.success("Job successfully deleted");
             setJobLists((prevJobLists) =>
                 prevJobLists.filter((job) => job.id !== jobId)
             );
             await fetchJobLists();
         } else {
-            alert("Failed to delete job.");
+            toast.error("Failed to delete job.");
         }
     };
 
@@ -334,6 +336,7 @@ export default function CompanyHome() {
                     </div>
                 </div>
             </div>
+            <ToastWrapper/>
             <GeneralFooter />
         </div>
     );

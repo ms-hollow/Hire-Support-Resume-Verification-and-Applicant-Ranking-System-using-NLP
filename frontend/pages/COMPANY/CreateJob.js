@@ -9,6 +9,10 @@ import { getCompany } from "../api/companyApi";
 import AuthContext from "../context/AuthContext";
 import Cookies from "js-cookie";
 import { getCookie } from "../utils/cookieUtils";
+import { toast } from 'react-toastify';
+import ToastWrapper from "@/components/ToastWrapper";
+
+
 
 export default function CreateJob() {
     const [regions, setRegions] = useState([]);
@@ -97,7 +101,7 @@ export default function CreateJob() {
 
                 //* Remove this if you don't want to alert the user once mount
                 if (companyData?.profile_data?.company_name === null) {
-                    alert("Please complete your company profile.");
+                    toast.error("Please complete your company profile.");
                 }
 
                 const currentDate = new Date();
@@ -198,13 +202,13 @@ export default function CreateJob() {
         e.preventDefault();
 
         if (companyName === "Unknown Company") {
-            alert("Please complete your company profile.");
+            toast.error("Please complete your company profile.");
             return;
         }
 
         const errors = validateForm();
         if (Object.keys(errors).length > 0) {
-            alert(
+            toast.error(
                 `Please fix the following errors:\n\n${Object.values(
                     errors
                 ).join("\n")}`
@@ -847,6 +851,7 @@ export default function CreateJob() {
                     </div>
                 </div>
             </div>
+            <ToastWrapper/>
             <GeneralFooter />
         </div>
     );

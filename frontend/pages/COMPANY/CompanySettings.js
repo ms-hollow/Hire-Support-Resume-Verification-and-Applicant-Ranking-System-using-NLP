@@ -14,6 +14,8 @@ import {
 import { getCookie } from "../utils/cookieUtils";
 import useFetchOptions from "@/hooks/companySettingsHooks";
 import { useFormData } from "@/hooks/companySettingsHooks";
+import { toast } from 'react-toastify';
+import ToastWrapper from "@/components/ToastWrapper";
 
 export default function CompanySettings() {
     const [options, setOptions] = useFetchOptions();
@@ -2347,6 +2349,7 @@ export default function CompanySettings() {
                     </form>
                 </div>
             </div>
+            <ToastWrapper/>
             <GeneralFooter />
         </div>
     );

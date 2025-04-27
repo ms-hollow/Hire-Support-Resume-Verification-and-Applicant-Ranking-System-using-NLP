@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Image from 'next/image';
 import { useState, useEffect } from "react";
+import { toast } from 'react-toastify';
+import ToastWrapper from "./ToastWrapper";
 
 const ReviewApplication = ({showEditButtons = true}) => {
     
@@ -68,15 +70,16 @@ const ReviewApplication = ({showEditButtons = true}) => {
         });
 
         const result = await response.json();
-        alert(result.message);
+        toast.error(result.message);
     };
 
     const handleEdit = () => {
-        alert("Edit button clicked - implement your logic here.");
+        toast.success("Edit button clicked");
     };
 
     return ( 
         <div className="job-application-box rounded-xs px-8 py-5 mx-auto">
+            <ToastWrapper/>
             <section className=" pb-6">
                  <div className="flex flex-row justify-between items-center pt-3 mb-2">
                     <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium text-primary pb-1">Personal Information</p>

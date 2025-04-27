@@ -8,6 +8,8 @@ import PersonalInfo from '@/components/PersonalInfo';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
+import ToastWrapper from '@/components/ToastWrapper';
 
 //TODO
 
@@ -33,7 +35,7 @@ export default function ForgotPassword() {
     const getEmail = async (e) => {
         e.preventDefault(); // Prevent form submission and page reload
 
-        console.log('Email Address Submitted:', emailAddress);
+        toast.success('Email Address Submitted', emailAddress);
         // Validate email
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         
@@ -43,7 +45,7 @@ export default function ForgotPassword() {
         }
         
         if (!emailRegex.test(emailAddress)) {
-            console.log('Invalid email address. Please input a valid email address.');
+            toast.error('Invalid email address. Please input a valid email address.');
             return;
         }
         
@@ -59,10 +61,10 @@ export default function ForgotPassword() {
                 if (error.response.status === 404) {
                     console.log('Account Not Found.');
                 } else {
-                    console.log('An unexpected server error occurred. Please try again.');
+                    toast.error('An unexpected server error occurred. Please try again.');
                 }
             } else {
-                console.log('Network error. Please check your connection and try again.');
+                toast.error('Network error. Please check your connection and try again.');
             }
         }
          // Retrieve the CSRF token from cookies
@@ -88,9 +90,9 @@ export default function ForgotPassword() {
                     withCredentials: true,  // Make sure cookies are sent with the request
                 }
             );
-            console.log('Password reset request sent:', response.data);
+            toast.info('Password reset request sent:', response.data);
         } catch (error) {
-            console.error('Error during password reset:', error.response ? error.response.data : error.message);
+            toast.error('Error during password reset:', error.response ? error.response.data : error.message);
         }
     };
     
@@ -118,6 +120,7 @@ export default function ForgotPassword() {
     return (
         <div className='pb-20'>
             <GeneralHeader />
+            <ToastWrapper/>
             <div className="flex items-center justify-center lg:pt-36 mb:pt-24 xsm:pt-24 xxsm:pt-24 sm:pt-24 mb:p-8 sm:p-8 xsm:p-8 xxsm:p-4 py-8 mx-auto">
                     <div className="job-application-box rounded-xs px-8 py-5">     
                         {step === 1 && (

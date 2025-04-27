@@ -3,6 +3,8 @@ import Link from "next/link";
 import { useState, useContext, useEffect, useCallback } from "react";
 import AuthContext from "@/pages/context/AuthContext";
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
+import ToastWrapper from './ToastWrapper';
 
 const SkeletonLoader = () => {
     return (
@@ -182,13 +184,14 @@ const ApplicantDetailsWrapper = () => {
   };
 
   const handleSchedule = () => {
-    alert("Interview scheduled successfully!");
+    toast.success("Interview scheduled successfully!");
     handleCloseModal();
   };
 
   return (
     <div className="flex-1 h-[calc(100vh-150px)] border border-none rounded-lg">
       <ApplicantDetails  applicantId={selectedApplicantId}/>
+      <ToastWrapper/>
         <div className="flex flex-grow items-center lg:-mt-36 mb:-mt-16 ">
           <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 mr-2 font-medium">Hiring Decision: </p>
           <div className="flex h-medium rounded-xs border-2 border-fontcolor">

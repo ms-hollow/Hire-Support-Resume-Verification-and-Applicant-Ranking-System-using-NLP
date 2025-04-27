@@ -10,6 +10,8 @@ import {
 } from "../api/notificationApi";
 import { getApplicantProfile } from "../api/applicantApi";
 import DeleteConfirmationModal from "@/components/ui/DeleteConfirmationModal";
+import { toast } from 'react-toastify';
+import ToastWrapper from "@/components/ToastWrapper";
 
 export default function Notifications() {
     let { authTokens } = useContext(AuthContext);
@@ -82,7 +84,7 @@ export default function Notifications() {
             setSelectAll(false);
             setIsDeleteModalOpen(false);
         } catch (error) {
-            console.log("Failed to delete notifications:", error);
+            toast.error("Failed to delete notifications:", error);
         }
     };
 
@@ -118,6 +120,7 @@ export default function Notifications() {
         <div>
             <>
                 <ApplicantHeader />
+                <ToastWrapper/>
                 <div className="lg:pt-28 mb:pt-24 sm:pt-24 xsm:pt-24 xxsm:pt-24 lg:px-20 mb:px-10 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto pb-8">
                     <div className="text-lg text-primary">
                         <b>Notifications</b>

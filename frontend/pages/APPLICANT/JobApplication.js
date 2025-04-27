@@ -7,6 +7,8 @@ import AuthContext from '../context/AuthContext';
 import { useRouter } from 'next/router';
 import jwt from 'jsonwebtoken';
 import JobDetailsWrapper from "@/components/JobDetails";
+import { toast } from 'react-toastify';
+import ToastWrapper from "@/components/ToastWrapper";
 
 export default function JobApplication ({handleJobClick}) {
 
@@ -61,7 +63,7 @@ export default function JobApplication ({handleJobClick}) {
     };
 
     const handleEdit = () => {
-        alert("Edit button clicked - implement your logic here.");
+        toast.success("Edit button clicked");
     };
 
     const saveDraft = async () => {
@@ -211,6 +213,7 @@ export default function JobApplication ({handleJobClick}) {
     return ( 
         <div>
             <ApplicantHeader/>
+            <ToastWrapper/>
                 <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 xxsm:px-4 py-8 mx-auto">
                     <p className="font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">You are Applying for </p>
                     <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>

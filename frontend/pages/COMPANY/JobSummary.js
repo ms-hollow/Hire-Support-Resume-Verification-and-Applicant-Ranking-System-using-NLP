@@ -7,6 +7,9 @@ import Cookies from "js-cookie";
 import { createJob } from "../api/companyJobApi";
 import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
+import { toast } from 'react-toastify';
+import ToastWrapper from "@/components/ToastWrapper";
+
 
 export default function JobSummary() {
     const [SerializedData, setSerializedData] = useState(null);
@@ -140,19 +143,22 @@ export default function JobSummary() {
         const response = await createJob(formData, authTokens.access);
 
         if (response) {
-            alert("Job created successfully.");
+            toast.success("Job created successfully.");
         } else {
-            alert("Failed to create job.");
+            toast.error("Failed to create job.");
         }
 
         Cookies.remove("DRAFT_DATA");
         Cookies.remove("SERIALIZED_DATA");
-        router.push("/COMPANY/CompanyHome");
+        setTimeout(() => {
+            router.push("/COMPANY/CompanyHome");
+        }, 3000); 
     };
 
     return (
         <div>
             <CompanyHeader />
+            <ToastWrapper/> 
             <div className="lg:pt-28 mb:pt-24 sm:pt-24 xsm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 xxsm:px-4 mx-auto cursor-default">
                 <h1 className="lg:text-xl mb:text-xl sm:text-large text-primary">
                     {" "}
@@ -661,7 +667,7 @@ export default function JobSummary() {
                                     </div>
                                 </div>
                             </div>
-                        </div>   
+                        </div>
                     </form>
                     <div className="flex justify-between">
                         <button
@@ -708,8 +714,9 @@ export default function JobSummary() {
                             </button>
                         </div>
                     </div>
-                </div>
-            </div>
+                  
+                </div>    
+            </div>   
             <GeneralFooter />
         </div>
     );
