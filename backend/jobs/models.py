@@ -226,4 +226,3 @@ class RecentSearch(models.Model):
             "salary": self.salary,
             "experience_level": self.experience_level,
         }
-
