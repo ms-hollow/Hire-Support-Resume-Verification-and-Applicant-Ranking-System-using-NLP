@@ -71,11 +71,7 @@ def create_job_hiring(request):
 
     if serializer.is_valid():
         # Save the JobHiring instance
-        job_hiring = serializer.save(company=request.user.company)
-
-        # Generate the JSON file for hire_support.py in the proper location
-        job_hiring_json_path = create_job_hiring_json(job_hiring)
-
+        serializer.save(company=request.user.company)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
