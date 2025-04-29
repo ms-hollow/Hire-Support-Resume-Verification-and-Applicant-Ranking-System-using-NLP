@@ -224,11 +224,12 @@ def verify_resume(application: Dict, extracted_texts: Dict[str, List[str]],
     Returns dictionary containing verified lists for each category.
     """
     # Verify name in resume
-    first_name = application.get('first_name', '').strip()
-    last_name = application.get('last_name', '').strip()
 
-    if not first_name or not last_name:
-        raise ValueError("First name and last name are required in application")
+    first_name = application.get('first_name', '') or ''  # Use empty string if None
+    last_name = application.get('last_name', '') or ''    # Use empty string if None
+
+    first_name = first_name.strip()
+    last_name = last_name.strip()
 
     # Join all resume texts and clean them
     resume_text = ''.join(extracted_texts.get('resume', [''])).strip()
