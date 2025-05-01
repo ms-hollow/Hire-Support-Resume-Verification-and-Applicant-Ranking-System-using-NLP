@@ -24,7 +24,9 @@ export default function CompanySettings() {
     const router = useRouter();
     const [formData, setFormData] = useState(initialFormData);
 
-    const getFilteredOptions = (currentCategory, currentField) => {
+    const getFilteredOptions = (currentCategory, currentField, term = "") => {
+        const search = term.toLowerCase();
+    
         const allSelectedOptions = new Set([
             ...formData.criteria.workExperience.directlyRelevant,
             ...formData.criteria.workExperience.highlyRelevant,
@@ -32,27 +34,19 @@ export default function CompanySettings() {
             ...formData.criteria.skills.primarySkills,
             ...formData.criteria.skills.secondarySkills,
             ...formData.criteria.skills.additionalSkills,
-            ...(formData.criteria.education.firstChoice
-                ? [formData.criteria.education.firstChoice]
-                : []),
-            ...(formData.criteria.education.secondChoice
-                ? [formData.criteria.education.secondChoice]
-                : []),
-            ...(formData.criteria.education.thirdChoice
-                ? [formData.criteria.education.thirdChoice]
-                : []),
+            ...(formData.criteria.education.firstChoice ? [formData.criteria.education.firstChoice] : []),
+            ...(formData.criteria.education.secondChoice ? [formData.criteria.education.secondChoice] : []),
+            ...(formData.criteria.education.thirdChoice ? [formData.criteria.education.thirdChoice] : []),
             ...formData.criteria.schools.schoolPreference,
             ...formData.criteria.certificates.preferred,
         ]);
-
-        return options[currentCategory].filter((option) => {
-            return (
+    
+        return options[currentCategory]
+            .filter((option) => option.toLowerCase().includes(search))
+            .filter((option) => 
                 !allSelectedOptions.has(option) ||
-                formData.criteria[currentCategory][currentField]?.includes(
-                    option
-                )
+                formData.criteria[currentCategory][currentField]?.includes(option)
             );
-        });
     };
 
     useFormData(setFormData);
@@ -137,7 +131,12 @@ export default function CompanySettings() {
     
         handleMultiSelectChange(category, field, customOption);
     
-        setSearchTerm((prev) => ({ ...prev, [field]: "" })); 
+        setSearchTerm(prev => {
+            const updated = { ...prev };
+            updated[field] = "";
+            return updated;
+        });
+        
     };
     
     const handleRemoveSelectedOption = (category, field, option) => {
@@ -453,38 +452,27 @@ export default function CompanySettings() {
                                                             }
                                                             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
                                                             onKeyDown={(e) => {
-                                                                if (
-                                                                    e.key ===
-                                                                    "Enter"
-                                                                ) {
-                                                                    handleAddCustomOption(
-                                                                        "workExperience",
-                                                                        "directlyRelevant",
-                                                                        e.target
-                                                                            .value
-                                                                    );
+                                                                if (e.key === "Enter") {
+                                                                    e.preventDefault();
+                                                                    const input = e.target.value.trim();
+                                                                    const lowerInput = input.toLowerCase();
+                                                                    const existingOptions = options.workExperience.map(opt => opt.toLowerCase());
+                                                            
+                                                                    if (!existingOptions.includes(lowerInput) && input !== "") {
+                                                                        handleAddCustomOption("workExperience", "directlyRelevant", input);
+                                                                    }
                                                                 }
-                                                            }}
+                                                            }} 
                                                         />
                                                         {searchTerm.directly &&
-                                                            !options.workExperience.includes(
-                                                                searchTerm.directly
-                                                            ) && (
+                                                            getFilteredOptions("workExperience", "directlyRelevant", searchTerm.directly).length === 0 && (
                                                                 <button
                                                                     className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
                                                                     onClick={() =>
-                                                                        handleAddCustomOption(
-                                                                            "workExperience",
-                                                                            "directlyRelevant",
-                                                                            searchTerm.directly
-                                                                        )
+                                                                        handleAddCustomOption("workExperience", "directlyRelevant", searchTerm.directly)
                                                                     }
                                                                 >
-                                                                    Add "
-                                                                    {
-                                                                        searchTerm.directly
-                                                                    }
-                                                                    "
+                                                                    Add "{searchTerm.directly}"
                                                                 </button>
                                                             )}
                                                     </div>
@@ -492,7 +480,8 @@ export default function CompanySettings() {
                                                     {/* Available Options List */}
                                                     {getFilteredOptions(
                                                         "workExperience",
-                                                        "directlyRelevant"
+                                                        "directlyRelevant", 
+                                                        searchTerm.directly
                                                     ).map((option, index) => (
                                                         <label
                                                             key={index}
@@ -606,45 +595,34 @@ export default function CompanySettings() {
                                                             onChange={(e) =>
                                                                 setSearchTerm({
                                                                     ...searchTerm,
-                                                                    highly: e
-                                                                        .target
-                                                                        .value,
+                                                                    highly:
+                                                                        e.target
+                                                                            .value,
                                                                 })
                                                             }
                                                             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
                                                             onKeyDown={(e) => {
-                                                                if (
-                                                                    e.key ===
-                                                                    "Enter"
-                                                                ) {
-                                                                    handleAddCustomOption(
-                                                                        "workExperience",
-                                                                        "highlyRelevant",
-                                                                        e.target
-                                                                            .value
-                                                                    );
+                                                                if (e.key === "Enter") {
+                                                                    e.preventDefault();
+                                                                    const input = e.target.value.trim();
+                                                                    const lowerInput = input.toLowerCase();
+                                                                    const existingOptions = options.workExperience.map(opt => opt.toLowerCase());
+                                                            
+                                                                    if (!existingOptions.includes(lowerInput) && input !== "") {
+                                                                        handleAddCustomOption("workExperience", "highlyRelevant", input);
+                                                                    }
                                                                 }
-                                                            }}
+                                                            }} 
                                                         />
-                                                        {searchTerm.highly &&
-                                                            !options.workExperience.includes(
-                                                                searchTerm.highly
-                                                            ) && (
+                                                        {searchTerm.directly &&
+                                                            getFilteredOptions("workExperience", "highlyRelevant", searchTerm.highly).length === 0 && (
                                                                 <button
                                                                     className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
                                                                     onClick={() =>
-                                                                        handleAddCustomOption(
-                                                                            "workExperience",
-                                                                            "highlyRelevant",
-                                                                            searchTerm.highly
-                                                                        )
+                                                                        handleAddCustomOption("workExperience", "highlyRelevant", searchTerm.highly)
                                                                     }
                                                                 >
-                                                                    Add "
-                                                                    {
-                                                                        searchTerm.highly
-                                                                    }
-                                                                    "
+                                                                    Add "{searchTerm.highly}"
                                                                 </button>
                                                             )}
                                                     </div>
@@ -652,7 +630,8 @@ export default function CompanySettings() {
                                                     {/* Available Options List */}
                                                     {getFilteredOptions(
                                                         "workExperience",
-                                                        "highlyRelevant"
+                                                        "highlyRelevant",
+                                                        searchTerm.highly
                                                     ).map((option, index) => (
                                                         <label
                                                             key={index}
@@ -758,7 +737,7 @@ export default function CompanySettings() {
                                                 <div className="top-full mt-1 w-full border border-gray-300 rounded-lg bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
                                                     {/* Search & Add Custom Option */}
                                                     <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                                                        <input
+                                                    <input
                                                             type="text"
                                                             placeholder="Search or add a new option..."
                                                             value={
@@ -775,38 +754,27 @@ export default function CompanySettings() {
                                                             }
                                                             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
                                                             onKeyDown={(e) => {
-                                                                if (
-                                                                    e.key ===
-                                                                    "Enter"
-                                                                ) {
-                                                                    handleAddCustomOption(
-                                                                        "workExperience",
-                                                                        "moderatelyRelevant",
-                                                                        e.target
-                                                                            .value
-                                                                    );
+                                                                if (e.key === "Enter") {
+                                                                    e.preventDefault();
+                                                                    const input = e.target.value.trim();
+                                                                    const lowerInput = input.toLowerCase();
+                                                                    const existingOptions = options.workExperience.map(opt => opt.toLowerCase());
+                                                            
+                                                                    if (!existingOptions.includes(lowerInput) && input !== "") {
+                                                                        handleAddCustomOption("workExperience", "moderatelyRelevant", input);
+                                                                    }
                                                                 }
-                                                            }}
+                                                            }} 
                                                         />
                                                         {searchTerm.moderately &&
-                                                            !options.workExperience.includes(
-                                                                searchTerm.moderately
-                                                            ) && (
+                                                            getFilteredOptions("workExperience", "moderatelyRelevant", searchTerm.moderately).length === 0 && (
                                                                 <button
                                                                     className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
                                                                     onClick={() =>
-                                                                        handleAddCustomOption(
-                                                                            "workExperience",
-                                                                            "moderatelyRelevant",
-                                                                            searchTerm.moderately
-                                                                        )
+                                                                        handleAddCustomOption("workExperience", "moderatelyRelevant", searchTerm.moderately)
                                                                     }
                                                                 >
-                                                                    Add "
-                                                                    {
-                                                                        searchTerm.moderately
-                                                                    }
-                                                                    "
+                                                                    Add "{searchTerm.moderately}"
                                                                 </button>
                                                             )}
                                                     </div>
@@ -814,7 +782,8 @@ export default function CompanySettings() {
                                                     {/* Available Options List */}
                                                     {getFilteredOptions(
                                                         "workExperience",
-                                                        "moderatelyRelevant"
+                                                        "moderatelyRelevant",
+                                                        searchTerm.moderately
                                                     ).map((option, index) => (
                                                         <label
                                                             key={index}
@@ -989,61 +958,45 @@ export default function CompanySettings() {
                                                                     ""
                                                                 }
                                                                 onChange={(e) =>
-                                                                    setSearchTerm(
-                                                                        {
-                                                                            ...searchTerm,
-                                                                            primary:
-                                                                                e
-                                                                                    .target
-                                                                                    .value,
-                                                                        }
-                                                                    )
+                                                                    setSearchTerm({
+                                                                        ...searchTerm,
+                                                                        primary:
+                                                                            e.target
+                                                                                .value,
+                                                                    })
                                                                 }
                                                                 className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                                                                onKeyDown={(
-                                                                    e
-                                                                ) => {
-                                                                    if (
-                                                                        e.key ===
-                                                                        "Enter"
-                                                                    ) {
-                                                                        handleAddCustomOption(
-                                                                            "skills",
-                                                                            "primarySkills",
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        );
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === "Enter") {
+                                                                        e.preventDefault();
+                                                                        const input = e.target.value.trim();
+                                                                        const lowerInput = input.toLowerCase();
+                                                                        const existingOptions = options.skills.map(opt => opt.toLowerCase());
+                                                                
+                                                                        if (!existingOptions.includes(lowerInput) && input !== "") {
+                                                                            handleAddCustomOption("skills", "primarySkills", input);
+                                                                        }
                                                                     }
-                                                                }}
+                                                                }} 
                                                             />
                                                             {searchTerm.primary &&
-                                                                !options.skills.includes(
-                                                                    searchTerm.primary
-                                                                ) && (
-                                                                    <button
-                                                                        className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
-                                                                        onClick={() =>
-                                                                            handleAddCustomOption(
-                                                                                "skills",
-                                                                                "primarySkills",
-                                                                                searchTerm.primary
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        Add "
-                                                                        {
-                                                                            searchTerm.primary
-                                                                        }
-                                                                        "
-                                                                    </button>
-                                                                )}
+                                                            getFilteredOptions("skills", "primarySkills", searchTerm.primary).length === 0 && (
+                                                                <button
+                                                                    className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
+                                                                    onClick={() =>
+                                                                        handleAddCustomOption("skills", "primarySkills", searchTerm.primary)
+                                                                    }
+                                                                >
+                                                                    Add "{searchTerm.primary}"
+                                                                </button>
+                                                            )}
                                                         </div>
 
                                                         {/* Available Options List */}
                                                         {getFilteredOptions(
                                                             "skills",
-                                                            "primarySkills"
+                                                            "primarySkills",
+                                                            searchTerm.primary
                                                         ).map(
                                                             (option, index) => (
                                                                 <label
@@ -1165,61 +1118,45 @@ export default function CompanySettings() {
                                                                     ""
                                                                 }
                                                                 onChange={(e) =>
-                                                                    setSearchTerm(
-                                                                        {
-                                                                            ...searchTerm,
-                                                                            secondary:
-                                                                                e
-                                                                                    .target
-                                                                                    .value,
-                                                                        }
-                                                                    )
+                                                                    setSearchTerm({
+                                                                        ...searchTerm,
+                                                                        secondary:
+                                                                            e.target
+                                                                                .value,
+                                                                    })
                                                                 }
                                                                 className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                                                                onKeyDown={(
-                                                                    e
-                                                                ) => {
-                                                                    if (
-                                                                        e.key ===
-                                                                        "Enter"
-                                                                    ) {
-                                                                        handleAddCustomOption(
-                                                                            "skills",
-                                                                            "secondarySkills",
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        );
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === "Enter") {
+                                                                        e.preventDefault();
+                                                                        const input = e.target.value.trim();
+                                                                        const lowerInput = input.toLowerCase();
+                                                                        const existingOptions = options.skills.map(opt => opt.toLowerCase());
+                                                                
+                                                                        if (!existingOptions.includes(lowerInput) && input !== "") {
+                                                                            handleAddCustomOption("skills", "secondarySkills", input);
+                                                                        }
                                                                     }
-                                                                }}
+                                                                }} 
                                                             />
                                                             {searchTerm.secondary &&
-                                                                !options.skills.includes(
-                                                                    searchTerm.secondary
-                                                                ) && (
-                                                                    <button
-                                                                        className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
-                                                                        onClick={() =>
-                                                                            handleAddCustomOption(
-                                                                                "skills",
-                                                                                "secondarySkills",
-                                                                                searchTerm.secondary
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        Add "
-                                                                        {
-                                                                            searchTerm.secondary
-                                                                        }
-                                                                        "
-                                                                    </button>
-                                                                )}
+                                                            getFilteredOptions("skills", "secondarySkills", searchTerm.secondary).length === 0 && (
+                                                                <button
+                                                                    className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
+                                                                    onClick={() =>
+                                                                        handleAddCustomOption("skills", "secondarySkills", searchTerm.secondary)
+                                                                    }
+                                                                >
+                                                                    Add "{searchTerm.secondary}"
+                                                                </button>
+                                                            )}
                                                         </div>
 
                                                         {/* Available Options List */}
                                                         {getFilteredOptions(
                                                             "skills",
-                                                            "secondarySkills"
+                                                            "secondarySkills",
+                                                            searchTerm.secondary
                                                         ).map(
                                                             (option, index) => (
                                                                 <label
@@ -1342,61 +1279,45 @@ export default function CompanySettings() {
                                                                     ""
                                                                 }
                                                                 onChange={(e) =>
-                                                                    setSearchTerm(
-                                                                        {
-                                                                            ...searchTerm,
-                                                                            additional:
-                                                                                e
-                                                                                    .target
-                                                                                    .value,
-                                                                        }
-                                                                    )
+                                                                    setSearchTerm({
+                                                                        ...searchTerm,
+                                                                        additional:
+                                                                            e.target
+                                                                                .value,
+                                                                    })
                                                                 }
                                                                 className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                                                                onKeyDown={(
-                                                                    e
-                                                                ) => {
-                                                                    if (
-                                                                        e.key ===
-                                                                        "Enter"
-                                                                    ) {
-                                                                        handleAddCustomOption(
-                                                                            "skills",
-                                                                            "additionalSkills",
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        );
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === "Enter") {
+                                                                        e.preventDefault();
+                                                                        const input = e.target.value.trim();
+                                                                        const lowerInput = input.toLowerCase();
+                                                                        const existingOptions = options.skills.map(opt => opt.toLowerCase());
+                                                                
+                                                                        if (!existingOptions.includes(lowerInput) && input !== "") {
+                                                                            handleAddCustomOption("skills", "additionalSkills", input);
+                                                                        }
                                                                     }
-                                                                }}
+                                                                }} 
                                                             />
                                                             {searchTerm.additional &&
-                                                                !options.skills.includes(
-                                                                    searchTerm.additional
-                                                                ) && (
-                                                                    <button
-                                                                        className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
-                                                                        onClick={() =>
-                                                                            handleAddCustomOption(
-                                                                                "skills",
-                                                                                "additionalSkills",
-                                                                                searchTerm.additional
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        Add "
-                                                                        {
-                                                                            searchTerm.additional
-                                                                        }
-                                                                        "
-                                                                    </button>
-                                                                )}
+                                                            getFilteredOptions("skills", "additionalSkills", searchTerm.additional).length === 0 && (
+                                                                <button
+                                                                    className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
+                                                                    onClick={() =>
+                                                                        handleAddCustomOption("skills", "additionalSkills", searchTerm.additional)
+                                                                    }
+                                                                >
+                                                                    Add "{searchTerm.additional}"
+                                                                </button>
+                                                            )}
                                                         </div>
 
                                                         {/* Available Options List */}
                                                         {getFilteredOptions(
                                                             "skills",
-                                                            "additionalSkills"
+                                                            "additionalSkills",
+                                                            searchTerm.additional
                                                         ).map(
                                                             (option, index) => (
                                                                 <label
@@ -1522,29 +1443,50 @@ export default function CompanySettings() {
                                                         <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
                                                             <input
                                                                 type="text"
-                                                                placeholder="Search options..."
+                                                                placeholder="Search or add a new option..."
                                                                 value={
                                                                     searchTerm.firstChoice ||
                                                                     ""
                                                                 }
                                                                 onChange={(e) =>
-                                                                    setSearchTerm(
-                                                                        {
-                                                                            ...searchTerm,
-                                                                            firstChoice:
-                                                                                e
-                                                                                    .target
-                                                                                    .value,
-                                                                        }
-                                                                    )
+                                                                    setSearchTerm({
+                                                                        ...searchTerm,
+                                                                        firstChoice:
+                                                                            e.target
+                                                                                .value,
+                                                                    })
                                                                 }
                                                                 className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === "Enter") {
+                                                                        e.preventDefault();
+                                                                        const input = e.target.value.trim();
+                                                                        const lowerInput = input.toLowerCase();
+                                                                        const existingOptions = options.education.map(opt => opt.toLowerCase());
+                                                                
+                                                                        if (!existingOptions.includes(lowerInput) && input !== "") {
+                                                                            handleAddCustomOption("education", "firstChoice", input);
+                                                                        }
+                                                                    }
+                                                                }} 
                                                             />
+                                                            {searchTerm.firstChoice &&
+                                                            getFilteredOptions("education", "firstChoice", searchTerm.firstChoice).length === 0 && (
+                                                                <button
+                                                                    className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
+                                                                    onClick={() =>
+                                                                        handleAddCustomOption("education", "firstChoice", searchTerm.firstChoice)
+                                                                    }
+                                                                >
+                                                                    Add "{searchTerm.firstChoice}"
+                                                                </button>
+                                                            )}
                                                         </div>
 
                                                         {getFilteredOptions(
                                                             "education",
-                                                            "firstChoice"
+                                                            "firstChoice",
+                                                            searchTerm.firstChoice
                                                         ).map(
                                                             (option, index) => (
                                                                 <label
@@ -1623,29 +1565,50 @@ export default function CompanySettings() {
                                                         <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
                                                             <input
                                                                 type="text"
-                                                                placeholder="Search options..."
+                                                                placeholder="Search or add a new option..."
                                                                 value={
                                                                     searchTerm.secondChoice ||
                                                                     ""
                                                                 }
                                                                 onChange={(e) =>
-                                                                    setSearchTerm(
-                                                                        {
-                                                                            ...searchTerm,
-                                                                            secondChoice:
-                                                                                e
-                                                                                    .target
-                                                                                    .value,
-                                                                        }
-                                                                    )
+                                                                    setSearchTerm({
+                                                                        ...searchTerm,
+                                                                        secondChoice:
+                                                                            e.target
+                                                                                .value,
+                                                                    })
                                                                 }
                                                                 className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === "Enter") {
+                                                                        e.preventDefault();
+                                                                        const input = e.target.value.trim();
+                                                                        const lowerInput = input.toLowerCase();
+                                                                        const existingOptions = options.education.map(opt => opt.toLowerCase());
+                                                                
+                                                                        if (!existingOptions.includes(lowerInput) && input !== "") {
+                                                                            handleAddCustomOption("education", "secondChoice", input);
+                                                                        }
+                                                                    }
+                                                                }} 
                                                             />
+                                                            {searchTerm.secondChoice &&
+                                                            getFilteredOptions("education", "secondChoice", searchTerm.secondChoice).length === 0 && (
+                                                                <button
+                                                                    className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
+                                                                    onClick={() =>
+                                                                        handleAddCustomOption("education", "secondChoice", searchTerm.secondChoice)
+                                                                    }
+                                                                >
+                                                                    Add "{searchTerm.secondChoice}"
+                                                                </button>
+                                                            )}
                                                         </div>
 
                                                         {getFilteredOptions(
                                                             "education",
-                                                            "secondChoice"
+                                                            "secondChoice",
+                                                            searchTerm.secondChoice 
                                                         ).map(
                                                             (option, index) => (
                                                                 <label
@@ -1724,29 +1687,50 @@ export default function CompanySettings() {
                                                         <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
                                                             <input
                                                                 type="text"
-                                                                placeholder="Search options..."
+                                                                placeholder="Search or add a new option..."
                                                                 value={
                                                                     searchTerm.thirdChoice ||
                                                                     ""
                                                                 }
                                                                 onChange={(e) =>
-                                                                    setSearchTerm(
-                                                                        {
-                                                                            ...searchTerm,
-                                                                            thirdChoice:
-                                                                                e
-                                                                                    .target
-                                                                                    .value,
-                                                                        }
-                                                                    )
+                                                                    setSearchTerm({
+                                                                        ...searchTerm,
+                                                                        thirdChoice:
+                                                                            e.target
+                                                                                .value,
+                                                                    })
                                                                 }
                                                                 className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === "Enter") {
+                                                                        e.preventDefault();
+                                                                        const input = e.target.value.trim();
+                                                                        const lowerInput = input.toLowerCase();
+                                                                        const existingOptions = options.education.map(opt => opt.toLowerCase());
+                                                                
+                                                                        if (!existingOptions.includes(lowerInput) && input !== "") {
+                                                                            handleAddCustomOption("education", "thirdChoice", input);
+                                                                        }
+                                                                    }
+                                                                }} 
                                                             />
+                                                            {searchTerm.thirdChoice &&
+                                                            getFilteredOptions("education", "thirdChoice", searchTerm.thirdChoice).length === 0 && (
+                                                                <button
+                                                                    className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
+                                                                    onClick={() =>
+                                                                        handleAddCustomOption("education", "thirdChoice", searchTerm.thirdChoice)
+                                                                    }
+                                                                >
+                                                                    Add "{searchTerm.thirdChoice}"
+                                                                </button>
+                                                            )}
                                                         </div>
 
                                                         {getFilteredOptions(
                                                             "education",
-                                                            "secondChoice"
+                                                            "secondChoice",
+                                                            searchTerm.thirdChoice
                                                         ).map(
                                                             (option, index) => (
                                                                 <label
@@ -1870,53 +1854,43 @@ export default function CompanySettings() {
                                                             onChange={(e) =>
                                                                 setSearchTerm({
                                                                     ...searchTerm,
-                                                                    school: e
-                                                                        .target
-                                                                        .value,
+                                                                    school:
+                                                                        e.target
+                                                                            .value,
                                                                 })
                                                             }
                                                             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
                                                             onKeyDown={(e) => {
-                                                                if (
-                                                                    e.key ===
-                                                                    "Enter"
-                                                                ) {
-                                                                    handleAddCustomOption(
-                                                                        "schools",
-                                                                        "schoolPreference",
-                                                                        e.target
-                                                                            .value
-                                                                    );
+                                                                if (e.key === "Enter") {
+                                                                    e.preventDefault();
+                                                                    const input = e.target.value.trim();
+                                                                    const lowerInput = input.toLowerCase();
+                                                                    const existingOptions = options.schools.map(opt => opt.toLowerCase());
+                                                            
+                                                                    if (!existingOptions.includes(lowerInput) && input !== "") {
+                                                                        handleAddCustomOption("schools", "schoolPreference", input);
+                                                                    }
                                                                 }
-                                                            }}
+                                                            }} 
                                                         />
                                                         {searchTerm.school &&
-                                                            !options.schools.includes(
-                                                                searchTerm.school
-                                                            ) && (
-                                                                <button
-                                                                    className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
-                                                                    onClick={() =>
-                                                                        handleAddCustomOption(
-                                                                            "schools",
-                                                                            "schoolPreference",
-                                                                            searchTerm.school
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    Add "
-                                                                    {
-                                                                        searchTerm.school
-                                                                    }
-                                                                    "
-                                                                </button>
-                                                            )}
+                                                        getFilteredOptions("schools", "schoolPreference", searchTerm.school).length === 0 && (
+                                                            <button
+                                                                className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
+                                                                onClick={() =>
+                                                                    handleAddCustomOption("schools", "schoolPreference", searchTerm.school)
+                                                                }
+                                                            >
+                                                                Add "{searchTerm.school}"
+                                                            </button>
+                                                        )}
                                                     </div>
 
                                                     {/* Available Options List */}
                                                     {getFilteredOptions(
                                                         "schools",
-                                                        "schoolPreference"
+                                                        "schoolPreference",
+                                                        searchTerm.school
                                                     ).map((option, index) => (
                                                         <label
                                                             key={index}
@@ -2057,6 +2031,7 @@ export default function CompanySettings() {
                                         </div>
                                     </div>
 
+                                     {/* School Preference */}
                                     <div className="mb-4">
                                         <div>
                                             <label className="block text-sm font-semibold text-fontcolor mb-1">
@@ -2143,38 +2118,27 @@ export default function CompanySettings() {
                                                             }
                                                             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
                                                             onKeyDown={(e) => {
-                                                                if (
-                                                                    e.key ===
-                                                                    "Enter"
-                                                                ) {
-                                                                    handleAddCustomOption(
-                                                                        "certificates",
-                                                                        "preferred",
-                                                                        e.target
-                                                                            .value
-                                                                    );
+                                                                if (e.key === "Enter") {
+                                                                    e.preventDefault();
+                                                                    const input = e.target.value.trim();
+                                                                    const lowerInput = input.toLowerCase();
+                                                                    const existingOptions = options.certificates.map(opt => opt.toLowerCase());
+                                                            
+                                                                    if (!existingOptions.includes(lowerInput) && input !== "") {
+                                                                        handleAddCustomOption("certificates", "preferred", input);
+                                                                    }
                                                                 }
-                                                            }}
+                                                            }} 
                                                         />
-                                                        {searchTerm.certicatePrefered &&
-                                                            !options.certificates.includes(
-                                                                searchTerm.certicatePrefered
-                                                            ) && (
+                                                        {searchTerm.firstChoice &&
+                                                            getFilteredOptions("certificates", "preferred", searchTerm.certicatePrefered).length === 0 && (
                                                                 <button
                                                                     className="mt-2 w-full text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-2 rounded-md"
                                                                     onClick={() =>
-                                                                        handleAddCustomOption(
-                                                                            "certificates",
-                                                                            "preferred",
-                                                                            searchTerm.certicatePrefered
-                                                                        )
+                                                                        handleAddCustomOption("certificates", "preferred", searchTerm.certicatePrefered)
                                                                     }
                                                                 >
-                                                                    Add "
-                                                                    {
-                                                                        searchTerm.certicatePrefered
-                                                                    }
-                                                                    "
+                                                                    Add "{searchTerm.certicatePrefered}"
                                                                 </button>
                                                             )}
                                                     </div>
@@ -2182,7 +2146,8 @@ export default function CompanySettings() {
                                                     {/* Available Options List */}
                                                     {getFilteredOptions(
                                                         "certificates",
-                                                        "preferred"
+                                                        "preferred",
+                                                        searchTerm.certicatePrefered
                                                     ).map((option, index) => (
                                                         <label
                                                             key={index}
