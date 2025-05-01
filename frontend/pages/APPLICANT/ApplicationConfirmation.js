@@ -42,7 +42,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
 
     return (
         <div>
-            <ApplicantHeader />
+            <ApplicantHeader/>
             <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto">
                 <p className="font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall   text-fontcolor pb-1">
                     You are Applying for{" "}
@@ -78,7 +78,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                         </div>
                     )}
                 </div>
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center pb-8">
                     <div className="job-application-box rounded-xs px-8 py-5 mx-auto">
                         <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium text-primary">
                             Please review your application
@@ -93,7 +93,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                             </div>
                         </div>
 
-                        <p className="font-medium lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-fontcolor">
+                        <p className="font-medium lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
                             Please review that all the information and documents
                             are correct
                         </p>
@@ -111,7 +111,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                                     checked={isChecked}
                                     onChange={handleCheckboxChange}
                                 />
-                                <span className="text-fontcolor lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall">
+                                <span className="text-fontcolor text-justify lg:text-xxsmall mb:text-xxsmall sm:text-xxsmall xsm:text-xxsmall">
                                     Lorem ipsum dolor sit amet, consectetur
                                     adipiscing elit. Amet tincidunt et turpis
                                     habitasse ultrices condimentum velit.

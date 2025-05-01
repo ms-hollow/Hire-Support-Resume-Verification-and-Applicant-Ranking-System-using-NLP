@@ -76,7 +76,7 @@ const ReviewApplication = ({showEditButtons = true}) => {
     };
 
     return ( 
-        <div className="job-application-box rounded-xs px-8 py-5 mx-auto">
+        <div>
             <section className=" pb-6">
                  <div className="flex flex-row justify-between items-center pt-3 mb-2">
                     <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium text-primary pb-1">Personal Information</p>
