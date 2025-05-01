@@ -200,48 +200,75 @@ export const getAllJobApplications = async (authToken) => {
 
 export const submitJobApplication = async (authToken, applicationData, documentFiles, documentTypes) => {
     if (!authToken) {
-      console.error("No access token available.");
-      return null;
+        console.error("No access token available.");
+        return { success: false, error: "No authentication token available" };
     }
   
     try {
-      // Create FormData object for file upload
-      const formData = new FormData();
+        // Debug authentication token
+        console.log("Using auth token (first 10 chars):", authToken.substring(0, 10) + "...");
+        
+        // Create FormData object for file upload
+        const formData = new FormData();
+        
+        // Add application data
+        Object.keys(applicationData).forEach(key => {
+            formData.append(key, applicationData[key]);
+        });
       
-      // Add application data
-      Object.keys(applicationData).forEach(key => {
-        formData.append(key, applicationData[key]);
-      });
+        // Add document types and files
+        documentFiles.forEach((file, index) => {
+            if (index < documentTypes.length) {
+                formData.append('document_type', documentTypes[index]);
+                formData.append('document_file', file);
+            }
+        });
+
+        // Debugging - log the form data contents
+        console.log("--- Form Data Content ---");
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + (pair[1] instanceof File ? pair[1].name : pair[1]));
+        }
+        console.log("-----------------------");
       
-      // Add document types
-      documentTypes.forEach(type => {
-        formData.append('document_type', type);
-      });
+        const response = await fetch("http://127.0.0.1:8000/job/applications/create", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${authToken}`,
+                // Don't set Content-Type when using FormData, browser will set it with boundary
+            },
+            body: formData,
+            credentials: 'include' // Include cookies if needed
+        });
+
+        // Check if the server returns JSON or something else
+        const contentType = response.headers.get("content-type");
+        console.log("Response status:", response.status);
+        console.log("Response content-type:", contentType);
       
-      // Add document files
-      documentFiles.forEach(file => {
-        formData.append('document_file', file);
-      });
-      
-      const response = await fetch("http://127.0.0.1:8000/job/applications/create/", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          // Don't set Content-Type when using FormData, browser will set it with boundary
-        },
-        body: formData
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Failed to submit application:", errorData);
-        return { success: false, error: errorData };
-      }
-      
-      const responseData = await response.json();
-      return { success: true, data: responseData };
+        if (!response.ok) {
+            if (contentType && contentType.includes("application/json")) {
+                const errorData = await response.json();
+                console.error("Failed to submit application:", errorData);
+                return { success: false, error: JSON.stringify(errorData) };
+            } else {
+                const textError = await response.text();
+                console.error("Server returned non-JSON error:", textError);
+                return { success: false, error: "Server error: " + response.status + " - " + textError.substring(0, 200) };
+            }
+        }
+          
+        if (contentType && contentType.includes("application/json")) {
+            const responseData = await response.json();
+            console.log("Successful response data:", responseData);
+            return { success: true, data: responseData };
+        } else {
+            const textResponse = await response.text();
+            console.log("Successful non-JSON response:", textResponse.substring(0, 100));
+            return { success: true, data: "Application submitted successfully" };
+        }
     } catch (error) {
-      console.error("Error submitting job application:", error);
-      return { success: false, error: error.message };
+        console.error("Error submitting job application:", error);
+        return { success: false, error: error.message };
     }
 };
