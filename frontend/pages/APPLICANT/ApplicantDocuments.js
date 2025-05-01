@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { FaChevronDown } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import JobDetailsWrapper from "@/components/JobDetails";
+import { saveSectionData, getSectionData } from "../utils/jobApplicationStates";
 
 //TODO TODO TODO TODO
 
@@ -43,12 +44,19 @@ export default function ApplicantDocument({ handleJobClick }) {
 
     const [formData, setFormData] = useState({
         resume: { file: "", option: "upload" },
-        educationaldocs: { file: "", option: "upload" },
+        educationalDocuments: { file: "", option: "upload" },
         workcertificate: { file: "", option: "upload" },
         seminarCertificate: { file: "", option: "upload" },
         additionalDocuments: { file: "", option: "upload" },
-        additionalDocs: { files: [] }, // Keep additional documents as an array
     });
+
+    // Load any saved document data when component mounts
+    useEffect(() => {
+        const savedDocuments = getSectionData('documents');
+        if (savedDocuments) {
+            setFormData(prev => ({ ...prev, ...savedDocuments }));
+        }
+    }, []);
 
     const goBack = () => {
         router.push({
@@ -80,14 +88,6 @@ export default function ApplicantDocument({ handleJobClick }) {
         }));
     };
 
-    const handleSubmit = async (e) => {
-        if (e) e.preventDefault();
-        router.push({
-            pathname: "/APPLICANT/ApplicationConfirmation",
-            query: { id, jobHiringTitle, companyName },
-        });
-    };
-
     const addAdditionalFile = (category) => {
         setFormData((prevState) => {
             const updatedFiles = [...(prevState[category]?.files || [])];
@@ -103,7 +103,7 @@ export default function ApplicantDocument({ handleJobClick }) {
     };
 
     // Remove additional file input for a specific category
-    const removeAdditionalFile = (category, index) => {
+    const removeFile = (category, index) => {
         setFormData((prevState) => {
             const updatedFiles = (prevState[category]?.files || []).filter(
                 (_, i) => i !== index
@@ -117,8 +117,9 @@ export default function ApplicantDocument({ handleJobClick }) {
             };
         });
     };
+
     // Handle file input change for additional files
-    const handleAdditionalFileChange = (e, category, index) => {
+    const handleFileChange = (e, category, index) => {
         const { files } = e.target;
         setFormData((prevState) => {
             const updatedFiles = [...(prevState[category]?.files || [])];
@@ -132,6 +133,59 @@ export default function ApplicantDocument({ handleJobClick }) {
             };
         });
     };
+
+    // Save data and navigate to confirmation page
+    const handleSubmit = async (e) => {
+        if (e) e.preventDefault();
+        
+        // Save documents data to localStorage
+        // Note: We can't store File objects directly in localStorage, so store metadata
+        const documentMetadata = Object.keys(formData).reduce((acc, key) => {
+            const item = formData[key];
+            
+            // Handle single file uploads
+            if (item.file && item.file instanceof File) {
+                acc[key] = {
+                    fileName: item.file.name,
+                    fileSize: item.file.size,
+                    fileType: item.file.type,
+                    option: item.option
+                };
+            } 
+            // Handle multiple file uploads (additionalDocuments)
+            else if (item.files && Array.isArray(item.files)) {
+                acc[key] = {
+                    files: item.files.map(file => {
+                        if (file instanceof File) {
+                            return {
+                                fileName: file.name,
+                                fileSize: file.size,
+                                fileType: file.type
+                            };
+                        }
+                        return null;
+                    }).filter(Boolean)
+                };
+            }
+            
+            return acc;
+        }, {});
+
+        
+        // Store document metadata and actual files in memory
+        saveSectionData('documentMetadata', documentMetadata);
+        
+        // Store the actual files in a separate location
+        // We'll use sessionStorage for the file references, but the actual File objects
+        // will be kept in memory via the formData state
+        saveSectionData('documents', formData);
+        
+        router.push({
+            pathname: "/APPLICANT/ApplicationConfirmation",
+            query: { id, jobHiringTitle, companyName },
+        });
+    };
+
 
     return (
         <div>
@@ -222,7 +276,7 @@ export default function ApplicantDocument({ handleJobClick }) {
                                                 <input
                                                     type="file"
                                                     onChange={(e) =>
-                                                        handleAdditionalFileChange(
+                                                        handleFileChange(
                                                             e,
                                                             "resume",
                                                             index
@@ -233,7 +287,7 @@ export default function ApplicantDocument({ handleJobClick }) {
                                                 <button
                                                     type="button"
                                                     onClick={() =>
-                                                        removeAdditionalFile(
+                                                        removeFile(
                                                             "resume",
                                                             index
                                                         )
@@ -294,7 +348,7 @@ export default function ApplicantDocument({ handleJobClick }) {
 
                             {isEducationalOpen && (
                                 <div className="mt-2 ml-4">
-                                    {formData.educationaldocs.files?.map(
+                                    {formData.educationalDocuments.files?.map(
                                         (file, index) => (
                                             <div
                                                 key={index}
@@ -303,9 +357,9 @@ export default function ApplicantDocument({ handleJobClick }) {
                                                 <input
                                                     type="file"
                                                     onChange={(e) =>
-                                                        handleAdditionalFileChange(
+                                                        handleFileChange(
                                                             e,
-                                                            "resume",
+                                                            "educationalDocuments",
                                                             index
                                                         )
                                                     }
@@ -314,8 +368,8 @@ export default function ApplicantDocument({ handleJobClick }) {
                                                 <button
                                                     type="button"
                                                     onClick={() =>
-                                                        removeAdditionalFile(
-                                                            "educationaldocs",
+                                                        removeFile(
+                                                            "educationalDocuments",
                                                             index
                                                         )
                                                     }
@@ -329,7 +383,7 @@ export default function ApplicantDocument({ handleJobClick }) {
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            addAdditionalFile("educationaldocs")
+                                            addAdditionalFile("educationalDocuments")
                                         }
                                         className="flex items-center space-x-2 text-primary font-semibold"
                                     >
@@ -383,7 +437,7 @@ export default function ApplicantDocument({ handleJobClick }) {
                                                 <input
                                                     type="file"
                                                     onChange={(e) =>
-                                                        handleAdditionalFileChange(
+                                                        handleFileChange(
                                                             e,
                                                             "workcertificate",
                                                             index
@@ -394,7 +448,7 @@ export default function ApplicantDocument({ handleJobClick }) {
                                                 <button
                                                     type="button"
                                                     onClick={() =>
-                                                        removeAdditionalFile(
+                                                        removeFile(
                                                             "workcertificate",
                                                             index
                                                         )
@@ -465,7 +519,7 @@ export default function ApplicantDocument({ handleJobClick }) {
                                                 <input
                                                     type="file"
                                                     onChange={(e) =>
-                                                        handleAdditionalFileChange(
+                                                        handleFileChange(
                                                             e,
                                                             "seminarCertificate",
                                                             index
@@ -476,7 +530,7 @@ export default function ApplicantDocument({ handleJobClick }) {
                                                 <button
                                                     type="button"
                                                     onClick={() =>
-                                                        removeAdditionalFile(
+                                                        removeFile(
                                                             "seminarCertificate",
                                                             index
                                                         )
@@ -541,7 +595,7 @@ export default function ApplicantDocument({ handleJobClick }) {
                                                 <input
                                                     type="file"
                                                     onChange={(e) =>
-                                                        handleAdditionalFileChange(
+                                                        handleFileChange(
                                                             e,
                                                             "additionalDocuments",
                                                             index

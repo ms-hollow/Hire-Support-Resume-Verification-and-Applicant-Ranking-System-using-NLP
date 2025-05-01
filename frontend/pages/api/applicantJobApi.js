@@ -196,3 +196,52 @@ export const getAllJobApplications = async (authToken) => {
         return null;
     }
 };
+
+
+export const submitJobApplication = async (authToken, applicationData, documentFiles, documentTypes) => {
+    if (!authToken) {
+      console.error("No access token available.");
+      return null;
+    }
+  
+    try {
+      // Create FormData object for file upload
+      const formData = new FormData();
+      
+      // Add application data
+      Object.keys(applicationData).forEach(key => {
+        formData.append(key, applicationData[key]);
+      });
+      
+      // Add document types
+      documentTypes.forEach(type => {
+        formData.append('document_type', type);
+      });
+      
+      // Add document files
+      documentFiles.forEach(file => {
+        formData.append('document_file', file);
+      });
+      
+      const response = await fetch("http://127.0.0.1:8000/job/applications/create/", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          // Don't set Content-Type when using FormData, browser will set it with boundary
+        },
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Failed to submit application:", errorData);
+        return { success: false, error: errorData };
+      }
+      
+      const responseData = await response.json();
+      return { success: true, data: responseData };
+    } catch (error) {
+      console.error("Error submitting job application:", error);
+      return { success: false, error: error.message };
+    }
+};

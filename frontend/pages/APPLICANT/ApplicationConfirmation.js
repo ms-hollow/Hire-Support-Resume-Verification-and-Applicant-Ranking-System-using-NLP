@@ -2,18 +2,24 @@ import ApplicantHeader from "@/components/ApplicantHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import ReviewApplication from "@/components/ReviewApplication";
+import { getSectionData, clearJobApplicationDraft } from "../utils/jobApplicationStates";
+import { submitJobApplication } from "../api/applicantJobApi";
 import { useRouter } from "next/router";
 import JobDetailsWrapper from "@/components/JobDetails";
+import AuthContext from "../context/AuthContext";
+// ...existing code...
 
 export default function ApplicationConfirmation({ handleJobClick }) {
     const [isChecked, setIsChecked] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
     const { id, jobHiringTitle, companyName } = router.query;
-
     const [showJobDetails, setShowJobDetails] = useState(false);
-
+    const [submitResult, setSubmitResult] = useState({ success: null, message: "" });
+    const { authTokens } = useContext(AuthContext);
+    
     const handleToggleDetails = () => {
         setShowJobDetails((prev) => !prev); // Toggle visibility
     };
@@ -22,13 +28,104 @@ export default function ApplicationConfirmation({ handleJobClick }) {
         setIsChecked(e.target.checked);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!isChecked) {
             alert("Please agree to the terms before submitting.");
             return;
         }
-        alert("Application submitted successfully!");
-        localStorage.removeItem("job_application_draft");
+
+        setIsSubmitting(true);
+
+        try {
+            // Get all necessary data from localStorage
+            const personalInfo = getSectionData('personalInfo');
+            const documents = getSectionData('documents');
+            const jobDetails = getSectionData('jobDetails');
+
+            // Prepare application data for submission
+            const applicationData = {
+                job_hiring: jobDetails.job_hiring_id,
+                fullName: `${personalInfo.first_name} ${personalInfo.middle_mame} ${personalInfo.last_name}`,
+                email: personalInfo.email,
+                contact_number: personalInfo.contact_number,
+                address: personalInfo.complete || personalInfo.present_address,
+                linkedin_profile: personalInfo.linkedin_profile,
+                application_date: new Date().toISOString().split('T')[0],
+                application_status: "PENDING"
+            };
+
+            // Extract document files and types
+            const documentFiles = [];
+            const documentTypes = [];
+
+            // Add resume
+            if (documents.resume?.file instanceof File) {
+                documentFiles.push(documents.resume.file);
+                documentTypes.push("RESUME");
+            }
+
+            // Add educational documents
+            if (documents.educationaldocs?.file instanceof File) {
+                documentFiles.push(documents.educationaldocs.file);
+                documentTypes.push("EDUCATION");
+            }
+
+            // Add work certificate
+            if (documents.workcertificate?.file instanceof File) {
+                documentFiles.push(documents.workcertificate.file);
+                documentTypes.push("WORK_EXPERIENCE");
+            }
+
+            // Add seminar certificate
+            if (documents.seminarCertificate?.file instanceof File) {
+                documentFiles.push(documents.seminarCertificate.file);
+                documentTypes.push("SEMINAR");
+            }
+
+            // Add additional documents
+            if (documents.additionalDocs?.files && documents.additionalDocs.files.length > 0) {
+                documents.additionalDocs.files.forEach(file => {
+                    if (file instanceof File) {
+                        documentFiles.push(file);
+                        documentTypes.push("ADDITIONAL");
+                    }
+                });
+            }
+
+            const result = await submitJobApplication(
+                authTokens.access, 
+                applicationData, 
+                documentFiles, 
+                documentTypes
+            );
+
+            if (result.success) {
+                setSubmitResult({ 
+                    success: true, 
+                    message: "Application submitted successfully!" 
+                });
+                // Clear application draft from localStorage
+                clearJobApplicationDraft();
+                
+                // Redirect to success page after short delay
+                setTimeout(() => {
+                    router.push("/APPLICANT/ApplicationSuccess");
+                }, 2000);
+            } else {
+                setSubmitResult({ 
+                    success: false, 
+                    message: "Failed to submit application. Please try again." 
+                });
+            }
+        } catch (error) {
+            console.error("Error submitting application:", error);
+            setSubmitResult({ 
+                success: false, 
+                message: "An error occurred. Please try again." 
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const goBack = () => {
@@ -42,7 +139,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
 
     return (
         <div>
-            <ApplicantHeader />
+            <ApplicantHeader/>
             <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto">
                 <p className="font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall   text-fontcolor pb-1">
                     You are Applying for{" "}
@@ -78,7 +175,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                         </div>
                     )}
                 </div>
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center pb-8">
                     <div className="job-application-box rounded-xs px-8 py-5 mx-auto">
                         <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium text-primary">
                             Please review your application
@@ -93,7 +190,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                             </div>
                         </div>
 
-                        <p className="font-medium lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-fontcolor">
+                        <p className="font-medium lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
                             Please review that all the information and documents
                             are correct
                         </p>
@@ -111,7 +208,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                                     checked={isChecked}
                                     onChange={handleCheckboxChange}
                                 />
-                                <span className="text-fontcolor lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall">
+                                <span className="text-fontcolor text-justify lg:text-xxsmall mb:text-xxsmall sm:text-xxsmall xsm:text-xxsmall">
                                     Lorem ipsum dolor sit amet, consectetur
                                     adipiscing elit. Amet tincidunt et turpis
                                     habitasse ultrices condimentum velit.

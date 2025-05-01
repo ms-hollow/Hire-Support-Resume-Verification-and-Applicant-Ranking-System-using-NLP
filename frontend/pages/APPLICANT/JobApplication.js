@@ -9,6 +9,7 @@ import JobDetailsWrapper from "@/components/JobDetails";
 import { getApplicantProfile } from "../api/applicantApi";
 import { fetchJobDetails } from "../api/applicantJobApi";
 import { toTitleCase } from "../utils/functions";
+import { saveSectionData, getSectionData } from "../utils/jobApplicationStates";
 
 export default function JobApplication({ handleJobClick }) {
     let { authTokens } = useContext(AuthContext);
@@ -45,9 +46,14 @@ export default function JobApplication({ handleJobClick }) {
     const [step, setStep] = useState(1);
 
     useEffect(() => {
+        const savedPersonalInfo = getSectionData('personalInfo');
+        if (savedPersonalInfo) {
+            setFormData(prev => ({ ...prev, ...savedPersonalInfo }));
+        }
+
         const applicantProfile = async () => {
             const data = await getApplicantProfile(authTokens);
-            setFormData(data);
+            setFormData(prev => ({ ...prev, ...data }));
         };
 
         const getJobHiringDetails = async () => {
@@ -58,7 +64,7 @@ export default function JobApplication({ handleJobClick }) {
 
         applicantProfile();
         getJobHiringDetails();
-    }, [authTokens]);
+    }, [authTokens, id]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -76,7 +82,25 @@ export default function JobApplication({ handleJobClick }) {
         alert("Edit button clicked - implement your logic here.");
     };
 
+    // Save data and navigate to next step
     const handleNext = () => {
+        // Format full name for display
+        const fullName = `${formData.first_name} ${formData.middle_mame || ''} ${formData.last_name}`.trim();
+        
+        // Save personal info to localStorage with formatted values
+        saveSectionData('personalInfo', {
+            ...formData,
+            fullName: fullName
+        });
+        
+        // Also save job details
+        saveSectionData('jobDetails', {
+            job_hiring_id: id,
+            job_title: jobHiringTitle,
+            company_name: companyName
+        });
+        
+        // Navigate to next page
         router.push({
             pathname: "/APPLICANT/ApplicantDocuments",
             query: { id, jobHiringTitle, companyName },
