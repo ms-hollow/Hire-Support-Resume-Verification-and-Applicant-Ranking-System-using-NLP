@@ -95,13 +95,15 @@ export default function JobSummary() {
         const response = await createJob(formData, authTokens.access);
 
         if (response) {
-            console.log("Job created successfully:", response);
+            toast.success("Job is saved as Draft.");
         } else {
-            console.log("Failed to create job.");
+            toast.error("Failed to saved as Draft.");
         }
         Cookies.remove("DRAFT_DATA");
         Cookies.remove("SERIALIZED_DATA");
-        router.push("/COMPANY/CompanyHome");
+        setTimeout(() => {
+            router.push("/COMPANY/CompanyHome");
+        }, 3000); 
     };
 
     const handlePublish = async () => {
