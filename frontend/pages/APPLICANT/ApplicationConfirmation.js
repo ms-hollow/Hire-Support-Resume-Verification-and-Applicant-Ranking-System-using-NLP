@@ -1,19 +1,18 @@
 import ApplicantHeader from "@/components/ApplicantHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import Link from "next/link";
-import Image from 'next/image';
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import ReviewApplication from "@/components/ReviewApplication";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 import JobDetailsWrapper from "@/components/JobDetails";
 import { toast } from 'react-toastify';
 import ToastWrapper from "@/components/ToastWrapper";
 
-export default function ApplicationConfirmation ({handleJobClick}) {
-
+export default function ApplicationConfirmation({ handleJobClick }) {
     const [isChecked, setIsChecked] = useState(false);
     const router = useRouter();
-    const { jobId } = router.query;
+    const { id, jobHiringTitle, companyName } = router.query;
 
     const [showJobDetails, setShowJobDetails] = useState(false);
 
@@ -46,14 +45,14 @@ export default function ApplicationConfirmation ({handleJobClick}) {
 
     const goBack = () => {
         router.push({
-            pathname: '/APPLICANT/ApplicantDocuments',
-            query: { jobId }, 
+            pathname: "/APPLICANT/ApplicantDocuments",
+            query: { id, jobHiringTitle, companyName },
         });
     };
 
     //TODO 1. Retrieve yung job application id then display it
 
-    return ( 
+    return (
         <div>
             <ApplicantHeader/>
             <ToastWrapper/>
@@ -70,73 +69,97 @@ export default function ApplicationConfirmation ({handleJobClick}) {
                                     <JobDetailsWrapper
                                     /*authToken={authTokens?.access}*/
                                     onJobClick={handleJobClick}
-                                    />
-                                </div>
+                                />
                             </div>
-                        )}
-                    </div>
-                    <div className="flex items-center justify-center">
-                        <div className="job-application-box rounded-xs px-8 py-5 mx-auto">
-                            <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium text-primary">Please review your application</p>
+                        </div>
+                    )}
+                </div>
+                <div className="flex items-center justify-center pb-8">
+                    <div className="job-application-box rounded-xs px-8 py-5 mx-auto">
+                        <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium text-primary">
+                            Please review your application
+                        </p>
 
-                            <div className="flex items-center pt-2 pb-2">
-                                <div className="w-full bg-background h-1. border-2 border-primary rounded-full relative">
-                                    <div className={`relative h-1 rounded-full transition-all duration-300 bg-primary`} style={{ width: "75%" }}></div>
-                                </div>
+                        <div className="flex items-center pt-2 pb-2">
+                            <div className="w-full bg-background h-1. border-2 border-primary rounded-full relative">
+                                <div
+                                    className={`relative h-1 rounded-full transition-all duration-300 bg-primary`}
+                                    style={{ width: "75%" }}
+                                ></div>
                             </div>
+                        </div>
 
-                            <p className="font-medium lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall text-fontcolor">Please review that all the information and documents are correct</p>
-                            
-                            <div className="pt-2">
-                                <ReviewApplication/>
-                             </div>
+                        <p className="font-medium lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
+                            Please review that all the information and documents
+                            are correct
+                        </p>
 
+                        <div className="pt-2">
+                            <ReviewApplication />
+                        </div>
 
-                            {/* Checkbox Section */}
-                            <section className="mt-2 mb-6">
+                        {/* Checkbox Section */}
+                        <section className="mt-2 mb-6">
                             <label className="flex items-start space-x-2">
                                 <input
-                                type="checkbox"
-                                className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                checked={isChecked}
-                                onChange={handleCheckboxChange}
+                                    type="checkbox"
+                                    className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    checked={isChecked}
+                                    onChange={handleCheckboxChange}
                                 />
-                                <span className="text-fontcolor lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Amet
-                                tincidunt et turpis habitasse ultrices condimentum velit.
-                                <br />
-                                Consectetur pellentesque non eget nisl, pretium, ultrices. Tortor
-                                dignissim pretium aliquet nunc, pulvinar.
+                                <span className="text-fontcolor text-justify lg:text-xxsmall mb:text-xxsmall sm:text-xxsmall xsm:text-xxsmall">
+                                    Lorem ipsum dolor sit amet, consectetur
+                                    adipiscing elit. Amet tincidunt et turpis
+                                    habitasse ultrices condimentum velit.
+                                    <br />
+                                    Consectetur pellentesque non eget nisl,
+                                    pretium, ultrices. Tortor dignissim pretium
+                                    aliquet nunc, pulvinar.
                                 </span>
                             </label>
-                            </section>
+                        </section>
 
+                        <div className="flex justify-between mt-1">
+                            <button
+                                onClick={goBack}
+                                type="button"
+                                className="button2 flex items-center justify-center"
+                            >
+                                <div className="flex items-center space-x-2">
+                                    <Image
+                                        src="/Arrow Left.svg"
+                                        width={23}
+                                        height={10}
+                                        alt="Back Icon"
+                                    />
+                                    <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
+                                        Back
+                                    </p>
+                                </div>
+                            </button>
 
-                            <div className="flex justify-between mt-1">
-                                
-                                <button onClick={goBack} type="button" className="button2 flex items-center justify-center">
-                                    <div className="flex items-center space-x-2">
-                                        <Image 
-                                            src="/Arrow Left.svg" 
-                                            width={23} 
-                                            height={10} 
-                                            alt="Back Icon" 
-                                        />
-                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Back</p>
-                                    </div>
-                                </button>
-                                
-
-                                <button type="button" onClick={handleSubmit}  className={`button1 flex items-center justify-center ${!isChecked && "opacity-50"}`} disabled={!isChecked}>
-                                    <Link href="/APPLICANT/ApplicationSubmit" className="flex items-center space-x-2 ml-auto">
-                                        <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Submit Application</p>
-                                    </Link>
-                                </button>
-                            </div>
+                            <button
+                                type="button"
+                                onClick={handleSubmit}
+                                className={`button1 flex items-center justify-center ${
+                                    !isChecked && "opacity-50"
+                                }`}
+                                disabled={!isChecked}
+                            >
+                                <Link
+                                    href="/APPLICANT/ApplicationSubmit"
+                                    className="flex items-center space-x-2 ml-auto"
+                                >
+                                    <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
+                                        Submit Application
+                                    </p>
+                                </Link>
+                            </button>
                         </div>
                     </div>
                 </div>
-            <GeneralFooter/>
+            </div>
+            <GeneralFooter />
         </div>
-     );
+    );
 }
