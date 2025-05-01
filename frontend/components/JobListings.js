@@ -153,7 +153,7 @@ const JobListings = ({ onJobClick, jobListings, loading }) => {
 const JobListingsWrapper = ({ onJobClick, jobListings, loading }) => {
     const { authTokens } = useContext(AuthContext);
     return (
-        <div className="flex overflow-y-auto border border-none hide-scrollbar p-1 h-[calc(100vh-150px)]">
+        <div className="w-[450px] flex overflow-y-auto border border-none hide-scrollbar p-1 h-[calc(100vh-150px)]">
             <JobProvider authToken={authTokens.access}>
                 <JobListings
                     authToken={authTokens.access}
