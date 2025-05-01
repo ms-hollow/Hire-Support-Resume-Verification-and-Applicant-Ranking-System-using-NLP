@@ -8,8 +8,10 @@ import {
     unsaveJob,
 } from "@/pages/api/applicantJobApi";
 import { toTitleCase } from "@/pages/utils/functions";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import ToastWrapper from "./ToastWrapper";
+import { useRouter } from "next/router";
+import { getApplicantProfile } from "@/pages/api/applicantApi";
 
 const SavedJobs = () => {
     const { authTokens } = useContext(AuthContext);
@@ -18,6 +20,7 @@ const SavedJobs = () => {
     const [savedStatus, setSavedStatus] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const router = useRouter();
 
     useEffect(() => {
         const loadSavedJobs = async () => {
@@ -76,7 +79,6 @@ const SavedJobs = () => {
                     prevJobs.filter((job) => job.job_id !== jobId)
                 );
                 toast.success("Job unsaved successfully!");
-              
             }
         },
         [authTokens]
@@ -88,6 +90,31 @@ const SavedJobs = () => {
         } else {
             await handleSaveJob(jobId);
         }
+    };
+
+    const checkProfile = async () => {
+        const res = await getApplicantProfile(authTokens);
+        const hasIncompleteField = Object.values(res).some(
+            (val) => val === null || val === ""
+        );
+
+        if (!res || hasIncompleteField) {
+            toast.info("Please complete your profile before applying.");
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleApplyNow = async (id) => {
+        const isProfileComplete = await checkProfile();
+        if (!isProfileComplete) {
+            return;
+        }
+        router.push({
+            pathname: "/APPLICANT/JobApplication",
+            query: { id },
+        });
     };
 
     if (loading)
@@ -114,7 +141,12 @@ const SavedJobs = () => {
 
                                     <div className="flex items-start ml-5 gap-4">
                                         <div className="flex items-center gap-4">
-                                            <button className="button1 flex items-center justify-center text-center">
+                                            <button
+                                                className="button1 flex items-center justify-center text-center"
+                                                onClick={() =>
+                                                    handleApplyNow(job.job_id)
+                                                }
+                                            >
                                                 <p className="lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-center">
                                                     Apply Now
                                                 </p>
@@ -197,19 +229,18 @@ const SavedJobs = () => {
                                             />
                                             <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
                                                 {" "}
-                                                {job.salary_min} - {job.salary_max}
+                                                {job.salary_min} -{" "}
+                                                {job.salary_max}
                                             </p>
                                         </div>
                                     </div>
-
-                                  
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             ))}
-            <ToastWrapper/>
+            <ToastWrapper />
         </div>
     );
 };
@@ -218,7 +249,7 @@ const SavedJobsWrapper = () => {
     return (
         <div className="flex overflow-y-auto border border-none hide-scrollbar p-1 h-[calc(100vh-150px)]">
             <SavedJobs />
-            <ToastWrapper/>
+            <ToastWrapper />
         </div>
     );
 };

@@ -6,9 +6,9 @@ import { useState, useEffect, useContext, useCallback } from "react";
 import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
 import JobDetailsWrapper from "@/components/JobDetails";
-import { toast } from 'react-toastify';
-import ToastWrapper from "@/components/ToastWrapper";
-import Loading from "../GENERAL/Loading";
+import { getApplicantProfile } from "../api/applicantApi";
+import { fetchJobDetails } from "../api/applicantJobApi";
+import { toTitleCase } from "../utils/functions";
 
 export default function JobApplication({ handleJobClick }) {
     let { authTokens } = useContext(AuthContext);
@@ -60,22 +60,6 @@ export default function JobApplication({ handleJobClick }) {
         getJobHiringDetails();
     }, [authTokens]);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        const updatedData = { ...formData, [name]: value };
-        setFormData(updatedData);
-
-        const fields = Object.keys(formData);
-        const filledFields = fields.filter(
-            (field) => formData[field] || updatedData[field]
-        );
-        setStep(Math.min(filledFields.length, fields.length));
-    };
-
-    const handleEdit = () => {
-        toast.success("Edit button clicked");
-    };
-
     const handleNext = () => {
         router.push({
             pathname: "/APPLICANT/ApplicantDocuments",
@@ -83,158 +67,42 @@ export default function JobApplication({ handleJobClick }) {
         });
     };
 
-    useEffect(() => {
-        if (!authTokens?.access || !id) return;
-
-        const decodedToken = jwt.decode(authTokens.access);
-        if (!decodedToken) {
-            console.error("Invalid or expired token");
-            return;
-        }
-
-        const getApplicantInfo = async () => {
-            try {
-                const res = await fetch('http://127.0.0.1:8000/applicant/profile/view/', {
-                    method: 'GET',
-                    headers: {
-                        Authorization: `Bearer ${authTokens.access}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (res.ok) {
-                    const data = await res.json();
-                    const applicantKey = data?.applicant_key;
-                    const profileData = data?.profile_data;
-
-                    if (profileData) {
-                        const { city, province, region, barangay } = profileData;
-                        const addressNames = convertAddressCodes(region, province, city, barangay);
-                        const completeAddress = `${profileData.present_address}, ${addressNames.barangayName || "Unknown"}, ${addressNames.cityName || "Unknown"}, ${addressNames.regionName || "Unknown"}`;
-                        const fullName = `${profileData.first_name} ${profileData.middle_name} ${profileData.last_name}`;
-
-                        setFormData({
-                            firstName: profileData.first_name,
-                            lastName: profileData.last_name,
-                            middleName: profileData.middle_name,
-                            email: decodedToken.email,
-                            contact_number: profileData.contact_number,
-                            sex: profileData.sex,
-                            date_of_birth: profileData.date_of_birth,
-                            age: profileData.age,
-                            complete: completeAddress,
-                            linkedin_profile: profileData.linkedin_profile,
-                        });
-
-                        setdraftJobApplication({
-                            job_hiring: Number(id),
-                            applicant: Number(applicantKey),
-                            fullName: fullName,
-                            email: decodedToken.email,
-                            contact_number: profileData.contact_number,
-                            address: completeAddress,
-                            linkedin_profile: profileData.linkedin_profile,
-                            application_date: new Date().toISOString(),
-                            application_status: "draft",
-                            documents: [],
-                        });
-                    } else {
-                        console.error("Profile data not found in the response.");
-                    }
-                } else {
-                    console.error("Failed to fetch applicant info, status:", res.status);
-                }
-            } catch (error) {
-                console.error("Error fetching applicant info:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        getApplicantInfo();
-    }, [authTokens, id]);
-
-
-    // Check kung nakapag apply na si applicant or hindi
-    const checkIfAlreadyApplied = async () => {
-        try {
-            const response = await fetch(`http://127.0.0.1:8000/job/applications/check/${id}/?applicant_id=${draftJobApplication.applicant}`);
-            if (!response.ok) {
-                throw new Error("Failed to check application status");
-            }
-            const data = await response.json();
-            console.log("Application Status:", data);
-            return data.hasApplied;
-        } catch (error) {
-            console.error("Error checking application status:", error);
-            return false;
-        }
-    };
-
-    const getTitle = () => {
-        const jobTitle = sessionStorage.getItem('job_title');
-        return jobTitle ? jobTitle : null; 
-    };
-    
-    const getCompany = () => {
-        const company = sessionStorage.getItem('company');
-        return company ? company : null; 
-    };
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-          setLoading(false);
-        }, 3000); 
-    
-        return () => clearTimeout(timer);
-      }, []);
-    
-      if (loading) {
-        return <Loading/>;
-      }
-
-    // const saveDraft = async () => {
-    //     localStorage.setItem('draftJobApplication', JSON.stringify(draftJobApplication));
-    //     checkIfAlreadyApplied();
-    //     // router.push({
-    //     //     pathname: '/APPLICANT/ApplicantDocuments',
-    //     //     query: { jobId },
-    //     // });
+    // if (loading) {
+    //     return <p className="text-accent">Loading... (temporary) </p>;
     // }
-
-    // const checkIfAlreadyApplied = async () => {
-    //     try {
-    //         const response = await fetch(`http://127.0.0.1:8000/job/applications/check/${jobId}/?applicant_id=${applicantId}`);
-    //         if (!response.ok) {
-    //             throw new Error("Failed to check application status");
-    //         }
-    //         const data = await response.json();
-    //         console.log(data)
-    //         return data.hasApplied;
-    //     } catch (error) {
-    //         console.error("Error checking application status:", error);
-    //         return false;
-    //     }
-    // };
-    
-    
-    //TODO 1. Get lahat ng data and save it as draft sa database
-    //TODO 2. Save ang job application id
 
     return (
         <div>
-            <ApplicantHeader/>
-            <ToastWrapper/>
-                <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 xxsm:px-4 py-8 mx-auto">
-                    <p className="font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">You are Applying for </p>
-                    <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>
-                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompanyFromLocalStorage() || 'No Job Company Available'}</p>
-                    <div className="relative">
-                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-8 font-bold underline cursor-pointer" onClick={handleToggleDetails} >See job hiring details</p>
-                        {showJobDetails && (
-                            <div className="flex items-center justify-center absolute inset-0 bg-background h-screen ">
-                                <div className="relative w-full lg:w-6/12 mb:w-10/12 sm:w-full bg-background rounded ">
-                                    <button onClick={() => setShowJobDetails(false)} className="absolute -top-12 right-0  text-xl text-fontcolor hover:text-gray-700" > ✖ </button>
-                                    <JobDetailsWrapper
+            <ApplicantHeader />
+            <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 xxsm:px-4 py-8 mx-auto">
+                <p className="font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
+                    You are Applying for{" "}
+                </p>
+                <p className="font-semibold text-primary text-large pb-1">
+                    {jobHiringTitle || ""}
+                </p>
+                <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">
+                    {companyName || ""}
+                </p>
+                <div className="relative">
+                    <p
+                        className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-8 font-bold underline cursor-pointer"
+                        onClick={handleToggleDetails}
+                    >
+                        See job hiring details
+                    </p>
+
+                    {showJobDetails && (
+                        <div className="flex items-center justify-center absolute inset-0 bg-background h-screen ">
+                            <div className="relative w-full lg:w-6/12 mb:w-10/12 sm:w-full bg-background rounded ">
+                                <button
+                                    onClick={() => setShowJobDetails(false)}
+                                    className="absolute -top-12 right-0  text-xl text-fontcolor hover:text-gray-700"
+                                >
+                                    {" "}
+                                    ✖{" "}
+                                </button>
+                                <JobDetailsWrapper
                                     authToken={authTokens?.access}
                                     onJobClick={handleJobClick}
                                 />
