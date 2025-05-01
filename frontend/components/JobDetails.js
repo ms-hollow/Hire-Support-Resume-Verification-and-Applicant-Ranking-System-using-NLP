@@ -37,7 +37,7 @@ const JobDetails = ({ authToken }) => {
     };
 
     if (loading) return <JDSkeletonLoader />;
-    if (!jobDetails) return <p className="text-fontcolor">Please Select Job</p>;
+    if (!jobDetails) return <p className="text-foreground justify-center font-semibold text-4xl">Please Select Job</p>;
 
     return (
         <div className="flex flex-col h-full">
