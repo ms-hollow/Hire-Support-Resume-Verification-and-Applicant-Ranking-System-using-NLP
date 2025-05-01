@@ -91,8 +91,16 @@ const SavedJobs = () => {
     };
 
     if (loading)
-        return <div className="text-fontcolor">Loading saved jobs...</div>;
+        return <div className="text-fontcolor text-center py-10">Loading saved jobs...</div>;
     if (error) return <div>Error: {error}</div>;
+
+    if (!loading && jobListings.length === 0) {
+        return (
+            <div className="text-fontcolor text-center py-10">
+                No saved jobs available.
+            </div>
+        );
+    }
 
     return (
         <div>
