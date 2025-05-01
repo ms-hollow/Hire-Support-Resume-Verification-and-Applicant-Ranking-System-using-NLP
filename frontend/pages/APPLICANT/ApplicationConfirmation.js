@@ -6,10 +6,10 @@ import { useEffect, useState, useContext } from "react";
 import ReviewApplication from "@/components/ReviewApplication";
 import { getSectionData, clearJobApplicationDraft } from "../utils/jobApplicationStates";
 import { submitJobApplication } from "../api/applicantJobApi";
+import { getApplicantProfile } from "../api/applicantApi";
 import { useRouter } from "next/router";
 import JobDetailsWrapper from "@/components/JobDetails";
 import AuthContext from "../context/AuthContext";
-// ...existing code...
 
 export default function ApplicationConfirmation({ handleJobClick }) {
     const [isChecked, setIsChecked] = useState(false);
@@ -18,10 +18,67 @@ export default function ApplicationConfirmation({ handleJobClick }) {
     const { id, jobHiringTitle, companyName } = router.query;
     const [showJobDetails, setShowJobDetails] = useState(false);
     const [submitResult, setSubmitResult] = useState({ success: null, message: "" });
-    const { authTokens } = useContext(AuthContext);
-    
+    const { authTokens, user } = useContext(AuthContext);
+    const [profileData, setProfileData] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [applicantId, setApplicantId] = useState(null);
+
+    // Check for console debugging
+    useEffect(() => {
+        // Log what we have from context for debugging
+        console.log("Auth tokens from context:", authTokens ? "Present (first 10 chars): " + 
+            (authTokens.access ? authTokens.access.substring(0, 10) + "..." : "No access token") : "No auth tokens");
+        console.log("User from context:", user);
+    }, [authTokens, user]);
+
+    // Fetch applicant profile data when component mounts
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const data = await getApplicantProfile(authTokens);
+                console.log("Fetched profile data:", data);
+                setProfileData(data);
+                
+                // Find applicant ID from any available source
+                if (data && data.applicant_id) {
+                    setApplicantId(data.applicant_id);
+                    console.log("Setting applicant ID from profile data:", data.applicant_id);
+                } else if (user && user.applicant_id) {
+                    setApplicantId(user.applicant_id);
+                    console.log("Setting applicant ID from user context:", user.applicant_id);
+                } else if (user && user.user_id) {
+                    // In some systems, user_id might be the same as applicant_id
+                    console.log("No applicant ID found, but user_id is available:", user.user_id);
+                    setApplicantId(user.user_id);
+                } else {
+                    console.error("No applicant ID found in either profile data or user context");
+                }
+                
+                setIsLoading(false);
+            } catch (error) {
+                console.error("Error fetching applicant profile:", error);
+                setSubmitResult({
+                    success: false,
+                    message: "Failed to load your profile. Please refresh or log in again."
+                });
+                setIsLoading(false);
+            }
+        };
+        
+        if (authTokens && authTokens.access) {
+            fetchProfile();
+        } else {
+            console.error("No auth tokens available for profile fetch");
+            setIsLoading(false);
+            setSubmitResult({
+                success: false,
+                message: "You need to be logged in to submit an application."
+            });
+        }
+    }, [authTokens, user]);
+
     const handleToggleDetails = () => {
-        setShowJobDetails((prev) => !prev); // Toggle visibility
+        setShowJobDetails((prev) => !prev);
     };
 
     const handleCheckboxChange = (e) => {
@@ -34,6 +91,35 @@ export default function ApplicationConfirmation({ handleJobClick }) {
             return;
         }
 
+        // Check if we have applicant ID from any source
+        const effectiveApplicantId = applicantId || 
+            (profileData?.applicant_id) || 
+            (user?.applicant_id) ||
+            (user?.user_id); // In some systems, user_id might be the same as applicant_id
+            
+        console.log("Effective applicant ID for submission:", effectiveApplicantId);
+        
+        if (!effectiveApplicantId) {
+            console.error("No applicant ID found from any source");
+            setSubmitResult({
+                success: false,
+                message: "No applicant information found. Please log in again."
+            });
+            alert("No applicant information found. Please log in again.");
+            return;
+        }
+
+        // Check if we have authentication tokens
+        if (!authTokens || !authTokens.access) {
+            console.error("No auth tokens available for submission");
+            setSubmitResult({
+                success: false,
+                message: "Authentication required. Please log in again."
+            });
+            alert("Authentication required. Please log in again.");
+            return;
+        }
+
         setIsSubmitting(true);
 
         try {
@@ -41,17 +127,24 @@ export default function ApplicationConfirmation({ handleJobClick }) {
             const personalInfo = getSectionData('personalInfo');
             const documents = getSectionData('documents');
             const jobDetails = getSectionData('jobDetails');
+            
+            console.log("Retrieved jobDetails:", jobDetails);
+            
+            if (!jobDetails || !jobDetails.job_hiring_id) {
+                throw new Error("Missing job hiring information. Please restart your application.");
+            }
 
             // Prepare application data for submission
             const applicationData = {
                 job_hiring: jobDetails.job_hiring_id,
-                fullName: `${personalInfo.first_name} ${personalInfo.middle_mame} ${personalInfo.last_name}`,
+                applicant: effectiveApplicantId, // Use the effective applicant ID
+                fullName: `${personalInfo.first_name} ${personalInfo.middle_name || ''} ${personalInfo.last_name}`.trim(),
                 email: personalInfo.email,
                 contact_number: personalInfo.contact_number,
-                address: personalInfo.complete || personalInfo.present_address,
+                address: personalInfo.complete_address || personalInfo.present_address,
                 linkedin_profile: personalInfo.linkedin_profile,
                 application_date: new Date().toISOString().split('T')[0],
-                application_status: "PENDING"
+                application_status: "draft"
             };
 
             // Extract document files and types
@@ -79,18 +172,22 @@ export default function ApplicationConfirmation({ handleJobClick }) {
             // Add seminar certificate
             if (documents.seminarCertificate?.file instanceof File) {
                 documentFiles.push(documents.seminarCertificate.file);
-                documentTypes.push("SEMINAR");
+                documentTypes.push("CERTIFICATION");
             }
 
             // Add additional documents
-            if (documents.additionalDocs?.files && documents.additionalDocs.files.length > 0) {
-                documents.additionalDocs.files.forEach(file => {
+            if (documents.additionalDocuments?.files && documents.additionalDocuments.files.length > 0) {
+                documents.additionalDocuments.files.forEach(file => {
                     if (file instanceof File) {
                         documentFiles.push(file);
                         documentTypes.push("ADDITIONAL");
                     }
                 });
             }
+
+            console.log("Submitting application with data:", applicationData);
+            console.log("Document files:", documentFiles.map(f => f.name));
+            console.log("Document types:", documentTypes);
 
             const result = await submitJobApplication(
                 authTokens.access, 
@@ -104,25 +201,30 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                     success: true, 
                     message: "Application submitted successfully!" 
                 });
+                alert("Application submitted successfully!");
+                
                 // Clear application draft from localStorage
                 clearJobApplicationDraft();
                 
                 // Redirect to success page after short delay
                 setTimeout(() => {
-                    router.push("/APPLICANT/ApplicationSuccess");
+                    router.push("/APPLICANT/ApplicationSubmit");
                 }, 2000);
             } else {
+                console.error("Submission error:", result.error);
                 setSubmitResult({ 
                     success: false, 
-                    message: "Failed to submit application. Please try again." 
+                    message: `Failed to submit application: ${result.error || "Please try again"}` 
                 });
+                alert(`Failed to submit application: ${result.error || "Please try again"}`);
             }
         } catch (error) {
             console.error("Error submitting application:", error);
             setSubmitResult({ 
                 success: false, 
-                message: "An error occurred. Please try again." 
+                message: `An error occurred: ${error.message}. Please try again.` 
             });
+            alert(`An error occurred: ${error.message}. Please try again.`);
         } finally {
             setIsSubmitting(false);
         }
@@ -135,40 +237,37 @@ export default function ApplicationConfirmation({ handleJobClick }) {
         });
     };
 
-    //TODO 1. Retrieve yung job application id then display it
-
     return (
         <div>
             <ApplicantHeader/>
             <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto">
-                <p className="font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall   text-fontcolor pb-1">
+                <p className="font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
                     You are Applying for{" "}
                 </p>
                 <p className="font-semibold text-primary text-large pb-1">
                     {jobHiringTitle}
                 </p>
-                <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">
+                <p className="font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">
                     {companyName}
                 </p>
                 <div className="relative">
                     <p
-                        className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall  text-fontcolor pb-8 font-bold underline cursor-pointer"
+                        className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-8 font-bold underline cursor-pointer"
                         onClick={handleToggleDetails}
                     >
                         See job hiring details
                     </p>
                     {showJobDetails && (
-                        <div className="flex items-center justify-center absolute inset-0 bg-background h-screen ">
-                            <div className="relative w-full lg:w-6/12 mb:w-10/12 sm:w-full z-10 bg-background rounded ">
+                        <div className="flex items-center justify-center absolute inset-0 bg-background h-screen">
+                            <div className="relative w-full lg:w-6/12 mb:w-10/12 sm:w-full z-10 bg-background rounded">
                                 <button
                                     onClick={() => setShowJobDetails(false)}
-                                    className="absolute -top-12 right-0  text-xl text-fontcolor hover:text-gray-700"
+                                    className="absolute -top-12 right-0 text-xl text-fontcolor hover:text-gray-700"
                                 >
                                     {" "}
                                     ✖{" "}
                                 </button>
                                 <JobDetailsWrapper
-                                    /*authToken={authTokens?.access}*/
                                     onJobClick={handleJobClick}
                                 />
                             </div>
@@ -220,6 +319,14 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                             </label>
                         </section>
 
+                        {/* Show loading/error/success message if applicable */}
+                        {isLoading && <p className="text-gray-500 text-center mb-4">Loading your profile data...</p>}
+                        {submitResult.message && (
+                            <p className={`text-center mb-4 ${submitResult.success ? 'text-green-600' : 'text-red-600'}`}>
+                                {submitResult.message}
+                            </p>
+                        )}
+
                         <div className="flex justify-between mt-1">
                             <button
                                 onClick={goBack}
@@ -243,18 +350,13 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                                 type="button"
                                 onClick={handleSubmit}
                                 className={`button1 flex items-center justify-center ${
-                                    !isChecked && "opacity-50"
+                                    (!isChecked || isSubmitting) && "opacity-50"
                                 }`}
-                                disabled={!isChecked}
+                                disabled={!isChecked || isSubmitting || isLoading}
                             >
-                                <Link
-                                    href="/APPLICANT/ApplicationSubmit"
-                                    className="flex items-center space-x-2 ml-auto"
-                                >
-                                    <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
-                                        Submit Application
-                                    </p>
-                                </Link>
+                                <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
+                                    {isSubmitting ? "Submitting..." : "Submit Application"}
+                                </p>
                             </button>
                         </div>
                     </div>
