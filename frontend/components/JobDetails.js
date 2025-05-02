@@ -31,11 +31,10 @@ const JobDetails = ({ authToken, applicantName }) => {
     };
 
     const navigateToJobApplication = () => {
-        if (!applicantName) {
+        if (applicantName === "Applicant") {
             toast.info("Please complete your profile before applying.");
             return;
         }
-
         router.push({
             pathname: "/APPLICANT/JobApplication",
             query: { id },
@@ -262,8 +261,8 @@ const JobDetails = ({ authToken, applicantName }) => {
     );
 };
 
-const JobDetailsWrapper = () => {
-    const { authTokens, applicantName } = useContext(AuthContext);
+const JobDetailsWrapper = ({ applicantName }) => {
+    const { authTokens } = useContext(AuthContext);
     return (
         <div className="flex-1 overflow-y-auto h-[calc(100vh)] border border-none  hide-scrollbar rounded-lg">
             <JobProvider authToken={authTokens.access}>

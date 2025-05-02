@@ -60,7 +60,7 @@ export default function ApplicantHome({ onJobClick }) {
         const fetchApplicantData = async () => {
             if (authTokens?.access) {
                 const profileData = await getApplicantProfile(authTokens);
-                setApplicantName(profileData?.first_name || "Unknown");
+                setApplicantName(profileData?.first_name || "Applicant");
             }
         };
 
@@ -237,7 +237,6 @@ export default function ApplicantHome({ onJobClick }) {
                     }
                     onJobClick={onJobClick}
                     loading={loading}
-                    applicantName={applicantName}
                 />
             ) : (
                 // When there are no job listings available
