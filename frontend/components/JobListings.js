@@ -22,10 +22,6 @@ const JobListings = ({ onJobClick, jobListings, loading }) => {
         onJobClick(jobId);
     };
 
-    if (!Array.isArray(jobListings) || jobListings.length === 0) {
-        return <p>No job listings available.</p>;
-    }
-
     return (
         <div className="flex flex-col w-full">
             {/* Display skeleton loader when loading */}
@@ -63,7 +59,7 @@ const JobListings = ({ onJobClick, jobListings, loading }) => {
                                 />
                             </button>
                         </div>
-                       
+
                         <p className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
                             {job.company_name}
                         </p>
@@ -136,11 +132,7 @@ const JobListings = ({ onJobClick, jobListings, loading }) => {
                         </div>
                     </div>
                 ))
-            ) : (
-                <p className="flex flex-col text-fontcolor">
-                    No job listings available.
-                </p>
-            )}
+            ) : null }
         </div>
     );
 };

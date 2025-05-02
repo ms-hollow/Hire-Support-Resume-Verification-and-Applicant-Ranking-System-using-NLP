@@ -6,8 +6,9 @@ import { JDSkeletonLoader } from "./ui/SkeletonLoader";
 import { fetchJobDetails } from "@/pages/api/applicantJobApi";
 import { useJob, JobProvider } from "@/pages/context/JobContext";
 import { toTitleCase } from "@/pages/utils/functions";
+import { toast } from "react-toastify";
 
-const JobDetails = ({ authToken }) => {
+const JobDetails = ({ authToken, applicantName }) => {
     const { savedStatus, toggleSaveJob } = useJob();
     const router = useRouter();
     const { id } = router.query;
@@ -30,6 +31,11 @@ const JobDetails = ({ authToken }) => {
     };
 
     const navigateToJobApplication = () => {
+        if (!applicantName) {
+            toast.info("Please complete your profile before applying.");
+            return;
+        }
+
         router.push({
             pathname: "/APPLICANT/JobApplication",
             query: { id },
@@ -257,11 +263,14 @@ const JobDetails = ({ authToken }) => {
 };
 
 const JobDetailsWrapper = () => {
-    const { authTokens } = useContext(AuthContext);
+    const { authTokens, applicantName } = useContext(AuthContext);
     return (
         <div className="flex-1 overflow-y-auto h-[calc(100vh)] border border-none  hide-scrollbar rounded-lg">
             <JobProvider authToken={authTokens.access}>
-                <JobDetails authToken={authTokens.access} />
+                <JobDetails
+                    authToken={authTokens.access}
+                    applicantName={applicantName}
+                />
             </JobProvider>
         </div>
     );

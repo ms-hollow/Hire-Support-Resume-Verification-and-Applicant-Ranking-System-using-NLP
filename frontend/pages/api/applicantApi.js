@@ -56,7 +56,7 @@ export const updateApplicantProfile = async (authTokens, formData) => {
       return false;
     }
 
-    console.log("Profile updated successfully");
+    // console.log("Profile updated successfully");
     return true;
   } catch (error) {
     console.error("Error updating profile:", error);
