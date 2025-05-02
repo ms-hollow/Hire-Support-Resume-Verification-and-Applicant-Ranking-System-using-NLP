@@ -8,6 +8,7 @@ import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
 import { getApplicantProfile } from "../api/applicantApi";
 import phLocation from "../../public/placeHolder/location.json";
+import jobIndustry from "../../public/placeHolder/dummy_options.json";
 import { fetchJobListings } from "@/pages/api/applicantJobApi";
 import JobListingsWrapper from "@/components/JobListings";
 import JobDetailsWrapper from "@/components/JobDetails";
@@ -24,6 +25,10 @@ export default function ApplicantHome({ onJobClick }) {
     const [isSalaryOpen, setIsSalaryOpen] = useState(false);
     const [paymentType, setPaymentType] = useState("Annually");
     const [range, setRange] = useState(0);
+    const [classificationInput, setClassificationInput] = useState("");
+    const [showClassificationDropdown, setShowClassificationDropdown] = useState(false);
+    const [locationInput, setLocationInput] = useState("");
+    const [showLocationDropdown, setShowLocationDropdown] = useState(false);
 
     const [filters, setFilters] = useState({
         keyword: "",
@@ -221,6 +226,15 @@ export default function ApplicantHome({ onJobClick }) {
         return null;
     }
 
+    const filteredClassifications = jobIndustry.jobIndustries.filter((item) =>
+        item.industry.toLowerCase().includes(classificationInput.toLowerCase())
+      );
+    
+    const allCities = Object.values(phLocation).flat();
+    const filteredLocations = allCities.filter((city) =>
+        city.toLowerCase().includes(locationInput.toLowerCase())
+      );
+
     return (
         <div>
             <ApplicantHeader />
@@ -282,79 +296,115 @@ export default function ApplicantHome({ onJobClick }) {
                             />
                         </div>
 
-                        <div className="h-medium rounded-xs border-2 border-[#A5A5A5] flex flex-grow">
-                            <select
-                                className="valid:text-fontcolor invalid:text-placeholder lg:flex-grow mb:flex-grow sm:flex-grow xsm:flex-grow lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall"
-                                id="classification"
-                                name="classification"
-                                value={filters.classification} // Bind to state
-                                onChange={(e) =>
-                                    handleFilterChange(
-                                        "classification",
-                                        e.target.value
-                                    )
-                                }
-                                required
-                            >
-                                <option value="" disabled selected hidden>
-                                    Classification
-                                </option>
-                                <option value="Science and Technology">
-                                    Science and Technology
-                                </option>
-                                <option value="Engineering">Engineering</option>
-                                <option value="Computer Science">
-                                    Computer Science
-                                </option>
-                            </select>
-                        </div>
+                        <div className="relative flex flex-grow">
+                            <input
+                                type="text"
+                                value={classificationInput}
+                                onChange={(e) => {
+                                const value = e.target.value;
+                                setClassificationInput(value);
+                                setShowClassificationDropdown(value.trim().length > 0);
+                                }}
+                                onFocus={() => {
+                                if (classificationInput.trim()) setShowClassificationDropdown(true);
+                                }}
+                                onBlur={() => {
+                                setTimeout(() => setShowClassificationDropdown(false), 150);
+                                }}
+                                placeholder="Search Classification"
+                                className="w-full h-medium rounded-xs border-2 border-[#A5A5A5] px-3 lg:text-medium mb:text-xsmall sm:text-xxsmall"
+                            />
 
-                        <div className="relative h-medium rounded-xs border-2 border-[#A5A5A5] justify-center flex flex-grow items-center">
-                            <div className="absolute left-3">
+                            {classificationInput && (
+                                <button type="button" onClick={() => { setClassificationInput(""); setShowClassificationDropdown(false);handleFilterChange("classification", ""); }}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-700 text-sm">
+                                    ×
+                                </button>
+                            )}
+
+                            {showClassificationDropdown && (
+                                <div className="absolute left-0 top-full mt-1 w-full bg-white border border-black shadow overflow-y-auto z-50">
+                                {filteredClassifications.length > 0 ? (
+                                    filteredClassifications.map((item, index) => (
+                                    <div
+                                        key={index}
+                                        className="px-4 py-1 hover:bg-gray-100 cursor-pointer text-fontcolor"
+                                        onMouseDown={() => {
+                                        handleFilterChange("classification", item.industry);
+                                        setClassificationInput(item.industry);
+                                        setShowClassificationDropdown(false);
+                                        }}
+                                    >
+                                        {item.industry}
+                                    </div>
+                                    ))
+                                ) : (
+                                    <div className="px-4 py-2 text-gray-500">No match found</div>
+                                )}
+                                </div>
+                            )}
+                         </div>
+
+                         <div className="relative flex flex-grow">
+                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                                 <Image
-                                    src="/Location Icon.svg"
-                                    width={24}
-                                    height={24}
-                                    alt="Search Icon"
+                                src="/Location Icon.svg"
+                                width={26}
+                                height={24}
+                                alt="Location Icon"
                                 />
                             </div>
 
-                            <select
-                                id="location"
-                                name="location"
-                                value={filters.location}
-                                onChange={(e) =>
-                                    handleFilterChange(
-                                        "location",
-                                        e.target.value
-                                    )
-                                }
-                                required
-                                className="w-full h-full border-primarycolor lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall pl-12"
-                            >
-                                <option value="" disabled>
-                                    Select a location
-                                </option>
-                                {/* Map through NCR and Regions */}
-                                {Object.keys(phLocation).map((region, index) =>
-                                    phLocation[region].map(
-                                        (city, cityIndex) => (
-                                            <option
-                                                key={`${region}-${cityIndex}`}
-                                                value={city}
-                                            >
-                                                {city}
-                                            </option>
-                                        )
-                                    )
+                            {/* Input field with left padding for icon */}
+                            <input
+                                type="text"
+                                value={locationInput}
+                                onChange={(e) => {
+                                const value = e.target.value;
+                                setLocationInput(value);
+                                setShowLocationDropdown(value.trim().length > 0);
+                                }}
+                                onFocus={() => {
+                                if (locationInput.trim()) setShowLocationDropdown(true);
+                                }}
+                                onBlur={() => {
+                                setTimeout(() => setShowLocationDropdown(false), 150);
+                                }}
+                                placeholder="Search Location"
+                                className="w-full h-medium rounded-xs border-2 border-[#A5A5A5] pl-12 pr-10 lg:text-medium mb:text-xsmall sm:text-xxsmall"
+                            />
+
+                            {locationInput && (
+                                <button type="button" onClick={() => {setLocationInput(""); setShowLocationDropdown(false); handleFilterChange("location", "");}}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-700 text-sm">
+                                    ×
+                                </button>
+                            )}
+
+                            {showLocationDropdown && (
+                                <div className="absolute z-50 left-0 top-full mt-1 w-full bg-white border border-black shadow max-h-60 overflow-y-auto">
+                                {filteredLocations.length > 0 ? (
+                                    filteredLocations.map((city, index) => (
+                                    <div
+                                        key={index}
+                                        className="px-4 py-1 hover:bg-gray-100 cursor-pointer text-fontcolor"
+                                        onMouseDown={() => {
+                                        handleFilterChange("location", city);
+                                        setLocationInput(city);
+                                        setShowLocationDropdown(false);
+                                        }}
+                                    >
+                                        {city}
+                                    </div>
+                                    ))
+                                ) : (
+                                    <div className="px-4 py-2 text-gray-500">No location found</div>
                                 )}
-                            </select>
+                                </div>
+                            )}
                         </div>
 
-                        <button
-                            className="button1 items-center flex justify-center flex-shrink-0 p-5"
-                            onClick={applyFilters}
-                        >
+                        <button className="button1 items-center flex justify-center flex-shrink-0 p-5" onClick={applyFilters}>
                             <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-center">
                                 Find Job
                             </p>
@@ -585,33 +635,36 @@ export default function ApplicantHome({ onJobClick }) {
                 </div>
 
                 {/* Job Listings and Details */}
-
                 <div className="flex flex-col w-full pt-4 ">
-                    {/* Job Listings */}
-                    <div className="flex flex-row gap-4 pb-8">
-                        {isAnyFilterApplied &&
-                            filteredJobListings.length === 0 && (
-                                <p className="text-center text-gray-500 my-4">
-                                    No jobs match your filters.
-                                </p>
-                            )}
-                        <JobListings
-                            authToken={authTokens?.access}
-                            onJobClick={handleJobClick} // Trigger to open job details
-                            jobListings={
-                                isAnyFilterApplied
-                                    ? filteredJobListings
-                                    : jobListings
-                            }
-                        />
-                        {/* Job Details for Desktop */}
-                        <div className="hidden md:block flex-grow pb-8">
-                            <JobDetailsWrapper
+                    <div className="flex flex-row gap-4 pb-8 w-full">
+                        {isAnyFilterApplied && filteredJobListings.length === 0 ? (
+                            <div className="flex justify-center items-center w-full h-full py-12">
+                            <p className="text-center text-gray-500 text-lg">
+                                No jobs match your filters.
+                            </p>
+                            </div>
+                        ) : (
+                            <>
+                            {/* Job Listings */}
+                            <JobListings
+                                authToken={authTokens?.access}
+                                onJobClick={handleJobClick}
+                                jobListings={
+                                isAnyFilterApplied ? filteredJobListings : jobListings
+                                }
+                            />
+
+                            {/* Job Details Panel (Desktop Only) */}
+                            <div className="hidden md:block flex-grow pb-8">
+                                <JobDetailsWrapper
                                 authToken={authTokens?.access}
                                 applicantName={applicantName}
-                            />
-                        </div>
+                                />
+                            </div>
+                            </>
+                        )}
                     </div>
+
 
                     {/* Job Details for Mobile (Animated Drawer) */}
                     <div
