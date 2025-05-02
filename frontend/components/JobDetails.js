@@ -43,7 +43,18 @@ const JobDetails = ({ authToken, applicantName }) => {
     };
 
     if (loading) return <JDSkeletonLoader />;
-    if (!jobDetails) return <p className="text-foreground justify-center font-semibold text-4xl">Please Select Job</p>;
+    if (!jobDetails) return <div className="relative flex flex-col justify-start items-start  min-h-screen h-full bg-gray-100 text-fontcolor font-light text-xl px-2">
+    {/* Top-left: Arrow + Text */}
+    <div className="flex items-center gap-2 pt-4 px-2 mb-8">
+      <Image src="/Arrow Left.svg" width={40} height={20} alt="Arrow Left" />
+      <p>Please select a job</p>
+    </div>
+  
+    {/* Bottom-center: Home Icon */}
+    <div className="relative left-1/2 transform -translate-x-1/2">
+      <Image src="/Home.svg" width={350} height={20} alt="Home" />
+    </div>
+  </div>
 
     return (
         <div className="flex flex-col h-full">
