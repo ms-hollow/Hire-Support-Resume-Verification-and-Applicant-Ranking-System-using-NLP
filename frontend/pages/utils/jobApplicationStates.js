@@ -8,6 +8,7 @@ const JOB_APPLICATION_STORAGE_KEY = 'job_application_draft';
  * Save job application data to localStorage
  * @param {Object} data - The data to save
  */
+
 export const saveJobApplicationDraft = (data) => {
   try {
     const existingData = getJobApplicationDraft() || {};
@@ -77,4 +78,28 @@ export const getSectionData = (section) => {
     console.error(`Error retrieving ${section} data:`, error);
     return null;
   }
+};
+
+/**
+ * Get temp uploaded files from window object
+ * @returns {Object} Object containing all temporary files
+ */
+export const getTempUploadedFiles = () => {
+  return window.tempUploadedFiles || {};
+};
+
+/**
+* Get a specific file by its ID from temp storage
+* @param {string} fileId - The ID of the file to retrieve
+* @returns {File|null} The file object or null if not found
+*/
+export const getTempFileById = (fileId) => {
+  return window.tempUploadedFiles?.[fileId] || null;
+};
+
+/**
+* Clear all temporary files from memory
+*/
+export const clearTempFiles = () => {
+  window.tempUploadedFiles = {};
 };

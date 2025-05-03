@@ -138,54 +138,66 @@ export default function ApplicantDocument({ handleJobClick }) {
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
         
-        // Save documents data to localStorage
-        // Note: We can't store File objects directly in localStorage, so store metadata
-        const documentMetadata = Object.keys(formData).reduce((acc, key) => {
-            const item = formData[key];
+        // We need to properly serialize document information
+        // Create a structure that tracks both file metadata and references
+        const documentMetadata = {};
+        
+        // For each document type, store metadata that we can use to identify files later
+        Object.keys(formData).forEach(docType => {
+            const item = formData[docType];
             
             // Handle single file uploads
-            if (item.file && item.file instanceof File) {
-                acc[key] = {
+            if (item.file instanceof File) {
+                documentMetadata[docType] = {
                     fileName: item.file.name,
                     fileSize: item.file.size,
                     fileType: item.file.type,
-                    option: item.option
+                    option: item.option,
+                    // Add unique ID for reference
+                    fileId: `${docType}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
                 };
+                
+                // We'll use a temporary global object since Files can't be stored in sessionStorage
+                if (!window.tempUploadedFiles) {
+                    window.tempUploadedFiles = {};
+                }
+                window.tempUploadedFiles[documentMetadata[docType].fileId] = item.file;
             } 
             // Handle multiple file uploads (additionalDocuments)
             else if (item.files && Array.isArray(item.files)) {
-                acc[key] = {
+                documentMetadata[docType] = {
                     files: item.files.map(file => {
                         if (file instanceof File) {
+                            const fileId = `${docType}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+                            
+                            // Store file in temp object
+                            if (!window.tempUploadedFiles) {
+                                window.tempUploadedFiles = {};
+                            }
+                            window.tempUploadedFiles[fileId] = file;
+                            
                             return {
                                 fileName: file.name,
                                 fileSize: file.size,
-                                fileType: file.type
+                                fileType: file.type,
+                                fileId: fileId
                             };
                         }
                         return null;
                     }).filter(Boolean)
                 };
             }
-            
-            return acc;
-        }, {});
+        });
 
-        
-        // Store document metadata and actual files in memory
+        // Store document metadata in localStorage
         saveSectionData('documentMetadata', documentMetadata);
-        
-        // Store the actual files in a separate location
-        // We'll use sessionStorage for the file references, but the actual File objects
-        // will be kept in memory via the formData state
-        saveSectionData('documents', formData);
-        
+        // We won't try to store actual files in localStorage, just their metadata and references
+    
         router.push({
             pathname: "/APPLICANT/ApplicationConfirmation",
             query: { id, jobHiringTitle, companyName },
         });
     };
-
 
     return (
         <div>
