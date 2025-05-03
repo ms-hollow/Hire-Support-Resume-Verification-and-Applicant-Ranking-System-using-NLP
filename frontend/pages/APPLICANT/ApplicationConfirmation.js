@@ -96,7 +96,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
         const effectiveApplicantId = applicantId || 
             (profileData?.applicant_id) || 
             (user?.applicant_id) ||
-            (user?.user_id); // In some systems, user_id might be the same as applicant_id
+            (user?.user_id); 
             
         console.log("Effective applicant ID for submission:", effectiveApplicantId);
         
@@ -156,65 +156,43 @@ export default function ApplicationConfirmation({ handleJobClick }) {
             // Get temp files from window object
             const tempFiles = getTempUploadedFiles();
             console.log("Retrieved temp files:", Object.keys(tempFiles).length);
-    
-            // Process each document type
+            
+            // Document type mapping
+            const documentTypeMapping = {
+                'resume': 'RESUME',
+                'educationalDocuments': 'EDUCATION',
+                'workcertificate': 'WORK_EXPERIENCE',
+                'seminarCertificate': 'CERTIFICATION',
+                'additionalDocuments': 'ADDITIONAL'
+            };
+
+            // Process each document category
             if (documentMetadata) {
-                // Add resume
-                if (documentMetadata.resume?.fileId) {
-                    const resumeFile = tempFiles[documentMetadata.resume.fileId];
-                    if (resumeFile instanceof File) {
-                        documentFiles.push(resumeFile);
-                        documentTypes.push("RESUME");
-                    }
-                }
-    
-                // Add educational documents
-                if (documentMetadata.educationalDocuments?.fileId) {
-                    const educationFile = tempFiles[documentMetadata.educationalDocuments.fileId];
-                    if (educationFile instanceof File) {
-                        documentFiles.push(educationFile);
-                        documentTypes.push("EDUCATION");
-                    }
-                }
-    
-                // Add work certificate
-                if (documentMetadata.workcertificate?.fileId) {
-                    const workFile = tempFiles[documentMetadata.workcertificate.fileId];
-                    if (workFile instanceof File) {
-                        documentFiles.push(workFile);
-                        documentTypes.push("WORK_EXPERIENCE");
-                    }
-                }
-    
-                // Add seminar certificate
-                if (documentMetadata.seminarCertificate?.fileId) {
-                    const seminarFile = tempFiles[documentMetadata.seminarCertificate.fileId];
-                    if (seminarFile instanceof File) {
-                        documentFiles.push(seminarFile);
-                        documentTypes.push("CERTIFICATION");
-                    }
-                }
-    
-                // Add additional documents
-                if (documentMetadata.additionalDocuments?.files && 
-                    documentMetadata.additionalDocuments.files.length > 0) {
-                        
-                    documentMetadata.additionalDocuments.files.forEach(fileInfo => {
-                        if (fileInfo && fileInfo.fileId) {
-                            const additionalFile = tempFiles[fileInfo.fileId];
-                            if (additionalFile instanceof File) {
-                                documentFiles.push(additionalFile);
-                                documentTypes.push("ADDITIONAL");
+                Object.keys(documentMetadata).forEach(category => {
+                    const categoryData = documentMetadata[category];
+                    const docType = documentTypeMapping[category] || 'ADDITIONAL';
+                    
+                    // Process main file if exists
+                    if (categoryData.files && Array.isArray(categoryData.files)) {
+                        categoryData.files.forEach(fileInfo => {
+                            if (fileInfo && fileInfo.fileId) {
+                                const file = tempFiles[fileInfo.fileId];
+                                if (file instanceof File) {
+                                    documentFiles.push(file);
+                                    documentTypes.push(docType);
+                                    console.log(`Adding ${docType} file: ${file.name}`);
+                                }
                             }
-                        }
-                    });
-                }
+                        });
+                    }
+                });
             }
     
             console.log("Submitting application with data:", applicationData);
             console.log("Document files:", documentFiles.map(f => f.name));
             console.log("Document types:", documentTypes);
-    
+            
+            // Submit application with all files
             const result = await submitJobApplication(
                 authTokens.access, 
                 applicationData, 
