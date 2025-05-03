@@ -39,19 +39,12 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                 console.log("Fetched profile data:", data);
                 setProfileData(data);
                 
-                // Find applicant ID from any available source
-                if (data && data.applicant_id) {
-                    setApplicantId(data.applicant_id);
-                    console.log("Setting applicant ID from profile data:", data.applicant_id);
-                } else if (user && user.applicant_id) {
-                    setApplicantId(user.applicant_id);
-                    console.log("Setting applicant ID from user context:", user.applicant_id);
-                } else if (user && user.user_id) {
-                    // In some systems, user_id might be the same as applicant_id
-                    console.log("No applicant ID found, but user_id is available:", user.user_id);
+                // Always use user_id as applicant ID
+                if (user && user.user_id) {
                     setApplicantId(user.user_id);
+                    console.log("Setting applicant ID to user_id:", user.user_id);
                 } else {
-                    console.error("No applicant ID found in either profile data or user context");
+                    console.error("No user_id found in user context");
                 }
                 
                 setIsLoading(false);
@@ -91,11 +84,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
             return;
         }
 
-        // Check if we have applicant ID from any source
-        const effectiveApplicantId = applicantId || 
-            (profileData?.applicant_id) || 
-            (user?.applicant_id) ||
-            (user?.user_id); // In some systems, user_id might be the same as applicant_id
+        const effectiveApplicantId = user?.user_id;
             
         console.log("Effective applicant ID for submission:", effectiveApplicantId);
         
