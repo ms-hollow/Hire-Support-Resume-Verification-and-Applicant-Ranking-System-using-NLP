@@ -7,6 +7,8 @@ import {
     getApplicantProfile,
     updateApplicantProfile,
 } from "@/pages/api/applicantApi";
+import { toast } from 'react-toastify';
+import ToastWrapper from "./ToastWrapper";
 
 const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
     const { authTokens } = useContext(AuthContext);
@@ -48,17 +50,17 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
                 : 0);
 
         if (birthYear > currentYear) {
-            alert("The year entered exceeds the current year.");
+            toast.error("The year entered exceeds the current year.");
             return;
         }
 
         if (age < 15) {
-            alert("Age must be 15 years or older.");
+            toast.info("Age must be 15 years or older.");
             return;
         }
 
         if (age > 85) {
-            alert("Age must be less than 85 years old.");
+            toast.error("Age must be less than 85 years old.");
             return;
         }
 
@@ -88,45 +90,49 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+    
         if (!authTokens?.access) {
             console.error("No auth token, cannot update profile.");
             return;
         }
-
+    
         const success = await updateApplicantProfile(authTokens, formData);
-
+    
         if (success) {
-            alert("Profile updated successfully!");
-
-            // Fetch updated profile
-            const updatedData = await getApplicantProfile(authTokens);
-            if (updatedData) {
-                setFormData(updatedData);
+            if (typeof window !== "undefined") {
+                const fullUrl = window.location.href;
+    
+                if (fullUrl === "http://localhost:3000/APPLICANT/ApplicantProfile") {
+                    toast.success("Profile updated successfully!");
+                    
+                    // Fetch updated profile after successful update
+                    const updatedData = await getApplicantProfile(authTokens);
+                    if (updatedData) {
+                        setFormData(updatedData);
+                    }
+    
+                    if (onUpdateComplete) {
+                        onUpdateComplete();
+                    }
+    
+                    router.push("/APPLICANT/ApplicantProfile");
+                } 
+                else if (fullUrl === "http://localhost:3000/GENERAL/Register") {
+                    toast.success("Account successfully registered!");
+    
+                    setTimeout(() => {
+                        router.push("/APPLICANT/ApplicantHome");
+                    }, 2000); // 2 seconds delay
+                } 
+                else {
+                    toast.error("An unexpected error occurred. Please try again later.");
+                }
             }
-
-            if (onUpdateComplete) {
-                onUpdateComplete();
-            }
-            validate();
         } else {
-            alert("Failed to update profile. Please try again.");
+            toast.error("Failed to update profile. Please try again.");
         }
     };
-
-    const validate = async () => {
-        if (typeof window !== "undefined") {
-            const fullUrl = window.location.href;
-            if (
-                fullUrl === "http://localhost:3000/APPLICANT/ApplicantProfile"
-            ) {
-                router.push("/APPLICANT/ApplicantProfile");
-            } else if (fullUrl === "http://localhost:3000/GENERAL/Register") {
-                router.push("/APPLICANT/ApplicantHome");
-            } else {
-                alert("An unexpected error occurred. Please try again later.");
-            }
-        }
-    };
+    
 
     useEffect(() => {
         if (!authTokens?.access) {
@@ -476,6 +482,7 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
                     )}
                 </div>
             </form>
+            <ToastWrapper/>
         </div>
     );
 };

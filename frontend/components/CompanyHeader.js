@@ -82,10 +82,6 @@ const CompanyHeader = () => {
           )}
         </div>
 
-        {/* Company Site Link */}
-        <div className="hidden md:block">
-          <Link href="/GENERAL/Login"><h3>Applicant Site</h3></Link>
-        </div>
       </div>
 
       {/* Hamburger Menu */}

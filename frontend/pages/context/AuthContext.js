@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import jwt from 'jsonwebtoken';
+import { toast } from 'react-toastify';
 
 const AuthContext = createContext();
 
@@ -89,7 +90,7 @@ export const AuthProvider = ({children}) => {
         // Email Validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            alert('Please enter a valid email address.');
+            toast.error('Please enter a valid email address.');
             return;
         }
 
@@ -115,7 +116,7 @@ export const AuthProvider = ({children}) => {
                 router.push("/APPLICANT/ApplicantHome"); //! Palitan ng applicant home
             }
         } else {
-            alert(data.error || 'Invalid credentials');
+            toast.error(data.error || 'Invalid credentials');
         }
     };
 
@@ -143,7 +144,7 @@ export const AuthProvider = ({children}) => {
                     router.push("/APPLICANT/ApplicantHome");
                 }
             } else {
-                alert("Invalid Email!");
+                toast.error("Invalid Email!");
             }
         } catch (error) {
             console.error('Google login error:', error);

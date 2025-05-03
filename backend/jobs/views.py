@@ -81,13 +81,22 @@ def create_job_hiring(request):
 def edit_job_hiring(request, pk):
     try:
         job_hiring = JobHiring.objects.get(pk=pk)
-        serializer = JobHiringSerializer(job_hiring, data=request.data)
+
+        # Make a copy of the request data to modify
+        updated_data = request.data.copy()
+
+        # If current status is "draft", update to "open"
+        if job_hiring.status == "draft":
+            updated_data["status"] = "open"
+
+        serializer = JobHiringSerializer(job_hiring, data=updated_data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except JobHiring.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

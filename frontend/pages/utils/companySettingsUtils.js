@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import { toast } from 'react-toastify'; 
+
 export function validateFormData(formData) {
     const totalWeight =
         parseFloat(formData.criteria.workExperience.weight || 0) +
@@ -7,7 +10,7 @@ export function validateFormData(formData) {
         parseFloat(formData.criteria.certificates.weight || 0);
 
     if (totalWeight !== 100) {
-        alert("Total weight of criteria must be equal to 100");
+        toast.error("Total weight of criteria must be equal to 100");
         return false;
     }
 
@@ -29,13 +32,13 @@ export function validateFormData(formData) {
 
     for (const { field, msg } of requiredFields) {
         if (!formData[field]) {
-            alert(msg);
+            toast.error(msg);
             return false;
         }
     }
 
     if (formData.required_documents.length === 0) {
-        alert("Please select at least one required document.");
+        toast.error("Please select at least one required document.");
         return false;
     }
 

@@ -7,6 +7,8 @@ import {
     getCompanyProfile,
     updateCompanyProfile,
 } from "@/pages/api/companyApi";
+import { toast } from 'react-toastify';
+import ToastWrapper from "./ToastWrapper";
 
 const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
     const { authTokens } = useContext(AuthContext);
@@ -110,33 +112,43 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
+        if (!authTokens?.access) {
+            console.error("No auth token, cannot update company profile.");
+            return;
+        }
+    
         const success = await updateCompanyProfile(authTokens, formData);
+    
         if (success) {
-            alert("Company profile updated!");
-            if (onUpdateComplete) {
-                onUpdateComplete();
+            if (typeof window !== "undefined") {
+                const fullUrl = window.location.href;
+    
+                if (fullUrl === "http://localhost:3000/COMPANY/CompanyProfile") {
+                    toast.success("Company profile updated!");
+    
+                    if (onUpdateComplete) {
+                        onUpdateComplete();
+                    }
+    
+                    router.push("/COMPANY/CompanyProfile");
+                } 
+                else if (fullUrl === "http://localhost:3000/GENERAL/Register") {
+                    toast.success("Account successfully registered!");
+    
+                    setTimeout(() => {
+                        router.push("/COMPANY/CompanyHome");
+                    }, 2000); // 2 seconds delay
+                } 
+                else {
+                    toast.error("An unexpected error occurred. Please try again later.");
+                }
             }
-            validate();
         } else {
-            alert("Error updating profile. See console for details.");
+            toast.error("Error updating profile. See console for details.");
         }
     };
-
-    const validate = async () => {
-        if (typeof window !== "undefined") {
-            const fullUrl = window.location.href;
-
-            if (fullUrl === "http://localhost:3000/COMPANY/CompanyProfile") {
-                router.push("/COMPANY/CompanyProfile");
-            } else if (fullUrl === "http://localhost:3000/GENERAL/Register") {
-                router.push("/COMPANY/CompanyHome");
-            } else {
-                alert("An unexpected error occurred. Please try again later.");
-            }
-        }
-    };
-
+    
     return (
         <div>
             <form onSubmit={handleSubmit}>
@@ -358,6 +370,7 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                     )}
                 </div>
             </form>
+            <ToastWrapper/>
         </div>
     );
 };

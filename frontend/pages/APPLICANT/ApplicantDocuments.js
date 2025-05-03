@@ -7,7 +7,8 @@ import { useRouter } from "next/router";
 import { FaChevronDown } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import JobDetailsWrapper from "@/components/JobDetails";
-import { saveSectionData, getSectionData } from "../utils/jobApplicationStates";
+import { toast } from 'react-toastify';
+import ToastWrapper from "@/components/ToastWrapper";
 
 //TODO TODO TODO TODO
 
@@ -189,35 +190,19 @@ export default function ApplicantDocument({ handleJobClick }) {
 
     return (
         <div>
-            <ApplicantHeader />
-            <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 xxsm:px-4  py-8 mx-auto">
-                <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall  text-fontcolor pb-1">
-                    You are Applying for{" "}
-                </p>
-                <p className="font-semibold text-primary text-large pb-1">
-                    {jobHiringTitle}
-                </p>
-                <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">
-                    {companyName}
-                </p>
-                <div className="relative">
-                    <p
-                        className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-8 font-bold underline cursor-pointer"
-                        onClick={handleToggleDetails}
-                    >
-                        See job hiring details
-                    </p>
-                    {showJobDetails && (
-                        <div className="flex items-center justify-center absolute inset-0 bg-background h-screen ">
-                            <div className="relative w-full lg:w-6/12 mb:w-10/12 sm:w-full z-10 bg-background rounded ">
-                                <button
-                                    onClick={() => setShowJobDetails(false)}
-                                    className="absolute -top-12 right-0  text-xl text-fontcolor hover:text-gray-700"
-                                >
-                                    {" "}
-                                    ✖{" "}
-                                </button>
-                                <JobDetailsWrapper
+            <ApplicantHeader/>
+            <ToastWrapper/>
+                <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 xxsm:px-4  py-8 mx-auto">
+                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
+                    <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>
+                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompanyFromLocalStorage() || 'No Job Company Available'}</p>
+                    <div className="relative">
+                        <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-8 font-bold underline cursor-pointer" onClick={handleToggleDetails} >See job hiring details</p>
+                        {showJobDetails && (
+                            <div className="flex items-center justify-center absolute inset-0 bg-background h-screen ">
+                                <div className="relative w-full lg:w-6/12 mb:w-10/12 sm:w-full z-10 bg-background rounded ">
+                                    <button onClick={() => setShowJobDetails(false)} className="absolute -top-12 right-0  text-xl text-fontcolor hover:text-gray-700" > ✖ </button>
+                                    <JobDetailsWrapper
                                     /*authToken={authTokens?.access}*/
                                     onJobClick={handleJobClick}
                                 />

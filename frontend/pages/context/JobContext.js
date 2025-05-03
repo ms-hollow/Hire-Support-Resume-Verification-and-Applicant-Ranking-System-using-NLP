@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { fetchSavedJobs, unsaveJob, saveJob } from "../api/applicantJobApi";
+import { toast } from 'react-toastify';
+import ToastWrapper from "@/components/ToastWrapper";
 
 const JobContext = createContext();
 
@@ -51,9 +53,9 @@ export const JobProvider = ({ authToken, children }) => {
                 ...prevStatus,
                 [jobId]: isCurrentlySaved,
             }));
-            alert("Failed to update saved job status.");
+            toast.error("Failed to update saved job status.");
         } else {
-            alert(
+            toast.success(
                 isCurrentlySaved
                     ? "Job unsaved successfully!"
                     : "Job saved successfully!"
@@ -63,8 +65,15 @@ export const JobProvider = ({ authToken, children }) => {
     };
 
     return (
-        <JobContext.Provider value={{ savedStatus, toggleSaveJob }}>
-            {children}
-        </JobContext.Provider>
+        <div>
+            <ToastWrapper/>
+            <JobContext.Provider value={{ savedStatus, toggleSaveJob }}>
+                {children}
+            </JobContext.Provider>
+        </div>
+       
+          
+        
+       
     );
 };

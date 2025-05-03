@@ -10,7 +10,7 @@ export default function  ApplicationSubmit () {
                     <h1 className="lg:text-xl mb:text-xl sm:text-large text-primary mb-2">Application Submitted</h1>
                     <p id='full-name' className="font-thin lg:text-medium mb:text-meduim sm:text-xsmall xsm:text-xsmall text-fontcolor mb-8">Hi, NAME</p> 
 
-                    <div className="flex items-center justify-center ">
+                    <div className="flex items-center justify-center pb-8">
                     <div className="job-application-box rounded-xs px-8 py-5 mx-auto">
                         <p className="font-semibold lg:text-large mb:text-large sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-primary">Your application has been submitted!</p>
 
