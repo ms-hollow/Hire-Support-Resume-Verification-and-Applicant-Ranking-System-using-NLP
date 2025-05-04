@@ -4,10 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useContext } from "react";
 import ReviewApplication from "@/components/ReviewApplication";
-import {
-    getSectionData,
-    clearJobApplicationDraft,
-} from "../utils/jobApplicationStates";
+import { getSectionData, clearJobApplicationDraft, getTempUploadedFiles, clearTempFiles } from "../utils/jobApplicationStates";
 import { submitJobApplication } from "../api/applicantJobApi";
 import { getApplicantProfile } from "../api/applicantApi";
 import { useRouter } from "next/router";
@@ -235,10 +232,10 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                     You are Applying for{" "}
                 </p>
                 <p className="font-semibold text-primary text-large pb-1">
-                    {getTitleFromLocalStorage() || "No Job Title Available"}
+                    {jobHiringTitle || "No Job Title Available"}
                 </p>
                 <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">
-                    {getCompanyFromLocalStorage() || "No Job Company Available"}
+                    {companyName || "No Job Company Available"}
                 </p>
                 <div className="relative">
                     <p
