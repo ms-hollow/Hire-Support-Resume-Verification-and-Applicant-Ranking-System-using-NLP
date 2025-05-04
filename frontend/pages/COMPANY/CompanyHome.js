@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useContext } from "react";
 import CompanyHeader from "@/components/CompanyHeader";
 import GeneralFooter from "@/components/GeneralFooter";
-import Link from "next/link";
 import Image from "next/image";
 import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
@@ -9,9 +8,6 @@ import { getCompany } from "../api/companyApi";
 import { fetchJobList, deleteJobHiring } from "../api/companyJobApi";
 import { toast } from "react-toastify";
 import ToastWrapper from "@/components/ToastWrapper";
-
-//* PAGE STATUS
-// TODO - Pass the job hiring id to query (for edit job hiring & view)
 
 const getStatusClassName = (status) => {
     const statusClasses = {

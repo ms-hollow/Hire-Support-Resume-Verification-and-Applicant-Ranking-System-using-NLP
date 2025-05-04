@@ -21,7 +21,6 @@ export default function Notifications() {
     const [selectedNotifs, setSelectedNotifs] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 10;
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchProfile = async () => {
