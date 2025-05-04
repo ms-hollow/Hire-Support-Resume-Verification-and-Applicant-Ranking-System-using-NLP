@@ -633,7 +633,7 @@ export default function ApplicantDocument({ handleJobClick }) {
                                                 <button
                                                     type="button"
                                                     onClick={() =>
-                                                        removeAdditionalFile(
+                                                        removeFile(
                                                             "additionalDocuments",
                                                             index
                                                         )
