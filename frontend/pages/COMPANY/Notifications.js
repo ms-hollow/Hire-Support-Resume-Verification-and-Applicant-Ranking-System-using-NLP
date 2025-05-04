@@ -224,8 +224,8 @@ export default function Notifications() {
                                         }
                                         className={`w-full px-4 py-3 shadow-lg hover:border-2 flex items-start gap-3 ${
                                             notif.is_read
-                                                ? "bg-gray-200"
-                                                : "bg-white"
+                                                ? "bg-white"
+                                                : "bg-gray-200"
                                         }`}
                                     >
                                         <div className="flex flex-col w-full">
