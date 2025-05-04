@@ -1397,11 +1397,57 @@
           }
         },
         {
-          "title": "UX Researcher"
+          "title": "UX Researcher",
+          "relevance": {
+            "directly_relevant": [
+              "User Experience Researcher",
+              "Human Factors Specialist",
+              "Product Researcher",
+              "Behavioral UX Analyst",
+              "Usability Analyst"
+            ],
+            "highly_relevant": [
+              "UX Designer",
+              "Design Strategist",
+              "Interaction Designer",
+              "Information Architect",
+              "Service Designer"
+            ],
+            "moderately_relevant": [
+              "Market Research Analyst",
+              "Data Analyst",
+              "Product Manager",
+              "Content Strategist",
+              "Psychology Research Assistant"
+            ]
+          }
         },
         {
-          "title": "Accessibility Specialist"
-        }
+          "title": "Accessibility Specialist",
+          "relevance": {
+            "directly_relevant": [
+              "Digital Accessibility Consultant",
+              "ADA Compliance Specialist",
+              "Web Accessibility Analyst",
+              "Accessibility Engineer",
+              "Accessibility Auditor"
+            ],
+            "highly_relevant": [
+              "UX Designer",
+              "Front-end Developer",
+              "QA Analyst",
+              "Interaction Designer",
+              "Web Developer"
+            ],
+            "moderately_relevant": [
+              "Technical Writer",
+              "Instructional Designer",
+              "Customer Support Specialist",
+              "Graphic Designer",
+              "Project Coordinator"
+            ]
+          }
+        }        
       ]
     },
     

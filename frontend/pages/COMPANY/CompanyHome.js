@@ -320,7 +320,7 @@ export default function CompanyHome() {
                                         <tr>
                                             <td
                                                 colSpan="5"
-                                                className="p-5 text-center"
+                                                className="p-5 text-gray-500 text-center"
                                             >
                                                 No job details available.
                                             </td>
