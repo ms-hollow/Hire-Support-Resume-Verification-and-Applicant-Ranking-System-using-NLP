@@ -5,7 +5,8 @@ from  .models import Applicant
 class ApplicantProfileFormSerializer(serializers.ModelSerializer):
     class Meta:
         model = Applicant
-        fields = ['first_name', 
+        fields = ['id',
+                  'first_name', 
                   'middle_name', 
                   'last_name', 
                   'sex', 

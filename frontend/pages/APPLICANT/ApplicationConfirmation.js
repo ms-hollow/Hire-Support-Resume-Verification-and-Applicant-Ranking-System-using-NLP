@@ -10,6 +10,7 @@ import { getApplicantProfile } from "../api/applicantApi";
 import { useRouter } from "next/router";
 import JobDetailsWrapper from "@/components/JobDetails";
 import AuthContext from "../context/AuthContext";
+import jwt from "jsonwebtoken";
 
 
 export default function ApplicationConfirmation({ handleJobClick }) {
@@ -20,9 +21,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
     const [showJobDetails, setShowJobDetails] = useState(false);
     const [submitResult, setSubmitResult] = useState({ success: null, message: "" });
     const { authTokens, user } = useContext(AuthContext);
-    const [profileData, setProfileData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [applicantId, setApplicantId] = useState(null);
 
     // Check for console debugging
     useEffect(() => {
@@ -30,52 +29,16 @@ export default function ApplicationConfirmation({ handleJobClick }) {
         console.log("Auth tokens from context:", authTokens ? "Present (first 10 chars): " + 
             (authTokens.access ? authTokens.access.substring(0, 10) + "..." : "No access token") : "No auth tokens");
         console.log("User from context:", user);
-    }, [authTokens, user]);
-
-    // Fetch applicant profile data when component mounts
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const data = await getApplicantProfile(authTokens);
-                console.log("Fetched profile data:", data);
-                setProfileData(data);
-                
-                // Find applicant ID from any available source
-                if (data && data.applicant_id) {
-                    setApplicantId(data.applicant_id);
-                    console.log("Setting applicant ID from profile data:", data.applicant_id);
-                } else if (user && user.applicant_id) {
-                    setApplicantId(user.applicant_id);
-                    console.log("Setting applicant ID from user context:", user.applicant_id);
-                } else if (user && user.user_id) {
-                    // In some systems, user_id might be the same as applicant_id
-                    console.log("No applicant ID found, but user_id is available:", user.user_id);
-                    setApplicantId(user.user_id);
-                } else {
-                    console.error("No applicant ID found in either profile data or user context");
-                }
-                
-                setIsLoading(false);
-            } catch (error) {
-                console.error("Error fetching applicant profile:", error);
-                setSubmitResult({
-                    success: false,
-                    message: "Failed to load your profile. Please refresh or log in again."
-                });
-                setIsLoading(false);
-            }
-        };
         
-        if (authTokens && authTokens.access) {
-            fetchProfile();
-        } else {
-            console.error("No auth tokens available for profile fetch");
-            setIsLoading(false);
+        if (!authTokens || !authTokens.access) {
+            console.error("No auth tokens available");
             setSubmitResult({
                 success: false,
                 message: "You need to be logged in to submit an application."
             });
         }
+        
+        setIsLoading(false);
     }, [authTokens, user]);
 
     const handleToggleDetails = () => {
@@ -92,25 +55,6 @@ export default function ApplicationConfirmation({ handleJobClick }) {
             return;
         }
         
-        // Check if we have applicant ID from any source
-        const effectiveApplicantId = applicantId || 
-            (profileData?.applicant_id) || 
-            (user?.applicant_id) ||
-            (user?.user_id); 
-            
-        console.log("Effective applicant ID for submission:", effectiveApplicantId);
-        
-        if (!effectiveApplicantId) {
-            console.error("No applicant ID found from any source");
-            setSubmitResult({
-                success: false,
-                message: "No applicant information found. Please log in again."
-            });
-            alert("No applicant information found. Please log in again.");
-            return;
-        }
-
-        // Check if we have authentication tokens
         if (!authTokens || !authTokens.access) {
             console.error("No auth tokens available for submission");
             setSubmitResult({
@@ -124,6 +68,14 @@ export default function ApplicationConfirmation({ handleJobClick }) {
         setIsSubmitting(true);
 
         try {
+            // First get the applicant profile to get the applicant ID
+            const profileData = await getApplicantProfile(authTokens);
+            console.log("Retrieved profile data:", profileData);
+
+            if (!profileData?.applicant_id) {
+                throw new Error("Could not determine applicant ID from profile");
+            }
+
             // Get all necessary data from localStorage
             const personalInfo = getSectionData('personalInfo');
             const documentMetadata = getSectionData('documentMetadata');
@@ -139,7 +91,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
             // Prepare application data for submission
             const applicationData = {
                 job_hiring: jobDetails.job_hiring_id,
-                applicant: effectiveApplicantId, // Use the effective applicant ID
+                applicant: profileData.applicant_id,
                 fullName: `${personalInfo.first_name} ${personalInfo.middle_name || ''} ${personalInfo.last_name}`.trim(),
                 email: personalInfo.email,
                 contact_number: personalInfo.contact_number,
@@ -148,6 +100,8 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                 application_date: new Date().toISOString().split('T')[0],
                 application_status: "draft"
             };
+
+            console.log("Submitting with applicant ID:", profileData.applicant_id);
     
             // Extract document files and types using the stored metadata
             const documentFiles = [];
@@ -217,6 +171,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                 setTimeout(() => {
                     router.push("/APPLICANT/ApplicationSubmit");
                 }, 2000);
+
             } else {
                 console.error("Submission error:", result.error);
                 setSubmitResult({ 
@@ -225,6 +180,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                 });
                 alert(`Failed to submit application: ${result.error || "Please try again"}`);
             }
+            
         } catch (error) {
             console.error("Error submitting application:", error);
             setSubmitResult({ 

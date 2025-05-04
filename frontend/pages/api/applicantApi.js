@@ -36,28 +36,18 @@ export const getApplicantProfile = async (authTokens) => {
 
     const data = await response.json();
     
-    // Add token data to the profile
+    // Extract user ID from token to use as applicant ID
     const tokenData = jwt.decode(authTokens.access);
+    const userId = tokenData?.user_id;
     
-    // Extract applicant_id specifically - this is critical for job applications
-    let applicantId = null;
-    if (data.profile_data && data.profile_data.applicant_id) {
-      applicantId = data.profile_data.applicant_id;
-    } else if (data.profile_data && data.profile_data.id) {
-      applicantId = data.profile_data.id;
-    } else if (tokenData && tokenData.applicant_id) {
-      applicantId = tokenData.applicant_id;
-    } else if (tokenData && tokenData.user_id) {
-      console.log("No direct applicant_id found, but user_id is available in token");
-    }
+    console.log("User ID from token:", userId);
     
-    console.log("Applicant ID from profile:", applicantId);
-    
-    // Combine profile data with token data and ensure applicant_id is set
+    // Create a simple profile data object
     const profileData = {
       ...data.profile_data,
       email: tokenData?.email,
-      applicant_id: applicantId,
+      user_id: userId,
+      applicant_id: data.profile_data.id // This should be the applicant ID from your database
     };
     
     console.log("Complete profile data:", profileData);
