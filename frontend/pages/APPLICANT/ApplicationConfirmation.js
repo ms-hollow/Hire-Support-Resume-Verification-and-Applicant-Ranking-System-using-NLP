@@ -129,7 +129,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
             const documentTypeMapping = {
                 'resume': 'RESUME',
                 'educationalDocuments': 'EDUCATION',
-                'workcertificate': 'WORK_EXPERIENCE',
+                'workcertificate': 'EXPERIENCE',
                 'seminarCertificate': 'CERTIFICATION',
                 'additionalDocuments': 'ADDITIONAL'
             };
