@@ -1,8 +1,10 @@
+import apiBaseUrl from "@/config/apiBaseUrl";
+
 export const fetchJobList = async (authTokens) => {
     if (!authTokens?.access) return null;
 
     try {
-        const res = await fetch("http://127.0.0.1:8000/job/hirings/company", {
+        const res = await fetch(`${apiBaseUrl}/job/hirings/company`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${authTokens.access}`,
@@ -22,7 +24,7 @@ export const getJobHiringDetails = async (id, authTokens) => {
     }
 
     try {
-        const res = await fetch(`http://127.0.0.1:8000/job/hirings/${id}`, {
+        const res = await fetch(`${apiBaseUrl}/job/hirings/${id}`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${authTokens.access}`,
@@ -47,7 +49,7 @@ export const getJobHiringDetails = async (id, authTokens) => {
 export const createJob = async (formData, token) => {
     try {
         const response = await fetch(
-            "http://127.0.0.1:8000/job/hirings/create/",
+            `${apiBaseUrl}/job/hirings/create/`,
             {
                 method: "POST",
                 headers: {
@@ -80,7 +82,7 @@ export const deleteJobHiring = async (id, authTokens) => {
 
     try {
         const res = await fetch(
-            `http://127.0.0.1:8000/job/hirings/delete/${id}`,
+            `${apiBaseUrl}/job/hirings/delete/${id}`,
             {
                 method: "DELETE",
                 headers: {
@@ -111,7 +113,7 @@ export const updateJobHiring = async (id, formData, authTokens) => {
 
     try {
         const res = await fetch(
-            `http://127.0.0.1:8000/job/hirings/edit/${id}/`,
+            `${apiBaseUrl}/job/hirings/edit/${id}/`,
             {
                 method: "PUT",
                 headers: {
@@ -141,7 +143,7 @@ export const updateJobHiring = async (id, formData, authTokens) => {
 export const getJobHiringApplications = async (id, authTokens) => {
     try {
         const res = await fetch(
-            `http://127.0.0.1:8000/job/applications/get-applicant-summary/${id}`,
+            `${apiBaseUrl}/job/applications/get-applicant-summary/${id}`,
             {
                 method: "GET",
                 headers: {
@@ -162,7 +164,7 @@ export const getJobHiringApplications = async (id, authTokens) => {
 export const getApplicationDetails = async (id, authTokens) => {
     try {
         const res = await fetch(
-            `http://127.0.0.1:8000/job/applications/${id}`,
+            `${apiBaseUrl}/job/applications/${id}`,
             {
                 method: "GET",
                 headers: {
@@ -187,7 +189,7 @@ export const getApplicationDetails = async (id, authTokens) => {
 export const editJobApplication = async (id, formData, authTokens) => {
     try {
         const res = await fetch(
-            `http://127.0.0.1:8000/job/applications/edit/${id}`,
+            `${apiBaseUrl}/job/applications/edit/${id}`,
             {
                 method: "PUT",
                 headers: {
@@ -212,7 +214,7 @@ export const editJobApplication = async (id, formData, authTokens) => {
 export const updateApplicationStatus = async (id, status, authTokens) => {
     try {
         const res = await fetch(
-            `http://127.0.0.1:8000/job/applications/update-application-status/${id}/`,
+            `${apiBaseUrl}/job/applications/update-application-status/${id}/`,
             {
                 method: "PUT",
                 headers: {

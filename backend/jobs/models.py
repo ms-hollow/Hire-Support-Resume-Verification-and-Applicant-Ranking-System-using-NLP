@@ -12,15 +12,6 @@ STATUS_CHOICES = (
     ('complete', 'Complete')
 )
 
-class Notification(models.Model):
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
-    message = models.TextField()
-    is_read = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Notification to {self.recipient}"
-
 class JobHiring(models.Model): 
     job_hiring_id = models.AutoField(primary_key=True) #PK
     company = models.ForeignKey(Company, on_delete=models.CASCADE) #FK
@@ -204,6 +195,15 @@ class JobApplicationDocument(models.Model):
     def __str__(self):
         return f"{self.document_type} for {self.job_application}"
 
+class Notification(models.Model):
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    job_application = models.ForeignKey(JobApplication, on_delete=models.CASCADE, null=True, blank=True) 
+
+    def __str__(self):
+        return f"Notification to {self.recipient}"
 class RecentSearch(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     job_title = models.CharField(max_length=255, blank=True, null=True)

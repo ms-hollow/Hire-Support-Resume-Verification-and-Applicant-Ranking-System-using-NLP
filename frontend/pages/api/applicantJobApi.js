@@ -1,6 +1,8 @@
+import apiBaseUrl from "@/config/apiBaseUrl";
+
 export const fetchJobListings = async (authToken) => {
     try {
-        const response = await fetch("http://127.0.0.1:8000/job/job-hirings/", {
+        const response = await fetch(`${apiBaseUrl}/job/job-hirings/`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -44,7 +46,7 @@ export const fetchJobListings = async (authToken) => {
 export const fetchSavedJobs = async (authToken) => {
     try {
         const response = await fetch(
-            "http://127.0.0.1:8000/applicant/saved-jobs/",
+            `${apiBaseUrl}/applicant/saved-jobs/`,
             {
                 method: "GET",
                 headers: {
@@ -65,7 +67,7 @@ export const fetchSavedJobs = async (authToken) => {
 export const saveJob = async (authToken, jobId) => {
     try {
         const response = await fetch(
-            `http://127.0.0.1:8000/applicant/save-job/${jobId}/`,
+            `${apiBaseUrl}/applicant/save-job/${jobId}/`,
             {
                 method: "POST",
                 headers: {
@@ -85,7 +87,7 @@ export const saveJob = async (authToken, jobId) => {
 export const unsaveJob = async (authToken, jobId) => {
     try {
         const response = await fetch(
-            `http://127.0.0.1:8000/applicant/unsave-job/${jobId}/`,
+            `${apiBaseUrl}/applicant/unsave-job/${jobId}/`,
             {
                 method: "DELETE",
                 headers: {
@@ -107,7 +109,7 @@ export const fetchJobDetails = async (authToken, jobId) => {
 
     try {
         const response = await fetch(
-            `http://127.0.0.1:8000/job/hirings/${jobId}/`,
+            `${apiBaseUrl}/job/hirings/${jobId}/`,
             {
                 method: "GET",
                 headers: {
@@ -171,7 +173,7 @@ export const fetchJobDetails = async (authToken, jobId) => {
 export const getAllJobApplications = async (authToken) => {
     try {
         const res = await fetch(
-            "http://127.0.0.1:8000/job/applications/get-all-applications/",
+            `${apiBaseUrl}/job/applications/get-all-applications/`,
             {
                 method: "GET",
                 headers: {
@@ -230,8 +232,8 @@ export const submitJobApplication = async (authToken, applicationData, documentF
             console.log(pair[0] + ': ' + (pair[1] instanceof File ? pair[1].name : pair[1]));
         }
         console.log("-----------------------");
-      
-        const response = await fetch("http://127.0.0.1:8000/job/applications/create", {
+        
+        const response = await fetch(`${apiBaseUrl}/job/applications/create`, {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${authToken}`,

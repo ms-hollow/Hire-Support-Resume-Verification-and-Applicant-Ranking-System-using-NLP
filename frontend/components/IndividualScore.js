@@ -48,21 +48,30 @@ const IndividualScore = () => {
 
         try {
             const res = await getApplicationDetails(applicant, authTokens);
+            const scores = res.scores || {};
             const mappedScore = {
-                Education: res.scores.education_score || 0,
-                Work_Experience: res.scores.experience_score || 0,
-                Skills: res.scores.skills_score || 0,
-                Certifications: res.scores.certification_score || 0,
+                Education: scores.education_score || 0,
+                Work_Experience: scores.experience_score || 0,
+                Skills: scores.skills_score || 0,
+                Certifications: scores.certification_score || 0,
             };
 
             setindivScore(mappedScore);
-            setVerificationResult(res.verification_result);
+            setVerificationResult(res.verification_result || {});
         } catch (error) {
             console.error("Error fetching job applications:", error);
         }
     };
 
-    if (!indivScore) return <p>Loading...</p>;
+    if (!indivScore) {
+        setindivScore({
+            Education: 0,
+            Work_Experience: 0,
+            Skills: 0,
+            Certifications: 0,
+        });
+        return <p>Loading...</p>;
+    }
 
     // Bar chart data for the selected applicant
     const barData = {
@@ -265,11 +274,11 @@ const IndividualScore = () => {
                 <div className="flex-1 overflow-y-auto mt-4">
                     {activeTab === "verified" ? (
                         <VerifiedCredentialsWrapper
-                            verificationResult={verificationResult}
+                            verificationResult={verificationResult || {}}
                         />
                     ) : (
                         <UnverifiedCredentialsWrapper
-                            verificationResult={verificationResult}
+                            verificationResult={verificationResult || {}}
                         />
                     )}
                 </div>
