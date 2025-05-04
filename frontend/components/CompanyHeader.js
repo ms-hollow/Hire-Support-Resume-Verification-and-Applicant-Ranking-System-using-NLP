@@ -33,7 +33,6 @@ const CompanyHeader = () => {
         <ul className="justify-center items-center mt-1 hidden md:flex space-x-10">
           <li><Link href="/COMPANY/CompanyHome">Home</Link></li>
           <li><Link href="/COMPANY/CreateJob">Create Job</Link></li>
-          <li><Link href="/COMPANY/ApplicantsSummary">Applicants Summary</Link></li>
         </ul>
 
         {/* Hamburger Menu Button */}
@@ -97,7 +96,6 @@ const CompanyHeader = () => {
         <ul className="flex flex-col items-start">
           <li className="py-2 hover:bg-primary hover:text-background cursor-pointer transition-all duration-300 w-full"><Link href="/COMPANY/CompanyHome" onClick={toggleMenu} className="block px-4 py-2"> <p className="pl-2">Home</p></Link></li>
           <li className="py-2 hover:bg-primary hover:text-background cursor-pointer transition-all duration-300 w-full"><Link href="/COMPANY/CreateJob" onClick={toggleMenu} className="block px-4 py-2"> <p className="pl-2">Create Job</p></Link></li>
-          <li className="py-2 hover:bg-primary hover:text-background cursor-pointer transition-all duration-300 w-full"><Link href="/COMPANY/ApplicantsSummary" onClick={toggleMenu} className="block px-4 py-2"><p className="pl-2">Applicants Summary </p></Link></li>
         </ul>
 
       </div>
