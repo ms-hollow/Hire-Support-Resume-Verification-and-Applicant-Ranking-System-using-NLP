@@ -183,55 +183,54 @@ export default function Notifications() {
 
                         {/* Notifications List */}
                         <div className="flex flex-col w-full">
-                            {paginatedNotifications.map((notif) => (
-                                <div
-                                    key={notif.id}
-                                    onClick={() => handleMarkAsRead(notif.id)}
-                                    className="w-full px-4 py-3 bg-white shadow-lg hover:border-2 flex items-start gap-3"
-                                >
-                                    <div className="flex flex-col w-full">
-                                        <div className="flex flex-row items-center gap-3 w-full">
-                                            <input
-                                                type="checkbox"
-                                                checked={
-                                                    selectedNotifs[notif.id] ||
-                                                    false
-                                                }
-                                                onChange={() =>
-                                                    handleCheckboxChange(
-                                                        notif.id
-                                                    )
-                                                }
-                                                className="w-4 h-4 align-middle"
-                                            />
-                                            <Image
-                                                src="/Notification Icon 1.svg"
-                                                width={39}
-                                                height={30}
-                                                alt="Notification Icon"
-                                            />
-                                            <div className="flex items-center justify-between w-full overflow-hidden cursor-pointer">
-                                                <p className="text-fontcolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall leading-snug truncate">
-                                                    Hi there,
-                                                    <span className="font-bold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall">
-                                                        {" "}
-                                                        {applicantName}{" "}
-                                                    </span>
-                                                    <span className="text-fontcolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-thin">
-                                                        {" "}
-                                                        - {notif.message}
-                                                    </span>
-                                                </p>
-                                                <p className="text-xs text-gray-400 flex-shrink-0 pl-4">
-                                                    {new Date(
-                                                        notif.created_at
-                                                    ).toLocaleTimeString()}
-                                                </p>
+                            {notifications.length === 0 ? (
+                                <div className="text-center text-gray-500 py-8">
+                                    No notifications available at the moment.
+                                </div>
+                            ) : (
+                                paginatedNotifications.map((notif) => (
+                                    <div
+                                        key={notif.id}
+                                        onClick={() => handleMarkAsRead(notif.id)}
+                                        className="w-full px-4 py-3 bg-white shadow-lg hover:border-2 flex items-start gap-3"
+                                    >
+                                        <div className="flex flex-col w-full">
+                                            <div className="flex flex-row items-center gap-3 w-full">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedNotifs[notif.id] || false}
+                                                    onChange={() =>
+                                                        handleCheckboxChange(notif.id)
+                                                    }
+                                                    className="w-4 h-4 align-middle"
+                                                />
+                                                <Image
+                                                    src="/Notification Icon 1.svg"
+                                                    width={39}
+                                                    height={30}
+                                                    alt="Notification Icon"
+                                                />
+                                                <div className="flex items-center justify-between w-full overflow-hidden cursor-pointer">
+                                                    <p className="text-fontcolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall leading-snug truncate">
+                                                        Hi there,
+                                                        <span className="font-bold">
+                                                            {" "}
+                                                            {applicantName}{" "}
+                                                        </span>
+                                                        <span className="text-fontcolor font-thin">
+                                                            {" "}
+                                                            - {notif.message}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-xs text-gray-400 flex-shrink-0 pl-4">
+                                                        {new Date(notif.created_at).toLocaleTimeString()}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>
