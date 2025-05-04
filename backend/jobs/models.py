@@ -111,6 +111,11 @@ class JobApplication(models.Model):
         ('processed', 'Submitted'),
         ('error', 'Processing Failed'),
         ('cancelled', 'Cancelled'),
+        ('shortlisted', 'Shortlisted'),
+        ('rejected', 'Rejected'),
+        ('interview scheduled', 'Interview Scheduled'),
+        ('emailed', 'Emailed'),
+        ('accepted', 'Accepted'),
     ]
     
     application_status = models.CharField(
@@ -120,11 +125,10 @@ class JobApplication(models.Model):
     )
     scores = models.JSONField(blank=True, null=True)
     verification_result = models.JSONField(blank=True, null=True)
-    
-    application_date = models.DateTimeField(auto_now_add=True)
-    application_status = models.CharField(max_length=20, default='draft')
-    scores = models.JSONField(blank=True, null=True)
-    verification_result = models.JSONField(blank=True, null=True)
+    interview_date = models.DateField(null=True, blank=True)
+    interview_start_time = models.TimeField(null=True, blank=True)
+    interview_end_time = models.TimeField(null=True, blank=True)
+    interview_location_link = models.CharField(max_length=255, null=True, blank=True)
 
     def notify_applicant(self, message):
         Notification.objects.create(

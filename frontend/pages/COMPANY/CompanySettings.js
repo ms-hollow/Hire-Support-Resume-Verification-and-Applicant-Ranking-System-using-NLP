@@ -14,6 +14,8 @@ import {
 import { getCookie } from "../utils/cookieUtils";
 import useFetchOptions from "@/hooks/companySettingsHooks";
 import { useFormData } from "@/hooks/companySettingsHooks";
+import { toast } from 'react-toastify';
+import ToastWrapper from "@/components/ToastWrapper";
 
 export default function CompanySettings() {
     const [options, setOptions] = useFetchOptions();
@@ -95,7 +97,7 @@ export default function CompanySettings() {
                 ? selectedOptions.filter((item) => item !== option)
                 : [...selectedOptions, option];
 
-            return {
+            const updatedFormData = {
                 ...prev,
                 criteria: {
                     ...prev.criteria,
@@ -105,37 +107,72 @@ export default function CompanySettings() {
                     },
                 },
             };
+            
+            if (category === 'workExperience' && 
+                (field === 'directlyRelevant' || 
+                 field === 'highlyRelevant' || 
+                 field === 'moderatelyRelevant')) {
+                
+                const relevantRoles = {
+                    directly_relevant: updatedFormData.criteria.workExperience.directlyRelevant || [],
+                    highly_relevant: updatedFormData.criteria.workExperience.highlyRelevant || [],
+                    moderately_relevant: updatedFormData.criteria.workExperience.moderatelyRelevant || []
+                };
+                
+                Cookies.set('RELEVANT_ROLES', JSON.stringify(relevantRoles), { expires: 7 });
+            }
+    
+            return updatedFormData;
         });
     };
 
     const handleAddCustomOption = (category, field, customOption) => {
-        if (!customOption.trim()) return; // Prevent empty input
-
+        if (!customOption.trim()) return; 
         setOptions((prev) => ({
             ...prev,
             [category]: prev[category]?.includes(customOption)
                 ? prev[category]
-                : [...(prev[category] || []), customOption], // Add only if not exists
+                : [...(prev[category] || []), customOption], 
         }));
-
+    
         handleMultiSelectChange(category, field, customOption);
-
-        setSearchTerm((prev) => ({ ...prev, [field]: "" })); // Reset only the relevant search field
+    
+        setSearchTerm((prev) => ({ ...prev, [field]: "" })); 
     };
-
+    
     const handleRemoveSelectedOption = (category, field, option) => {
-        setFormData((prev) => ({
-            ...prev,
-            criteria: {
-                ...prev.criteria,
-                [category]: {
-                    ...prev.criteria[category],
-                    [field]: prev.criteria[category][field].filter(
-                        (item) => item !== option
-                    ),
+        setFormData((prev) => {
+            const updatedOptions = prev.criteria[category][field].filter(
+                (item) => item !== option
+            );
+            
+            const updatedFormData = {
+                ...prev,
+                criteria: {
+                    ...prev.criteria,
+                    [category]: {
+                        ...prev.criteria[category],
+                        [field]: updatedOptions,
+                    },
                 },
-            },
-        }));
+            };
+            
+            if (category === 'workExperience' && 
+                (field === 'directlyRelevant' || 
+                 field === 'highlyRelevant' || 
+                 field === 'moderatelyRelevant')) {
+                
+                const relevantRoles = {
+                    directly_relevant: updatedFormData.criteria.workExperience.directlyRelevant || [],
+                    highly_relevant: updatedFormData.criteria.workExperience.highlyRelevant || [],
+                    moderately_relevant: updatedFormData.criteria.workExperience.moderatelyRelevant || []
+                };
+                
+                Cookies.set('RELEVANT_ROLES', JSON.stringify(relevantRoles), { expires: 7 });
+            }
+    
+            return updatedFormData;
+        });
     };
 
     const handleCriteriaChange = (field, subField, value) => {
@@ -164,6 +201,31 @@ export default function CompanySettings() {
             return { ...prevFormData, required_documents: updatedDocuments };
         });
     };
+
+    useEffect(() => {
+        const relevantRolesCookie = Cookies.get("RELEVANT_ROLES");
+        if (relevantRolesCookie) {
+            try {
+                const parsedRelevance = JSON.parse(relevantRolesCookie);
+                setFormData((prev) => ({
+                    ...prev,
+                    criteria: {
+                        ...prev.criteria,
+                        workExperience: {
+                            ...prev.criteria.workExperience,
+                            directlyRelevant: parsedRelevance.directly_relevant || [],
+                            highlyRelevant: parsedRelevance.highly_relevant || [],
+                            moderatelyRelevant: parsedRelevance.moderately_relevant || [],
+                        },
+                    },
+                }));
+            } catch (err) {
+                console.error("Failed to parse RELEVANT_ROLES", err);
+            }
+        }
+    }, []);
+    
+
 
     // Get today's date in YYYY-MM-DD format
     const currentDate = new Date().toISOString().split("T")[0];
@@ -339,11 +401,11 @@ export default function CompanySettings() {
                                                                     {selected}
                                                                 </span>
                                                                 <button
+                                                                    type="button" 
                                                                     className="ml-2 text-red-600 font-extrabold"
-                                                                    onClick={(
-                                                                        e
-                                                                    ) => {
+                                                                    onClick={(e) => {
                                                                         e.stopPropagation();
+                                                                        e.preventDefault(); 
                                                                         handleRemoveSelectedOption(
                                                                             "workExperience",
                                                                             "directlyRelevant",
@@ -499,11 +561,11 @@ export default function CompanySettings() {
                                                                     {selected}
                                                                 </span>
                                                                 <button
+                                                                    type="button"  
                                                                     className="ml-2 text-red-600 font-extrabold"
-                                                                    onClick={(
-                                                                        e
-                                                                    ) => {
+                                                                    onClick={(e) => {
                                                                         e.stopPropagation();
+                                                                        e.preventDefault();
                                                                         handleRemoveSelectedOption(
                                                                             "workExperience",
                                                                             "highlyRelevant",
@@ -660,11 +722,11 @@ export default function CompanySettings() {
                                                                     {selected}
                                                                 </span>
                                                                 <button
+                                                                    type="button" 
                                                                     className="ml-2 text-red-600 font-extrabold"
-                                                                    onClick={(
-                                                                        e
-                                                                    ) => {
+                                                                    onClick={(e) => {
                                                                         e.stopPropagation();
+                                                                        e.preventDefault(); 
                                                                         handleRemoveSelectedOption(
                                                                             "workExperience",
                                                                             "moderatelyRelevant",
@@ -1419,10 +1481,10 @@ export default function CompanySettings() {
                                                 </div>
                                             </div>
 
-                                            {/* 1st Choice Field of Study */}
+                                            {/* 1st Preference Field of Study */}
                                             <div className="mb-4">
                                                 <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                    1st Choice Field of Study{" "}
+                                                    1st Preference Field of Study{" "}
                                                     <span className="font-medium text-xsmall">
                                                         (Put the most directly
                                                         relevant fields of study
@@ -1520,16 +1582,16 @@ export default function CompanySettings() {
                                                 )}
                                             </div>
 
-                                            {/* 2nd Choice Field of Study */}
+                                            {/* 2nd Preference Field of Study */}
                                             <div className="mb-4">
                                                 <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                    2nd Choice Field of Study
-                                                    <span className="font-medium text-xsmall">
-                                                        (Put closely related
-                                                        fields that have
-                                                        significant overlap with
-                                                        the job requirements)
-                                                    </span>
+                                                    2nd Preference Field of Study{" "}
+                                                        <span className="font-medium text-xsmall">
+                                                            (Put closely related
+                                                            fields that have
+                                                            significant overlap with
+                                                            the job requirements)
+                                                        </span>
                                                 </label>
                                                 <div
                                                     className="w-full border border-gray-300 rounded-lg px-4 py-2 text-medium text-fontcolor cursor-pointer flex items-center justify-between"
@@ -1621,10 +1683,10 @@ export default function CompanySettings() {
                                                 )}
                                             </div>
 
-                                            {/* 3rd Choice Field of Study */}
+                                            {/* 3rd Preference Field of Study */}
                                             <div className="mb-4">
                                                 <label className="block text-sm font-semibold text-fontcolor mb-1">
-                                                    3rd Choice Field of Study
+                                                    3rd Preference Field of Study {" "}
                                                     <span className="font-medium text-xsmall">
                                                         (Put fields that have
                                                         some relevance or
@@ -2287,6 +2349,7 @@ export default function CompanySettings() {
                     </form>
                 </div>
             </div>
+            <ToastWrapper/>
             <GeneralFooter />
         </div>
     );

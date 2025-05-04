@@ -6,8 +6,9 @@ import { JDSkeletonLoader } from "./ui/SkeletonLoader";
 import { fetchJobDetails } from "@/pages/api/applicantJobApi";
 import { useJob, JobProvider } from "@/pages/context/JobContext";
 import { toTitleCase } from "@/pages/utils/functions";
+import { toast } from "react-toastify";
 
-const JobDetails = ({ authToken }) => {
+const JobDetails = ({ authToken, applicantName }) => {
     const { savedStatus, toggleSaveJob } = useJob();
     const router = useRouter();
     const { id } = router.query;
@@ -30,6 +31,10 @@ const JobDetails = ({ authToken }) => {
     };
 
     const navigateToJobApplication = () => {
+        if (applicantName === "Applicant") {
+            toast.info("Please complete your profile before applying.");
+            return;
+        }
         router.push({
             pathname: "/APPLICANT/JobApplication",
             query: { id },
@@ -42,7 +47,7 @@ const JobDetails = ({ authToken }) => {
     return (
         <div className="flex flex-col h-full">
             {/* Top Part of Job Details - Fixed */}
-            <div className="job-details-box border-b-8 top rounded-t-lg p-4">
+            <div className=" sticky top-0 z-10 bg-background job-details-box border-b-8 top rounded-t-lg p-4">
                 <div className="flex justify-between items-center">
                     <p className="font-semibold text-fontcolor lg:text-xlarge mb:text-large sm:text-large xsm:text-large xxsm:text-large">
                         {jobDetails.job_title}
@@ -137,7 +142,7 @@ const JobDetails = ({ authToken }) => {
             </div>
 
             {/* Main Part of Job Details - Scrollable */}
-            <div className="job-details-box rounded-b-lg overflow-y-auto bg-white p-4">
+            <div className="flex-1 job-details-box rounded-b-lg overflow-y-auto bg-white p-4">
                 {/*Employment Type*/}
                 <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">
                     Employment Type
@@ -256,12 +261,15 @@ const JobDetails = ({ authToken }) => {
     );
 };
 
-const JobDetailsWrapper = () => {
+const JobDetailsWrapper = ({ applicantName }) => {
     const { authTokens } = useContext(AuthContext);
     return (
-        <div className="flex-1 h-[calc(100vh-150px)] border border-none rounded-lg">
+        <div className="flex-1 overflow-y-auto h-[calc(100vh)] border border-none  hide-scrollbar rounded-lg">
             <JobProvider authToken={authTokens.access}>
-                <JobDetails authToken={authTokens.access} />
+                <JobDetails
+                    authToken={authTokens.access}
+                    applicantName={applicantName}
+                />
             </JobProvider>
         </div>
     );

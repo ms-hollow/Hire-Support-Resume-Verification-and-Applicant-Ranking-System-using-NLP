@@ -93,7 +93,11 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             'job_title',
             'region',
             'province',
-            'city'
+            'city',
+            'interview_date',
+            'interview_start_time',
+            'interview_end_time',
+            'interview_location_link',
         ]
  
     def create(self, validated_data):

@@ -9,6 +9,10 @@ import { getCompany } from "../api/companyApi";
 import AuthContext from "../context/AuthContext";
 import Cookies from "js-cookie";
 import { getCookie } from "../utils/cookieUtils";
+import { toast } from 'react-toastify';
+import ToastWrapper from "@/components/ToastWrapper";
+
+
 
 export default function CreateJob() {
     const [regions, setRegions] = useState([]);
@@ -20,6 +24,7 @@ export default function CreateJob() {
     const [companyName, setCompanyName] = useState("");
     let { authTokens } = useContext(AuthContext);
     const router = useRouter();
+
 
     const [formData, setFormData] = useState({
         job_title: "",
@@ -96,7 +101,7 @@ export default function CreateJob() {
 
                 //* Remove this if you don't want to alert the user once mount
                 if (companyData?.profile_data?.company_name === null) {
-                    alert("Please complete your company profile.");
+                    toast.error("Please complete your company profile.");
                 }
 
                 const currentDate = new Date();
@@ -197,13 +202,13 @@ export default function CreateJob() {
         e.preventDefault();
 
         if (companyName === "Unknown Company") {
-            alert("Please complete your company profile.");
+            toast.error("Please complete your company profile.");
             return;
         }
 
         const errors = validateForm();
         if (Object.keys(errors).length > 0) {
-            alert(
+            toast.error(
                 `Please fix the following errors:\n\n${Object.values(
                     errors
                 ).join("\n")}`
@@ -288,6 +293,56 @@ export default function CreateJob() {
         handleMultiSelectChange(option);
     };
 
+    const handleSingleSelectChange = (field, value) => {
+        setFormData((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
+    
+        if (field === "job_title") {
+            const foundIndustry = options?.jobIndustries?.find((industry) =>
+                industry.roles?.some((role) =>
+                    typeof role === "object"
+                        ? role.title === value
+                        : role === value
+                )
+            );
+    
+            const selectedRole = foundIndustry?.roles?.find((role) =>
+                typeof role === "object" ? role.title === value : role === value
+            );
+    
+            // Set Job Industry
+            if (foundIndustry) {
+                setFormData((prev) => ({
+                    ...prev,
+                    job_industry: foundIndustry.industry,
+                }));
+            }
+    
+            // Save relevant roles to cookies or local storage for use in CompanySettings
+            if (typeof selectedRole === "object" && selectedRole.relevance) {
+                const relevanceData = selectedRole.relevance;
+                Cookies.set("RELEVANT_ROLES", JSON.stringify(relevanceData), { expires: 1 });
+            } else {
+                Cookies.remove("RELEVANT_ROLES");
+            }
+        }
+    
+        setDropdownOpen((prev) => ({
+            ...prev,
+            [field]: false,
+        }));
+    };
+    
+
+    const allJobTitles = (options?.jobIndustries || []).flatMap((industryObj) =>
+        industryObj.roles.map((role) => ({
+          title: role.title || role,
+          industry: industryObj.industry,
+        }))
+      );
+      
     return (
         <div>
             <CompanyHeader />
@@ -317,31 +372,74 @@ export default function CreateJob() {
                         {/* <pre>{JSON.stringify(formData, null, 2)}</pre> */}
                         <form onSubmit={handleSubmit}>
                             <div className="grid grid-cols-2 gap-3">
+                                <div className="col-span-2 gap-3">
                                 <div>
-                                    <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor font-semibold mb-1">
+                                    <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall font-semibold text-fontcolor mb-1">
                                         Job Title
                                     </label>
-                                    <input
-                                        name="job_title"
-                                        value={formData.job_title}
-                                        onChange={handleInputChange}
-                                        placeholder="Job Title"
-                                        className="h-medium rounded-xs border-2 border-fontcolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall"
-                                    />
+                                    <div className="w-full border-2 border-black rounded-lg px-4 py-2 lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor cursor-pointer flex items-center justify-between"
+                                        onClick={() => setDropdownOpen({ ...dropdownOpen, jobTitle: !dropdownOpen.jobTitle })}>
+                                            <span>{formData.job_title || "Select Job Title"}</span>
+                                        <FaChevronDown className={`ml-2 transform ${dropdownOpen.jobTitle ? "rotate-180" : "rotate-0"} transition-transform`}/>
+                                    </div>
+
+                                    {dropdownOpen.jobTitle && (
+                                        <div className="top-full mt-1 w-full border border-gray-300 rounded-xs bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                                        {/* Search Box */}
+                                        <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                                            <input type="text" placeholder="Search job titles..." value={searchTerm.jobTitle || ""}
+                                            onChange={(e) => setSearchTerm({ ...searchTerm, jobTitle: e.target.value })}
+                                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"/>
+                                        </div>
+
+                                        {/* Filtered Titles */}
+                                        {allJobTitles
+                                            .filter((item) => item.title.toLowerCase().includes((searchTerm.jobTitle || "").toLowerCase()))
+                                            .map((item, index) => (
+                                                <div key={index}
+                                                    onClick={() => {handleSingleSelectChange("job_title", item.title);handleSingleSelectChange("job_industry", item.industry);setDropdownOpen({ ...dropdownOpen, jobTitle: false });}}
+                                                    className="py-2 px-4 hover:bg-gray-100 cursor-pointer">
+                                                    {item.title}
+                                                </div>
+                                            ))}
+                                        </div>
+                                       )}
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall  text-fontcolor font-semibold mb-1">
-                                        Job Industry
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="job_industry"
-                                        value={formData.job_industry}
-                                        onChange={handleInputChange}
-                                        placeholder="Job Industry"
-                                        className="h-medium rounded-xs border-2  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall border-fontcolor"
-                                    />
+                                <div className="col-span-2 gap-3">
+                                    <div>
+                                        <label className="block lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall font-semibold text-fontcolor mb-1">
+                                            Job Industry
+                                        </label>
+                                        <div className="w-full border-2 border-black rounded-lg px-4 py-2 lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor cursor-pointer flex items-center justify-between"
+                                            onClick={() => setDropdownOpen({...dropdownOpen, jobIndustry: !dropdownOpen.jobIndustry,})}>
+                                            <span>{formData.job_industry || "Select Job Industry"}</span>
+                                            <FaChevronDown className={`ml-2 transform ${ dropdownOpen.jobIndustry ? "rotate-180" : "rotate-0"} transition-transform`}/>
+                                        </div>
+
+                                        {dropdownOpen.jobIndustry && (
+                                            <div className="top-full mt-1 w-full border border-gray-300 rounded-xs bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
+                                            {/* Search Box */}
+                                            <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
+                                                <input type="text"placeholder="Search job industries..." value={searchTerm.jobIndustry || ""}
+                                                onChange={(e) => setSearchTerm({ ...searchTerm, jobIndustry: e.target.value,})}
+                                                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                                                />
+                                            </div>
+
+                                            {/* Job Industry Options */}
+                                            {options.jobIndustries?.map((ind) => ind.industry)
+                                                .filter((industry) => industry.toLowerCase().includes((searchTerm.jobIndustry || "").toLowerCase()))
+                                                .map((industry, index) => (
+                                                    <div key={index} onClick={() => {handleSingleSelectChange("job_industry", industry);setDropdownOpen({ ...dropdownOpen, jobIndustry: false }); }}
+                                                    className="py-2 px-4 hover:bg-gray-100 cursor-pointer">
+                                                    {industry}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className="col-span-2 gap-3">
@@ -350,116 +448,43 @@ export default function CreateJob() {
                                             <label className="block  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall font-semibold text-fontcolor mb-1">
                                                 Specialization
                                             </label>
-                                            <div
-                                                className="w-full border-2 border-black rounded-lg px-4 py-2  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
-                                                onClick={() =>
-                                                    setDropdownOpen({
-                                                        ...dropdownOpen,
-                                                        specoption:
-                                                            !dropdownOpen.specoption,
-                                                    })
-                                                }
-                                            >
-                                                {formData.specialization
-                                                    .length > 0 ? (
-                                                    formData.specialization.map(
-                                                        (selected, index) => (
-                                                            <div
-                                                                key={index}
-                                                                className="bg-gray-200 px-3 py-1 rounded-md flex items-center"
-                                                            >
-                                                                <span className="text-sm">
-                                                                    {selected}
-                                                                </span>
-                                                                <button
-                                                                    className="ml-2 text-red-600 font-extrabold"
-                                                                    onClick={(
-                                                                        e
-                                                                    ) => {
-                                                                        e.stopPropagation();
-                                                                        handleRemoveSelectedOption(
-                                                                            selected
-                                                                        );
-                                                                    }}
-                                                                >
-                                                                    X
-                                                                </button>
-                                                            </div>
-                                                        )
-                                                    )
-                                                ) : (
-                                                    <span className="text-fontcolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall">
-                                                        Select Specialization
-                                                    </span>
-                                                )}
-                                                <FaChevronDown
-                                                    className={`ml-auto transform ${
-                                                        dropdownOpen.specoption
-                                                            ? "rotate-180"
-                                                            : "rotate-0"
-                                                    } transition-transform`}
-                                                />
+                                            <div className="w-full border-2 border-black rounded-lg px-4 py-2  lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall text-fontcolor cursor-pointer flex flex-wrap gap-2 items-center"
+                                                onClick={() => setDropdownOpen({...dropdownOpen,specoption:!dropdownOpen.specoption,})}>
+                                                {formData.specialization.length > 0 ? (
+                                                    formData.specialization.map((selected, index) => (
+                                                        <div key={index} className="bg-gray-200 px-3 py-1 rounded-md flex items-center">
+                                                            <span className="text-sm"> {selected}</span>
+                                                            <button className="ml-2 text-red-600 font-extrabold"onClick={(e) => {e.stopPropagation();handleRemoveSelectedOption(selected);}}>
+                                                                X
+                                                            </button>
+                                                        </div>
+                                                    ))) : (<span className="text-fontcolor lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall"> Select Specialization </span>
+                                                   )}
+                                                <FaChevronDown className={`ml-auto transform ${dropdownOpen.specoption? "rotate-180" : "rotate-0"} transition-transform`}/>
                                             </div>
 
                                             {dropdownOpen.specoption && (
                                                 <div className="top-full mt-1 w-full border border-gray-300 rounded-xs bg-white shadow-lg text-fontcolor z-10 max-h-60 overflow-y-auto">
                                                     {/* Search Box */}
                                                     <div className="sticky top-0 bg-white z-10 p-2 border-b border-gray-200">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Search options..."
-                                                            value={
-                                                                searchTerm.specoption ||
-                                                                ""
-                                                            }
-                                                            onChange={(e) =>
-                                                                setSearchTerm({
-                                                                    ...searchTerm,
-                                                                    specoption:
-                                                                        e.target
-                                                                            .value,
-                                                                })
-                                                            }
+                                                        <input type="text" placeholder="Search options..."
+                                                            value={ searchTerm.specoption || ""}
+                                                            onChange={(e) => setSearchTerm({...searchTerm, specoption: e.target.value,})}
                                                             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
                                                         />
                                                     </div>
 
                                                     {/* Specialization Options */}
-                                                    {options.specialization
-                                                        .filter((option) =>
-                                                            option
-                                                                .toLowerCase()
-                                                                .includes(
-                                                                    (
-                                                                        searchTerm.specoption ||
-                                                                        ""
-                                                                    ).toLowerCase()
-                                                                )
-                                                        )
-                                                        .map(
-                                                            (option, index) => (
-                                                                <label
-                                                                    key={index}
-                                                                    className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer"
-                                                                >
-                                                                    <input
-                                                                        type="checkbox"
-                                                                        value={
-                                                                            option
-                                                                        }
-                                                                        checked={formData.specialization.includes(
-                                                                            option
-                                                                        )}
-                                                                        onChange={() =>
-                                                                            handleMultiSelectChange(
-                                                                                option
-                                                                            )
-                                                                        }
-                                                                        className="ml-5 w-5 h-5"
-                                                                    />
-                                                                    <span className=" lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall ml-5">
-                                                                        {option}
-                                                                    </span>
+                                                    {options.specialization.filter((option) =>
+                                                            option.toLowerCase().includes(
+                                                                (searchTerm.specoption || "" ).toLowerCase()))
+                                                                .map((option, index) => (
+                                                                <label key={index} className="flex items-center gap-1 py-2 hover:bg-gray-100 cursor-pointer">
+                                                                    <input type="checkbox" value={option}
+                                                                        checked={formData.specialization.includes(option)}
+                                                                        onChange={() => handleMultiSelectChange(option)}
+                                                                        className="ml-5 w-5 h-5"/>
+                                                                    <span className=" lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xxsmall ml-5">{option}</span>
                                                                 </label>
                                                             )
                                                         )}
@@ -826,6 +851,7 @@ export default function CreateJob() {
                     </div>
                 </div>
             </div>
+            <ToastWrapper/>
             <GeneralFooter />
         </div>
     );

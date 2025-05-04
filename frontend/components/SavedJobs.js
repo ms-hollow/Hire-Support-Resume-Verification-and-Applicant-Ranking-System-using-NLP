@@ -8,6 +8,10 @@ import {
     unsaveJob,
 } from "@/pages/api/applicantJobApi";
 import { toTitleCase } from "@/pages/utils/functions";
+import { toast } from "react-toastify";
+import ToastWrapper from "./ToastWrapper";
+import { useRouter } from "next/router";
+import { getApplicantProfile } from "@/pages/api/applicantApi";
 
 const SavedJobs = () => {
     const { authTokens } = useContext(AuthContext);
@@ -16,6 +20,7 @@ const SavedJobs = () => {
     const [savedStatus, setSavedStatus] = useState({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const router = useRouter();
 
     useEffect(() => {
         const loadSavedJobs = async () => {
@@ -56,7 +61,7 @@ const SavedJobs = () => {
                     ...prevState,
                     [jobId]: true,
                 }));
-                alert("Job saved successfully!");
+                toast.success("Job saved successfully!");
             }
         },
         [authTokens]
@@ -73,7 +78,7 @@ const SavedJobs = () => {
                 setJobListings((prevJobs) =>
                     prevJobs.filter((job) => job.job_id !== jobId)
                 );
-                alert("Job unsaved successfully!");
+                toast.success("Job unsaved successfully!");
             }
         },
         [authTokens]
@@ -87,6 +92,31 @@ const SavedJobs = () => {
         }
     };
 
+    const checkProfile = async () => {
+        const res = await getApplicantProfile(authTokens);
+        const hasIncompleteField = Object.values(res).some(
+            (val) => val === null || val === ""
+        );
+
+        if (!res || hasIncompleteField) {
+            toast.info("Please complete your profile before applying.");
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleApplyNow = async (id) => {
+        const isProfileComplete = await checkProfile();
+        if (!isProfileComplete) {
+            return;
+        }
+        router.push({
+            pathname: "/APPLICANT/JobApplication",
+            query: { id },
+        });
+    };
+
     if (loading)
         return <div className="text-fontcolor">Loading saved jobs...</div>;
     if (error) return <div>Error: {error}</div>;
@@ -96,16 +126,7 @@ const SavedJobs = () => {
             {jobListings.map((job) => (
                 <div key={job.job_id} className="flex flex-col pt-4">
                     <div className="box-container px-2 py-2 mb-4">
-                        <div className="grid grid-cols-12  gap-4 p-3">
-                            <div className="col-span-2  justify-center">
-                                <Image
-                                    src="/Logo.png"
-                                    width={50}
-                                    height={30}
-                                    alt="Company Logo"
-                                />
-                            </div>
-
+                        <div className="grid grid-cols-3  gap-4 p-3">
                             <div className="col-span-10 flex flex-col w-full">
                                 <div className="flex justify-between items-start w-full">
                                     <div>
@@ -120,7 +141,12 @@ const SavedJobs = () => {
 
                                     <div className="flex items-start ml-5 gap-4">
                                         <div className="flex items-center gap-4">
-                                            <button className="button1 flex items-center justify-center text-center">
+                                            <button
+                                                className="button1 flex items-center justify-center text-center"
+                                                onClick={() =>
+                                                    handleApplyNow(job.job_id)
+                                                }
+                                            >
                                                 <p className="lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-center">
                                                     Apply Now
                                                 </p>
@@ -152,54 +178,61 @@ const SavedJobs = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-y-2 gap-x-4 mt-2">
-                                    <div className="flex items-center">
-                                        <Image
-                                            src="/Location Icon.svg"
-                                            width={23}
-                                            height={20}
-                                            alt="Location Icon"
-                                        />
-                                        <p className="ml-1 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
-                                            {toTitleCase(job.location)}
-                                        </p>
+                                <div className="justify-between mt-2">
+                                    <div className="flex justify-between items-center w-full mb-2">
+                                        <div className="flex items-center w-5/6">
+                                            <Image
+                                                src="/Location Icon.svg"
+                                                width={23}
+                                                height={20}
+                                                alt="Location Icon"
+                                            />
+                                            <p className="ml-1 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
+                                                {toTitleCase(job.location)}
+                                            </p>
+                                        </div>
+
+                                        <div className="flex items-center justify-end w-1/6">
+                                            <Image
+                                                src="/Work Setup Icon.svg"
+                                                width={23}
+                                                height={20}
+                                                alt="Work Setup Icon"
+                                            />
+                                            <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
+                                                {job.work_setup}
+                                            </p>
+                                        </div>
                                     </div>
 
-                                    <div className="flex items-center">
-                                        <Image
-                                            src="/Work Setup Icon.svg"
-                                            width={23}
-                                            height={20}
-                                            alt="Work Setup Icon"
-                                        />
-                                        <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
-                                            {job.work_setup}
-                                        </p>
-                                    </div>
+                                    <div className="flex justify-between items-center w-full">
+                                        {/* schedule (Left) */}
+                                        <div className="flex items-center w-5/6">
+                                            <Image
+                                                src="/Schedule Icon.svg"
+                                                width={18}
+                                                height={20}
+                                                alt="Schedule Icon"
+                                            />
+                                            <p className="ml-1 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
+                                                {toTitleCase(job.schedule)}
+                                            </p>
+                                        </div>
 
-                                    <div className="flex items-center">
-                                        <Image
-                                            src="/Schedule Icon.svg"
-                                            width={18}
-                                            height={20}
-                                            alt="Schedule Icon"
-                                        />
-                                        <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
-                                            {job.schedule}
-                                        </p>
-                                    </div>
-
-                                    <div className="flex items-center col-span-1">
-                                        <Image
-                                            src="/Salary Icon.svg"
-                                            width={18}
-                                            height={20}
-                                            alt="Salary Icon"
-                                        />
-                                        <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
-                                            {" "}
-                                            {job.salary_min} - {job.salary_max}
-                                        </p>
+                                        {/*  salary (Right) */}
+                                        <div className="flex items-center justify-end w-5/6">
+                                            <Image
+                                                src="/Salary Icon.svg"
+                                                width={18}
+                                                height={20}
+                                                alt="Salary Icon"
+                                            />
+                                            <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
+                                                {" "}
+                                                {job.salary_min} -{" "}
+                                                {job.salary_max}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -207,6 +240,7 @@ const SavedJobs = () => {
                     </div>
                 </div>
             ))}
+            <ToastWrapper />
         </div>
     );
 };
@@ -215,6 +249,7 @@ const SavedJobsWrapper = () => {
     return (
         <div className="flex overflow-y-auto border border-none hide-scrollbar p-1 h-[calc(100vh-150px)]">
             <SavedJobs />
+            <ToastWrapper />
         </div>
     );
 };

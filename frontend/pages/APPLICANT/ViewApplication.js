@@ -3,6 +3,8 @@ import ApplicantHeader from "@/components/ApplicantHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import ReviewApplication from "@/components/ReviewApplication";
 import JobDetailsWrapper from "@/components/JobDetails";
+import { toast } from 'react-toastify';
+import ToastWrapper from "@/components/ToastWrapper";
 
 export default function ViewApplication({handleJobClick}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,6 +21,7 @@ export default function ViewApplication({handleJobClick}) {
   return (
     <div>
       <ApplicantHeader />
+      <ToastWrapper/>
         <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 xxsm:px-4 py-8 mx-auto">
             <p className="font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1"> You are Applying for</p>
             <p className="font-semibold text-primary text-large pb-1">Job Title</p>
@@ -59,7 +62,7 @@ export default function ViewApplication({handleJobClick}) {
                     </p>
                     <div className="flex justify-center space-x-6">
                   
-                      <button className="button1 flex items-center justify-center" onClick={() => {alert("Application withdrawn successfully!"); handleCloseModal();}}>
+                      <button className="button1 flex items-center justify-center" onClick={() => {setTimeout(() => {toast.success("Application withdrawn successfully!");}, 500);; handleCloseModal();}}>
                       <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">Yes</p>
                       </button>
 

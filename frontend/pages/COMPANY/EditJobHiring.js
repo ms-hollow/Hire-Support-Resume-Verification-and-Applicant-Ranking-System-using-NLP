@@ -13,6 +13,8 @@ import {
     updateJobHiring,
 } from "../api/companyJobApi";
 import { validateJobForm } from "../utils/JobHelpers";
+import { toast } from "react-toastify";
+import ToastWrapper from "@/components/ToastWrapper";
 
 export default function EditJobHiring() {
     let { authTokens } = useContext(AuthContext);
@@ -25,6 +27,7 @@ export default function EditJobHiring() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [companyName, setCompanyName] = useState("");
+    const [jobData, setJobData] = useState([]);
 
     const [formData, setFormData] = useState({
         job_title: "",
@@ -45,7 +48,7 @@ export default function EditJobHiring() {
         salary_min: "",
         salary_max: "",
         salary_frequency: "",
-
+        status: "",
         required_documents: [],
         application_deadline: "",
         weight_of_criteria: "",
@@ -99,6 +102,7 @@ export default function EditJobHiring() {
     useEffect(() => {
         const fetchData = async () => {
             const jobHiringDetails = await getJobHiringDetails(id, authTokens);
+
             if (!jobHiringDetails)
                 return console.error("No job hiring details found.");
 
@@ -106,6 +110,8 @@ export default function EditJobHiring() {
                 typeof jobHiringDetails === "string"
                     ? JSON.parse(jobHiringDetails)
                     : jobHiringDetails;
+
+            setJobData(parsedData);
 
             const scoring = parsedData.scoring_criteria || [];
 
@@ -354,10 +360,12 @@ export default function EditJobHiring() {
     const handleDelete = async () => {
         const success = await deleteJobHiring(id, authTokens);
         if (success) {
-            alert("Job successfully deleted");
-            router.push("/COMPANY/CompanyHome");
+            toast.success("Job successfully deleted");
+            setTimeout(() => {
+                router.push("/COMPANY/CompanyHome");
+            }, 3000);
         } else {
-            alert("Failed to delete job.");
+            toast.error("Failed to delete job.");
         }
     };
 
@@ -418,6 +426,8 @@ export default function EditJobHiring() {
         if (!validateJobForm()) {
             return;
         }
+
+        const updatedStatus = formData.status === "draft" ? "open" : formData.status;
 
         const serializedData = {
             ...formData,
@@ -490,10 +500,12 @@ export default function EditJobHiring() {
         const res = await updateJobHiring(id, serializedData, authTokens);
 
         if (res) {
-            alert("Job successfully updated");
-            router.push("/COMPANY/CompanyHome");
+            toast.success("Job successfully updated");
+            setTimeout(() => {
+                router.push("/COMPANY/CompanyHome");
+            }, 3000);
         } else {
-            alert("Failed to delete job.");
+            toast.error("Failed to delete job.");
         }
     };
 
@@ -590,6 +602,7 @@ export default function EditJobHiring() {
     return (
         <div>
             <CompanyHeader />
+            <ToastWrapper />
             <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto">
                 <h1 className="lg:text-xl mb:text-xl sm:text-large text-primary pb-5">
                     Job Hiring Details{" "}
@@ -3515,7 +3528,10 @@ export default function EditJobHiring() {
                                                 >
                                                     <div className="flex items-center space-x-2 ml-auto">
                                                         <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
-                                                            Continue
+                                                            {jobData.status ===
+                                                            "draft"
+                                                                ? "Post Job Hiring"
+                                                                : "Continue"}
                                                         </p>
                                                         <Image
                                                             src="/Arrow Right.svg"

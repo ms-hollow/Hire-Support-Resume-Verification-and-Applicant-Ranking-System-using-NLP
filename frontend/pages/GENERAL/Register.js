@@ -8,6 +8,8 @@ import PersonalInfo from "@/components/PersonalInfo";
 import CompanyInfo from "@/components/CompanyInfo";
 import { useRouter } from "next/router";
 import AuthContext from "../context/AuthContext";
+import { toast } from "react-toastify";
+import ToastWrapper from "@/components/ToastWrapper";
 
 //TODO 1. Change routes 2. Setup show password
 //TODO Add CompanyInfo if company ang nag register
@@ -47,7 +49,7 @@ export default function Register() {
 
     const setRole = (role) => {
         if (!role) {
-            alert("Please select a role");
+            toast.error("Please select a role");
             return;
         }
 
@@ -82,12 +84,12 @@ export default function Register() {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
         if (!emailAddress) {
-            alert("Please input an email address.");
+            toast.error("Please input an email address.");
             return;
         }
 
         if (!emailRegex.test(emailAddress)) {
-            alert("Invalid email address. Please input a valid email address.");
+            toast.error("Please input a valid email address.");
             return;
         }
 
@@ -105,9 +107,7 @@ export default function Register() {
 
             // Check if the response status is 409 Conflict (email already exists)
             if (emailCheckResponse.status === 409) {
-                alert(
-                    "This email is already registered. Please use a different email."
-                );
+                toast.info("This email is already registered.");
                 setEmailAddress(""); // Clear the email input so user can re-enter
                 return;
             }
@@ -118,30 +118,33 @@ export default function Register() {
 
                 // If the server indicates the email exists, notify the user
                 if (responseData.exists) {
-                    alert(
-                        "This email is already registered. Please use a different email."
-                    );
+                    toast.info("This email is already registered.");
                     setEmailAddress(""); // Clear the email input
                     return;
                 }
 
                 // Check if the checkbox is checked
                 if (!isChecked) {
-                    alert("You must check the checkbox.");
+                    toast.error("You must check the checkbox.");
                     return; // Prevent further execution
                 } else {
                     handleNextStep(); // Proceed to the next step
                 }
             } else {
-                alert("Error checking email. Please try again.");
+                toast.error("Error checking email. Please try again.");
             }
         } catch (error) {
-            alert("Network error. Please check your connection and try again.");
+            toast.error(
+                "Network error. Please check your connection and try again."
+            );
         }
     };
 
     const handlePassword = (e) => {
         setPassword(e.target.value);
+    };
+
+    const handleConfirmPassword = (e) => {
         setConfirmPassword(e.target.value);
     };
 
@@ -151,22 +154,22 @@ export default function Register() {
 
         // Check if password and confirmPassword are provided
         if (!password || !confirmPassword) {
-            alert("Please input both password and confirm password.");
-            return;
-        }
-
-        // Validate password strength
-        if (!passwordRegex.test(password)) {
-            alert(
-                "Password must be at least 8 characters long, include a number, an uppercase letter, and a special character."
-            );
+            toast.warning("Please input both password and confirm password.");
             return;
         }
 
         // Check if passwords match
         if (password !== confirmPassword) {
-            alert(
+            toast.error(
                 "Your passwords don't match. Please make sure both passwords are the same."
+            );
+            return;
+        }
+
+        // Validate password strength
+        if (!passwordRegex.test(password)) {
+            toast.error(
+                "Password must be at least 8 characters long, include a number, an uppercase letter, and a special character."
             );
             return;
         }
@@ -444,7 +447,7 @@ export default function Register() {
                                         }
                                         id="confirm-password"
                                         name="confirmPassword"
-                                        onChange={handlePassword}
+                                        onChange={handleConfirmPassword}
                                     />
                                 </div>
 
@@ -584,6 +587,7 @@ export default function Register() {
                     </div>
                 )}
             </div>
+            <ToastWrapper />
             <GeneralFooter />
         </div>
     );

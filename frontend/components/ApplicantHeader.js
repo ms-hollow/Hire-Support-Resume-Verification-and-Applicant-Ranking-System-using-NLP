@@ -81,10 +81,6 @@ const ApplicantHeader = () => {
           )}
         </div>
 
-        {/* Company Site Link */}
-        <div className="hidden md:block">
-          <Link href="/GENERAL/Login"><h3>Company Site</h3></Link>
-        </div>
       </div>
 
       {/* Hamburger Menu */}

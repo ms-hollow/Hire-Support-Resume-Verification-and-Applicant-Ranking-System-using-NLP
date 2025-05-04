@@ -10,6 +10,7 @@ import { getApplicantProfile } from "../api/applicantApi";
 import phLocation from "../../public/placeHolder/location.json";
 import { fetchJobListings } from "@/pages/api/applicantJobApi";
 import JobListingsWrapper from "@/components/JobListings";
+import JobDetailsWrapper from "@/components/JobDetails";
 
 export default function ApplicantHome({ onJobClick }) {
     let { authTokens } = useContext(AuthContext);
@@ -59,7 +60,7 @@ export default function ApplicantHome({ onJobClick }) {
         const fetchApplicantData = async () => {
             if (authTokens?.access) {
                 const profileData = await getApplicantProfile(authTokens);
-                setApplicantName(profileData?.first_name || "Unknown");
+                setApplicantName(profileData?.first_name || "Applicant");
             }
         };
 
@@ -170,6 +171,10 @@ export default function ApplicantHome({ onJobClick }) {
         // console.log(filteredJobListings);
     }, [filters, jobListings]);
 
+    const isAnyFilterApplied = Object.values(filters).some(
+        (val) => val !== "" && val !== null && val !== undefined
+    );
+
     // Handle closing job details
     const handleCloseJobDetails = () => {
         setIsJobDetailsOpen(false);
@@ -222,7 +227,8 @@ export default function ApplicantHome({ onJobClick }) {
 
             {loading ? (
                 <p>Loading job listings...</p>
-            ) : (
+            ) : jobListings.length > 0 ? (
+                // When there are job listings, either show filtered or unfiltered job listings
                 <JobListingsWrapper
                     jobListings={
                         filteredJobListings.length > 0
@@ -232,9 +238,14 @@ export default function ApplicantHome({ onJobClick }) {
                     onJobClick={onJobClick}
                     loading={loading}
                 />
+            ) : (
+                // When there are no job listings available
+                <p className="flex flex-col text-fontcolor">
+                    No job listings available.
+                </p>
             )}
 
-            <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto">
+            <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto pb-8">
                 <div>
                     <p className="text-fontcolor text-large ">
                         Hi, {applicantName}
@@ -574,21 +585,30 @@ export default function ApplicantHome({ onJobClick }) {
 
                 {/* Job Listings and Details */}
 
-                <div className="flex flex-col w-full pt-4 gap-2 pb-16">
+                <div className="flex flex-col w-full pt-4 ">
                     {/* Job Listings */}
-                    <div className="flex flex-row gap-2">
+                    <div className="flex flex-row gap-4 pb-8">
+                        {isAnyFilterApplied &&
+                            filteredJobListings.length === 0 && (
+                                <p className="text-center text-gray-500 my-4">
+                                    No jobs match your filters.
+                                </p>
+                            )}
                         <JobListings
                             authToken={authTokens?.access}
                             onJobClick={handleJobClick} // Trigger to open job details
                             jobListings={
-                                filteredJobListings.length > 0
+                                isAnyFilterApplied
                                     ? filteredJobListings
                                     : jobListings
                             }
                         />
                         {/* Job Details for Desktop */}
-                        <div className="hidden md:block flex-grow">
-                            <JobDetails authToken={authTokens?.access} />
+                        <div className="hidden md:block flex-grow pb-8">
+                            <JobDetailsWrapper
+                                authToken={authTokens?.access}
+                                applicantName={applicantName}
+                            />
                         </div>
                     </div>
 
@@ -607,7 +627,10 @@ export default function ApplicantHome({ onJobClick }) {
                             >
                                 ✖
                             </button>
-                            <JobDetails authToken={authTokens?.access} />
+                            <JobDetailsWrapper
+                                authToken={authTokens?.access}
+                                applicantName={applicantName}
+                            />
                         </div>
                     </div>
                 </div>
