@@ -1,12 +1,16 @@
 import ApplicantHeader from "@/components/ApplicantHeader";
 import GeneralFooter from "@/components/GeneralFooter";
-import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useContext } from "react";
 import ReviewApplication from "@/components/ReviewApplication";
-import { getSectionData, clearJobApplicationDraft, getTempUploadedFiles, clearTempFiles } from "../utils/jobApplicationStates";
+import {
+    getSectionData,
+    clearJobApplicationDraft,
+    getTempUploadedFiles,
+    clearTempFiles,
+} from "../utils/jobApplicationStates";
 import { submitJobApplication } from "../api/applicantJobApi";
-import { getApplicantProfile } from "../api/applicantApi";
+import { fetchApplicantProfile } from "../api/applicantApi";
 import { useRouter } from "next/router";
 import JobDetailsWrapper from "@/components/JobDetails";
 import AuthContext from "../context/AuthContext";
@@ -26,20 +30,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
     const { authTokens, user } = useContext(AuthContext);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Check for console debugging
     useEffect(() => {
-        // Log what we have from context for debugging
-        console.log(
-            "Auth tokens from context:",
-            authTokens
-                ? "Present (first 10 chars): " +
-                      (authTokens.access
-                          ? authTokens.access.substring(0, 10) + "..."
-                          : "No access token")
-                : "No auth tokens"
-        );
-        console.log("User from context:", user);
-        
         if (!authTokens || !authTokens.access) {
             console.error("No auth tokens available");
             setSubmitResult({
@@ -47,7 +38,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                 message: "You need to be logged in to submit an application.",
             });
         }
-        
+
         setIsLoading(false);
     }, [authTokens, user]);
 
@@ -64,7 +55,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
             toast.error("Please agree to the terms before submitting.");
             return;
         }
-        
+
         if (!authTokens || !authTokens.access) {
             console.error("No auth tokens available for submission");
             setSubmitResult({
@@ -78,91 +69,91 @@ export default function ApplicationConfirmation({ handleJobClick }) {
         setIsSubmitting(true);
 
         try {
-            // First get the applicant profile to get the applicant ID
-            const profileData = await getApplicantProfile(authTokens);
-            console.log("Retrieved profile data:", profileData);
+            const profileData = await fetchApplicantProfile(authTokens);
 
-            if (!profileData?.applicant_id) {
-                throw new Error("Could not determine applicant ID from profile");
+            //! id = yan yung applicant id.
+            if (!profileData?.id) {
+                throw new Error(
+                    "Could not determine applicant ID from profile"
+                );
             }
 
             // Get all necessary data from localStorage
-            const personalInfo = getSectionData('personalInfo');
-            const documentMetadata = getSectionData('documentMetadata');
-            const jobDetails = getSectionData('jobDetails');
-            
+            const personalInfo = getSectionData("personalInfo");
+            const documentMetadata = getSectionData("documentMetadata");
+            const jobDetails = getSectionData("jobDetails");
+
             console.log("Retrieved jobDetails:", jobDetails);
             console.log("Retrieved documentMetadata:", documentMetadata);
-            
+
             if (!jobDetails || !jobDetails.job_hiring_id) {
                 throw new Error(
                     "Missing job hiring information. Please restart your application."
                 );
             }
-    
+
             // Prepare application data for submission
+            //! Remove applicant related details. Si applicant id bahala jan.
             const applicationData = {
                 job_hiring: jobDetails.job_hiring_id,
-                applicant: profileData.applicant_id,
-                fullName: `${personalInfo.first_name} ${personalInfo.middle_name || ''} ${personalInfo.last_name}`.trim(),
+                applicant: profileData.id,
                 email: personalInfo.email,
-                contact_number: personalInfo.contact_number,
-                address:
-                    personalInfo.complete_address ||
-                    personalInfo.present_address,
-                linkedin_profile: personalInfo.linkedin_profile,
                 application_date: new Date().toISOString().split("T")[0],
                 application_status: "draft",
             };
 
-            console.log("Submitting with applicant ID:", profileData.applicant_id);
-    
             // Extract document files and types using the stored metadata
             const documentFiles = [];
             const documentTypes = [];
-    
+
             // Get temp files from window object
             const tempFiles = getTempUploadedFiles();
             console.log("Retrieved temp files:", Object.keys(tempFiles).length);
-            
+
             // Document type mapping
             const documentTypeMapping = {
-                'resume': 'RESUME',
-                'educationalDocuments': 'EDUCATION',
-                'workcertificate': 'EXPERIENCE',
-                'seminarCertificate': 'CERTIFICATION',
-                'additionalDocuments': 'ADDITIONAL'
+                resume: "RESUME",
+                educationalDocuments: "EDUCATION",
+                workcertificate: "EXPERIENCE",
+                seminarCertificate: "CERTIFICATION",
+                additionalDocuments: "ADDITIONAL",
             };
 
             // Process each document category
             if (documentMetadata) {
-                Object.keys(documentMetadata).forEach(category => {
+                Object.keys(documentMetadata).forEach((category) => {
                     const categoryData = documentMetadata[category];
-                    const docType = documentTypeMapping[category] || 'ADDITIONAL';
-                    
+                    const docType =
+                        documentTypeMapping[category] || "ADDITIONAL";
+
                     // Process main file if exists
-                    if (categoryData.files && Array.isArray(categoryData.files)) {
-                        categoryData.files.forEach(fileInfo => {
+                    if (
+                        categoryData.files &&
+                        Array.isArray(categoryData.files)
+                    ) {
+                        categoryData.files.forEach((fileInfo) => {
                             if (fileInfo && fileInfo.fileId) {
                                 const file = tempFiles[fileInfo.fileId];
                                 if (file instanceof File) {
                                     documentFiles.push(file);
                                     documentTypes.push(docType);
-                                    console.log(`Adding ${docType} file: ${file.name}`);
+                                    console.log(
+                                        `Adding ${docType} file: ${file.name}`
+                                    );
                                 }
                             }
                         });
                     }
                 });
             }
-    
+
             console.log("Submitting application with data:", applicationData);
             console.log(
                 "Document files:",
                 documentFiles.map((f) => f.name)
             );
             console.log("Document types:", documentTypes);
-            
+
             // Submit application with all files
             const result = await submitJobApplication(
                 authTokens.access,
@@ -170,7 +161,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                 documentFiles,
                 documentTypes
             );
-    
+
             if (result.success) {
                 setSubmitResult({
                     success: true,
@@ -180,15 +171,18 @@ export default function ApplicationConfirmation({ handleJobClick }) {
 
                 // Clear application draft from localStorage
                 clearJobApplicationDraft();
-                
                 // Clear temp files from memory
                 clearTempFiles();
-                
+
+                const applicationId = result.data.application_id;
                 // Redirect to success page after short delay
                 setTimeout(() => {
-                    router.push("/APPLICANT/ApplicationSubmit");
-                }, 2000);
-
+                    //? Pasa job application id for reference.
+                    router.push({
+                        pathname: "/APPLICANT/ApplicationSubmit",
+                        query: { applicationId },
+                    });
+                }, 1500);
             } else {
                 console.error("Submission error:", result.error);
                 setSubmitResult({
@@ -203,7 +197,6 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                     }`
                 );
             }
-            
         } catch (error) {
             console.error("Error submitting application:", error);
             setSubmitResult({

@@ -107,6 +107,7 @@ class JobApplication(models.Model):
         ('interview scheduled', 'Interview Scheduled'),
         ('emailed', 'Emailed'),
         ('accepted', 'Accepted'),
+        ('withdrawn', 'Withdrawn'),
     ]
     
     application_status = models.CharField(

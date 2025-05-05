@@ -2,6 +2,9 @@ import { formatVerificationStatusUnverified } from "@/pages/utils/functions";
 
 const UnerifiedCredentials = ({ verificationResult }) => {
     const getUnverifiedItems = (data) => {
+        if (!Array.isArray(data)) {
+            return []; 
+        }
         return data.filter(
             (item) =>
                 item.verification_status &&
@@ -21,6 +24,9 @@ const UnerifiedCredentials = ({ verificationResult }) => {
     );
     const unverifiedExperience = getUnverifiedItems(
         verificationResult.experience_verification || []
+    );
+    const unverifiedResume = getUnverifiedItems(
+        verificationResult.resume_verification || []
     );
 
     return (
@@ -99,21 +105,13 @@ const UnerifiedCredentials = ({ verificationResult }) => {
                     <div className="flex flex-col w-full max-w-4xl px-4 py-3 bg-white shadow-lg rounded-lg">
                         <p className="text-primary text-base pb-3">Resume</p>
                         <ul className="list-disc list-inside space-y-1 text-fontcolor font-thin">
-                            {verificationResult.resume_verification
-                                .missing_name_components ? (
-                                Object.entries(
-                                    verificationResult.resume_verification
-                                        .missing_name_components
-                                ).map(([key, value], index) => (
-                                    <li key={index}>
-                                        Missing{" "}
-                                        {key.replace(/_/g, " ").toUpperCase()}:{" "}
-                                        {value || "N/A"}
-                                    </li>
-                                ))
-                            ) : (
-                                <li>No missing components found</li>
-                            )}
+                            {unverifiedResume.map((item, index) => (
+                                <li key={index}>
+                                    {formatVerificationStatusUnverified(
+                                        item.verification_status
+                                    )}
+                                </li>
+                            ))}
                         </ul>
                     </div>
                 </div>

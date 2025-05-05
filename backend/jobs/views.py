@@ -397,6 +397,23 @@ def get_all_application_applicant(request):
     serializer = JobApplicationSerializer(job_applications, many=True)
     return Response(serializer.data)
 
+#* Get specific job application of the applicant
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_job_specific_application(request, application_id):
+    try:
+        job_application = JobApplication.objects.get(pk=application_id)
+        job_application_serializer = JobApplicationSerializer(job_application)
+        job_hiring_serializer = JobHiringSerializer(job_application.job_hiring)
+
+        # Combine the serialized data
+        response_data = job_application_serializer.data
+        response_data['company_name'] = job_hiring_serializer.data.get('company_name')
+
+        return Response(response_data, status=status.HTTP_200_OK)
+    except JobApplication.DoesNotExist:
+        return Response({"error": "Job application not found."}, status=status.HTTP_404_NOT_FOUND)
+
 #* Delete Job Application
 @api_view(['DELETE'])
 def delete_job_application(request, pk):
@@ -441,25 +458,7 @@ def job_application_details(request, pk):
     try:
         job_application = JobApplication.objects.get(pk=pk)
         serializer = JobApplicationSerializer(job_application)
-        
-        application_data = serializer.data
-
-        applicant_id = application_data.get('applicant')
-        if applicant_id:
-            try:
-                applicant = Applicant.objects.get(pk=applicant_id)
-                applicant_serializer = ApplicantProfileFormSerializer(applicant)
-                application_data['applicant_profile'] = applicant_serializer.data
-            except Applicant.DoesNotExist:
-                application_data['applicant_profile'] = {
-                    "error": f"Applicant with ID {applicant_id} does not exist."
-                }
-        else:
-            application_data['applicant_profile'] = {
-                "error": "Applicant ID is missing."
-            }
-
-        return Response(application_data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     except JobApplication.DoesNotExist:
         return Response({"error": "Job application not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -467,11 +466,14 @@ def job_application_details(request, pk):
 @api_view(['PATCH'])
 def cancel_job_application(request, application_id):
     try:
-        # Get the job application by its ID
         job_application = JobApplication.objects.get(job_application_id=application_id)
 
-        # Update the application status to 'Cancelled'
-        job_application.application_status = JobApplication.CANCELLED
+        # Check if the status is already 'withdrawn'
+        if job_application.application_status == 'withdrawn':
+            return Response({"message": "Job application is already withdrawn."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update the status to 'withdrawn'
+        job_application.application_status = 'withdrawn'
         job_application.save()
 
         return Response({"message": "Job application cancelled successfully."}, status=status.HTTP_200_OK)

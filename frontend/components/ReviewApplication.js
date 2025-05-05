@@ -1,129 +1,59 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from 'next/image';
-import { getSectionData } from "../pages/utils/jobApplicationStates";
-
-import { toast } from 'react-toastify';
+import Image from "next/image";
 import ToastWrapper from "./ToastWrapper";
+import { toTitleCase } from "@/pages/utils/functions";
 
-    
-const ReviewApplication = ({ showEditButtons = true }) => {
-   
-    // State for personal information
-    const [formData, setFormData] = useState({
-        first_name: "",
-        middle_mame: "",
-        last_name: "",
-        email: "",
-        contact_number: "",
-        complete: "",
-        linkedin_profile: "",
-        // Add other personal fields as needed
-    });
-
-    // State for documents
-    const [documents, setDocuments] = useState({
-        resume: { files: [] },
-        educationalDocuments: { files: [] },
-        workcertificate: { files: [] },
-        seminarCertificate: { files: [] },
-        additionalDocuments: { files: [] },
-    });
-
-    // State for job details
-    const [jobDetails, setJobDetails] = useState({
-        job_title: "",
-        company_name: "",
-        job_hiring_id: ""
-    });
-
-    // Fetch all application data when component mounts
-    useEffect(() => {
-        // Get personal info
-        const personalInfo = getSectionData('personalInfo');
-        if (personalInfo) {
-            setFormData(personalInfo);
+const ReviewApplication = ({ showEditButtons = true, applicationDetails }) => {
+    const renderDocumentFiles = (documents, documentType) => {
+        // Ensure documents is an array
+        if (!Array.isArray(documents)) {
+            return (
+                <span className="pl-2 font-semibold text-fontcolor">
+                    No files uploaded
+                </span>
+            );
         }
 
-        // Get document metadata
-        const documentMetadata = getSectionData('documentMetadata');
-        if (documentMetadata) {
-            setDocuments((prev) => ({
-                ...prev,
-                ...Object.keys(documentMetadata).reduce((acc, key) => {
-                    acc[key] = {
-                        files: documentMetadata[key].files || [],
-                    };
-                    return acc;
-                }, {}),
-            }));
+        // Filter documents by type
+        const filteredDocuments = documents.filter(
+            (doc) => doc.document_type === documentType
+        );
+
+        if (filteredDocuments.length === 0) {
+            return (
+                <span className="pl-2 font-semibold text-fontcolor">
+                    No files uploaded
+                </span>
+            );
         }
 
-        // Get job details
-        const jobDetailsData = getSectionData('jobDetails');
-        if (jobDetailsData) {
-            setJobDetails(jobDetailsData);
-        }
-    }, []);
-
-    // Format the full name from first, middle, and last name
-    const getFullName = () => {
-        return `${formData.first_name || ''} ${formData.middle_mame || ''} ${formData.last_name || ''}`.trim();
-    };
-
-    // Get file name from document info
-    const getFileName = (docInfo) => {
-        if (!docInfo) return "No file selected";
-        return docInfo.fileName || "No file selected";
-    };
-
-    const [step, setStep] = useState(1);
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        const updatedData = { ...formData, [name]: value };
-        setFormData(updatedData);
-
-        const fields = Object.keys(formData);
-        const filledFields = fields.filter((field) => formData[field] || updatedData[field]);
-        setStep(Math.min(filledFields.length, fields.length));
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        const response = await fetch("/api/submit-info", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData),
-        });
-
-        const result = await response.json();
-        toast.error(result.message);
-    };
-
-    const handleEdit = () => {
-        toast.success("Edit button clicked");
-    };
-
-    // Add this helper function to display multiple files
-    const renderDocumentFiles = (docInfo) => {
-        if (!docInfo || !docInfo.files || docInfo.files.length === 0) {
-            return <span className="pl-2 font-semibold text-fontcolor">No files uploaded</span>;
-        }
-    
         return (
             <div className="pl-2">
-                {docInfo.files.map((file, index) => (
-                    <div key={index} className="font-semibold text-fontcolor">
-                        {file.fileName || `File ${index + 1}`}
-                    </div>
-                ))}
+                {filteredDocuments.map((doc, index) => {
+                    // Extract the file name from the document_file URL
+                    const fileName = doc.document_file.split("/").pop();
+
+                    return (
+                        <div
+                            key={index}
+                            className="font-semibold text-fontcolor"
+                        >
+                            <a
+                                href={doc.document_file}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {`${fileName}`}
+                            </a>
+                        </div>
+                    );
+                })}
             </div>
         );
     };
 
-    return ( 
+    return (
         <div className="job-application-box rounded-xs px-8 py-5 mx-auto">
             {/* Job Information Section */}
             <section className="pb-6">
@@ -138,15 +68,15 @@ const ReviewApplication = ({ showEditButtons = true }) => {
                             <tr className="px-2 border-b border-[#F5F5F5]">
                                 <td className="p-2">
                                     <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
-                                        Job Title: 
+                                        Job Title:
                                         <span className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">
-                                            {jobDetails.job_title}
+                                            {applicationDetails?.job_title}
                                         </span>
                                     </p>
                                     <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
-                                        Company: 
+                                        Company:
                                         <span className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">
-                                            {jobDetails.company_name}
+                                            {applicationDetails?.company_name}
                                         </span>
                                     </p>
                                 </td>
@@ -158,10 +88,12 @@ const ReviewApplication = ({ showEditButtons = true }) => {
 
             {/* Personal Information Section */}
 
-            <ToastWrapper/>
+            <ToastWrapper />
             <section className=" pb-6">
-                 <div className="flex flex-row justify-between items-center pt-3 mb-2">
-                    <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium text-primary pb-1">Personal Information</p>
+                <div className="flex flex-row justify-between items-center pt-3 mb-2">
+                    <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium text-primary pb-1">
+                        Personal Information
+                    </p>
                     {showEditButtons && (
                         <button className="flex items-center focus:outline-none">
                             <Link href="/APPLICANT/JobApplication">
@@ -183,31 +115,71 @@ const ReviewApplication = ({ showEditButtons = true }) => {
                                     <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
                                         Full Name:
                                         <span className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">
-                                            {getFullName()}
+                                            {
+                                                applicationDetails?.applicant
+                                                    ?.first_name
+                                            }{" "}
+                                            {
+                                                applicationDetails?.applicant
+                                                    ?.middle_name
+                                            }{" "}
+                                            {
+                                                applicationDetails?.applicant
+                                                    ?.last_name
+                                            }{" "}
                                         </span>
                                     </p>
                                     <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
                                         Email Address:
                                         <span className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">
-                                            {formData.email}
+                                            {applicationDetails?.email}
                                         </span>
                                     </p>
                                     <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
                                         Contact No.:
                                         <span className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">
-                                            {formData.contact_number}
+                                            {
+                                                applicationDetails?.applicant
+                                                    ?.contact_number
+                                            }
                                         </span>
                                     </p>
                                     <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
                                         Complete Address:
                                         <span className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">
-                                            {formData.complete || formData.present_address}
+                                            {
+                                                applicationDetails?.applicant
+                                                    ?.region
+                                            }
+                                            ,{" "}
+                                            {toTitleCase(
+                                                applicationDetails?.applicant
+                                                    ?.province
+                                            )}
+                                            ,{" "}
+                                            {toTitleCase(
+                                                applicationDetails?.applicant
+                                                    ?.city
+                                            )}
+                                            ,{" "}
+                                            {toTitleCase(
+                                                applicationDetails?.applicant
+                                                    ?.barangay
+                                            )}
+                                            ,{" "}
+                                            {
+                                                applicationDetails?.applicant
+                                                    ?.present_address
+                                            }
                                         </span>
                                     </p>
                                     <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
                                         LinkedIn Profile Link:
                                         <span className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">
-                                            {formData.linkedin_profile}
+                                            {
+                                                applicationDetails?.applicant
+                                                    ?.linkedin_profile
+                                            }
                                         </span>
                                     </p>
                                 </td>
@@ -220,7 +192,9 @@ const ReviewApplication = ({ showEditButtons = true }) => {
             {/* Uploaded Documents Section */}
             <section className="pb-6">
                 <div className="flex flex-row justify-between items-center pt-3 mb-2">
-                    <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium text-primary pb-1">Uploaded Documents</p>
+                    <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium text-primary pb-1">
+                        Uploaded Documents
+                    </p>
                     {showEditButtons && (
                         <button className="flex items-center focus:outline-none">
                             <Link href="/APPLICANT/ApplicantDocuments">
@@ -241,7 +215,10 @@ const ReviewApplication = ({ showEditButtons = true }) => {
                                 <td className="p-2">
                                     <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
                                         Resume:
-                                        {renderDocumentFiles(documents.resume)}
+                                        {renderDocumentFiles(
+                                            applicationDetails?.documents,
+                                            "RESUME"
+                                        )}
                                     </p>
                                 </td>
                             </tr>
@@ -249,23 +226,34 @@ const ReviewApplication = ({ showEditButtons = true }) => {
                                 <td className="p-2">
                                     <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
                                         Educational Documents:
-                                        {renderDocumentFiles(documents.educationalDocuments)}
+                                        {renderDocumentFiles(
+                                            applicationDetails?.documents,
+                                            "EDUCATION"
+                                        )}
                                     </p>
                                 </td>
                             </tr>
                             <tr className="px-2 border-b border-[#F5F5F5]">
                                 <td className="p-2">
                                     <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
-                                        Work Experience - Certificate of Employment:
-                                        {renderDocumentFiles(documents.workcertificate)}
+                                        Work Experience - Certificate of
+                                        Employment:
+                                        {renderDocumentFiles(
+                                            applicationDetails?.documents,
+                                            "EXPERIENCE"
+                                        )}
                                     </p>
                                 </td>
                             </tr>
                             <tr className="px-2 border-b border-[#F5F5F5]">
                                 <td className="p-2">
                                     <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
-                                        Certifications - Seminar/Workshop/Skills Certificates:
-                                        {renderDocumentFiles(documents.seminarCertificate)}
+                                        Certifications - Seminar/Workshop/Skills
+                                        Certificates:
+                                        {renderDocumentFiles(
+                                            applicationDetails?.documents,
+                                            "CERTIFICATION"
+                                        )}
                                     </p>
                                 </td>
                             </tr>
@@ -274,7 +262,10 @@ const ReviewApplication = ({ showEditButtons = true }) => {
                                 <td className="p-2">
                                     <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
                                         Additional Documents:
-                                        {renderDocumentFiles(documents.additionalDocuments)}
+                                        {renderDocumentFiles(
+                                            applicationDetails?.documents,
+                                            "ADDITIONAL"
+                                        )}
                                     </p>
                                 </td>
                             </tr>
@@ -284,6 +275,6 @@ const ReviewApplication = ({ showEditButtons = true }) => {
             </section>
         </div>
     );
-}
+};
 
 export default ReviewApplication;

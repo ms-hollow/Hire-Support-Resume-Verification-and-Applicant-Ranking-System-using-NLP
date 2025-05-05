@@ -6,7 +6,7 @@ import { useState, useEffect, useContext, useCallback } from "react";
 import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
 import JobDetailsWrapper from "@/components/JobDetails";
-import { getApplicantProfile } from "../api/applicantApi";
+import { fetchApplicantProfile } from "../api/applicantApi";
 import { fetchJobDetails } from "../api/applicantJobApi";
 import { toTitleCase } from "../utils/functions";
 import { saveSectionData, getSectionData } from "../utils/jobApplicationStates";
@@ -52,7 +52,7 @@ export default function JobApplication({ handleJobClick }) {
         }
 
         const applicantProfile = async () => {
-            const data = await getApplicantProfile(authTokens);
+            const data = await fetchApplicantProfile(authTokens);
             setFormData(prev => ({ ...prev, ...data }));
         };
 
@@ -76,10 +76,6 @@ export default function JobApplication({ handleJobClick }) {
             (field) => formData[field] || updatedData[field]
         );
         setStep(Math.min(filledFields.length, fields.length));
-    };
-
-    const handleEdit = () => {
-        alert("Edit button clicked - implement your logic here.");
     };
 
     // Save data and navigate to next step

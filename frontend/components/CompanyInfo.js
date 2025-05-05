@@ -7,8 +7,9 @@ import {
     getCompanyProfile,
     updateCompanyProfile,
 } from "@/pages/api/companyApi";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import ToastWrapper from "./ToastWrapper";
+import apiBaseUrl from "@/config/apiBaseUrl";
 
 const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
     const { authTokens } = useContext(AuthContext);
@@ -112,55 +113,69 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         if (!authTokens?.access) {
             console.error("No auth token, cannot update company profile.");
             return;
         }
-    
+
         const success = await updateCompanyProfile(authTokens, formData);
-    
+
         if (success) {
             if (typeof window !== "undefined") {
                 const fullUrl = window.location.href;
-    
-                if (fullUrl === "http://localhost:3000/COMPANY/CompanyProfile") {
+
+                if (fullUrl === `${apiBaseUrl}/COMPANY/CompanyProfile`) {
                     toast.success("Company profile updated!");
-    
+
                     if (onUpdateComplete) {
                         onUpdateComplete();
                     }
-    
+
                     router.push("/COMPANY/CompanyProfile");
-                } 
-                else if (fullUrl === "http://localhost:3000/GENERAL/Register") {
+                } else if (fullUrl === `${apiBaseUrl}/COMPANY/CompanyInfo`) {
                     toast.success("Account successfully registered!");
-    
+
                     setTimeout(() => {
                         router.push("/COMPANY/CompanyHome");
                     }, 2000); // 2 seconds delay
-                } 
-                else {
-                    toast.error("An unexpected error occurred. Please try again later.");
+                } else {
+                    toast.error(
+                        "An unexpected error occurred. Please try again later."
+                    );
                 }
             }
         } else {
             toast.error("Error updating profile. See console for details.");
         }
     };
-    
+
     return (
         <div>
             <form onSubmit={handleSubmit}>
                 <div className="flex gap-5 pb-5">
                     <div className="flex flex-col flex-grow">
-                        <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">Company Name</p>
-                            <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                                <input type="text" name="company_name" value={formData.company_name} placeholder="" required onChange={handleChange}  readOnly={!isEditable}
+                        <p className="lg:text-medium mb:text-small sm:text-small xsm:text-small text-fontcolor pb-1 font-medium">
+                            Company Name
+                        </p>
+                        <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+                            <input
+                                type="text"
+                                name="company_name"
+                                value={formData.company_name}
+                                placeholder=""
+                                required
+                                onChange={handleChange}
+                                readOnly={!isEditable}
                                 className={`w-full px-2 py-1 outline-none rounded-xs 
-                                ${isEditable ? 'text-fontcolor' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}></input>
-                            </div>
-                    </div>        
+                                ${
+                                    isEditable
+                                        ? "text-fontcolor"
+                                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                }`}
+                            ></input>
+                        </div>
+                    </div>
                 </div>
                 <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col gap-5 pb-5">
                     <div className="flex flex-col flex-grow">
@@ -168,15 +183,42 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                             Industry/Sector
                         </p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <select disabled={!isEditable} className={`valid:text-fontcolor invalid:text-placeholder lg:w-auto mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall ${!isEditable ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ' text-fontcolor'}`} name="job_industry" value={formData.job_industry} required onChange={handleChange} >
-                                <option value=''  disabled selected hidden>Select Sector</option>
-                                <option value='IT'>Information Technology (IT)</option>
-                                <option value='IT'>Information System (IS)</option>
-                                <option value='Computer Science'>Computer Science</option>   
-                                <option value="Data Science">Data Science</option>
-                                <option value="Cybersecurity">Cybersecurity</option>
-                                <option value="Artificial Intelligence">Artificial Intelligence</option>
-                                <option value="Cloud Computing">Cloud Computing</option>
+                            <select
+                                disabled={!isEditable}
+                                className={`valid:text-fontcolor invalid:text-placeholder lg:w-auto mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall ${
+                                    !isEditable
+                                        ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                                        : " text-fontcolor"
+                                }`}
+                                name="job_industry"
+                                value={formData.job_industry}
+                                required
+                                onChange={handleChange}
+                            >
+                                <option value="" disabled selected hidden>
+                                    Select Sector
+                                </option>
+                                <option value="IT">
+                                    Information Technology (IT)
+                                </option>
+                                <option value="IT">
+                                    Information System (IS)
+                                </option>
+                                <option value="Computer Science">
+                                    Computer Science
+                                </option>
+                                <option value="Data Science">
+                                    Data Science
+                                </option>
+                                <option value="Cybersecurity">
+                                    Cybersecurity
+                                </option>
+                                <option value="Artificial Intelligence">
+                                    Artificial Intelligence
+                                </option>
+                                <option value="Cloud Computing">
+                                    Cloud Computing
+                                </option>
                                 <option value="Robotics">Robotics</option>
                                 <option value="Bioinformatics">
                                     Bioinformatics
@@ -190,9 +232,21 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                             No. of Employees
                         </p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <input type="text" name="num_applicants" value={formData.num_applicants} placeholder="" required onChange={handleChange}  readOnly={!isEditable}
+                            <input
+                                type="text"
+                                name="num_applicants"
+                                value={formData.num_applicants}
+                                placeholder=""
+                                required
+                                onChange={handleChange}
+                                readOnly={!isEditable}
                                 className={`w-full px-2 py-1 outline-none rounded-xs 
-                                ${isEditable ? 'text-fontcolor' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}></input>
+                                ${
+                                    isEditable
+                                        ? "text-fontcolor"
+                                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                }`}
+                            ></input>
                         </div>
                     </div>
                 </div>
@@ -203,9 +257,21 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                             Email Address
                         </p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <input type="text"  name="email" value={formData.email} placeholder="applicant@gmail.com" required onChange={handleChange} readOnly={!isEditable}
+                            <input
+                                type="text"
+                                name="email"
+                                value={formData.email}
+                                placeholder="applicant@gmail.com"
+                                required
+                                onChange={handleChange}
+                                readOnly={!isEditable}
                                 className={`w-full px-2 py-1 outline-none rounded-xs 
-                                ${isEditable ? 'text-fontcolor' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}></input>
+                                ${
+                                    isEditable
+                                        ? "text-fontcolor"
+                                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                }`}
+                            ></input>
                         </div>
                     </div>
                     <div className="flex flex-col flex-grow">
@@ -213,23 +279,29 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                             Contact No.
                         </p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex items-center">
-                            <span className="pl-2 pr-1 text-fontcolor">+63</span> 
-                                <input 
-                                    type="text" 
-                                    name="contact_number" 
-                                    value={formData.contact_number} 
-                                    required 
-                                    onChange={handlePhoneNumberChange} 
-                                    maxLength="10" 
-                                    placeholder="9XXXXXXXXX"  
-                                    readOnly={!isEditable}
-                                    className={`flex-grow w-full px-2 py-1 outline-none rounded-xs 
-                                    ${isEditable ? 'text-fontcolor' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
-                                />
+                            <span className="pl-2 pr-1 text-fontcolor">
+                                +63
+                            </span>
+                            <input
+                                type="text"
+                                name="contact_number"
+                                value={formData.contact_number}
+                                required
+                                onChange={handlePhoneNumberChange}
+                                maxLength="10"
+                                placeholder="9XXXXXXXXX"
+                                readOnly={!isEditable}
+                                className={`flex-grow w-full px-2 py-1 outline-none rounded-xs 
+                                    ${
+                                        isEditable
+                                            ? "text-fontcolor"
+                                            : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                    }`}
+                            />
                         </div>
                     </div>
                 </div>
-                
+
                 <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col flex-grow gap-5 pb-5">
                     <div className="flex flex-col flex-grow">
                         <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
@@ -239,14 +311,20 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                             <select
                                 disabled={!isEditable}
                                 className={`valid:text-fontcolor invalid:text-placeholder lg:w-full mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall 
-                                    ${!isEditable ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'text-fontcolor'}`}
+                                    ${
+                                        !isEditable
+                                            ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                                            : "text-fontcolor"
+                                    }`}
                                 id="region"
                                 name="region"
                                 value={formData.region}
                                 onChange={handleChange}
                                 required
                             >
-                                <option value="" disabled selected hidden>Select Region</option>
+                                <option value="" disabled selected hidden>
+                                    Select Region
+                                </option>
                                 {regions.map((region) => (
                                     <option key={region.id} value={region.id}>
                                         {region.n}{" "}
@@ -264,14 +342,20 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                             <select
                                 disabled={!isEditable}
                                 className={`valid:text-fontcolor invalid:text-placeholder lg:w-full mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall 
-                                    ${!isEditable ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'text-fontcolor'}`}
+                                    ${
+                                        !isEditable
+                                            ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                                            : "text-fontcolor"
+                                    }`}
                                 id="province"
                                 name="province"
                                 value={formData.province}
                                 onChange={handleChange}
                                 required={formData.region}
                             >
-                                <option value="" disabled selected hidden>Select Province</option>
+                                <option value="" disabled selected hidden>
+                                    Select Province
+                                </option>
                                 {provinces.map((province) => (
                                     <option key={province.n} value={province.n}>
                                         {province.n}
@@ -284,36 +368,59 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
 
                 <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col flex-grow pb-5">
                     <div className="flex flex-col flex-grow">
-                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">City/Municipality</p>
+                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
+                            City/Municipality
+                        </p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
                             <select
                                 disabled={!isEditable}
                                 className={`valid:text-fontcolor invalid:text-placeholder lg:w-full mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall 
-                                    ${!isEditable ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'text-fontcolor'}`}
+                                    ${
+                                        !isEditable
+                                            ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                                            : "text-fontcolor"
+                                    }`}
                                 id="city"
                                 name="city"
                                 required
                                 value={formData.city}
                                 onChange={handleChange}
                             >
-                                <option value="" disabled selected hidden>Select City</option>
-                                    {cities.map((city, index) => (
-                                        <option key={index} value={city.n}>
-                                            {city.n}
-                                        </option>
-                                    ))}
+                                <option value="" disabled selected hidden>
+                                    Select City
+                                </option>
+                                {cities.map((city, index) => (
+                                    <option key={index} value={city.n}>
+                                        {city.n}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     </div>
                 </div>
 
-
                 <div className="flex lg:flex-row mb:flex-row sm:flex-col xsm:flex-col xxsm:flex-col flex-grow gap-5 pb-5">
                     <div className="flex flex-col flex-grow">
-                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Barangay</p>
+                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
+                            Barangay
+                        </p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <select disabled={!isEditable} className={`valid:text-fontcolor invalid:text-placeholder lg:w-full mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall ${!isEditable ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'text-fontcolor'}`} id="barangay" name="barangay" value={formData.barangay}   required  onChange={handleChange} >
-                                <option value="" disabled selected hidden>Select Barangay</option>
+                            <select
+                                disabled={!isEditable}
+                                className={`valid:text-fontcolor invalid:text-placeholder lg:w-full mb:w-full sm:w-full xsm:w-full lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall ${
+                                    !isEditable
+                                        ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                                        : "text-fontcolor"
+                                }`}
+                                id="barangay"
+                                name="barangay"
+                                value={formData.barangay}
+                                required
+                                onChange={handleChange}
+                            >
+                                <option value="" disabled selected hidden>
+                                    Select Barangay
+                                </option>
                                 {barangays.map((barangay, index) => (
                                     <option key={index} value={barangay}>
                                         {barangay}
@@ -324,29 +431,75 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                     </div>
 
                     <div className="flex flex-col flex-grow">
-                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Postal Code</p>
+                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">
+                            Postal Code
+                        </p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <input type="text" id="postal-code" name="postal_code" placeholder="" required value={formData.postal_code || ''}  onChange={handleChange} readOnly={!isEditable}
-                            className={`w-full px-2 py-1 outline-none rounded-xs 
-                            ${isEditable ? 'text-fontcolor' : 'bg-gray-100 text-gray-500 cursor-not-allowed'}`}></input>
+                            <input
+                                type="text"
+                                id="postal-code"
+                                name="postal_code"
+                                placeholder=""
+                                required
+                                value={formData.postal_code || ""}
+                                onChange={handleChange}
+                                readOnly={!isEditable}
+                                className={`w-full px-2 py-1 outline-none rounded-xs 
+                            ${
+                                isEditable
+                                    ? "text-fontcolor"
+                                    : "bg-gray-100 text-gray-500 cursor-not-allowed"
+                            }`}
+                            ></input>
                         </div>
                     </div>
                 </div>
 
                 <div className="flex lg:flex-col mb:flex-col sm:flex-col xsm: flex-col flex-grow pb-5">
-                    <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-medium pb-1">Lot, Block, Unit, Building, Floor, Street Name, Subdivision</p>
-                        <div className="h-medium rounded-xs border-2 border-fontcolor flex ">
-                            <input type="complete" id="present-address" name="present_address" placeholder="" required value={formData.present_address || ''}  onChange={handleChange}   readOnly={!isEditable}
-                                className={`flex-grow w-full px-2 py-1 outline-none rounded-xs 
-                                ${isEditable ? 'text-fontcolor' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}></input>
-                        </div>
-                        
-                    <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-medium pt-5">LinkedIn Profile Link</p>
-                        <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <input type="linkedin-link" id="linkedin" name="linkedin_profile" placeholder="" required value={formData.linkedin_profile} onChange={handleChange}   readOnly={!isEditable}
-                                className={`flex-grow w-full px-2 py-1 outline-none rounded-xs 
-                                ${isEditable ? 'text-fontcolor' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}></input>
-                        </div>  
+                    <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-medium pb-1">
+                        Lot, Block, Unit, Building, Floor, Street Name,
+                        Subdivision
+                    </p>
+                    <div className="h-medium rounded-xs border-2 border-fontcolor flex ">
+                        <input
+                            type="complete"
+                            id="present-address"
+                            name="present_address"
+                            placeholder=""
+                            required
+                            value={formData.present_address || ""}
+                            onChange={handleChange}
+                            readOnly={!isEditable}
+                            className={`flex-grow w-full px-2 py-1 outline-none rounded-xs 
+                                ${
+                                    isEditable
+                                        ? "text-fontcolor"
+                                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                }`}
+                        ></input>
+                    </div>
+
+                    <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor font-medium pt-5">
+                        LinkedIn Profile Link
+                    </p>
+                    <div className="h-medium rounded-xs border-2 border-fontcolor flex">
+                        <input
+                            type="linkedin-link"
+                            id="linkedin"
+                            name="linkedin_profile"
+                            placeholder=""
+                            required
+                            value={formData.linkedin_profile}
+                            onChange={handleChange}
+                            readOnly={!isEditable}
+                            className={`flex-grow w-full px-2 py-1 outline-none rounded-xs 
+                                ${
+                                    isEditable
+                                        ? "text-fontcolor"
+                                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                }`}
+                        ></input>
+                    </div>
                 </div>
 
                 <div className="flex justify-end">
@@ -370,7 +523,7 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                     )}
                 </div>
             </form>
-            <ToastWrapper/>
+            <ToastWrapper />
         </div>
     );
 };

@@ -8,9 +8,9 @@ import {
     markNotificationAsRead,
     deleteNotifications,
 } from "../api/notificationApi";
-import { getApplicantProfile } from "../api/applicantApi";
+import { fetchApplicantProfile } from "../api/applicantApi";
 import DeleteConfirmationModal from "@/components/ui/DeleteConfirmationModal";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import ToastWrapper from "@/components/ToastWrapper";
 
 export default function Notifications() {
@@ -26,7 +26,7 @@ export default function Notifications() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const profile = await getApplicantProfile(authTokens);
+                const profile = await fetchApplicantProfile(authTokens);
                 setApplicantName(profile.first_name);
             } catch (error) {
                 console.error("Failed to fetch profile:", error);
@@ -120,7 +120,7 @@ export default function Notifications() {
         <div>
             <>
                 <ApplicantHeader />
-                <ToastWrapper/>
+                <ToastWrapper />
                 <div className="lg:pt-28 mb:pt-24 sm:pt-24 xsm:pt-24 xxsm:pt-24 lg:px-20 mb:px-10 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto pb-8">
                     <div className="text-lg text-primary">
                         <b>Notifications</b>
