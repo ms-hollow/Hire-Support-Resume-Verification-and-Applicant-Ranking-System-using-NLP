@@ -174,9 +174,9 @@ WSGI_APPLICATION = 'hiresupport.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'main', 
+        'NAME': 'postgres', 
         'USER': 'postgres',  
-        'PASSWORD': 'postgres',
+        'PASSWORD': '123',
         'HOST': 'localhost',  
         'PORT': '5432', 
     }

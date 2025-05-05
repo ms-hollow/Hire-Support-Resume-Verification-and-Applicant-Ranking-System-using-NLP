@@ -221,8 +221,12 @@ export const submitJobApplication = async (authToken, applicationData, documentF
         // Add document types and files
         documentFiles.forEach((file, index) => {
             if (index < documentTypes.length) {
-                formData.append('document_type', documentTypes[index]);
-                formData.append('document_file', file);
+                // For multiple files of the same type, we need to maintain correct mapping
+                formData.append(`document_type`, documentTypes[index]);
+                formData.append(`document_file`, file);
+                
+                // Log each file being added
+                console.log(`Adding ${documentTypes[index]} file: ${file.name}`);
             }
         });
 
