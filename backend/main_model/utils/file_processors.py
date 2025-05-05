@@ -197,6 +197,7 @@ def extract_application_data(job_application):
     experience_documents_links = []
     educational_documents_links = []
     certifications_documents_links = []
+    additional_documents_links = []
     
     # Initialize Google Drive service
     service = None
@@ -252,6 +253,9 @@ def extract_application_data(job_application):
             elif document.document_type.lower() == 'certifications':
                 certifications_documents_links.append(local_path)
                 print(f"Added certification document: {local_path}")
+            elif document.document_type.lower() == 'additional':
+                additional_documents_links.append(local_path)
+                print(f"Added additional document: {local_path}")
     
     # Prepare application data in format expected by hire_support.py
     application_data = {
