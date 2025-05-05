@@ -284,11 +284,28 @@ def create_job_application(request):
                         document.save()
                         
                         # If the GoogleDriveStorage._save method returned a Google Drive ID
-                        # it should be accessible from the file object
                         if hasattr(doc_file, 'google_drive_id'):
+                            # Set the Google Drive ID
                             document.google_drive_id = doc_file.google_drive_id
-                            print(f"Setting Google Drive ID: {document.google_drive_id}")
-                            document.save(update_fields=['google_drive_id'])
+                            
+                            # Set file ID and URL
+                            document.file_id = doc_file.google_drive_id
+                            document.file_url = getattr(doc_file, 'google_drive_file_url', 
+                                                     f"https://drive.google.com/file/d/{doc_file.google_drive_id}/view")
+                            
+                            # Set folder ID and URL
+                            if hasattr(doc_file, 'google_drive_folder_id'):
+                                document.folder_id = doc_file.google_drive_folder_id
+                                document.folder_url = getattr(doc_file, 'google_drive_folder_url',
+                                                          f"https://drive.google.com/drive/folders/{doc_file.google_drive_folder_id}")
+                        
+                            
+                            # Save the additional fields
+                            fields_to_update = ['google_drive_id', 'file_id', 'file_url']
+                            if hasattr(document, 'folder_id') and document.folder_id:
+                                fields_to_update.extend(['folder_id', 'folder_url'])
+                                
+                            document.save(update_fields=fields_to_update)
                         else:
                             print("No Google Drive ID found in file object")
                     else:
@@ -315,7 +332,7 @@ def create_job_application(request):
                 }, status=status.HTTP_202_ACCEPTED)
                 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+       
 #? For company side kapag papalitan na ang status
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])

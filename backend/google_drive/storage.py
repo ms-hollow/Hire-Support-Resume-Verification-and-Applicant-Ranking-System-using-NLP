@@ -1,4 +1,3 @@
-# google_drive/storage.py
 from django.core.files.storage import Storage
 from django.conf import settings
 from .utils import authenticate_service_account, create_folder_path, upload_file_to_folder
@@ -50,11 +49,22 @@ class GoogleDriveStorage(Storage):
             # Upload the file to Google Drive
             file_id = upload_file_to_folder(self.service, temp_path, file_name, mimetype, folder_id)
             
-            # Store the Google Drive ID
+            # Store the Google Drive IDs on the content object for later use
             setattr(content, 'google_drive_id', file_id)
+            setattr(content, 'google_drive_folder_id', folder_id)
+            
+            # Store the URLs for easier access
+            file_url = f"https://drive.google.com/file/d/{file_id}/view"
+            folder_url = f"https://drive.google.com/drive/folders/{folder_id}"
+            setattr(content, 'google_drive_file_url', file_url)
+            setattr(content, 'google_drive_folder_url', folder_url)
             
             # Print debug info
-            print(f"Uploaded file to Google Drive: {name}, ID: {file_id}")
+            print(f"Uploaded file to Google Drive: {name}")
+            print(f"File ID: {file_id}")
+            print(f"File URL: {file_url}")
+            print(f"Folder ID: {folder_id}")
+            print(f"Folder URL: {folder_url}")
             
             return name
         finally:
@@ -63,16 +73,12 @@ class GoogleDriveStorage(Storage):
     
     def _open(self, name, mode='rb'):
         # This would be used to retrieve files
-        # Implementation needed if you want to read files
         raise NotImplementedError("Reading files is not implemented yet")
     
     def exists(self, name):
-        # For now, always return False to force uploading
         # In a complete implementation, you'd check if the file exists in Google Drive
         return False
     
     def url(self, name):
-        # Return a URL that points to the Google Drive file
-        # This requires retrieving or storing file IDs
-        # For now, just return a placeholder
-        return f"https://drive.google.com/file/d/{name}"
+        # This method needs to return a URL for accessing the file
+        return f"https://drive.google.com/file/d/FILE_ID_NEEDED/view"

@@ -43,6 +43,13 @@ const ApplicantDetails = () => {
         return <ApplicantDetailsSkeletonLoader />;
     }
 
+    // Extract the file_url for the resume
+    const resumeDocument = individualApplicants.documents.find(
+        (doc) => doc.document_type === "resume"
+    );
+
+    const resumeFileUrl = resumeDocument?.file_url;
+    
     return (
         <div className="flex flex-col h-full">
             {/* Top Part of applicant Details - Fixed */}
@@ -69,6 +76,13 @@ const ApplicantDetails = () => {
                     <button
                         type="button"
                         className="button1 flex flex-col items-center justify-center"
+                        onClick={() => {
+                            if (resumeFileUrl) {
+                                window.open(resumeFileUrl, "_blank");
+                            } else {
+                                console.error("Resume file URL not found");
+                            }
+                        }}
                     >
                         <Link href="" className="flex items-center space-x-2">
                             <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-medium text-center">
