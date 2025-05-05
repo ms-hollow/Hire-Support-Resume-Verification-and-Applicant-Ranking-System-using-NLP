@@ -104,7 +104,6 @@ class JobApplication(models.Model):
     applicant = models.ForeignKey('applicant.Applicant', on_delete=models.CASCADE)  
     email = models.EmailField()  
     application_date = models.DateField(auto_now_add=True)
-    folder_url = models.URLField(max_length=500, blank=True, null=True)
     
     # Updated status choices
     APPLICATION_STATUS_CHOICES = [
