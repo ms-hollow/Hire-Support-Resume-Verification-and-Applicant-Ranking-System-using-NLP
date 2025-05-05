@@ -127,11 +127,11 @@ export default function ApplicationConfirmation({ handleJobClick }) {
             
             // Document type mapping
             const documentTypeMapping = {
-                'resume': 'RESUME',
-                'educationalDocuments': 'EDUCATION',
-                'workcertificate': 'EXPERIENCE',
-                'seminarCertificate': 'CERTIFICATION',
-                'additionalDocuments': 'ADDITIONAL'
+                'resume': 'resume',
+                'educationalDocuments': 'education',
+                'workcertificate': 'experience',
+                'seminarCertificate': 'certification',
+                'additionalDocuments': 'additional'
             };
 
             // Process each document category
