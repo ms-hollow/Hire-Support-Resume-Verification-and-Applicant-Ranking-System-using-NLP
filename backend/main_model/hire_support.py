@@ -143,7 +143,7 @@ def process_application(hiring_settings, application_data, output_dir=None):
     # Create a structured verification result dictionary
     verification_result = {
         'resume_verification': {
-            'missing_name_components': missing_names
+            'verification_status': f"unverified: missing {missing_names}" if missing_names else "verified"
         },
         'experience_verification': applicant_experiences,
         'education_verification': applicant_education,
