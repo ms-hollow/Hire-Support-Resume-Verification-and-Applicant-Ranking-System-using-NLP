@@ -1,0 +1,22 @@
+{
+    "job_title": "Network Engineer",
+    "specialization": "Networking, Troubleshooting, Security",
+    "experience_weight": 0.40,
+    "skills_weight": 0.30,
+    "education_weight": 0.20,
+    "certifications_weight": 0.10,
+    "directly_relevant_job_titles": "Network Engineer, Network Administrator, Network Specialist",
+    "highly_relevant_job_titles": "Systems Engineer, Network Security Engineer, IT Support Engineer",
+    "moderately_relevant_job_titles": "IT Administrator, Technical Support Engineer, Infrastructure Engineer",
+    "primary_skills": "Networking (LAN/WAN), Cisco Routers/Switches, Firewall Management, Troubleshooting, Network Monitoring Tools",
+    "secondary_skills": "Wireless Networks, VPN Configuration, VoIP, VLANs, Network Automation (Ansible), Load Balancing",
+    "additional_skills": "Cloud Networking (AWS, Azure), Security Protocols (IPSec, SSL), SD-WAN, DNS/DHCP, Network Scripting (Python, Bash)",
+    "first_choice_field_study": "Information Technology, Computer Science, Computer Engineering",
+    "second_choice_field_study": "Electrical Engineering, Systems Engineering, Information Systems",
+    "third_choice_field_study": "Mathematics, Physics, Telecommunications Engineering",
+    "school_preference": "University of the Philippines, Ateneo de Manila University, De La Salle University",
+    "honors": true,
+    "multiple_degrees": false,
+    "certificate_institution_preference": "Cisco (CCNA, CCNP), CompTIA (Network+), AWS, Juniper Networks, Microsoft",
+    "verification_option": 1
+}

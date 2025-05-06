@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useState, useEffect, useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
-import { getApplicantProfile } from "../api/applicantApi";
+import { fetchApplicantProfile } from "../api/applicantApi";
 import phLocation from "../../public/placeHolder/location.json";
 import jobIndustry from "../../public/placeHolder/dummy_options.json";
 import { fetchJobListings } from "@/pages/api/applicantJobApi";
@@ -64,7 +64,7 @@ export default function ApplicantHome({ onJobClick }) {
     useEffect(() => {
         const fetchApplicantData = async () => {
             if (authTokens?.access) {
-                const profileData = await getApplicantProfile(authTokens);
+                const profileData = await fetchApplicantProfile(authTokens);
                 setApplicantName(profileData?.first_name || "Applicant");
             }
         };
@@ -217,7 +217,7 @@ export default function ApplicantHome({ onJobClick }) {
     // Fetch applicant data after mounting
     useEffect(() => {
         if (authTokens) {
-            getApplicantProfile();
+            fetchApplicantProfile();
         }
     }, [authTokens]);
 

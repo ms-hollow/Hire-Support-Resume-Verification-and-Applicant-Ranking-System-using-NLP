@@ -1,6 +1,8 @@
+import apiBaseUrl from "@/config/apiBaseUrl";
+
 export const fetchJobListings = async (authToken) => {
     try {
-        const response = await fetch("http://127.0.0.1:8000/job/job-hirings/", {
+        const response = await fetch(`${apiBaseUrl}/job/job-hirings/`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -43,16 +45,13 @@ export const fetchJobListings = async (authToken) => {
 
 export const fetchSavedJobs = async (authToken) => {
     try {
-        const response = await fetch(
-            "http://127.0.0.1:8000/applicant/saved-jobs/",
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${authToken}`,
-                },
-            }
-        );
+        const response = await fetch(`${apiBaseUrl}/applicant/saved-jobs/`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${authToken}`,
+            },
+        });
 
         if (!response.ok) throw new Error("Failed to fetch saved jobs");
         return await response.json();
@@ -65,7 +64,7 @@ export const fetchSavedJobs = async (authToken) => {
 export const saveJob = async (authToken, jobId) => {
     try {
         const response = await fetch(
-            `http://127.0.0.1:8000/applicant/save-job/${jobId}/`,
+            `${apiBaseUrl}/applicant/save-job/${jobId}/`,
             {
                 method: "POST",
                 headers: {
@@ -85,7 +84,7 @@ export const saveJob = async (authToken, jobId) => {
 export const unsaveJob = async (authToken, jobId) => {
     try {
         const response = await fetch(
-            `http://127.0.0.1:8000/applicant/unsave-job/${jobId}/`,
+            `${apiBaseUrl}/applicant/unsave-job/${jobId}/`,
             {
                 method: "DELETE",
                 headers: {
@@ -106,16 +105,13 @@ export const fetchJobDetails = async (authToken, jobId) => {
     if (!jobId) return null;
 
     try {
-        const response = await fetch(
-            `http://127.0.0.1:8000/job/hirings/${jobId}/`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${authToken}`,
-                },
-            }
-        );
+        const response = await fetch(`${apiBaseUrl}/job/hirings/${jobId}/`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${authToken}`,
+            },
+        });
 
         if (!response.ok) throw new Error("Failed to fetch job details");
 
@@ -171,7 +167,7 @@ export const fetchJobDetails = async (authToken, jobId) => {
 export const getAllJobApplications = async (authToken) => {
     try {
         const res = await fetch(
-            "http://127.0.0.1:8000/job/applications/get-all-applications/",
+            `${apiBaseUrl}/job/applications/get-all-applications/`,
             {
                 method: "GET",
                 headers: {
@@ -194,5 +190,190 @@ export const getAllJobApplications = async (authToken) => {
     } catch (error) {
         console.log("Error fetching job details:", error);
         return null;
+    }
+};
+
+export const submitJobApplication = async (
+    authToken,
+    applicationData,
+    documentFiles,
+    documentTypes
+) => {
+    if (!authToken) {
+        console.error("No access token available.");
+    }
+
+    try {
+        // Create FormData object for file upload
+        const formData = new FormData();
+
+        // Add application data
+        Object.keys(applicationData).forEach((key) => {
+            formData.append(key, applicationData[key]);
+        });
+
+        // Add document types and files
+        documentFiles.forEach((file, index) => {
+            if (index < documentTypes.length) {
+                // For multiple files of the same type, we need to maintain correct mapping
+                formData.append(`document_type`, documentTypes[index]);
+                formData.append(`document_file`, file);
+
+                // Log each file being added
+                console.log(
+                    `Adding ${documentTypes[index]} file: ${file.name}`
+                );
+            }
+        });
+
+        // Debugging - log the form data contents
+        console.log("--- Form Data Content ---");
+        for (let pair of formData.entries()) {
+            console.log(
+                pair[0] +
+                    ": " +
+                    (pair[1] instanceof File ? pair[1].name : pair[1])
+            );
+        }
+        console.log("-----------------------");
+
+        const response = await fetch(`${apiBaseUrl}/job/applications/create`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${authToken}`,
+                // Don't set Content-Type when using FormData, browser will set it with boundary
+            },
+            body: formData,
+            credentials: "include", // Include cookies if needed
+        });
+
+        // Check if the server returns JSON or something else
+        const contentType = response.headers.get("content-type");
+        console.log("Response status:", response.status);
+        console.log("Response content-type:", contentType);
+
+        if (!response.ok) {
+            if (contentType && contentType.includes("application/json")) {
+                const errorData = await response.json();
+                console.error("Failed to submit application:", errorData);
+                return { success: false, error: JSON.stringify(errorData) };
+            } else {
+                const textError = await response.text();
+                console.error("Server returned non-JSON error:", textError);
+                return {
+                    success: false,
+                    error:
+                        "Server error: " +
+                        response.status +
+                        " - " +
+                        textError.substring(0, 200),
+                };
+            }
+        }
+
+        if (contentType && contentType.includes("application/json")) {
+            const responseData = await response.json();
+            console.log("Successful response data:", responseData);
+            return { success: true, data: responseData };
+        } else {
+            const textResponse = await response.text();
+            console.log(
+                "Successful non-JSON response:",
+                textResponse.substring(0, 100)
+            );
+            return {
+                success: true,
+                data: "Application submitted successfully",
+            };
+        }
+    } catch (error) {
+        console.error("Error submitting job application:", error);
+        return { success: false, error: error.message };
+    }
+};
+
+export const getSpecificJobApplication = async (authToken, applicationId) => {
+    if (!authToken) {
+        console.error("No access token available.");
+    }
+
+    try {
+        const response = await fetch(
+            `${apiBaseUrl}/job/applications/get-specific-application/${applicationId}/`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        if (!response.ok) {
+            console.log("Failed to fetch job application");
+        }
+
+        const data = await response.json();
+
+        return data;
+    } catch (error) {
+        console.error("Error fetching job application:", error);
+        return null;
+    }
+};
+
+export const withdrawJobApplication = async (authToken, applicationId) => {
+    if (!authToken) {
+        console.error("No access token available.");
+    }
+
+    try {
+        const response = await fetch(
+            `${apiBaseUrl}/job/applications/cancel/${applicationId}/`,
+            {
+                method: "PATCH",
+                headers: {
+                    Authorization: `Bearer ${authToken}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        const data = await response.json();
+
+        return data;
+    } catch (error) {
+        console.error("Error withdrawing job application:", error);
+        return false;
+    }
+};
+
+export const checkApplication = async (
+    authTokens,
+    job_hiring_id,
+    applicant
+) => {
+    try {
+        const response = await fetch(
+            `${apiBaseUrl}/job/applications/check/${job_hiring_id}/?applicant_id=${applicant}`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${authTokens}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        if (!response.ok) {
+            console.log("Failed to check application");
+            return { hasApplied: false }; // Return a default value if the request fails
+        }
+
+        const data = await response.json();
+        return data; // Return the API response directly
+    } catch (error) {
+        console.error("Error checking application:", error);
+        return { hasApplied: false }; // Return a default value in case of an error
     }
 };

@@ -1,8 +1,10 @@
+import apiBaseUrl from "@/config/apiBaseUrl";
+
 export const fetchJobList = async (authTokens) => {
     if (!authTokens?.access) return null;
 
     try {
-        const res = await fetch("http://127.0.0.1:8000/job/hirings/company", {
+        const res = await fetch(`${apiBaseUrl}/job/hirings/company`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${authTokens.access}`,
@@ -22,7 +24,7 @@ export const getJobHiringDetails = async (id, authTokens) => {
     }
 
     try {
-        const res = await fetch(`http://127.0.0.1:8000/job/hirings/${id}`, {
+        const res = await fetch(`${apiBaseUrl}/job/hirings/${id}`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${authTokens.access}`,
@@ -47,7 +49,7 @@ export const getJobHiringDetails = async (id, authTokens) => {
 export const createJob = async (formData, token) => {
     try {
         const response = await fetch(
-            "http://127.0.0.1:8000/job/hirings/create/",
+            `${apiBaseUrl}/job/hirings/create/`,
             {
                 method: "POST",
                 headers: {
@@ -80,7 +82,7 @@ export const deleteJobHiring = async (id, authTokens) => {
 
     try {
         const res = await fetch(
-            `http://127.0.0.1:8000/job/hirings/delete/${id}`,
+            `${apiBaseUrl}/job/hirings/delete/${id}`,
             {
                 method: "DELETE",
                 headers: {
@@ -111,7 +113,7 @@ export const updateJobHiring = async (id, formData, authTokens) => {
 
     try {
         const res = await fetch(
-            `http://127.0.0.1:8000/job/hirings/edit/${id}/`,
+            `${apiBaseUrl}/job/hirings/edit/${id}/`,
             {
                 method: "PUT",
                 headers: {
@@ -134,6 +136,101 @@ export const updateJobHiring = async (id, formData, authTokens) => {
         return data;
     } catch (error) {
         console.error("Error updating job hiring:", error);
+        return null;
+    }
+};
+
+export const getJobHiringApplications = async (id, authTokens) => {
+    try {
+        const res = await fetch(
+            `${apiBaseUrl}/job/applications/get-applicant-summary/${id}`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${authTokens.access}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching job hiring applications:", error);
+        return null;
+    }
+};
+
+export const getApplicationDetails = async (id, authTokens) => {
+    try {
+        const res = await fetch(
+            `${apiBaseUrl}/job/applications/${id}`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${authTokens.access}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        if (!res.ok) {
+            throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching application details:", error);
+        return null;
+    }
+};
+
+export const editJobApplication = async (id, formData, authTokens) => {
+    try {
+        const res = await fetch(
+            `${apiBaseUrl}/job/applications/edit/${id}`,
+            {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${authTokens.access}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            }
+        );
+        if (!res.ok) {
+            throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        console.error("Error editing job application:", error);
+        return null;
+    }
+};
+
+export const updateApplicationStatus = async (id, status, authTokens) => {
+    try {
+        const res = await fetch(
+            `${apiBaseUrl}/job/applications/update-application-status/${id}/`,
+            {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${authTokens.access}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(status),
+            }
+        );
+        if (!res.ok) {
+            throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        console.error("Error updating application status:", error);
         return null;
     }
 };

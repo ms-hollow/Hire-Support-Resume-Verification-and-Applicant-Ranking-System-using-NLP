@@ -1,5 +1,8 @@
 from rest_framework import serializers
 from .models import JobHiring, ScoringCriteria, JobApplication, JobApplicationDocument, Notification
+from applicant.models import Applicant
+from applicant.serializers import ApplicantProfileFormSerializer
+from company.serializers import CompanyProfileFormSerializer
 
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -66,12 +69,12 @@ class JobHiringSerializer(serializers.ModelSerializer):
 class JobApplicationDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobApplicationDocument
-        fields = ['document_type', 'document_file']
+        fields = ['document_type', 'file_url', 'folder_url']
 
 class JobApplicationSerializer(serializers.ModelSerializer):
 
     documents = JobApplicationDocumentSerializer(many=True, required=False)
-    applicant_name = serializers.CharField(source='applicant.applicant_name', read_only=True) # kunin ang applicant name
+    applicant = serializers.PrimaryKeyRelatedField(queryset=Applicant.objects.all())
     job_title = serializers.CharField(source='job_hiring.job_title', read_only=True)
     region = serializers.CharField(source='job_hiring.region', read_only=True)
     province = serializers.CharField(source='job_hiring.province', read_only=True)
@@ -83,17 +86,20 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             'job_application_id',
             'job_hiring',
             'applicant',
-            'applicant_name', # save applicant name
             'email',
             'application_date',
             'application_status',
-            # 'scores',
-            # 'verification_result',
+            'scores',
+            'verification_result',
             'documents',  # Include nested documents
             'job_title',
             'region',
             'province',
-            'city'
+            'city',
+            'interview_date',
+            'interview_start_time',
+            'interview_end_time',
+            'interview_location_link',
         ]
  
     def create(self, validated_data):

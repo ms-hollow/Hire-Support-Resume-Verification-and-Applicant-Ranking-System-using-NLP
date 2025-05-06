@@ -186,3 +186,37 @@ export const CompanyJobDetailsSkeletonLoader = () => {
         </div>
     );
 };
+
+export const ApplicantDetailsSkeletonLoader = () => {
+    return (
+        <div className="flex flex-col h-full">
+            <div className="job-details-box border-b-8 top rounded-t-lg p-4 animate-pulse">
+                <div className="bg-placeholder h-4 mt-2 w-1/3 rounded"></div>
+                <div className="bg-placeholder h-5 mt-2 w-full rounded"></div>
+
+                <div className="flex flex-col items-center justify-center">
+                    <div className="bg-placeholder h-5 mt-2 w-1/2 rounded"></div>
+                    <div className="bg-placeholder h-5 mt-2 w-1/2 rounded"></div>
+                </div>
+
+                <div className="flex justify-between  mt-2">
+                    <div className="bg-placeholder rounded-xs w-4/12 h-8"></div>
+                    <div className="bg-placeholder rounded-xs w-5/12 h-8"></div>
+                </div>
+            </div>
+            <div className="job-details-box rounded-b-lg overflow-y-auto bg-white p-4 animate-pulse">
+                <div className="bg-placeholder h-3 mt-2 rounded w-1/4"></div>
+                <div className="bg-placeholder h-3 mt-2 rounded w-full"></div>
+
+                <div className="bg-placeholder h-3 mt-2 rounded w-1/4"></div>
+                <div className="bg-placeholder h-3 mt-2 rounded w-full"></div>
+
+                <div className="bg-placeholder h-3 mt-2 rounded w-1/4"></div>
+                <div className="bg-placeholder h-3 mt-2 rounded w-full"></div>
+
+                <div className="bg-placeholder h-3 mt-2 rounded w-1/4"></div>
+                <div className="bg-placeholder h-3 mt-2 rounded w-full"></div>
+            </div>
+        </div>
+    );
+};

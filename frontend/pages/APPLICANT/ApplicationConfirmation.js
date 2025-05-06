@@ -2,45 +2,229 @@ import ApplicantHeader from "@/components/ApplicantHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import ReviewApplication from "@/components/ReviewApplication";
+import {
+    getSectionData,
+    clearJobApplicationDraft,
+    getTempUploadedFiles,
+    clearTempFiles,
+} from "../utils/jobApplicationStates";
+import { submitJobApplication } from "../api/applicantJobApi";
+import { getApplicantProfile } from "../api/applicantApi";
 import { useRouter } from "next/router";
 import JobDetailsWrapper from "@/components/JobDetails";
-import { toast } from 'react-toastify';
+import AuthContext from "../context/AuthContext";
+import { toast } from "react-toastify";
 import ToastWrapper from "@/components/ToastWrapper";
 
 export default function ApplicationConfirmation({ handleJobClick }) {
     const [isChecked, setIsChecked] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
     const { id, jobHiringTitle, companyName } = router.query;
-
     const [showJobDetails, setShowJobDetails] = useState(false);
+    const [submitResult, setSubmitResult] = useState({
+        success: null,
+        message: "",
+    });
+    const { authTokens, user } = useContext(AuthContext);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Check for console debugging
+    useEffect(() => {
+        // Log what we have from context for debugging
+        console.log(
+            "Auth tokens from context:",
+            authTokens
+                ? "Present (first 10 chars): " +
+                      (authTokens.access
+                          ? authTokens.access.substring(0, 10) + "..."
+                          : "No access token")
+                : "No auth tokens"
+        );
+        console.log("User from context:", user);
+
+        if (!authTokens || !authTokens.access) {
+            console.error("No auth tokens available");
+            setSubmitResult({
+                success: false,
+                message: "You need to be logged in to submit an application.",
+            });
+        }
+
+        setIsLoading(false);
+    }, [authTokens, user]);
 
     const handleToggleDetails = () => {
-        setShowJobDetails((prev) => !prev); // Toggle visibility
+        setShowJobDetails((prev) => !prev);
     };
 
     const handleCheckboxChange = (e) => {
         setIsChecked(e.target.checked);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!isChecked) {
-        toast.error("Please agree to the terms before submitting.");
-        return;
+            toast.error("Please agree to the terms before submitting.");
+            return;
         }
-        toast.success("Application submitted successfully!");
-        localStorage.removeItem('job_application_draft');
-    };    
 
-    const getTitleFromLocalStorage = () => {
-        const jobTitle = localStorage.getItem('job_title');
-        return jobTitle ? jobTitle : null; 
-    };
+        if (!authTokens || !authTokens.access) {
+            console.error("No auth tokens available for submission");
+            setSubmitResult({
+                success: false,
+                message: "Authentication required. Please log in again.",
+            });
+            alert("Authentication required. Please log in again.");
+            return;
+        }
 
-    const getCompanyFromLocalStorage = () => {
-        const company = localStorage.getItem('company');
-        return company ? company : null; 
+        setIsSubmitting(true);
+
+        try {
+            // First get the applicant profile to get the applicant ID
+            const profileData = await getApplicantProfile(authTokens);
+            console.log("Retrieved profile data:", profileData);
+
+            if (!profileData?.applicant_id) {
+                console.log("Could not determine applicant ID from profile");
+            }
+
+            // Get all necessary data from localStorage
+            const personalInfo = getSectionData("personalInfo");
+            const documentMetadata = getSectionData("documentMetadata");
+            const jobDetails = getSectionData("jobDetails");
+
+            console.log("Retrieved jobDetails:", jobDetails);
+            console.log("Retrieved documentMetadata:", documentMetadata);
+
+            if (!jobDetails || !jobDetails.job_hiring_id) {
+                console.log(
+                    "Missing job hiring information. Please restart your application."
+                );
+            }
+
+            // Prepare application data for submission
+            const applicationData = {
+                job_hiring: jobDetails.job_hiring_id,
+                applicant: personalInfo.id,
+                email: personalInfo.email,
+                application_date: new Date().toISOString().split("T")[0],
+                application_status: "draft",
+            };
+
+            console.log(
+                "Submitting with applicant ID:",
+                profileData.applicant_id
+            );
+
+            // Extract document files and types using the stored metadata
+            const documentFiles = [];
+            const documentTypes = [];
+
+            // Get temp files from window object
+            const tempFiles = getTempUploadedFiles();
+            console.log("Retrieved temp files:", Object.keys(tempFiles).length);
+
+            // Document type mapping
+            const documentTypeMapping = {
+                resume: "resume",
+                educationalDocuments: "education",
+                workcertificate: "experience",
+                seminarCertificate: "certification",
+                additionalDocuments: "additional",
+            };
+
+            // Process each document category
+            if (documentMetadata) {
+                Object.keys(documentMetadata).forEach((category) => {
+                    const categoryData = documentMetadata[category];
+                    const docType =
+                        documentTypeMapping[category] || "ADDITIONAL";
+
+                    // Process main file if exists
+                    if (
+                        categoryData.files &&
+                        Array.isArray(categoryData.files)
+                    ) {
+                        categoryData.files.forEach((fileInfo) => {
+                            if (fileInfo && fileInfo.fileId) {
+                                const file = tempFiles[fileInfo.fileId];
+                                if (file instanceof File) {
+                                    documentFiles.push(file);
+                                    documentTypes.push(docType);
+                                    console.log(
+                                        `Adding ${docType} file: ${file.name}`
+                                    );
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            console.log("Submitting application with data:", applicationData);
+            console.log(
+                "Document files:",
+                documentFiles.map((f) => f.name)
+            );
+            console.log("Document types:", documentTypes);
+
+            // Submit application with all files
+            const result = await submitJobApplication(
+                authTokens.access,
+                applicationData,
+                documentFiles,
+                documentTypes
+            );
+
+            if (result.success) {
+                setSubmitResult({
+                    success: true,
+                    message: "Application submitted successfully!",
+                });
+                alert("Application submitted successfully!");
+
+                // Clear application draft from localStorage
+                clearJobApplicationDraft();
+
+                // Clear temp files from memory
+                clearTempFiles();
+
+                const applicationId = result.data.application_id;
+                // Redirect to success page after short delay
+                setTimeout(() => {
+                    //? Pasa job application id for reference.
+                    router.push({
+                        pathname: "/APPLICANT/ApplicationSubmit",
+                        query: { applicationId },
+                    });
+                }, 1500);
+            } else {
+                console.error("Submission error:", result.error);
+                setSubmitResult({
+                    success: false,
+                    message: `Failed to submit application: ${
+                        result.error || "Please try again"
+                    }`,
+                });
+                alert(
+                    `Failed to submit application: ${
+                        result.error || "Please try again"
+                    }`
+                );
+            }
+        } catch (error) {
+            console.error("Error submitting application:", error);
+            setSubmitResult({
+                success: false,
+                message: `An error occurred: ${error.message}. Please try again.`,
+            });
+            alert(`An error occurred: ${error.message}. Please try again.`);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const goBack = () => {
@@ -50,23 +234,38 @@ export default function ApplicationConfirmation({ handleJobClick }) {
         });
     };
 
-    //TODO 1. Retrieve yung job application id then display it
-
     return (
         <div>
-            <ApplicantHeader/>
-            <ToastWrapper/>
-                <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto">
-                    <p className="font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall   text-fontcolor pb-1">You are Applying for </p>
-                    <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>
-                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompanyFromLocalStorage() || 'No Job Company Available'}</p>
-                    <div className="relative">
-                        <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall  text-fontcolor pb-8 font-bold underline cursor-pointer" onClick={handleToggleDetails} >See job hiring details</p>
-                        {showJobDetails && (
-                            <div className="flex items-center justify-center absolute inset-0 bg-background h-screen ">
-                                <div className="relative w-full lg:w-6/12 mb:w-10/12 sm:w-full z-10 bg-background rounded ">
-                                    <button onClick={() => setShowJobDetails(false)} className="absolute -top-12 right-0  text-xl text-fontcolor hover:text-gray-700" > ✖ </button>
-                                    <JobDetailsWrapper
+            <ApplicantHeader />
+            <ToastWrapper />
+            <div className="lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto">
+                <p className="font-thin lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall   text-fontcolor pb-1">
+                    You are Applying for{" "}
+                </p>
+                <p className="font-semibold text-primary text-large pb-1">
+                    {jobHiringTitle || "No Job Title Available"}
+                </p>
+                <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">
+                    {companyName || "No Job Company Available"}
+                </p>
+                <div className="relative">
+                    <p
+                        className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall  text-fontcolor pb-8 font-bold underline cursor-pointer"
+                        onClick={handleToggleDetails}
+                    >
+                        See job hiring details
+                    </p>
+                    {showJobDetails && (
+                        <div className="flex items-center justify-center absolute inset-0 bg-background h-screen ">
+                            <div className="relative w-full lg:w-6/12 mb:w-10/12 sm:w-full z-10 bg-background rounded ">
+                                <button
+                                    onClick={() => setShowJobDetails(false)}
+                                    className="absolute -top-12 right-0  text-xl text-fontcolor hover:text-gray-700"
+                                >
+                                    {" "}
+                                    ✖{" "}
+                                </button>
+                                <JobDetailsWrapper
                                     /*authToken={authTokens?.access}*/
                                     onJobClick={handleJobClick}
                                 />
@@ -119,6 +318,24 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                             </label>
                         </section>
 
+                        {/* Show loading/error/success message if applicable */}
+                        {isLoading && (
+                            <p className="text-gray-500 text-center mb-4">
+                                Loading your profile data...
+                            </p>
+                        )}
+                        {submitResult.message && (
+                            <p
+                                className={`text-center mb-4 ${
+                                    submitResult.success
+                                        ? "text-green-600"
+                                        : "text-red-600"
+                                }`}
+                            >
+                                {submitResult.message}
+                            </p>
+                        )}
+
                         <div className="flex justify-between mt-1">
                             <button
                                 onClick={goBack}
@@ -142,18 +359,17 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                                 type="button"
                                 onClick={handleSubmit}
                                 className={`button1 flex items-center justify-center ${
-                                    !isChecked && "opacity-50"
+                                    (!isChecked || isSubmitting) && "opacity-50"
                                 }`}
-                                disabled={!isChecked}
+                                disabled={
+                                    !isChecked || isSubmitting || isLoading
+                                }
                             >
-                                <Link
-                                    href="/APPLICANT/ApplicationSubmit"
-                                    className="flex items-center space-x-2 ml-auto"
-                                >
-                                    <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
-                                        Submit Application
-                                    </p>
-                                </Link>
+                                <p className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall font-medium text-center">
+                                    {isSubmitting
+                                        ? "Submitting..."
+                                        : "Submit Application"}
+                                </p>
                             </button>
                         </div>
                     </div>

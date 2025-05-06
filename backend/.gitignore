@@ -14,3 +14,9 @@ db.sqlite3
 # Ignore all files in the media directory
 /media
 
+# Ignore models / big files (.pt, .pb)
+
+main_model/certification_ner_model.pt
+main_model/education_ner_model.pt
+main_model/experience_ner_model.pt
+main_model/frozen_east_text_detection.pb

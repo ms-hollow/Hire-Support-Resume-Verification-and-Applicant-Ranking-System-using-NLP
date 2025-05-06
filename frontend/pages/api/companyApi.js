@@ -1,8 +1,9 @@
 import jwt from "jsonwebtoken";
+import apiBaseUrl from "@/config/apiBaseUrl";
 
 export const getCompany = async (authTokens) => {
   try {
-    const res = await fetch("http://127.0.0.1:8000/company/profile/view", {
+    const res = await fetch(`${apiBaseUrl}/company/profile/view`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authTokens.access}`,
@@ -24,7 +25,7 @@ export const getCompanyProfile = async (authTokens) => {
   const decodedToken = jwt.decode(token);
 
   try {
-    const res = await fetch("http://127.0.0.1:8000/company/profile/view/", {
+    const res = await fetch(`${apiBaseUrl}/company/profile/view/`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -52,7 +53,7 @@ export const updateCompanyProfile = async (authTokens, formData) => {
   if (!authTokens?.access) return false;
 
   try {
-    const res = await fetch("http://127.0.0.1:8000/company/profile/edit/", {
+    const res = await fetch(`${apiBaseUrl}/company/profile/edit/`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${authTokens.access}`,

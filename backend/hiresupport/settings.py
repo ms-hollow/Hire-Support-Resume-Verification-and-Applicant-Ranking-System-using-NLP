@@ -21,6 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-qag)3q_0s4)lvuu&*==pah^t1c6*0i)#tmfc%!l33)s&0g38p7' #? For Local Development
 # SECRET_KEY = os.environ.get("SECRET_KEY") #? For  Web Deployment
@@ -287,3 +288,8 @@ GOOGLE_CLIENT_SECRET_FILE = 'client_secret.json'
 GOOGLE_REDIRECT_URI = 'http://localhost:8000/oauth2callback/'
 GOOGLE_DRIVE_FOLDER_ID = '17eN9CdIVu7nGhZ8n1aUFxr3PTxUK0BOE'
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760
+
+# Google Drive settings
+GDRIVE_ROOT_FOLDER_ID = '1jq3s-PeUkcJVV_yMgbl8ZS19_veR-H96'  # Your root folder ID
+GDRIVE_SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, 'google_drive/hiresupport-3da67b24496a.json')
+GDRIVE_ENABLED = True  # Set to False to disable Google Drive uploads during development

@@ -6,18 +6,21 @@ import {
     fetchSavedJobs,
     saveJob,
     unsaveJob,
+    checkApplication, // Import checkApplication
 } from "@/pages/api/applicantJobApi";
 import { toTitleCase } from "@/pages/utils/functions";
 import { toast } from "react-toastify";
 import ToastWrapper from "./ToastWrapper";
 import { useRouter } from "next/router";
-import { getApplicantProfile } from "@/pages/api/applicantApi";
+import { fetchApplicantProfile } from "@/pages/api/applicantApi";
 
 const SavedJobs = () => {
     const { authTokens } = useContext(AuthContext);
+    const [applicantId, setApplicantID] = useState(null);
     const [savedJobs, setSavedJobs] = useState([]);
     const [jobListings, setJobListings] = useState([]);
     const [savedStatus, setSavedStatus] = useState({});
+    const [appliedStatus, setAppliedStatus] = useState({}); // New state for applied jobs
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const router = useRouter();
@@ -25,8 +28,18 @@ const SavedJobs = () => {
     useEffect(() => {
         const loadSavedJobs = async () => {
             try {
+                // Ensure applicantId is set before proceeding
+                const profileData = await fetchApplicantProfile(authTokens);
+                const applicantId = profileData?.id;
+                setApplicantID(applicantId);
+
+                if (!applicantId) {
+                    throw new Error("Applicant ID is not available.");
+                }
+
                 const savedJobsData = await fetchSavedJobs(authTokens.access);
                 setSavedJobs(savedJobsData);
+
                 const jobHiringIds = savedJobsData.map(
                     (job) => job.job_hiring_id
                 );
@@ -43,6 +56,18 @@ const SavedJobs = () => {
 
                 setJobListings(filteredJobs);
                 setSavedStatus(initialSavedStatus);
+
+                // Check applied status for each job
+                const appliedStatuses = {};
+                for (const job of filteredJobs) {
+                    const data = await checkApplication(
+                        authTokens.access,
+                        job.job_id,
+                        applicantId
+                    );
+                    appliedStatuses[job.job_id] = data?.hasApplied || false;
+                }
+                setAppliedStatus(appliedStatuses);
             } catch (error) {
                 setError(error.message);
             } finally {
@@ -93,7 +118,8 @@ const SavedJobs = () => {
     };
 
     const checkProfile = async () => {
-        const res = await getApplicantProfile(authTokens);
+        const res = await fetchApplicantProfile(authTokens);
+        setApplicantID(res.id);
         const hasIncompleteField = Object.values(res).some(
             (val) => val === null || val === ""
         );
@@ -149,16 +175,29 @@ const SavedJobs = () => {
 
                                     <div className="flex items-start ml-5 gap-4">
                                         <div className="flex items-center gap-4">
-                                            <button
-                                                className="button1 flex items-center justify-center text-center"
-                                                onClick={() =>
-                                                    handleApplyNow(job.job_id)
-                                                }
-                                            >
-                                                <p className="lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-center">
-                                                    Apply Now
-                                                </p>
-                                            </button>
+                                            {appliedStatus[job.job_id] ? (
+                                                <button
+                                                    className="button1 flex items-center justify-center text-center cursor-not-allowed opacity-50"
+                                                    disabled
+                                                >
+                                                    <p className="lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-center">
+                                                        Applied
+                                                    </p>
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className="button1 flex items-center justify-center text-center"
+                                                    onClick={() =>
+                                                        handleApplyNow(
+                                                            job.job_id
+                                                        )
+                                                    }
+                                                >
+                                                    <p className="lg:text-medium mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-center">
+                                                        Apply Now
+                                                    </p>
+                                                </button>
+                                            )}
 
                                             <button
                                                 onClick={() =>

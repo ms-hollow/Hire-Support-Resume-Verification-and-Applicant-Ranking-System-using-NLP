@@ -1,0 +1,22 @@
+{
+    "job_title": "Data Analyst",
+    "specialization": "Data Analysis, Reporting, Visualization",
+    "experience_weight": 0.30,
+    "skills_weight": 0.35,
+    "education_weight": 0.20,
+    "certifications_weight": 0.15,
+    "directly_relevant_job_titles": "Data Analyst, Business Analyst, Reporting Analyst",
+    "highly_relevant_job_titles": "Data Scientist, Research Analyst, Financial Analyst",
+    "moderately_relevant_job_titles": "Market Analyst, Data Engineer, Systems Analyst",
+    "primary_skills": "SQL, Excel, Tableau, Power BI, Data Cleaning, Statistical Analysis",
+    "secondary_skills": "Python, R, Data Visualization, Google Analytics, ETL Tools",
+    "additional_skills": "Big Data (Hadoop, Spark), Machine Learning Basics, Data Warehousing, Predictive Modeling, Cloud Tools (AWS, GCP)",
+    "first_choice_field_study": "Statistics, Data Science, Computer Science",
+    "second_choice_field_study": "Mathematics, Economics, Information Systems",
+    "third_choice_field_study": "Engineering, Physics, Business Administration",
+    "school_preference": "University of the Philippines, Ateneo de Manila University, De La Salle University",
+    "honors": true,
+    "multiple_degrees": false,
+    "certificate_institution_preference": "Google (Data Analytics), Microsoft (Power BI), Tableau, Coursera, Udemy",
+    "verification_option": 1
+}

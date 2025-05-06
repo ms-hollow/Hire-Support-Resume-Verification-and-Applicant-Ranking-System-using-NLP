@@ -6,9 +6,10 @@ import { useState, useEffect, useContext, useCallback } from "react";
 import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
 import JobDetailsWrapper from "@/components/JobDetails";
-import { getApplicantProfile } from "../api/applicantApi";
+import { fetchApplicantProfile } from "../api/applicantApi";
 import { fetchJobDetails } from "../api/applicantJobApi";
 import { toTitleCase } from "../utils/functions";
+import { saveSectionData, getSectionData } from "../utils/jobApplicationStates";
 
 export default function JobApplication({ handleJobClick }) {
     let { authTokens } = useContext(AuthContext);
@@ -45,9 +46,14 @@ export default function JobApplication({ handleJobClick }) {
     const [step, setStep] = useState(1);
 
     useEffect(() => {
+        const savedPersonalInfo = getSectionData("personalInfo");
+        if (savedPersonalInfo) {
+            setFormData((prev) => ({ ...prev, ...savedPersonalInfo }));
+        }
+
         const applicantProfile = async () => {
-            const data = await getApplicantProfile(authTokens);
-            setFormData(data);
+            const data = await fetchApplicantProfile(authTokens);
+            setFormData((prev) => ({ ...prev, ...data }));
         };
 
         const getJobHiringDetails = async () => {
@@ -58,9 +64,74 @@ export default function JobApplication({ handleJobClick }) {
 
         applicantProfile();
         getJobHiringDetails();
-    }, [authTokens]);
+    }, [authTokens, id]);
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        const updatedData = { ...formData, [name]: value };
+        setFormData(updatedData);
+
+        const fields = Object.keys(formData);
+        const filledFields = fields.filter(
+            (field) => formData[field] || updatedData[field]
+        );
+        setStep(Math.min(filledFields.length, fields.length));
+    };
+
+    const handleEdit = () => {
+        alert("Edit button clicked - implement your logic here.");
+    };
+
+    // Save data and navigate to next step
     const handleNext = () => {
+        const requiredFields = [
+            { key: "first_name", label: "First Name" },
+            { key: "last_name", label: "Last Name" },
+            { key: "email", label: "Email" },
+            { key: "contact_number", label: "Contact Number" },
+            { key: "sex", label: "Sex" },
+            { key: "date_of_birth", label: "Date of Birth" },
+            { key: "age", label: "Age" },
+            { key: "present_address", label: "Present Address" },
+            { key: "region", label: "Region" },
+            { key: "province", label: "Province" },
+            { key: "city", label: "City" },
+            { key: "barangay", label: "Barangay" },
+        ];
+
+        const missingFields = requiredFields.filter(
+            (field) =>
+                !formData[field.key] ||
+                String(formData[field.key]).trim() === ""
+        );
+
+        if (missingFields.length > 0) {
+            const missingFieldNames = missingFields
+                .map((field) => field.label)
+                .join(", ");
+            alert(`Please complete your personal information first.`);
+            return;
+        }
+
+        // Format full name for display
+        const fullName = `${formData.first_name} ${
+            formData.middle_mame || ""
+        } ${formData.last_name}`.trim();
+
+        // Save personal info to localStorage with formatted values
+        saveSectionData("personalInfo", {
+            ...formData,
+            fullName: fullName,
+        });
+
+        // Also save job details
+        saveSectionData("jobDetails", {
+            job_hiring_id: id,
+            job_title: jobHiringTitle,
+            company_name: companyName,
+        });
+
+        // Navigate to next page
         router.push({
             pathname: "/APPLICANT/ApplicantDocuments",
             query: { id, jobHiringTitle, companyName },

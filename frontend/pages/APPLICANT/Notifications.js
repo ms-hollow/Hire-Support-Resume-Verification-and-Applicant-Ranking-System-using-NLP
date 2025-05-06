@@ -8,13 +8,15 @@ import {
     markNotificationAsRead,
     deleteNotifications,
 } from "../api/notificationApi";
-import { getApplicantProfile } from "../api/applicantApi";
+import { fetchApplicantProfile } from "../api/applicantApi";
 import DeleteConfirmationModal from "@/components/ui/DeleteConfirmationModal";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import ToastWrapper from "@/components/ToastWrapper";
+import { useRouter } from "next/router";
 
 export default function Notifications() {
     let { authTokens } = useContext(AuthContext);
+    const router = useRouter();
     const [notifications, setNotifications] = useState([]);
     const [applicantName, setApplicantName] = useState("");
     const [selectAll, setSelectAll] = useState(false);
@@ -26,7 +28,7 @@ export default function Notifications() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const profile = await getApplicantProfile(authTokens);
+                const profile = await fetchApplicantProfile(authTokens);
                 setApplicantName(profile.first_name);
             } catch (error) {
                 console.error("Failed to fetch profile:", error);
@@ -59,9 +61,25 @@ export default function Notifications() {
         currentPage * pageSize
     );
 
-    //* In progress
-    const handleMarkAsRead = async (id) => {
-        console.log("Job to Mark as Read", id);
+    const handleMarkAsRead = async (notif_id) => {
+        const notification = notifications.find(
+            (notif) => notif.id === notif_id
+        );
+        let job_application_id = notification.job_application;
+        try {
+            await markNotificationAsRead(notif_id, authTokens?.access);
+            const updatedNotifications = notifications.map((notif) =>
+                notif.id === notif_id ? { ...notif, is_read: true } : notif
+            );
+            setNotifications(updatedNotifications);
+
+            router.push({
+                pathname: "/APPLICANT/ViewApplication/",
+                query: { applicationId: job_application_id },
+            });
+        } catch (error) {
+            console.error("Failed to mark notification as read:", error);
+        }
     };
 
     const handleDeleteNotification = async () => {
@@ -120,7 +138,7 @@ export default function Notifications() {
         <div>
             <>
                 <ApplicantHeader />
-                <ToastWrapper/>
+                <ToastWrapper />
                 <div className="lg:pt-28 mb:pt-24 sm:pt-24 xsm:pt-24 xxsm:pt-24 lg:px-20 mb:px-10 sm:px-8 xsm:px-4 xxsm:px-4 mx-auto pb-8">
                     <div className="text-lg text-primary">
                         <b>Notifications</b>

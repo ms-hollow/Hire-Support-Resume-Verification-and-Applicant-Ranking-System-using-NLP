@@ -1,0 +1,8 @@
+{
+    "first_name": "Rita",
+    "last_name": "Cardona",
+    "resume_link": "backend/media/Resume/1.pdf",
+    "experience_documents_links": "backend/media/Job Application Documents/RITA CARDONA/EX1.png, backend/media/Job Application Documents/RITA CARDONA/EX2.png, backend/media/Job Application Documents/RITA CARDONA/EX3.png",
+    "educational_documents_links": "backend/media/Job Application Documents/RITA CARDONA/ED1.png, backend/media/Job Application Documents/RITA CARDONA/ED2.png",
+    "certifications_documents_links": "backend/media/Job Application Documents/RITA CARDONA/CE1.png, backend/media/Job Application Documents/RITA CARDONA/CE2.png, backend/media/Job Application Documents/RITA CARDONA/CE3.png, backend/media/Job Application Documents/RITA CARDONA/CE4.png"
+}

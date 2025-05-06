@@ -1,6 +1,11 @@
 from django.db import models
 from company.models import Company
+from applicant.models import Applicant
 from users.models import User
+import os
+from google_drive.storage import GoogleDriveStorage
+from django.conf import settings
+from django.utils import timezone
 
 STATUS_CHOICES = (
     ('draft', 'Draft'),
@@ -8,15 +13,6 @@ STATUS_CHOICES = (
     ('closed', 'Closed'),
     ('complete', 'Complete')
 )
-
-class Notification(models.Model):
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
-    message = models.TextField()
-    is_read = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Notification to {self.recipient}"
 
 class JobHiring(models.Model): 
     job_hiring_id = models.AutoField(primary_key=True) #PK
@@ -85,7 +81,6 @@ class JobHiring(models.Model):
     def __str__(self):
         return f"{self.job_title} at {self.company.company_name}"
 
-
 class ScoringCriteria(models.Model):
     job_hiring = models.ForeignKey(JobHiring, related_name='scoring_criteria', on_delete=models.CASCADE)
     criteria_name = models.CharField(max_length=100, blank=True, null=True)
@@ -98,12 +93,36 @@ class ScoringCriteria(models.Model):
 class JobApplication(models.Model):
     job_application_id = models.AutoField(primary_key=True)
     job_hiring = models.ForeignKey(JobHiring, on_delete=models.CASCADE)
-    applicant = models.ForeignKey('applicant.Applicant', on_delete=models.CASCADE)  
+    applicant = models.ForeignKey(Applicant, on_delete=models.CASCADE)
     email = models.EmailField()  
-    application_date = models.DateTimeField(auto_now_add=True)
-    application_status = models.CharField(max_length=20, default='draft')
+    application_date = models.DateField(auto_now_add=True)
+    
+    # Updated status choices
+    APPLICATION_STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('processing', 'Processing'),
+        ('processed', 'Submitted'),
+        ('error', 'Processing Failed'),
+        ('cancelled', 'Cancelled'),
+        ('shortlisted', 'Shortlisted'),
+        ('rejected', 'Rejected'),
+        ('interview scheduled', 'Interview Scheduled'),
+        ('emailed', 'Emailed'),
+        ('accepted', 'Accepted'),
+        ('withdrawn', 'Withdrawn'),
+    ]
+    
+    application_status = models.CharField(
+        max_length=20, 
+        choices=APPLICATION_STATUS_CHOICES,
+        default='draft'
+    )
     scores = models.JSONField(blank=True, null=True)
     verification_result = models.JSONField(blank=True, null=True)
+    interview_date = models.DateField(null=True, blank=True)
+    interview_start_time = models.TimeField(null=True, blank=True)
+    interview_end_time = models.TimeField(null=True, blank=True)
+    interview_location_link = models.CharField(max_length=255, null=True, blank=True)
 
     def notify_applicant(self, message):
         Notification.objects.create(
@@ -131,14 +150,77 @@ class JobApplication(models.Model):
         return f"Application for {self.job_hiring.job_title}"
 
 
+def get_resume_upload_path(instance, filename):
+    """Define upload path for resume files"""
+    job_hiring_id = instance.job_application.job_hiring.job_hiring_id
+    applicant_id = instance.job_application.applicant.id
+    
+    # Ensure directory exists
+    from main_model.utils.file_structure import get_applicant_dir
+    applicant_dir = get_applicant_dir(job_hiring_id, applicant_id)
+    
+    # Create a new filename with original extension
+    name, ext = os.path.splitext(filename)
+    new_filename = f"resume{ext}"
+    
+    return os.path.join(f'job_hirings/job_hiring_{job_hiring_id}/applications/applicant_{applicant_id}', new_filename)
+
+def get_document_upload_path(instance, filename):
+    """Define upload path for document files based on document type"""
+    job_hiring_id = instance.job_application.job_hiring.job_hiring_id
+    applicant_id = instance.job_application.applicant.id
+    doc_type = instance.document_type.lower()
+    
+    # Ensure directory exists
+    from main_model.utils.file_structure import get_document_type_dir
+    doc_dir = get_document_type_dir(job_hiring_id, applicant_id, doc_type)
+    
+    # Build path and ensure it's relative (no leading slash)
+    path = f'job_hirings/job_hiring_{job_hiring_id}/applications/applicant_{applicant_id}/documents/{doc_type}/{filename}'
+    return path.lstrip('/')  # Remove leading slash if present
+
+# Create a single instance to be reused
+google_drive_storage = GoogleDriveStorage() if getattr(settings, 'GDRIVE_ENABLED', False) else None
+
 class JobApplicationDocument(models.Model):
     job_application = models.ForeignKey(JobApplication, related_name='documents', on_delete=models.CASCADE)
     document_type = models.CharField(max_length=255)
-    document_file = models.FileField(upload_to='documents/') # location kung saan siya iuupload #TODO modify ang path
+    document_file = models.FileField(upload_to='job_applications/documents/')
+    google_drive_id = models.CharField(max_length=100, blank=True, null=True)
+    
+    # New fields for storing URLs
+    google_drive_id = models.CharField(max_length=100, blank=True, null=True)
+    file_id = models.CharField(max_length=100, blank=True, null=True)
+    file_url = models.URLField(max_length=500, blank=True, null=True)
+    folder_id = models.CharField(max_length=100, blank=True, null=True)
+    folder_url = models.URLField(max_length=500, blank=True, null=True)
+    
+    uploaded_at = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return f"{self.document_type} for {self.job_application}"
+
+    # Use a callable for upload_to
+    document_file = models.FileField(
+        upload_to=get_document_upload_path,
+        storage=google_drive_storage if getattr(settings, 'GDRIVE_ENABLED', False) else None
+    )
+    
+    # Add a field to store Google Drive file ID
+    google_drive_id = models.CharField(max_length=255, blank=True, null=True)
+    
+    def __str__(self):
+        return f"{self.document_type} for {self.job_application}"
+
+class Notification(models.Model):
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    job_application = models.ForeignKey(JobApplication, on_delete=models.CASCADE, null=True, blank=True) 
 
     def __str__(self):
-        return self.document_type
-
+        return f"Notification to {self.recipient}"
 class RecentSearch(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     job_title = models.CharField(max_length=255, blank=True, null=True)

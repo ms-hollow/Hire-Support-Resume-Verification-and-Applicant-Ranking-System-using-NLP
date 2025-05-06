@@ -1,14 +1,13 @@
 import ApplicantHeader from "@/components/ApplicantHeader";
 import GeneralFooter from "@/components/GeneralFooter";
 import Image from "next/image";
-import { useState, useEffect, useContext, useCallback } from "react";
+import { useState, useEffect, useContext, useCallback, useRef } from "react";
 import AuthContext from "../context/AuthContext";
 import { useRouter } from "next/router";
 import { FaChevronDown } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import JobDetailsWrapper from "@/components/JobDetails";
-import { toast } from 'react-toastify';
-import ToastWrapper from "@/components/ToastWrapper";
+import { saveSectionData, getSectionData } from "../utils/jobApplicationStates";
 
 //TODO TODO TODO TODO
 
@@ -20,6 +19,9 @@ export default function ApplicantDocument({ handleJobClick }) {
     const [isAddOpen, setIsAddOpen] = useState(false);
 
     const [showJobDetails, setShowJobDetails] = useState(false);
+
+    const resumeInputRef = useRef(null); // Reference to the resume input field
+    const [resumeInputKey, setResumeInputKey] = useState(Date.now()); // initial key
 
     const handleToggleDetails = () => {
         setShowJobDetails((prev) => !prev); // Toggle visibility
@@ -44,13 +46,20 @@ export default function ApplicantDocument({ handleJobClick }) {
     });
 
     const [formData, setFormData] = useState({
-        resume: { file: "", option: "upload" },
-        educationaldocs: { file: "", option: "upload" },
-        workcertificate: { file: "", option: "upload" },
-        seminarCertificate: { file: "", option: "upload" },
-        additionalDocuments: { file: "", option: "upload" },
-        additionalDocs: { files: [] }, // Keep additional documents as an array
+        resume: { file: null, option: "upload" },
+        educationalDocuments: { file: null, files: [], option: "upload" },
+        workcertificate: { file: null, files: [], option: "upload" },
+        seminarCertificate: { file: null, files: [], option: "upload" },
+        additionalDocuments: { file: null, files: [], option: "upload" }
     });
+
+    // Load any saved document data when component mounts
+    useEffect(() => {
+        const savedDocuments = getSectionData('documents');
+        if (savedDocuments) {
+            setFormData(prev => ({ ...prev, ...savedDocuments }));
+        }
+    }, []);
 
     const goBack = () => {
         router.push({
@@ -59,94 +68,6 @@ export default function ApplicantDocument({ handleJobClick }) {
         });
     };
 
-    const handleOptionChange = (e, document) => {
-        const { value } = e.target;
-        setFormData((prevState) => ({
-            ...prevState,
-            [document]: {
-                ...prevState[document],
-                option: value,
-                file: value === "upload" ? "" : prevState[document].file, // Clear file if 'select' option is chosen
-            },
-        }));
-    };
-
-    const handleDropdownChange = (e, document) => {
-        const { value } = e.target;
-        setFormData((prevState) => ({
-            ...prevState,
-            [document]: {
-                ...prevState[document],
-                file: value,
-            },
-        }));
-    };
-
-    const handleSubmit = async (e) => {
-        if (e) e.preventDefault();
-    
-        const applicationData = {
-            ...draftJobApplication,
-            documents: Object.keys(formData).map((key) => ({
-                document_type: key,
-                document_file: formData[key].file, // <- This is the actual File object
-            })),
-        };
-
-        console.log(applicationData);
-    
-        const formDataToSubmit = new FormData();
-        formDataToSubmit.append('job_hiring', applicationData.job_hiring);
-        formDataToSubmit.append('applicant', applicationData.applicant);
-        formDataToSubmit.append('fullName', applicationData.fullName);
-        formDataToSubmit.append('email', applicationData.email);
-        formDataToSubmit.append('contact_number', applicationData.contact_number);
-        formDataToSubmit.append('address', applicationData.address);
-        formDataToSubmit.append('linkedin_profile', applicationData.linkedin_profile);
-        formDataToSubmit.append('application_date', applicationData.application_date);
-        formDataToSubmit.append('application_status', applicationData.application_status);
-    
-        // Append each document file and its type to FormData
-        applicationData.documents.forEach((doc) => {
-            if (doc.document_file) {
-                formDataToSubmit.append('document_type', doc.document_type); // Matches 'document_type' in your backend
-                formDataToSubmit.append('document_file', doc.document_file); // Matches 'document_file' in your backend
-            }
-        });
-    
-        // Debugging: See what's being sent
-        for (let pair of formDataToSubmit.entries()) {
-            console.log(pair[0], pair[1]);
-        }
-    
-        try {
-            const res = await fetch('http://127.0.0.1:8000/job/applications/create', {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${authTokens.access}`, // Keep headers minimal for FormData
-                },
-                body: formDataToSubmit,
-            });
-    
-            if (res.ok) {
-                toast.success('Job application submitted successfully!');
-                localStorage.removeItem('draftJobApplication');
-                router.push({
-                    pathname: '/APPLICANT/ApplicationConfirmation',
-                    query: { jobId },
-                });
-            } else {
-                const errorData = await res.json();
-                console.error('Submission error:', errorData);
-                toast.error('Failed to submit job application.');
-            }
-        } catch (error) {
-            console.error('Network error:', error);
-            toast.error('An error occurred. Please try again later.');
-        }
-    };
-    
-    
     const addAdditionalFile = (category) => {
         setFormData((prevState) => {
             const updatedFiles = [...(prevState[category]?.files || [])];
@@ -162,7 +83,7 @@ export default function ApplicantDocument({ handleJobClick }) {
     };
 
     // Remove additional file input for a specific category
-    const removeAdditionalFile = (category, index) => {
+    const removeFile = (category, index) => {
         setFormData((prevState) => {
             const updatedFiles = (prevState[category]?.files || []).filter(
                 (_, i) => i !== index
@@ -177,37 +98,188 @@ export default function ApplicantDocument({ handleJobClick }) {
         });
     };
 
-    // Handle file input change for additional files
-    const handleAdditionalFileChange = (e, category, index) => {
+    const clearResumeField = () => {
+        console.log("Clearing resume file");
+    
+        setFormData(prevData => ({
+            ...prevData,
+            resume: {
+                ...prevData.resume,
+                file: null
+            }
+        }));
+    
+        // Force remount by changing the key
+        setResumeInputKey(Date.now());
+    };
+
+    const handleFileChange = (e, field) => {
+        const file = e.target.files[0]; // Get only the first file
+    
+        if (file) {
+            const allowedTypes = [
+                "application/pdf",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+                "application/msword" // .doc
+            ];
+    
+            if (!allowedTypes.includes(file.type)) {
+                alert("Invalid file type. Only PDF, DOC, and DOCX files are allowed.");
+                e.target.value = null; // Clear the file input
+                return;
+            }
+    
+            setFormData(prevData => ({
+                ...prevData,
+                [field]: {
+                    file: file
+                }
+            }));
+        }
+    };
+
+
+    // Modified handleMultipleFileChange 
+    const handleMultipleFileChange = (e, docType, index) => {
         const { files } = e.target;
-        setFormData((prevState) => {
-            const updatedFiles = [...(prevState[category]?.files || [])];
-            updatedFiles[index] = files[0]; // Store the file object, not just the filename
-            return {
-                ...prevState,
-                [category]: {
-                    ...prevState[category],
-                    files: updatedFiles,
-                },
-            };
+    
+        if (files.length > 0) {
+            const file = files[0];
+            const allowedTypes = [
+                "application/pdf",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+                "application/msword", // .doc
+                "image/png",
+                "image/jpeg", // covers .jpeg and .jpg
+            ];
+    
+            if (!allowedTypes.includes(file.type)) {
+                alert("Invalid file type. Only PDF, DOC, DOCX, PNG, JPG, and JPEG are allowed.");
+                e.target.value = null; // Clear the input field
+                return;
+            }
+    
+            setFormData(prev => {
+                const updatedFiles = [...(prev[docType].files || [])];
+                updatedFiles[index] = file;
+                return {
+                    ...prev,
+                    [docType]: {
+                        ...prev[docType],
+                        files: updatedFiles
+                    }
+                };
+            });
+        }
+    };
+
+    // Save data and navigate to confirmation page
+    const handleSubmit = async (e) => {
+        if (e) e.preventDefault();
+        
+        // Initialize temporary file storage if it doesn't exist
+        if (!window.tempUploadedFiles) {
+            window.tempUploadedFiles = {};
+        }
+        
+        // Create a structure to store document metadata for all categories
+        const documentMetadata = {};
+        
+        // Helper function to process document files
+        const processDocumentFiles = (docType, filesData) => {
+            // For single file upload option
+            if (filesData.file instanceof File) {
+                const fileId = `${docType}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+                
+                documentMetadata[docType] = {
+                    type: docType,
+                    option: filesData.option,
+                    files: [{
+                        fileName: filesData.file.name,
+                        fileSize: filesData.file.size, 
+                        fileType: filesData.file.type,
+                        fileId: fileId
+                    }]
+                };
+                
+                // Store actual file in temporary storage
+                window.tempUploadedFiles[fileId] = filesData.file;
+            } 
+            // For array of files (multiple file uploads)
+            else if (filesData.files && Array.isArray(filesData.files)) {
+                documentMetadata[docType] = {
+                    type: docType,
+                    option: filesData.option,
+                    files: filesData.files.map(file => {
+                        if (file instanceof File) {
+                            const fileId = `${docType}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+                            
+                            // Store file in temp object
+                            window.tempUploadedFiles[fileId] = file;
+                            
+                            return {
+                                fileName: file.name,
+                                fileSize: file.size,
+                                fileType: file.type,
+                                fileId: fileId
+                            };
+                        }
+                        return null;
+                    }).filter(Boolean)
+                };
+            }
+        };
+        
+        // Process each document category
+        Object.keys(formData).forEach(docType => {
+            processDocumentFiles(docType, formData[docType]);
+        });
+    
+        // Debug log to verify what's being stored
+        console.log("Document metadata being stored:", documentMetadata);
+        console.log("Temp files stored:", Object.keys(window.tempUploadedFiles).length);
+        
+        // Store document metadata in localStorage
+        saveSectionData('documentMetadata', documentMetadata);
+        
+        // Navigate to confirmation page
+        router.push({
+            pathname: "/APPLICANT/ApplicationConfirmation",
+            query: { id, jobHiringTitle, companyName },
         });
     };
 
     return (
         <div>
-            <ApplicantHeader/>
-            <ToastWrapper/>
-                <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 xxsm:px-4  py-8 mx-auto">
-                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall  text-fontcolor pb-1">You are Applying for </p>
-                    <p className="font-semibold text-primary text-large pb-1">{getTitleFromLocalStorage() || 'No Job Title Available'}</p>
-                    <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">{getCompanyFromLocalStorage() || 'No Job Company Available'}</p>
-                    <div className="relative">
-                        <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-8 font-bold underline cursor-pointer" onClick={handleToggleDetails} >See job hiring details</p>
-                        {showJobDetails && (
-                            <div className="flex items-center justify-center absolute inset-0 bg-background h-screen ">
-                                <div className="relative w-full lg:w-6/12 mb:w-10/12 sm:w-full z-10 bg-background rounded ">
-                                    <button onClick={() => setShowJobDetails(false)} className="absolute -top-12 right-0  text-xl text-fontcolor hover:text-gray-700" > ✖ </button>
-                                    <JobDetailsWrapper
+            <ApplicantHeader />
+            <div className=" lg:pt-28 mb:pt-24 xsm:pt-24 sm:pt-24 xxsm:pt-24 lg:px-20 mb:px-20 sm:px-8 xsm:px-8 xxsm:px-4  py-8 mx-auto">
+                <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall  text-fontcolor pb-1">
+                    You are Applying for{" "}
+                </p>
+                <p className="font-semibold text-primary text-large pb-1">
+                    {jobHiringTitle}
+                </p>
+                <p className="font-thin lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1">
+                    {companyName}
+                </p>
+                <div className="relative">
+                    <p
+                        className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-8 font-bold underline cursor-pointer"
+                        onClick={handleToggleDetails}
+                    >
+                        See job hiring details
+                    </p>
+                    {showJobDetails && (
+                        <div className="flex items-center justify-center absolute inset-0 bg-background h-screen ">
+                            <div className="relative w-full lg:w-6/12 mb:w-10/12 sm:w-full z-10 bg-background rounded ">
+                                <button
+                                    onClick={() => setShowJobDetails(false)}
+                                    className="absolute -top-12 right-0  text-xl text-fontcolor hover:text-gray-700"
+                                >
+                                    {" "}
+                                    ✖{" "}
+                                </button>
+                                <JobDetailsWrapper
                                     /*authToken={authTokens?.access}*/
                                     onJobClick={handleJobClick}
                                 />
@@ -237,73 +309,34 @@ export default function ApplicantDocument({ handleJobClick }) {
                         </p>
 
                         {/* Resume */}
-                        <div>
-                            {/* Resume Header (Clickable)*/}
-                            <div
-                                className="flex justify-between items-center"
-                                onClick={() => setIsResumeOpen(!isResumeOpen)}
+                        <div className="mb-4">
+                        <h2 className="lg:text-large mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-semibold text-fontcolor mt-4">
+                            1. Resume
+                        </h2>
+
+                        <div className="mt-2 ml-4">
+                            <div className="flex items-center space-x-4">
+                            <input
+                                key={resumeInputKey} // Force re-render on clear
+                                ref={resumeInputRef}
+                                type="file"
+                                onChange={(e) => handleFileChange(e, "resume")}
+                                className="block w-full px-2 py-1 text-medium border focus:ring-2 rounded-xs focus:outline-none"
+                                accept=".pdf,.doc,.docx"
+                            />
+
+                            {/* Clear Button: Always Visible but Disabled if No File */}
+                            <button
+                                type="button"
+                                onClick={clearResumeField}
+                                disabled={!formData.resume.file} // Disable if no file uploaded
+                                className={`text-accent lg:text-medium mb:text-medium sm:text-medium xsm:text-medium 
+                                ${!formData.resume.file ? "opacity-50 cursor-not-allowed" : ""}`} // Grey out if disabled
                             >
-                                <h2 className="lg:text-large mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-semibold text-fontcolor mt-4 cursor-pointer">
-                                    {" "}
-                                    1. Resume
-                                </h2>
-                                <FaChevronDown
-                                    className={`text-fontcolor transform ${
-                                        isResumeOpen ? "rotate-180" : "rotate-0"
-                                    } transition-transform`}
-                                />
+                                Remove
+                            </button>
                             </div>
-
-                            {/* Accordion Content */}
-                            {isResumeOpen && (
-                                <div className="mt-2 ml-4">
-                                    {formData.resume.files?.map(
-                                        (file, index) => (
-                                            <div
-                                                key={index}
-                                                className="flex items-center space-x-4 mb-2"
-                                            >
-                                                <input
-                                                    type="file"
-                                                    onChange={(e) =>
-                                                        handleAdditionalFileChange(
-                                                            e,
-                                                            "resume",
-                                                            index
-                                                        )
-                                                    }
-                                                    className="block w-full px-2 py-1 text-medium border focus:ring-2 rounded-xs focus:outline-none"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        removeAdditionalFile(
-                                                            "resume",
-                                                            index
-                                                        )
-                                                    }
-                                                    className="text-accent lg:text-large mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall"
-                                                >
-                                                    Remove
-                                                </button>
-                                            </div>
-                                        )
-                                    )}
-
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            addAdditionalFile("resume")
-                                        }
-                                        className="flex items-center space-x-2 text-primary font-semibold"
-                                    >
-                                        <FaPlus className="text-lg" />
-                                        <span className="lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall">
-                                            Add Resume
-                                        </span>
-                                    </button>
-                                </div>
-                            )}
+                        </div>
                         </div>
 
                         {/* Educational Documents */}
@@ -338,7 +371,7 @@ export default function ApplicantDocument({ handleJobClick }) {
 
                             {isEducationalOpen && (
                                 <div className="mt-2 ml-4">
-                                    {formData.educationaldocs.files?.map(
+                                    {formData.educationalDocuments.files?.map(
                                         (file, index) => (
                                             <div
                                                 key={index}
@@ -347,19 +380,20 @@ export default function ApplicantDocument({ handleJobClick }) {
                                                 <input
                                                     type="file"
                                                     onChange={(e) =>
-                                                        handleAdditionalFileChange(
+                                                        handleMultipleFileChange(
                                                             e,
-                                                            "resume",
+                                                            "educationalDocuments",
                                                             index
                                                         )
                                                     }
                                                     className="block w-full px-2 py-1 text-medium border focus:ring-2 rounded-xs focus:outline-none"
+                                                    accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
                                                 />
                                                 <button
                                                     type="button"
                                                     onClick={() =>
-                                                        removeAdditionalFile(
-                                                            "educationaldocs",
+                                                        removeFile(
+                                                            "educationalDocuments",
                                                             index
                                                         )
                                                     }
@@ -373,7 +407,7 @@ export default function ApplicantDocument({ handleJobClick }) {
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            addAdditionalFile("educationaldocs")
+                                            addAdditionalFile("educationalDocuments")
                                         }
                                         className="flex items-center space-x-2 text-primary font-semibold"
                                     >
@@ -427,18 +461,19 @@ export default function ApplicantDocument({ handleJobClick }) {
                                                 <input
                                                     type="file"
                                                     onChange={(e) =>
-                                                        handleAdditionalFileChange(
+                                                        handleMultipleFileChange(
                                                             e,
                                                             "workcertificate",
                                                             index
                                                         )
                                                     }
                                                     className="block w-full px-2 py-1 text-medium border focus:ring-2 rounded-xs focus:outline-none"
+                                                    accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
                                                 />
                                                 <button
                                                     type="button"
                                                     onClick={() =>
-                                                        removeAdditionalFile(
+                                                        removeFile(
                                                             "workcertificate",
                                                             index
                                                         )
@@ -509,18 +544,19 @@ export default function ApplicantDocument({ handleJobClick }) {
                                                 <input
                                                     type="file"
                                                     onChange={(e) =>
-                                                        handleAdditionalFileChange(
+                                                        handleMultipleFileChange(
                                                             e,
                                                             "seminarCertificate",
                                                             index
                                                         )
                                                     }
                                                     className="block w-full px-2 py-1 text-medium border focus:ring-2 rounded-xs focus:outline-none"
+                                                    accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
                                                 />
                                                 <button
                                                     type="button"
                                                     onClick={() =>
-                                                        removeAdditionalFile(
+                                                        removeFile(
                                                             "seminarCertificate",
                                                             index
                                                         )
@@ -585,18 +621,19 @@ export default function ApplicantDocument({ handleJobClick }) {
                                                 <input
                                                     type="file"
                                                     onChange={(e) =>
-                                                        handleAdditionalFileChange(
+                                                        handleMultipleFileChange(
                                                             e,
                                                             "additionalDocuments",
                                                             index
                                                         )
                                                     }
                                                     className="block w-full px-2 py-1 text-medium border focus:ring-2 rounded-xs focus:outline-none"
+                                                    accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
                                                 />
                                                 <button
                                                     type="button"
                                                     onClick={() =>
-                                                        removeAdditionalFile(
+                                                        removeFile(
                                                             "additionalDocuments",
                                                             index
                                                         )

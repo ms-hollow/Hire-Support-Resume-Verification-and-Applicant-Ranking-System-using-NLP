@@ -1,5 +1,6 @@
+import apiBaseUrl from "@/config/apiBaseUrl";
 export async function getAllNotifications(token) {
-    const res = await fetch("http://127.0.0.1:8000/job/notifications/", {
+    const res = await fetch(`${apiBaseUrl}/job/notifications/`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -10,21 +11,18 @@ export async function getAllNotifications(token) {
 }
 
 export async function markNotificationAsRead(id, token) {
-    const res = await fetch(
-        `http://127.0.0.1:8000/notifications/mark-as-read/${id}/`,
-        {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        }
-    );
+    const res = await fetch(`${apiBaseUrl}/job/notifications/mark-as-read/${id}/`, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
 
     return await res.json();
 }
 
 export async function getUnreadNotifications(token) {
-    const res = await fetch("http://127.0.0.1:8000/notifications/unread/", {
+    const res = await fetch(`${apiBaseUrl}/notifications/unread/`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -37,7 +35,7 @@ export async function getUnreadNotifications(token) {
 export const deleteNotifications = async (token, ids) => {
     try {
         const response = await fetch(
-            "http://127.0.0.1:8000/job/notifications/delete-notification/",
+            `${apiBaseUrl}/job/notifications/delete-notification/`,
             {
                 method: "DELETE",
                 headers: {
