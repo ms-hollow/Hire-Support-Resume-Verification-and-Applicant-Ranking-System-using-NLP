@@ -23,6 +23,7 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
         number_applicants: "",
         email: "",
         contact_number: "",
+        number_applicants: "",
         job_industry: "",
         region: "",
         province: "",
@@ -39,6 +40,7 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
             const profileData = await getCompanyProfile(authTokens);
             if (profileData) {
                 setFormData(profileData);
+                console.log(profileData);
             }
         };
         fetchProfile();
@@ -125,7 +127,9 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
             if (typeof window !== "undefined") {
                 const fullUrl = window.location.href;
 
-                if (fullUrl === `${apiBaseUrl}/COMPANY/CompanyProfile`) {
+                if (
+                    fullUrl === `http://localhost:3000/COMPANY/CompanyProfile`
+                ) {
                     toast.success("Company profile updated!");
 
                     if (onUpdateComplete) {
@@ -133,16 +137,14 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                     }
 
                     router.push("/COMPANY/CompanyProfile");
-                } else if (fullUrl === `${apiBaseUrl}/COMPANY/CompanyInfo`) {
+                } else if (
+                    fullUrl === `http://localhost:3000/COMPANY/CompanyInfo`
+                ) {
                     toast.success("Account successfully registered!");
 
                     setTimeout(() => {
                         router.push("/COMPANY/CompanyHome");
                     }, 2000); // 2 seconds delay
-                } else {
-                    toast.error(
-                        "An unexpected error occurred. Please try again later."
-                    );
                 }
             }
         } else {
@@ -235,7 +237,7 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                             <input
                                 type="text"
                                 name="num_applicants"
-                                value={formData.num_applicants}
+                                value={formData.number_applicants}
                                 placeholder=""
                                 required
                                 onChange={handleChange}

@@ -39,49 +39,45 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
 
     const handleDateOfBirthChange = (event) => {
         const value = event.target.value;
-    
+
         if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-            return; 
+            return;
         }
-    
+
         const birthDate = new Date(value);
         if (isNaN(birthDate)) return;
-    
+
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
         const birthYear = birthDate.getFullYear();
-    
+
         if (birthYear > currentYear) {
             toast.error("The year exceeds the current year.");
             return;
         }
-    
+
         const birthDateThisYear = new Date(birthDate);
         birthDateThisYear.setFullYear(currentYear);
-    
+
         const age =
-            currentYear -
-            birthYear -
-            (currentDate < birthDateThisYear ? 1 : 0);
-    
+            currentYear - birthYear - (currentDate < birthDateThisYear ? 1 : 0);
+
         if (age < 15) {
             toast.info("Age must be 15 years or older.");
             return;
         }
-    
+
         if (age > 85) {
             toast.error("Age must be less than 85 years old.");
             return;
         }
-    
+
         setFormData({
             ...formData,
             date_of_birth: value,
             age: age,
         });
     };
-    
-    
 
     const minDate = new Date();
     minDate.setFullYear(minDate.getFullYear() - 85);
@@ -114,7 +110,10 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
             if (typeof window !== "undefined") {
                 const fullUrl = window.location.href;
 
-                if (fullUrl === `${apiBaseUrl}/APPLICANT/ApplicantProfile`) {
+                if (
+                    fullUrl ===
+                    `http://localhost:3000/APPLICANT/ApplicantProfile`
+                ) {
                     toast.success("Profile updated successfully!");
 
                     // Fetch updated profile after successful update
@@ -129,7 +128,8 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
 
                     router.push("/APPLICANT/ApplicantProfile");
                 } else if (
-                    fullUrl === `${apiBaseUrl}/APPLICANT/ApplicantRegister`
+                    fullUrl ===
+                    `http://localhost:3000/APPLICANT/ApplicantRegister`
                 ) {
                     toast.success("Account successfully registered!");
 
@@ -373,7 +373,22 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
                             Date of Birth
                         </p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
-                            <input type="date" id="birth-date" name="date_of_birth"  required value={formData.date_of_birth} min={minDate.toISOString().split("T")[0]}  max={new Date().toISOString().split("T")[0]} onChange={(e) =>setFormData({ ...formData, date_of_birth: e.target.value })} onBlur={handleDateOfBirthChange} readOnly={!isEditable}
+                            <input
+                                type="date"
+                                id="birth-date"
+                                name="date_of_birth"
+                                required
+                                value={formData.date_of_birth}
+                                min={minDate.toISOString().split("T")[0]}
+                                max={new Date().toISOString().split("T")[0]}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        date_of_birth: e.target.value,
+                                    })
+                                }
+                                onBlur={handleDateOfBirthChange}
+                                readOnly={!isEditable}
                                 className={`flex-grow w-full px-2 py-1 outline-none rounded-xs 
                                 ${
                                     isEditable
