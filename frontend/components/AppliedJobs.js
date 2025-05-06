@@ -1,13 +1,14 @@
 import { useEffect, useState, useContext } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import AuthContext from "@/pages/context/AuthContext";
 import { getAllJobApplications } from "@/pages/api/applicantJobApi";
 import { toTitleCase } from "@/pages/utils/functions";
+import { useRouter } from "next/router";
 
 const AppliedJobs = () => {
     const { authTokens } = useContext(AuthContext);
     const [jobApplications, setJobApplications] = useState([]);
+    const router = useRouter();
 
     useEffect(() => {
         const fetchJobApplications = async () => {
@@ -17,9 +18,11 @@ const AppliedJobs = () => {
         fetchJobApplications();
     }, [authTokens]);
 
-    //* In progress
     const handleViewApplication = (id) => {
-        console.log("Job Application ID to be pass: ", id);
+        router.push({
+            pathname: "/APPLICANT/ViewApplication/",
+            query: { applicationId: id },
+        });
     };
 
     return (

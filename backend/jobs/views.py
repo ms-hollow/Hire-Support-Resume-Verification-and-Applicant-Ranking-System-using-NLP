@@ -253,7 +253,7 @@ def show_recent_searches(request):
 def create_job_application(request):
     if request.method == 'POST':
         # Get non-file data
-        data = request.data.copy()
+        data = request.POST.copy()
         
         # Remove files-related fields from data to avoid issues with validation
         document_types = data.pop('document_type', [])

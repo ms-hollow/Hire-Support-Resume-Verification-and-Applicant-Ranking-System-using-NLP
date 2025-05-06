@@ -1,5 +1,6 @@
 import ApplicantHeader from "@/components/ApplicantHeader";
 import GeneralFooter from "@/components/GeneralFooter";
+import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useContext } from "react";
 import ReviewApplication from "@/components/ReviewApplication";
@@ -10,7 +11,7 @@ import {
     clearTempFiles,
 } from "../utils/jobApplicationStates";
 import { submitJobApplication } from "../api/applicantJobApi";
-import { fetchApplicantProfile } from "../api/applicantApi";
+import { getApplicantProfile } from "../api/applicantApi";
 import { useRouter } from "next/router";
 import JobDetailsWrapper from "@/components/JobDetails";
 import AuthContext from "../context/AuthContext";
@@ -30,7 +31,20 @@ export default function ApplicationConfirmation({ handleJobClick }) {
     const { authTokens, user } = useContext(AuthContext);
     const [isLoading, setIsLoading] = useState(true);
 
+    // Check for console debugging
     useEffect(() => {
+        // Log what we have from context for debugging
+        console.log(
+            "Auth tokens from context:",
+            authTokens
+                ? "Present (first 10 chars): " +
+                      (authTokens.access
+                          ? authTokens.access.substring(0, 10) + "..."
+                          : "No access token")
+                : "No auth tokens"
+        );
+        console.log("User from context:", user);
+
         if (!authTokens || !authTokens.access) {
             console.error("No auth tokens available");
             setSubmitResult({
@@ -69,13 +83,12 @@ export default function ApplicationConfirmation({ handleJobClick }) {
         setIsSubmitting(true);
 
         try {
-            const profileData = await fetchApplicantProfile(authTokens);
+            // First get the applicant profile to get the applicant ID
+            const profileData = await getApplicantProfile(authTokens);
+            console.log("Retrieved profile data:", profileData);
 
-            //! id = yan yung applicant id.
-            if (!profileData?.id) {
-                throw new Error(
-                    "Could not determine applicant ID from profile"
-                );
+            if (!profileData?.applicant_id) {
+                console.log("Could not determine applicant ID from profile");
             }
 
             // Get all necessary data from localStorage
@@ -87,20 +100,32 @@ export default function ApplicationConfirmation({ handleJobClick }) {
             console.log("Retrieved documentMetadata:", documentMetadata);
 
             if (!jobDetails || !jobDetails.job_hiring_id) {
-                throw new Error(
+                console.log(
                     "Missing job hiring information. Please restart your application."
                 );
             }
 
             // Prepare application data for submission
-            //! Remove applicant related details. Si applicant id bahala jan.
             const applicationData = {
                 job_hiring: jobDetails.job_hiring_id,
-                applicant: profileData.id,
+                applicant_id: profileData.applicant_id,
+                fullName: `${personalInfo.first_name} ${
+                    personalInfo.middle_name || ""
+                } ${personalInfo.last_name}`.trim(),
                 email: personalInfo.email,
+                contact_number: personalInfo.contact_number,
+                address:
+                    personalInfo.complete_address ||
+                    personalInfo.present_address,
+                linkedin_profile: personalInfo.linkedin_profile,
                 application_date: new Date().toISOString().split("T")[0],
                 application_status: "draft",
             };
+
+            console.log(
+                "Submitting with applicant ID:",
+                profileData.applicant_id
+            );
 
             // Extract document files and types using the stored metadata
             const documentFiles = [];
@@ -112,11 +137,11 @@ export default function ApplicationConfirmation({ handleJobClick }) {
 
             // Document type mapping
             const documentTypeMapping = {
-                resume: "RESUME",
-                educationalDocuments: "EDUCATION",
-                workcertificate: "EXPERIENCE",
-                seminarCertificate: "CERTIFICATION",
-                additionalDocuments: "ADDITIONAL",
+                resume: "resume",
+                educationalDocuments: "education",
+                workcertificate: "experience",
+                seminarCertificate: "certification",
+                additionalDocuments: "additional",
             };
 
             // Process each document category
@@ -171,18 +196,14 @@ export default function ApplicationConfirmation({ handleJobClick }) {
 
                 // Clear application draft from localStorage
                 clearJobApplicationDraft();
+
                 // Clear temp files from memory
                 clearTempFiles();
 
-                const applicationId = result.data.application_id;
                 // Redirect to success page after short delay
                 setTimeout(() => {
-                    //? Pasa job application id for reference.
-                    router.push({
-                        pathname: "/APPLICANT/ApplicationSubmit",
-                        query: { applicationId },
-                    });
-                }, 1500);
+                    router.push("/APPLICANT/ApplicationSubmit");
+                }, 2000);
             } else {
                 console.error("Submission error:", result.error);
                 setSubmitResult({

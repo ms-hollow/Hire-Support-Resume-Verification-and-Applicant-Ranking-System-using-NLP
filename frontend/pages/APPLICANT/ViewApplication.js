@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import ApplicantHeader from "@/components/ApplicantHeader";
 import GeneralFooter from "@/components/GeneralFooter";
-import ReviewApplication from "@/components/ReviewApplication";
+import ViewApplicationComponent from "@/components/ViewApplicationComponent";
 import { toast } from "react-toastify";
 import ToastWrapper from "@/components/ToastWrapper";
 import { useRouter } from "next/router";
@@ -51,14 +51,14 @@ export default function ViewApplication() {
             );
 
             if (res.message === "Job application is already withdrawn.") {
-                toast.info(res.message); 
-                setIsModalOpen(false); 
+                toast.info(res.message);
+                setIsModalOpen(false);
             } else {
-                toast.success(res.message); 
+                toast.success(res.message);
                 router.push("/APPLICANT/Applications");
             }
         } catch (error) {
-            console.log(error.message || "Failed to cancel application."); 
+            console.log(error.message || "Failed to cancel application.");
         }
     };
 
@@ -89,7 +89,7 @@ export default function ViewApplication() {
             {!loading && applicationDetails && (
                 <div className="flex flex-col items-center justify-center pb-8">
                     <div className="px-8 py-5 mx-auto">
-                        <ReviewApplication
+                        <ViewApplicationComponent
                             showEditButtons={false}
                             applicationDetails={applicationDetails}
                         />
