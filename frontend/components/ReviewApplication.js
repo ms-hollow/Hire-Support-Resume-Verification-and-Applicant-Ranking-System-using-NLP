@@ -130,7 +130,7 @@ const ReviewApplication = ({ showEditButtons = true }) => {
     };
 
     return (
-        <div className="job-application-box rounded-xs px-8 py-5 mx-auto">
+        <div>
             {/* Job Information Section */}
             <section className="pb-6">
                 <div className="flex flex-row justify-between items-center pt-3 mb-2">
