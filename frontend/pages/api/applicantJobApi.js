@@ -347,3 +347,33 @@ export const withdrawJobApplication = async (authToken, applicationId) => {
         return false;
     }
 };
+
+export const checkApplication = async (
+    authTokens,
+    job_hiring_id,
+    applicant
+) => {
+    try {
+        const response = await fetch(
+            `${apiBaseUrl}/job/applications/check/${job_hiring_id}/?applicant_id=${applicant}`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${authTokens}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        if (!response.ok) {
+            console.log("Failed to check application");
+            return { hasApplied: false }; // Return a default value if the request fails
+        }
+
+        const data = await response.json();
+        return data; // Return the API response directly
+    } catch (error) {
+        console.error("Error checking application:", error);
+        return { hasApplied: false }; // Return a default value in case of an error
+    }
+};

@@ -3,31 +3,53 @@ import { useState, useContext, useEffect } from "react";
 import AuthContext from "@/pages/context/AuthContext";
 import { useRouter } from "next/router";
 import { JDSkeletonLoader } from "./ui/SkeletonLoader";
-import { fetchJobDetails } from "@/pages/api/applicantJobApi";
+import { fetchJobDetails, checkApplication } from "@/pages/api/applicantJobApi";
+import { fetchApplicantProfile } from "@/pages/api/applicantApi";
 import { useJob, JobProvider } from "@/pages/context/JobContext";
 import { toTitleCase } from "@/pages/utils/functions";
 import { toast } from "react-toastify";
 
 const JobDetails = ({ authToken, applicantName }) => {
+    let { authTokens } = useContext(AuthContext);
     const { savedStatus, toggleSaveJob } = useJob();
     const router = useRouter();
     const { id } = router.query;
     const [jobDetails, setJobDetails] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [isApplied, setIsApplied] = useState(false);
+    const [applicantId, setApplicantID] = useState(null);
 
     useEffect(() => {
         if (id) {
+            fetchApplicantData(authTokens);
             loadJobDetails();
+            checkIfApplied();
         }
-    }, [id]);
+    }, [id, authToken]);
+
+    const fetchApplicantData = async (authTokens) => {
+        if (authTokens) {
+            const profileData = await fetchApplicantProfile(authTokens);
+            setApplicantID(profileData?.id);
+        }
+    };
 
     const loadJobDetails = async () => {
         setLoading(true);
         setJobDetails(null);
-
         const jobData = await fetchJobDetails(authToken, id);
         setJobDetails(jobData);
         setLoading(false);
+    };
+
+    const checkIfApplied = async () => {
+        if (!applicantId) return;
+        const data = await checkApplication(authToken, id, applicantId);
+        if (data && data.hasApplied) {
+            setIsApplied(true);
+        } else {
+            setIsApplied(false);
+        }
     };
 
     const navigateToJobApplication = () => {
@@ -121,13 +143,25 @@ const JobDetails = ({ authToken, applicantName }) => {
                 </div>
 
                 <div className="flex mt-4 gap-8">
-                    <button
-                        onClick={navigateToJobApplication}
-                        type="button"
-                        className="button1 flex items-center justify-center"
-                    >
-                        <p className="lg:text-medium font-medium">Apply</p>
-                    </button>
+                    {isApplied ? (
+                        <button
+                            type="button"
+                            className="button1 flex items-center justify-center cursor-not-allowed opacity-80"
+                            disabled
+                        >
+                            <p className="lg:text-medium font-medium">
+                                Applied
+                            </p>
+                        </button>
+                    ) : (
+                        <button
+                            onClick={navigateToJobApplication}
+                            type="button"
+                            className="button1 flex items-center justify-center"
+                        >
+                            <p className="lg:text-medium font-medium">Apply</p>
+                        </button>
+                    )}
 
                     <button
                         onClick={() => toggleSaveJob(jobDetails.job_hiring_id)}
