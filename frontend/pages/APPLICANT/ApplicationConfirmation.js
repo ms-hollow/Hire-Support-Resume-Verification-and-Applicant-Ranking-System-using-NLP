@@ -192,10 +192,15 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                 // Clear temp files from memory
                 clearTempFiles();
 
+                const applicationId = result.data.application_id;
                 // Redirect to success page after short delay
                 setTimeout(() => {
-                    router.push("/APPLICANT/ApplicationSubmit");
-                }, 2000);
+                    //? Pasa job application id for reference.
+                    router.push({
+                        pathname: "/APPLICANT/ApplicationSubmit",
+                        query: { applicationId },
+                    });
+                }, 1500);
             } else {
                 console.error("Submission error:", result.error);
                 setSubmitResult({

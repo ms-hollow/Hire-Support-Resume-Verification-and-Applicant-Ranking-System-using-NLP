@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import JobHiring, ScoringCriteria, JobApplication, JobApplicationDocument, Notification
+from applicant.models import Applicant
 from applicant.serializers import ApplicantProfileFormSerializer
 from company.serializers import CompanyProfileFormSerializer
 
@@ -73,7 +74,7 @@ class JobApplicationDocumentSerializer(serializers.ModelSerializer):
 class JobApplicationSerializer(serializers.ModelSerializer):
 
     documents = JobApplicationDocumentSerializer(many=True, required=False)
-    applicant = ApplicantProfileFormSerializer(read_only=True)
+    applicant = serializers.PrimaryKeyRelatedField(queryset=Applicant.objects.all())
     job_title = serializers.CharField(source='job_hiring.job_title', read_only=True)
     region = serializers.CharField(source='job_hiring.region', read_only=True)
     province = serializers.CharField(source='job_hiring.province', read_only=True)

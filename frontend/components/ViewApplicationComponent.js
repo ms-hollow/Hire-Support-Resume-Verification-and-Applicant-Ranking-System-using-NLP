@@ -5,54 +5,6 @@ import ToastWrapper from "./ToastWrapper";
 import { toTitleCase } from "@/pages/utils/functions";
 
 const ReviewApplication = ({ showEditButtons = true, applicationDetails }) => {
-    const renderDocumentFiles = (documents, documentType) => {
-        // Ensure documents is an array
-        if (!Array.isArray(documents)) {
-            return (
-                <span className="pl-2 font-semibold text-fontcolor">
-                    No files uploaded
-                </span>
-            );
-        }
-
-        // Filter documents by type
-        const filteredDocuments = documents.filter(
-            (doc) => doc.document_type === documentType
-        );
-
-        if (filteredDocuments.length === 0) {
-            return (
-                <span className="pl-2 font-semibold text-fontcolor">
-                    No files uploaded
-                </span>
-            );
-        }
-
-        return (
-            <div className="pl-2">
-                {filteredDocuments.map((doc, index) => {
-                    // Extract the file name from the document_file URL
-                    const fileName = doc.document_file.split("/").pop();
-
-                    return (
-                        <div
-                            key={index}
-                            className="font-semibold text-fontcolor"
-                        >
-                            <a
-                                href={doc.document_file}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                {`${fileName}`}
-                            </a>
-                        </div>
-                    );
-                })}
-            </div>
-        );
-    };
-
     return (
         <div className="job-application-box rounded-xs px-8 py-5 mx-auto">
             {/* Job Information Section */}
@@ -189,24 +141,12 @@ const ReviewApplication = ({ showEditButtons = true, applicationDetails }) => {
                 </div>
             </section>
 
-            {/* Uploaded Documents Section */}
+            {/* Interview Section */}
             <section className="pb-6">
                 <div className="flex flex-row justify-between items-center pt-3 mb-2">
                     <p className="font-semibold lg:text-large mb:text-medium sm:text-medium xsm:text-medium text-primary pb-1">
-                        Uploaded Documents
+                        Interview Details
                     </p>
-                    {showEditButtons && (
-                        <button className="flex items-center focus:outline-none">
-                            <Link href="/APPLICANT/ApplicantDocuments">
-                                <Image
-                                    src="/Edit Icon.svg"
-                                    width={25}
-                                    height={11}
-                                    alt="Edit Icon"
-                                />
-                            </Link>
-                        </button>
-                    )}
                 </div>
                 <div className="w-full rounded-t-lg rounded-b-lg border border-[#F5F5F5]">
                     <table className="w-full border-collapse">
@@ -214,58 +154,30 @@ const ReviewApplication = ({ showEditButtons = true, applicationDetails }) => {
                             <tr className="px-2 border-b border-[#F5F5F5]">
                                 <td className="p-2">
                                     <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
-                                        Resume:
-                                        {renderDocumentFiles(
-                                            applicationDetails?.documents,
-                                            "RESUME"
-                                        )}
+                                        Interview Date:
+                                        <span className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">
+                                            {applicationDetails?.interview_date}
+                                        </span>
                                     </p>
-                                </td>
-                            </tr>
-                            <tr className="px-2 border-b border-[#F5F5F5]">
-                                <td className="p-2">
                                     <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
-                                        Educational Documents:
-                                        {renderDocumentFiles(
-                                            applicationDetails?.documents,
-                                            "EDUCATION"
-                                        )}
+                                        Interview Time:
+                                        <span className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">
+                                            {
+                                                applicationDetails?.interview_start_time
+                                            }{" "}
+                                            -{" "}
+                                            {
+                                                applicationDetails?.interview_end_time
+                                            }
+                                        </span>
                                     </p>
-                                </td>
-                            </tr>
-                            <tr className="px-2 border-b border-[#F5F5F5]">
-                                <td className="p-2">
                                     <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
-                                        Work Experience - Certificate of
-                                        Employment:
-                                        {renderDocumentFiles(
-                                            applicationDetails?.documents,
-                                            "EXPERIENCE"
-                                        )}
-                                    </p>
-                                </td>
-                            </tr>
-                            <tr className="px-2 border-b border-[#F5F5F5]">
-                                <td className="p-2">
-                                    <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
-                                        Certifications - Seminar/Workshop/Skills
-                                        Certificates:
-                                        {renderDocumentFiles(
-                                            applicationDetails?.documents,
-                                            "CERTIFICATION"
-                                        )}
-                                    </p>
-                                </td>
-                            </tr>
-                            {/* Check if there are additional documents */}
-                            <tr className="px-2 border-b border-[#F5F5F5]">
-                                <td className="p-2">
-                                    <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
-                                        Additional Documents:
-                                        {renderDocumentFiles(
-                                            applicationDetails?.documents,
-                                            "ADDITIONAL"
-                                        )}
+                                        Interview Location/Link:
+                                        <span className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">
+                                            {
+                                                applicationDetails?.interview_location
+                                            }
+                                        </span>
                                     </p>
                                 </td>
                             </tr>

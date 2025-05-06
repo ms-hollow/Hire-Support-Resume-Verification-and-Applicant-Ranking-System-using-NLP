@@ -254,7 +254,6 @@ def create_job_application(request):
     if request.method == 'POST':
         # Get non-file data
         data = request.POST.copy()
-        print(data)
         
         # Remove files-related fields from data to avoid issues with validation
         document_types = data.pop('document_type', [])
@@ -423,10 +422,12 @@ def get_job_specific_application(request, application_id):
         job_application = JobApplication.objects.get(pk=application_id)
         job_application_serializer = JobApplicationSerializer(job_application)
         job_hiring_serializer = JobHiringSerializer(job_application.job_hiring)
-
+        applicant_serializer = ApplicantProfileFormSerializer(job_application.applicant)
+        
         # Combine the serialized data
         response_data = job_application_serializer.data
         response_data['company_name'] = job_hiring_serializer.data.get('company_name')
+        response_data['applicant'] = applicant_serializer.data  
 
         return Response(response_data, status=status.HTTP_200_OK)
     except JobApplication.DoesNotExist:
