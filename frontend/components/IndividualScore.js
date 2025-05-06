@@ -27,7 +27,13 @@ ChartJS.register(
 );
 
 const IndividualScore = () => {
-    const [indivScore, setindivScore] = useState(null);
+    const [indivScore, setindivScore] = useState({
+        Education: 0,
+        Work_Experience: 0,
+        Skills: 0,
+        Certifications: 0,
+        Overall: 0,
+    });
     const [verificationResult, setVerificationResult] = useState(null);
     const [activeTab, setActiveTab] = useState("verified");
     const router = useRouter();
@@ -54,6 +60,7 @@ const IndividualScore = () => {
                 Work_Experience: scores.experience_score || 0,
                 Skills: scores.skills_score || 0,
                 Certifications: scores.certification_score || 0,
+                Overall: scores.overall_score || 0,
             };
 
             setindivScore(mappedScore);
@@ -97,78 +104,25 @@ const IndividualScore = () => {
         },
     };
 
-    // Doughnut chart data for the overall score
-    // Calculate the total score by summing up all individual scores
-    const totalScore =
-        (indivScore.Education ?? 0) +
-        (indivScore["Work Experience"] ?? 0) +
-        (indivScore.Skills ?? 0) +
-        (indivScore.Certifications ?? 0);
+    const overallPercentage = indivScore?.Overall
+        ? indivScore.Overall.toFixed(2)
+        : "0.00";
 
-    // Calculate the overall percentage based on the total score
-    const overallPercentage =
-        totalScore > 0 ? ((totalScore / 400) * 100).toFixed(2) : 0;
-
-    // Calculate the remaining percentage to make up 100%
-    const remainingPercentage =
-        totalScore > 0 ? (100 - overallPercentage).toFixed(2) : 100;
-
-    // Calculate the ratio of the total score to the maximum possible score (400)
-    const ratio = totalScore > 0 ? totalScore / 400 : 0;
-
-    // Calculate the percentage contribution of the Education score
-    const educationPercentage =
-        totalScore > 0
-            ? (
-                  (((indivScore.Education ?? 0) * ratio) / totalScore) *
-                  100
-              ).toFixed(2)
-            : 0;
-
-    // Calculate the percentage contribution of the Work Experience score
-    const workExpPercentage =
-        totalScore > 0
-            ? (
-                  (((indivScore["Work Experience"] ?? 0) * ratio) /
-                      totalScore) *
-                  100
-              ).toFixed(2)
-            : 0;
-
-    // Calculate the percentage contribution of the Skills score
-    const skillsPercentage =
-        totalScore > 0
-            ? ((((indivScore.Skills ?? 0) * ratio) / totalScore) * 100).toFixed(
-                  2
-              )
-            : 0;
-
-    // Calculate the percentage contribution of the Certifications score
-    const certificationsPercentage =
-        totalScore > 0
-            ? (
-                  (((indivScore.Certifications ?? 0) * ratio) / totalScore) *
-                  100
-              ).toFixed(2)
-            : 0;
-
-    // Prepare the data for the Doughnut chart
     const doughnutData = {
         labels: [
-            `Education: ${educationPercentage}%`, // Label for Education
-            `Work Experience: ${workExpPercentage}%`, // Label for Work Experience
-            `Skills: ${skillsPercentage}%`, // Label for Skills
-            `Certifications: ${certificationsPercentage}%`, // Label for Certifications
+            `Education: ${indivScore.Education}%`,
+            `Work Experience: ${indivScore["Work Experience"]}%`,
+            `Skills: ${indivScore.Skills}%`,
+            `Certifications: ${indivScore.Certifications}%`,
         ],
         datasets: [
             {
-                // Data for each category, defaulting to 0 if undefined or null
                 data: [
                     indivScore.Education ?? 0,
                     indivScore["Work Experience"] ?? 0,
                     indivScore.Skills ?? 0,
                     indivScore.Certifications ?? 0,
-                    remainingPercentage, // Remaining percentage to make up 100%
+                    100 - indivScore.Overall,
                 ],
                 backgroundColor: [
                     "#69C55F",
