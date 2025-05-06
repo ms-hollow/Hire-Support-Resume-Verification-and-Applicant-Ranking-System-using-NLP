@@ -108,16 +108,8 @@ export default function ApplicationConfirmation({ handleJobClick }) {
             // Prepare application data for submission
             const applicationData = {
                 job_hiring: jobDetails.job_hiring_id,
-                applicant_id: profileData.applicant_id,
-                fullName: `${personalInfo.first_name} ${
-                    personalInfo.middle_name || ""
-                } ${personalInfo.last_name}`.trim(),
+                applicant: personalInfo.id,
                 email: personalInfo.email,
-                contact_number: personalInfo.contact_number,
-                address:
-                    personalInfo.complete_address ||
-                    personalInfo.present_address,
-                linkedin_profile: personalInfo.linkedin_profile,
                 application_date: new Date().toISOString().split("T")[0],
                 application_status: "draft",
             };

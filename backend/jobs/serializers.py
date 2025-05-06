@@ -68,7 +68,7 @@ class JobHiringSerializer(serializers.ModelSerializer):
 class JobApplicationDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobApplicationDocument
-        fields = ['document_type', 'document_file']
+        fields = ['document_type', 'file_url', 'folder_url']
 
 class JobApplicationSerializer(serializers.ModelSerializer):
 

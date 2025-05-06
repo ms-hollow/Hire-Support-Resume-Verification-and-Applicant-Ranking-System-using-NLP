@@ -28,21 +28,33 @@ def upload_file(request):
         try:
             # Create the applicant's folder in Google Drive (if not exists)
             folder_id = create_applicant_folder(applicant_name, FOLDER_ID)
+            folder_url = f"https://drive.google.com/drive/folders/{folder_id}"  # Construct folder URL
 
             # Upload the file to the applicant's folder
             file_id = upload_file_to_applicant_folder(temp_path, user_file.name, user_file.content_type, folder_id)
+            file_url = f"https://drive.google.com/file/d/{file_id}/view"  # Construct file URL
 
             # Clean up the temporary file
             os.remove(temp_path)
 
+            # Print the generated URLs for debugging
+            print(f"Folder ID: {folder_id}")
+            print(f"Folder URL: {folder_url}")
+            print(f"File ID: {file_id}")
+            print(f"File URL: {file_url}")
+
+            # Return the response with folder and file details
             return JsonResponse({
                 "message": "File uploaded successfully",
                 "folder_id": folder_id,
-                "file_id": file_id
+                "folder_url": folder_url,
+                "file_id": file_id,
+                "file_url": file_url
             })
         
         except Exception as e:
             os.remove(temp_path)
+            
             return JsonResponse({"error": str(e)}, status=500)
     else:
         return JsonResponse({"error": "No file provided"}, status=400)

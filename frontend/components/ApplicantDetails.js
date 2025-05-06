@@ -43,6 +43,30 @@ const ApplicantDetails = () => {
         return <ApplicantDetailsSkeletonLoader />;
     }
 
+    // Extract the file_url for the resume
+    const resumeDocument = individualApplicants.documents.find(
+        (doc) => doc.document_type === "resume"
+    );
+    const resumeFileUrl = resumeDocument?.file_url;
+
+    // Extract the folder_url for Education
+    const educationDocument = individualApplicants.documents.find(
+        (doc) => doc.document_type === "education"
+    );
+    const educationFolderUrl = educationDocument?.folder_url;
+
+    // Extract the folder_url for Experience
+    const experienceDocument = individualApplicants.documents.find(
+        (doc) => doc.document_type === "experience"
+    );
+    const experienceFolderUrl = experienceDocument?.folder_url;
+
+    // Extract the folder_url for Certifications
+    const certificationDocument = individualApplicants.documents.find(
+        (doc) => doc.document_type === "certification"
+    );
+    const certificationFolderUrl = certificationDocument?.folder_url;
+    
     return (
         <div className="flex flex-col h-full">
             {/* Top Part of applicant Details - Fixed */}
@@ -69,22 +93,70 @@ const ApplicantDetails = () => {
                     <button
                         type="button"
                         className="button1 flex flex-col items-center justify-center"
+                        onClick={() => {
+                            if (resumeFileUrl) {
+                                window.open(resumeFileUrl, "_blank");
+                            } else {
+                                console.error("Resume file URL not found");
+                            }
+                        }}
                     >
                         <Link href="" className="flex items-center space-x-2">
                             <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-medium text-center">
-                                View Resume
+                                Resume
                             </p>
                         </Link>
                     </button>
+
+                    {/* View Education Folder Button */}
+                    <button
+                        type="button"
+                        className="button1 flex flex-col items-center justify-center"
+                        onClick={() => {
+                            if (educationFolderUrl) {
+                                window.open(educationFolderUrl, "_blank");
+                            } else {
+                                console.error("Education folder URL not found");
+                            }
+                        }}
+                    >
+                        <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-medium text-center">
+                            Education
+                        </p>
+                    </button>
+
+                    {/* View Experience Folder Button */}
                     <button
                         type="button"
                         className="button2 flex flex-col items-center justify-center"
+                        onClick={() => {
+                            if (experienceFolderUrl) {
+                                window.open(experienceFolderUrl, "_blank");
+                            } else {
+                                console.error("Experience folder URL not found");
+                            }
+                        }}
                     >
-                        <Link href="" className="flex items-center space-x-2">
-                            <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-medium text-center">
-                                Supporting Documents
-                            </p>
-                        </Link>
+                        <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-medium text-center">
+                            Experience
+                        </p>
+                    </button>
+
+                    {/* View Certifications Folder Button */}
+                    <button
+                        type="button"
+                        className="button2 flex flex-col items-center justify-center"
+                        onClick={() => {
+                            if (certificationFolderUrl) {
+                                window.open(certificationFolderUrl, "_blank");
+                            } else {
+                                console.error("Certification folder URL not found");
+                            }
+                        }}
+                    >
+                        <p className="lg:text-medium  mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall font-medium text-center">
+                            Certification
+                        </p>
                     </button>
                 </div>
             </div>

@@ -1,9 +1,11 @@
 from django.db import models
 from company.models import Company
+from applicant.models import Applicant
 from users.models import User
 import os
 from google_drive.storage import GoogleDriveStorage
 from django.conf import settings
+from django.utils import timezone
 
 STATUS_CHOICES = (
     ('draft', 'Draft'),
@@ -91,7 +93,7 @@ class ScoringCriteria(models.Model):
 class JobApplication(models.Model):
     job_application_id = models.AutoField(primary_key=True)
     job_hiring = models.ForeignKey(JobHiring, on_delete=models.CASCADE)
-    applicant = models.ForeignKey('applicant.Applicant', on_delete=models.CASCADE)  
+    applicant = models.ForeignKey(Applicant, on_delete=models.CASCADE)
     email = models.EmailField()  
     application_date = models.DateField(auto_now_add=True)
     
@@ -183,7 +185,21 @@ google_drive_storage = GoogleDriveStorage() if getattr(settings, 'GDRIVE_ENABLED
 class JobApplicationDocument(models.Model):
     job_application = models.ForeignKey(JobApplication, related_name='documents', on_delete=models.CASCADE)
     document_type = models.CharField(max_length=255)
+    document_file = models.FileField(upload_to='job_applications/documents/')
+    google_drive_id = models.CharField(max_length=100, blank=True, null=True)
     
+    # New fields for storing URLs
+    google_drive_id = models.CharField(max_length=100, blank=True, null=True)
+    file_id = models.CharField(max_length=100, blank=True, null=True)
+    file_url = models.URLField(max_length=500, blank=True, null=True)
+    folder_id = models.CharField(max_length=100, blank=True, null=True)
+    folder_url = models.URLField(max_length=500, blank=True, null=True)
+    
+    uploaded_at = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return f"{self.document_type} for {self.job_application}"
+
     # Use a callable for upload_to
     document_file = models.FileField(
         upload_to=get_document_upload_path,
