@@ -190,7 +190,7 @@ const ApplicantDetails = () => {
                 </p>
                 <p
                     id="Qualifications"
-                    className="font-thin text-xsmall text-fontcolor pb-3"
+                    className="font-normal text-xsmall text-fontcolor pb-3"
                 >
                     {individualApplicants?.applicant_profile?.region}{" "}
                     {individualApplicants?.applicant_profile?.province}{" "}
