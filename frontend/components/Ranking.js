@@ -111,9 +111,9 @@ const Ranking = () => {
                 backgroundColor: "#69C55F",
             },
             {
-                label: "Work Experience",
+                label: "Work_Experience",
                 data: rankingData.map(
-                    (applicant) => applicant["Work Experience"]
+                    (applicant) => applicant["Work_Experience"]
                 ),
                 backgroundColor: "#519949",
             },
@@ -134,10 +134,10 @@ const Ranking = () => {
             data: rankingData.map((applicant) => applicant.Education),
             backgroundColor: "#69C55F",
         });
-    } else if (selectedOption === "Work Experience") {
+    } else if (selectedOption === "Work_Experience") {
         datasets.push({
-            label: "Work Experience",
-            data: rankingData.map((applicant) => applicant["Work Experience"]),
+            label: "Work_Experience",
+            data: rankingData.map((applicant) => applicant["Work_Experience"]),
             backgroundColor: "#519949",
         });
     } else if (selectedOption === "Skills") {
@@ -217,7 +217,7 @@ const Ranking = () => {
                     >
                         <option value="Overall">Overall Ranking</option>
                         <option value="Education">Education</option>
-                        <option value="Work Experience">Work Experience</option>
+                        <option value="Work_Experience">Work Experience</option>
                         <option value="Skills">Skills</option>
                         <option value="Certifications">Certifications</option>
                     </select>

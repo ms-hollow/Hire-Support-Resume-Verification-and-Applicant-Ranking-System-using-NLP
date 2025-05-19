@@ -132,7 +132,7 @@ export default function ApplicationConfirmation({ handleJobClick }) {
                 resume: "resume",
                 educationalDocuments: "education",
                 workcertificate: "experience",
-                seminarCertificate: "certification",
+                seminarCertificate: "certifications",
                 additionalDocuments: "additional",
             };
 

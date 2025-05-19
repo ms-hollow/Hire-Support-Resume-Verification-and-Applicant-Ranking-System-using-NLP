@@ -121,7 +121,7 @@ def fuzzy_match(text: str, pattern: str, debug: bool = False) -> bool:
     """
     Wrapper function for find_pattern_in_text to maintain compatibility
     """
-    return find_pattern_in_text(text, pattern, threshold=75, debug=debug)
+    return find_pattern_in_text(text, pattern, threshold=50, debug=debug)
 
 def get_entity_names(category_type: str) -> Dict[str, str]:
     """
