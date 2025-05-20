@@ -137,14 +137,12 @@ const CompanyInfo = ({ isEditable, onUpdateComplete }) => {
                     }
 
                     router.push("/COMPANY/CompanyProfile");
-                } else if (
-                    fullUrl === `http://localhost:3000/COMPANY/CompanyInfo`
-                ) {
-                    toast.success("Account successfully registered!");
+                } else if (fullUrl === `http://localhost:3000/GENERAL/Register`) {
+                  toast.success("Account successfully registered!");
 
-                    setTimeout(() => {
-                        router.push("/COMPANY/CompanyHome");
-                    }, 2000); // 2 seconds delay
+                  setTimeout(() => {
+                    router.push("/COMPANY/CompanyHome");
+                  }, 2000); // 2 seconds delay
                 }
             }
         } else {

@@ -127,19 +127,16 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
                     }
 
                     router.push("/APPLICANT/ApplicantProfile");
-                } else if (
-                    fullUrl ===
-                    `http://localhost:3000/APPLICANT/ApplicantRegister`
-                ) {
-                    toast.success("Account successfully registered!");
+                } else if (fullUrl === `http://localhost:3000/GENERAL/Register`) {
+                  toast.success("Account successfully registered!");
 
-                    setTimeout(() => {
-                        router.push("/APPLICANT/ApplicantHome");
-                    }, 2000); // 2 seconds delay
+                  setTimeout(() => {
+                    router.push("/APPLICANT/ApplicantHome");
+                  }, 2000); // 2 seconds delay
                 } else {
-                    toast.error(
-                        "An unexpected error occurred. Please try again later."
-                    );
+                  toast.error(
+                    "An unexpected error occurred. Please try again later."
+                  );
                 }
             }
         } else {

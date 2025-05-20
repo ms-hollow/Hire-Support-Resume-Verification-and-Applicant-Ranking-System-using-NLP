@@ -175,7 +175,7 @@ const ReviewApplication = ({ showEditButtons = true, applicationDetails }) => {
                                         Interview Location/Link:
                                         <span className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">
                                             {
-                                                applicationDetails?.interview_location
+                                                applicationDetails?.interview_location_link
                                             }
                                         </span>
                                     </p>

@@ -13,6 +13,7 @@ const AppliedJobs = () => {
     useEffect(() => {
         const fetchJobApplications = async () => {
             const res = await getAllJobApplications(authTokens?.access);
+            console.log(res);
             setJobApplications(res);
         };
         fetchJobApplications();
