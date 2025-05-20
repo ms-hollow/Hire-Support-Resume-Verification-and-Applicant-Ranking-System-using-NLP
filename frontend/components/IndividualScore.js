@@ -82,13 +82,13 @@ const IndividualScore = () => {
 
     // Bar chart data for the selected applicant
     const barData = {
-        labels: ["Education", "Work Experience", "Skills", "Certifications"],
+        labels: ["Education", "Work_Experience", "Skills", "Certifications"],
         datasets: [
             {
                 label: "Applicant Score",
                 data: [
                     indivScore.Education,
-                    indivScore["Work Experience"],
+                    indivScore.Work_Experience,
                     indivScore.Skills,
                     indivScore.Certifications,
                 ],
@@ -111,7 +111,7 @@ const IndividualScore = () => {
     const doughnutData = {
         labels: [
             `Education: ${indivScore.Education}%`,
-            `Work Experience: ${indivScore["Work Experience"]}%`,
+            `Work_Experience: ${indivScore.Work_Experience}%`,
             `Skills: ${indivScore.Skills}%`,
             `Certifications: ${indivScore.Certifications}%`,
         ],
@@ -119,7 +119,7 @@ const IndividualScore = () => {
             {
                 data: [
                     indivScore.Education ?? 0,
-                    indivScore["Work Experience"] ?? 0,
+                    indivScore.Work_Experience ?? 0,
                     indivScore.Skills ?? 0,
                     indivScore.Certifications ?? 0,
                     100 - indivScore.Overall,

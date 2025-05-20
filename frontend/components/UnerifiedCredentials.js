@@ -100,22 +100,7 @@ const UnerifiedCredentials = ({ verificationResult }) => {
             )}
 
             {/* Resume */}
-            {verificationResult.resume_verification && (
-                <div className="flex flex-col items-center justify-center w-full pb-5">
-                    <div className="flex flex-col w-full max-w-4xl px-4 py-3 bg-white shadow-lg rounded-lg">
-                        <p className="text-primary text-base pb-3">Resume</p>
-                        <ul className="list-disc list-inside space-y-1 text-fontcolor font-thin">
-                            {unverifiedResume.map((item, index) => (
-                                <li key={index}>
-                                    {formatVerificationStatusUnverified(
-                                        item.verification_status
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-            )}
+
         </div>
     );
 };

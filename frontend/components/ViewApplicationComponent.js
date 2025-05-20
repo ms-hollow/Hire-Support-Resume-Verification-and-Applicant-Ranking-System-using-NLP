@@ -172,7 +172,7 @@ const ReviewApplication = ({ showEditButtons = true, applicationDetails }) => {
                                         </span>
                                     </p>
                                     <p className="flex items-center pl-2 font-thin lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor pb-1">
-                                        Interview Location/Link:
+                                        Interview Location/Link: 
                                         <span className="pl-2 font-semibold lg:text-medium mb:text-medium sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor">
                                             {
                                                 applicationDetails?.interview_location_link

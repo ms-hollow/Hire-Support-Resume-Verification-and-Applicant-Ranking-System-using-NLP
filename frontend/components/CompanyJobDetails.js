@@ -65,7 +65,7 @@ const CompanyJobDetailsWrapper = () => {
                             height={20}
                             alt="Location Icon"
                         />
-                        <p className="ml-1.5 font-thin text-xsmall text-fontcolor">
+                        <p className="ml-1.5 font-normal text-xsmall text-fontcolor">
                             {/* {jobDetails.region},  */}
                             {jobDetails.province}, {jobDetails.city}
                         </p>
