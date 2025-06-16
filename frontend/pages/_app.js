@@ -26,7 +26,7 @@ export default function App({ Component, pageProps }) {
 
     return (
         <GoogleOAuthProvider clientId={clientId}>
-            <AuthProvider>
+            {/* <AuthProvider> */}
                 {isNoAuthRequired ? (
                     <Component {...pageProps} />
                 ) : (
@@ -34,7 +34,7 @@ export default function App({ Component, pageProps }) {
                         <Component {...pageProps} />
                     </ProtectedPage>
                 )}
-            </AuthProvider>
+            {/* </AuthProvider> */}
         </GoogleOAuthProvider>
     );
 }

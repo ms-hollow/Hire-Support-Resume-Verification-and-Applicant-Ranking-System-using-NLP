@@ -11,7 +11,7 @@ import { toast, ToastContainer } from 'react-toastify';
 export default function Login() {
 
     const [showPassword, setShowPassword] = useState(false);
-    const { loginUser, loginWithGoogle } = useContext(AuthContext);    
+    // const { loginUser, loginWithGoogle } = useContext(AuthContext);    
 
     return (
         <div>
@@ -20,8 +20,8 @@ export default function Login() {
             <div className="flex items-center justify-center lg:pt-36 mb:pt-24 xsm:pt-24 xxsm:pt-24 sm:pt-24 mb:p-8 sm:p-8 xsm:p-8 xxsm:p-4 py-8 mx-auto">
                 <div className="job-application-box rounded-xs px-8 py-5 ">
                     <h1 className="lg:text-extralarge mb:text-large sm:text-large text-primary">Sign in</h1>
-
-                    <form onSubmit={loginUser}>
+                    
+                    <form>
                         <p className="lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall text-fontcolor pb-1 font-medium">Email address</p>
                         <div className="h-medium rounded-xs border-2 border-fontcolor flex">
                             <input 
@@ -74,7 +74,7 @@ export default function Login() {
 
                     <div className='flex justify-center w-full px-5'>
                         <GoogleLogin 
-                            onSuccess={loginWithGoogle}
+                            // onSuccess={loginWithGoogle}
                             onError={() => toast.error('Google login failed!')} 
                             size='large'
                         />

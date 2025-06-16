@@ -25,9 +25,10 @@ export default function Register() {
     const [emailAddress, setEmailAddress] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const { registerUser } = useContext(AuthContext);
-    const { handleProceed, handleSkip, user, loading } =
-        useContext(AuthContext);
+    // const { registerUser } = useContext(AuthContext);
+    // const { handleProceed, handleSkip, user, loading } =
+    //     useContext(AuthContext);
+    
     const [showPersonalInfo, setShowPersonalInfo] = useState(false);
     const [showCompanyInfo, setShowCompanyInfo] = useState(false);
 
@@ -80,64 +81,66 @@ export default function Register() {
     };
 
     const getEmail = async () => {
-        // Validate email
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      // Validate email
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-        if (!emailAddress) {
-            toast.error("Please input an email address.");
-            return;
-        }
+      if (!emailAddress) {
+        toast.error("Please input an email address.");
+        return;
+      }
 
-        if (!emailRegex.test(emailAddress)) {
-            toast.error("Please input a valid email address.");
-            return;
-        }
+      if (!emailRegex.test(emailAddress)) {
+        toast.error("Please input a valid email address.");
+        return;
+      }
 
-        try {
-            const emailCheckResponse = await fetch(
-                "http://127.0.0.1:8000/users/check-email/",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ email: emailAddress }), // Convert the email to JSON format
-                }
-            );
+      handleNextStep(); // Proceed to the next step
 
-            // Check if the response status is 409 Conflict (email already exists)
-            if (emailCheckResponse.status === 409) {
-                toast.info("This email is already registered.");
-                setEmailAddress(""); // Clear the email input so user can re-enter
-                return;
-            }
+      // try {
+      //     const emailCheckResponse = await fetch(
+      //         "http://127.0.0.1:8000/users/check-email/",
+      //         {
+      //             method: "POST",
+      //             headers: {
+      //                 "Content-Type": "application/json",
+      //             },
+      //             body: JSON.stringify({ email: emailAddress }), // Convert the email to JSON format
+      //         }
+      //     );
 
-            // If the response is successful (status 200), parse the response data
-            if (emailCheckResponse.ok) {
-                const responseData = await emailCheckResponse.json(); // Parse the response as JSON
+      //     // Check if the response status is 409 Conflict (email already exists)
+      //     if (emailCheckResponse.status === 409) {
+      //         toast.info("This email is already registered.");
+      //         setEmailAddress(""); // Clear the email input so user can re-enter
+      //         return;
+      //     }
 
-                // If the server indicates the email exists, notify the user
-                if (responseData.exists) {
-                    toast.info("This email is already registered.");
-                    setEmailAddress(""); // Clear the email input
-                    return;
-                }
+      //     // If the response is successful (status 200), parse the response data
+      //     if (emailCheckResponse.ok) {
+      //         const responseData = await emailCheckResponse.json(); // Parse the response as JSON
 
-                // Check if the checkbox is checked
-                if (!isChecked) {
-                    toast.error("You must check the checkbox.");
-                    return; // Prevent further execution
-                } else {
-                    handleNextStep(); // Proceed to the next step
-                }
-            } else {
-                toast.error("Error checking email. Please try again.");
-            }
-        } catch (error) {
-            toast.error(
-                "Network error. Please check your connection and try again."
-            );
-        }
+      //         // If the server indicates the email exists, notify the user
+      //         if (responseData.exists) {
+      //             toast.info("This email is already registered.");
+      //             setEmailAddress(""); // Clear the email input
+      //             return;
+      //         }
+
+      //         // Check if the checkbox is checked
+      //         if (!isChecked) {
+      //             toast.error("You must check the checkbox.");
+      //             return; // Prevent further execution
+      //         } else {
+      //             handleNextStep(); // Proceed to the next step
+      //         }
+      //     } else {
+      //         toast.error("Error checking email. Please try again.");
+      //     }
+      // } catch (error) {
+      //     toast.error(
+      //         "Network error. Please check your connection and try again."
+      //     );
+      // }
     };
 
     const handlePassword = (e) => {
@@ -180,13 +183,14 @@ export default function Register() {
     };
 
     const handleSubmit = async () => {
-        const userData = {
-            email: emailAddress,
-            password: password,
-            is_company: isCompany,
-            is_applicant: isApplicant,
-        };
-        registerUser(userData);
+        // const userData = {
+        //     email: emailAddress,
+        //     password: password,
+        //     is_company: isCompany,
+        //     is_applicant: isApplicant,
+        // };
+        // registerUser(userData);
+        router.push("/APPLICANT/ApplicantHome"); // Redirect to dashboard after registration
     };
 
     const handleNextStep = () => {
@@ -198,9 +202,9 @@ export default function Register() {
         setStep((prevStep) => prevStep - 1); // Move to the previous step
     };
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
+    // if (loading) {
+    //     return <div>Loading...</div>;
+    // }
 
     return (
         <div className="pb-20">
@@ -288,7 +292,7 @@ export default function Register() {
                             </h1>
                             {step === 3 && (
                                 <button
-                                    onClick={handleSkip}
+                                    onClick={handleNextStep}
                                     className="text-primary font-medium lg:text-medium mb:text-medium sm:text-xxsmall"
                                 >
                                     Skip

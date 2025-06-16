@@ -14,7 +14,7 @@ import JobListingsWrapper from "@/components/JobListings";
 import JobDetailsWrapper from "@/components/JobDetails";
 
 export default function ApplicantHome({ onJobClick }) {
-    let { authTokens } = useContext(AuthContext);
+    // let { authTokens } = useContext(AuthContext);
     const router = useRouter();
     const [jobListings, setJobListings] = useState([]);
     const [filteredJobListings, setFilteredJobListings] = useState([]);
@@ -45,11 +45,11 @@ export default function ApplicantHome({ onJobClick }) {
         setJobListings(jobData);
     };
 
-    useEffect(() => {
-        if (authTokens?.access) {
-            loadJobListings();
-        }
-    }, [authTokens?.access]);
+    // useEffect(() => {
+    //     if (authTokens?.access) {
+    //         loadJobListings();
+    //     }
+    // }, [authTokens?.access]);
 
     useEffect(() => {
         setIsMounted(true);
