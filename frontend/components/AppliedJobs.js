@@ -1,21 +1,23 @@
 import { useEffect, useState, useContext } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import AuthContext from "@/pages/context/AuthContext";
+// import AuthContext from "@/pages/context/AuthContext";
 import { getAllJobApplications } from "@/pages/api/applicantJobApi";
 import { toTitleCase } from "@/pages/utils/functions";
+import jobListing from "@/public/placeHolder/dummy_AppliedJobs.json";
 
 const AppliedJobs = () => {
-    const { authTokens } = useContext(AuthContext);
+    // const { authTokens } = useContext(AuthContext);
     const [jobApplications, setJobApplications] = useState([]);
 
     useEffect(() => {
-        const fetchJobApplications = async () => {
-            const res = await getAllJobApplications(authTokens?.access);
-            setJobApplications(res);
-        };
-        fetchJobApplications();
-    }, [authTokens]);
+        // const fetchJobApplications = async () => {
+        //     const res = await getAllJobApplications(authTokens?.access);
+        //     setJobApplications(res);
+        // };
+        // fetchJobApplications();
+        setJobApplications(jobListing);
+    }, []);
 
     //* In progress
     const handleViewApplication = (id) => {

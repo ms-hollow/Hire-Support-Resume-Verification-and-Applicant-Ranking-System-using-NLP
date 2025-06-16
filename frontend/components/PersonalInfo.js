@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
 import Image from "next/image";
-import AuthContext from "@/pages/context/AuthContext";
+// import AuthContext from "@/pages/context/AuthContext";
 import { useRouter } from "next/router";
 import phLocations from "@/public/placeHolder/philippines.json";
 import {
@@ -11,29 +11,29 @@ import { toast } from 'react-toastify';
 import ToastWrapper from "./ToastWrapper";
 
 const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
-    const { authTokens } = useContext(AuthContext);
-    const router = useRouter();
+    // const { authTokens } = useContext(AuthContext);
+    // const router = useRouter();
     const [regions, setRegions] = useState([]);
     const [provinces, setProvinces] = useState([]);
     const [cities, setCities] = useState([]);
     const [barangays, setBarangays] = useState([]);
 
     const [formData, setFormData] = useState({
-        first_name: "",
-        last_name: "",
-        middle_name: "",
-        email: "",
-        contact_number: "",
-        sex: "",
-        date_of_birth: "",
-        age: "",
-        region: "",
-        province: "",
-        postal_code: "",
-        city: "",
-        barangay: "",
-        present_address: "",
-        linkedin_profile: "",
+        first_name: "John Doe",
+        last_name: "Smith",
+        middle_name: "A.",
+        email: "john.doe@example.com",
+        contact_number: "09123456789",
+        sex: "Male",
+        date_of_birth: "1990-01-01",
+        age: 31,
+        region: "NCR",
+        province: "Metro Manila",
+        postal_code: "1234",
+        city: "Makati",
+        barangay: "Bel-Air",
+        present_address: "1234 Main St, Makati",
+        linkedin_profile: "https://www.linkedin.com/in/johndoe",
     });
 
     const handleDateOfBirthChange = (event) => {
@@ -80,8 +80,6 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
         });
     };
     
-    
-
     const minDate = new Date();
     minDate.setFullYear(minDate.getFullYear() - 85);
 
@@ -102,68 +100,68 @@ const PersonalInfo = ({ isEditable, onUpdateComplete }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
     
-        if (!authTokens?.access) {
-            console.error("No auth token, cannot update profile.");
-            return;
-        }
+        // if (!authTokens?.access) {
+        //     console.error("No auth token, cannot update profile.");
+        //     return;
+        // }
     
-        const success = await updateApplicantProfile(authTokens, formData);
+        // const success = await updateApplicantProfile(authTokens, formData);
     
-        if (success) {
-            if (typeof window !== "undefined") {
-                const fullUrl = window.location.href;
+        // if (success) {
+        //     if (typeof window !== "undefined") {
+        //         const fullUrl = window.location.href;
     
-                if (fullUrl === "http://localhost:3000/APPLICANT/ApplicantProfile") {
-                    toast.success("Profile updated successfully!");
+        //         if (fullUrl === "http://localhost:3000/APPLICANT/ApplicantProfile") {
+        //             toast.success("Profile updated successfully!");
                     
-                    // Fetch updated profile after successful update
-                    const updatedData = await getApplicantProfile(authTokens);
-                    if (updatedData) {
-                        setFormData(updatedData);
-                    }
+        //             // Fetch updated profile after successful update
+        //             const updatedData = await getApplicantProfile(authTokens);
+        //             if (updatedData) {
+        //                 setFormData(updatedData);
+        //             }
     
-                    if (onUpdateComplete) {
-                        onUpdateComplete();
-                    }
+        //             if (onUpdateComplete) {
+        //                 onUpdateComplete();
+        //             }
     
-                    router.push("/APPLICANT/ApplicantProfile");
-                } 
-                else if (fullUrl === "http://localhost:3000/GENERAL/Register") {
-                    toast.success("Account successfully registered!");
+        //             router.push("/APPLICANT/ApplicantProfile");
+        //         } 
+        //         else if (fullUrl === "http://localhost:3000/GENERAL/Register") {
+        //             toast.success("Account successfully registered!");
     
-                    setTimeout(() => {
-                        router.push("/APPLICANT/ApplicantHome");
-                    }, 2000); // 2 seconds delay
-                } 
-                else {
-                    toast.error("An unexpected error occurred. Please try again later.");
-                }
-            }
-        } else {
-            toast.error("Failed to update profile. Please try again.");
-        }
+        //             setTimeout(() => {
+        //                 router.push("/APPLICANT/ApplicantHome");
+        //             }, 2000); // 2 seconds delay
+        //         } 
+        //         else {
+        //             toast.error("An unexpected error occurred. Please try again later.");
+        //         }
+        //     }
+        // } else {
+        //     toast.error("Failed to update profile. Please try again.");
+        // }
     };
     
 
-    useEffect(() => {
-        if (!authTokens?.access) {
-            console.error("No auth token found, cannot fetch profile.");
-            return;
-        }
+    // useEffect(() => {
+    //     if (!authTokens?.access) {
+    //         console.error("No auth token found, cannot fetch profile.");
+    //         return;
+    //     }
 
-        const fetchProfile = async () => {
-            const data = await getApplicantProfile(authTokens);
+    //     const fetchProfile = async () => {
+    //         const data = await getApplicantProfile(authTokens);
 
-            if (data) {
-                setFormData((prev) => ({
-                    ...prev,
-                    ...data,
-                }));
-            }
-        };
+    //         if (data) {
+    //             setFormData((prev) => ({
+    //                 ...prev,
+    //                 ...data,
+    //             }));
+    //         }
+    //     };
 
-        fetchProfile();
-    }, [authTokens]);
+    //     fetchProfile();
+    // }, [authTokens]);
 
     useEffect(() => {
         setRegions(phLocations);

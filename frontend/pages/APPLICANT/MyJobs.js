@@ -9,14 +9,14 @@ import { useRouter } from 'next/router';
 export default function MyJobs() {
   const [activeTab, setActiveTab] = useState('saved');
 
-  let {authTokens} = useContext(AuthContext);
-  const router = useRouter();
+  // let {authTokens} = useContext(AuthContext);
+  // const router = useRouter();
 
-  useEffect(() => {
-      if (!authTokens) {
-          router.push('/GENERAL/Login');
-      }
-    }, [authTokens, router]);
+  // useEffect(() => {
+  //     if (!authTokens) {
+  //         router.push('/GENERAL/Login');
+  //     }
+  //   }, [authTokens, router]);
 
   return (
     <div>

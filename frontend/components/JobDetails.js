@@ -1,71 +1,17 @@
 import Image from "next/image";
-import { useState, useContext, useEffect } from "react";
-import AuthContext from "@/pages/context/AuthContext";
-import { useRouter } from "next/router";
-import { JDSkeletonLoader } from "./ui/SkeletonLoader";
-import { fetchJobDetails } from "@/pages/api/applicantJobApi";
-import { useJob, JobProvider } from "@/pages/context/JobContext";
-import { toTitleCase } from "@/pages/utils/functions";
-import { toast } from "react-toastify";
 
-const JobDetails = ({ authToken, applicantName }) => {
-    const { savedStatus, toggleSaveJob } = useJob();
-    const router = useRouter();
-    const { id } = router.query;
-    const [jobDetails, setJobDetails] = useState(null);
-    const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        if (id) {
-            loadJobDetails();
-        }
-    }, [id]);
-
-    const loadJobDetails = async () => {
-        setLoading(true);
-        setJobDetails(null);
-
-        const jobData = await fetchJobDetails(authToken, id);
-        setJobDetails(jobData);
-        setLoading(false);
-    };
-
-    const navigateToJobApplication = () => {
-        if (applicantName === "Applicant") {
-            toast.info("Please complete your profile before applying.");
-            return;
-        }
-        router.push({
-            pathname: "/APPLICANT/JobApplication",
-            query: { id },
-        });
-    };
-
-    if (loading) return <JDSkeletonLoader />;
-    if (!jobDetails) return <div className="relative flex flex-col justify-start items-start  min-h-screen h-full bg-gray-100 text-fontcolor font-light text-xl px-2">
-    {/* Top-left: Arrow + Text */}
-    <div className="flex items-center gap-2 pt-4 px-2 mb-8">
-      <Image src="/Arrow Left.svg" width={40} height={20} alt="Arrow Left" />
-      <p>Please select a job</p>
-    </div>
-  
-    {/* Bottom-center: Home Icon */}
-    <div className="relative left-1/2 transform -translate-x-1/2">
-      <Image src="/Home.svg" width={350} height={20} alt="Home" />
-    </div>
-  </div>
-
+const JobDetails = () => {
     return (
         <div className="flex flex-col h-full">
             {/* Top Part of Job Details - Fixed */}
-            <div className=" sticky top-0 z-10 bg-background job-details-box border-b-8 top rounded-t-lg p-4">
+            <div className="job-details-box border-b-8 top rounded-t-lg p-4">
                 <div className="flex justify-between items-center">
-                    <p className="font-semibold text-fontcolor lg:text-xlarge mb:text-large sm:text-large xsm:text-large xxsm:text-large">
-                        {jobDetails.job_title}
+                    <p className="font-semibold text-fontcolor text-large">
+                        Job Title
                     </p>
                     <div className="flex items-center gap-2">
-                        <p className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
-                            {jobDetails.creation_date}
+                        <p className="font-thin text-fontcolor text-xsmall">
+                            Date Posted
                         </p>
                         <Image
                             src="/Menu.svg"
@@ -76,11 +22,13 @@ const JobDetails = ({ authToken, applicantName }) => {
                     </div>
                 </div>
 
-                <p className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
-                    {jobDetails.company_name}
-                </p>
-                <p className="font-thin text-fontcolor lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall">
-                    {jobDetails.job_industry} ({jobDetails.experience_level})
+                <p className="font-thin text-fontcolor text-xsmall">Company</p>
+                <p className="font-thin text-fontcolor text-xsmall">
+                    Job Industry{" "}
+                    <span className="font-thin text-fontcolor text-xsmall">
+                        {" "}
+                        (JavaScript, React)
+                    </span>
                 </p>
                 <div className="flex flex-row mt-2">
                     <div className="flex flex-row">
@@ -90,10 +38,8 @@ const JobDetails = ({ authToken, applicantName }) => {
                             height={20}
                             alt="Location Icon"
                         />
-                        <p className="ml-1.5 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
-                            {toTitleCase(jobDetails.region)},{" "}
-                            {toTitleCase(jobDetails.province)},{" "}
-                            {toTitleCase(jobDetails.city)}
+                        <p className="ml-1.5 font-thin text-xsmall text-fontcolor">
+                            Valenzuela
                         </p>
                     </div>
                     <div className="flex flex-row mx-4">
@@ -103,8 +49,8 @@ const JobDetails = ({ authToken, applicantName }) => {
                             height={20}
                             alt="Work Setup Icon"
                         />
-                        <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
-                            {jobDetails.work_setup}
+                        <p className="ml-2 font-thin text-xsmall text-fontcolor">
+                            Remote
                         </p>
                     </div>
                     <div className="flex flex-row">
@@ -114,8 +60,8 @@ const JobDetails = ({ authToken, applicantName }) => {
                             height={20}
                             alt="Schedule Icon"
                         />
-                        <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
-                            {jobDetails.schedule}
+                        <p className="ml-2 font-thin text-xsmall text-fontcolor">
+                            8 hrs shift
                         </p>
                     </div>
                 </div>
@@ -126,138 +72,175 @@ const JobDetails = ({ authToken, applicantName }) => {
                         height={20}
                         alt="Salary Icon"
                     />
-                    <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall pl-px text-fontcolor">
-                        {jobDetails.salary_min} - {jobDetails.salary_max}
+                    <p className="ml-2 font-thin text-xsmall pl-px text-fontcolor">
+                        Php 17,000 - 21,000 Monthly
                     </p>
                 </div>
 
                 <div className="flex mt-4 gap-8">
                     <button
-                        onClick={navigateToJobApplication}
                         type="button"
                         className="button1 flex items-center justify-center"
                     >
-                        <p className="lg:text-medium font-medium">Apply</p>
+                        <a
+                            href="/APPLICANT/JobApplication"
+                            className="lg:text-medium font-medium"
+                        >
+                            Apply
+                        </a>
                     </button>
 
                     <button
-                        onClick={() => toggleSaveJob(jobDetails.job_hiring_id)}
                         type="button"
-                        className="button2 flex items-center justify-center lg:text-medium font-medium"
+                        className="button2 flex items-center justify-center"
                     >
-                        {savedStatus[jobDetails.job_hiring_id]
-                            ? "Unsave"
-                            : "Save"}
+                        <a
+                            href="/APPLICANT/MyJobs"
+                            className="lg:text-medium font-medium"
+                        >
+                            Save
+                        </a>
                     </button>
                 </div>
             </div>
 
             {/* Main Part of Job Details - Scrollable */}
-            <div className="flex-1 job-details-box rounded-b-lg overflow-y-auto bg-white p-4">
+            <div className="job-details-box rounded-b-lg overflow-y-auto flex-1 bg-white p-4">
                 {/*Employment Type*/}
-                <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">
+                <p className="font-semibold text-xsmall text-fontcolor ">
                     Employment Type
                 </p>
                 <p
                     id="EmployType"
-                    className="font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-3"
+                    className="font-thin text-xsmall text-fontcolor pb-3"
                 >
-                    {jobDetails.employment_type}
+                    RemCompanLorem ipsum dolor sit amet, consectetur adipiscing
+                    elit.yote
                 </p>
 
                 {/*Job Description*/}
-                <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">
+                <p className="font-semibold text-xsmall text-fontcolor ">
                     {" "}
                     Job Description
                 </p>
                 <p
                     id="JobDescription"
-                    className="font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-3"
+                    className="font-thin text-xsmall text-fontcolor pb-3"
                 >
-                    {jobDetails.job_description}
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Amet tincidunt et turpis habitasse ultrices condimentum
+                    velit. At nulla eu urna cras sed odio mauris vivamus erat.
+                    Elit mi massa nisl enim. Tristique massa sit est in senectus
+                    amet, ut nullam. Amet consectetur netus duis diam.
+                    Consectetur pellentesque non eget nisl, pretium, ultrices.
+                    Tortor dignissim pretium aliquet nunc, pulvinar. Faucibus
+                    tincidunt odio tincidunt massa lobortis aliquam venenatis
+                    neque. Tortor porttitor parturient sagittis non faucibus
+                    faucibus tincidunt ut aliquam. Egestas sed massa enim tempor
+                    at orci dignissim id. Sed metus mi leo rutrum felis.{" "}
                 </p>
 
                 {/*Qualifications*/}
-                <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">
+                <p className="font-semibold text-xsmall text-fontcolor ">
                     Qualifications (Credentials and Skills){" "}
                 </p>
                 <p
                     id="Qualifications"
-                    className="font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-3"
+                    className="font-thin text-xsmall text-fontcolor pb-3"
                 >
-                    {jobDetails.qualifications}
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Amet tincidunt et turpis habitasse ultrices condimentum
+                    velit. At nulla eu urna cras sed odio mauris vivamus erat.
+                    Elit mi massa nisl enim. Tristique massa sit est in senectus
+                    amet, ut nullam. Amet consectetur netus duis diam.
+                    Consectetur pellentesque non eget nisl, pretium, ultrices.
+                    Tortor dignissim pretium aliquet nunc, pulvinar. Faucibus
+                    tincidunt odio tincidunt massa lobortis aliquam venenatis
+                    neque. Tortor porttitor parturient sagittis non faucibus
+                    faucibus tincidunt ut aliquam. Egestas sed massa enim tempor
+                    at orci dignissim id. Sed metus mi leo rutrum felis.{" "}
                 </p>
 
                 {/*Application Requirements*/}
-                <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">
+                <p className="font-semibold text-xsmall text-fontcolor ">
                     Application Requirements{" "}
                 </p>
                 <p
                     id="AppliReq"
-                    className="font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-3"
+                    className="font-thin text-xsmall text-fontcolor pb-3"
                 >
-                    {jobDetails.required_documents ? (
-                        <>
-                            {Object.entries(jobDetails.required_documents).map(
-                                ([key, value]) => (
-                                    <span key={key}>
-                                        • {value}
-                                        <br />
-                                    </span>
-                                )
-                            )}
-                        </>
-                    ) : (
-                        "No Application requirements information available."
-                    )}
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Amet tincidunt et turpis habitasse ultrices condimentum
+                    velit. At nulla eu urna cras sed odio mauris vivamus erat.
+                    Elit mi massa nisl enim. Tristique massa sit est in senectus
+                    amet, ut nullam. Amet consectetur netus duis diam.
+                    Consectetur pellentesque non eget nisl, pretium, ultrices.
+                    Tortor dignissim pretium aliquet nunc, pulvinar. Faucibus
+                    tincidunt odio tincidunt massa lobortis aliquam venenatis
+                    neque. Tortor porttitor parturient sagittis non faucibus
+                    faucibus tincidunt ut aliquam. Egestas sed massa enim tempor
+                    at orci dignissim id. Sed metus mi leo rutrum felis.{" "}
                 </p>
 
                 {/* Benefit*/}
-                <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">
+                <p className="font-semibold text-xsmall text-fontcolor ">
                     {" "}
                     Benefits{" "}
                 </p>
                 <p
                     id="Benefits"
-                    className="font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-3"
+                    className="font-thin text-xsmall text-fontcolor pb-3"
                 >
-                    {jobDetails.benefits}
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Amet tincidunt et turpis habitasse ultrices condimentum
+                    velit. At nulla eu urna cras sed odio mauris vivamus erat.
+                    Elit mi massa nisl enim. Tristique massa sit est in senectus
+                    amet, ut nullam. Amet consectetur netus duis diam.
+                    Consectetur pellentesque non eget nisl, pretium, ultrices.
+                    Tortor dignissim pretium aliquet nunc, pulvinar. Faucibus
+                    tincidunt odio tincidunt massa lobortis aliquam venenatis
+                    neque. Tortor porttitor parturient sagittis non faucibus
+                    faucibus tincidunt ut aliquam. Egestas sed massa enim tempor
+                    at orci dignissim id. Sed metus mi leo rutrum felis.{" "}
                 </p>
 
                 {/* No of Positions*/}
-                <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">
+                <p className="font-semibold text-xsmall text-fontcolor ">
                     {" "}
                     No. of Positions
                 </p>
                 <p
                     id="noPosition"
-                    className="font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-3"
+                    className="font-thin text-xsmall text-fontcolor pb-3"
                 >
-                    {jobDetails.num_positions}
+                    RemCompanLorem ipsum dolor sit amet, consectetur adipiscing
+                    elit.yote
                 </p>
 
                 {/* App Deadline*/}
-                <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">
+                <p className="font-semibold text-xsmall text-fontcolor ">
                     {" "}
                     Application Deadline
                 </p>
                 <p
                     id="deadline"
-                    className="font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-3"
+                    className="font-thin text-xsmall text-fontcolor pb-3"
                 >
-                    {jobDetails.application_deadline}
+                    RemCompanLorem ipsum dolor sit amet, consectetur adipiscing
+                    elit.yote
                 </p>
 
                 {/* Add Notes*/}
-                <p className="font-semibold lg:text-medium mb:text-xsmall sm:text-xsmall xsm:text-xsmall xxsm:text-xsmall text-fontcolor ">
+                <p className="font-semibold text-xsmall text-fontcolor ">
                     {" "}
                     Additional Note{" "}
                 </p>
                 <p
                     id="Notes"
-                    className="font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor pb-6"
+                    className="font-thin text-xsmall text-fontcolor pb-6"
                 >
-                    {jobDetails.additional_notes}
+                    RemCompanLorem ipsum dolor sit amet, consectetur adipiscing
+                    elit.yote
                 </p>
 
                 {/* Report Job Button */}
@@ -272,16 +255,10 @@ const JobDetails = ({ authToken, applicantName }) => {
     );
 };
 
-const JobDetailsWrapper = ({ applicantName }) => {
-    const { authTokens } = useContext(AuthContext);
+const JobDetailsWrapper = () => {
     return (
-        <div className="flex-1 overflow-y-auto h-[calc(100vh)] border border-none  hide-scrollbar rounded-lg">
-            <JobProvider authToken={authTokens.access}>
-                <JobDetails
-                    authToken={authTokens.access}
-                    applicantName={applicantName}
-                />
-            </JobProvider>
+        <div className="flex-1 h-[calc(100vh-150px)] border border-none rounded-lg">
+            <JobDetails />
         </div>
     );
 };

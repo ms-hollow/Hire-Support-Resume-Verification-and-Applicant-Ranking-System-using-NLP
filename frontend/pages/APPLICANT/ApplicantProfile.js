@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 
 export default function ApplicantProfile() {
 
-  let {authTokens} = useContext(AuthContext);
+  // let {authTokens} = useContext(AuthContext);
   const router = useRouter();
   const [isEditable, setIsEditable] = useState(false);
 
@@ -22,11 +22,11 @@ export default function ApplicantProfile() {
     setIsEditable(false);
   };
 
-  useEffect(() => {
-    if (!authTokens) {
-        router.push('/GENERAL/Login');
-    }
-  }, [authTokens, router]);
+  // useEffect(() => {
+  //   if (!authTokens) {
+  //       router.push('/GENERAL/Login');
+  //   }
+  // }, [authTokens, router]);
 
   return (
     <>

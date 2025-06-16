@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect, useCallback } from "react";
 import Image from "next/image";
-import AuthContext from "@/pages/context/AuthContext";
+// import AuthContext from "@/pages/context/AuthContext";
 import {
     fetchJobListings,
     fetchSavedJobs,
@@ -12,9 +12,10 @@ import { toast } from "react-toastify";
 import ToastWrapper from "./ToastWrapper";
 import { useRouter } from "next/router";
 import { getApplicantProfile } from "@/pages/api/applicantApi";
+import jobListing from "@/public/placeHolder/dummy_jobListings.json";
 
 const SavedJobs = () => {
-    const { authTokens } = useContext(AuthContext);
+    // const { authTokens } = useContext(AuthContext);
     const [savedJobs, setSavedJobs] = useState([]);
     const [jobListings, setJobListings] = useState([]);
     const [savedStatus, setSavedStatus] = useState({});
@@ -22,75 +23,80 @@ const SavedJobs = () => {
     const [error, setError] = useState(null);
     const router = useRouter();
 
+    // useEffect(() => {
+    //     const loadSavedJobs = async () => {
+    //         try {
+    //             const savedJobsData = await fetchSavedJobs(authTokens.access);
+    //             setSavedJobs(savedJobsData);
+    //             const jobHiringIds = savedJobsData.map(
+    //                 (job) => job.job_hiring_id
+    //             );
+    //             const allJobs = await fetchJobListings(authTokens.access);
+
+    //             const filteredJobs = allJobs.filter((job) =>
+    //                 jobHiringIds.includes(job.job_id)
+    //             );
+
+    //             const initialSavedStatus = filteredJobs.reduce((acc, job) => {
+    //                 acc[job.job_id] = true;
+    //                 return acc;
+    //             }, {});
+
+    //             setJobListings(filteredJobs);
+    //             setSavedStatus(initialSavedStatus);
+    //         } catch (error) {
+    //             setError(error.message);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+
+    //     loadSavedJobs();
+    // }, [authTokens]);
+
+    // const handleSaveJob = useCallback(
+    //     async (jobId) => {
+    //         const success = await saveJob(authTokens.access, jobId);
+    //         if (success) {
+    //             setSavedStatus((prevState) => ({
+    //                 ...prevState,
+    //                 [jobId]: true,
+    //             }));
+    //             toast.success("Job saved successfully!");
+    //         }
+    //     },
+    //     [authTokens]
+    // );
+
+    // const handleUnsaveJob = useCallback(
+    //     async (jobId) => {
+    //         const success = await unsaveJob(authTokens.access, jobId);
+    //         if (success) {
+    //             setSavedStatus((prevState) => ({
+    //                 ...prevState,
+    //                 [jobId]: false,
+    //             }));
+    //             setJobListings((prevJobs) =>
+    //                 prevJobs.filter((job) => job.job_id !== jobId)
+    //             );
+    //             toast.success("Job unsaved successfully!");
+    //         }
+    //     },
+    //     [authTokens]
+    // );
+
+    // const toggleSave = async (jobId) => {
+    //     if (savedStatus[jobId]) {
+    //         await handleUnsaveJob(jobId);
+    //     } else {
+    //         await handleSaveJob(jobId);
+    //     }
+    // };
+
     useEffect(() => {
-        const loadSavedJobs = async () => {
-            try {
-                const savedJobsData = await fetchSavedJobs(authTokens.access);
-                setSavedJobs(savedJobsData);
-                const jobHiringIds = savedJobsData.map(
-                    (job) => job.job_hiring_id
-                );
-                const allJobs = await fetchJobListings(authTokens.access);
-
-                const filteredJobs = allJobs.filter((job) =>
-                    jobHiringIds.includes(job.job_id)
-                );
-
-                const initialSavedStatus = filteredJobs.reduce((acc, job) => {
-                    acc[job.job_id] = true;
-                    return acc;
-                }, {});
-
-                setJobListings(filteredJobs);
-                setSavedStatus(initialSavedStatus);
-            } catch (error) {
-                setError(error.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadSavedJobs();
-    }, [authTokens]);
-
-    const handleSaveJob = useCallback(
-        async (jobId) => {
-            const success = await saveJob(authTokens.access, jobId);
-            if (success) {
-                setSavedStatus((prevState) => ({
-                    ...prevState,
-                    [jobId]: true,
-                }));
-                toast.success("Job saved successfully!");
-            }
-        },
-        [authTokens]
-    );
-
-    const handleUnsaveJob = useCallback(
-        async (jobId) => {
-            const success = await unsaveJob(authTokens.access, jobId);
-            if (success) {
-                setSavedStatus((prevState) => ({
-                    ...prevState,
-                    [jobId]: false,
-                }));
-                setJobListings((prevJobs) =>
-                    prevJobs.filter((job) => job.job_id !== jobId)
-                );
-                toast.success("Job unsaved successfully!");
-            }
-        },
-        [authTokens]
-    );
-
-    const toggleSave = async (jobId) => {
-        if (savedStatus[jobId]) {
-            await handleUnsaveJob(jobId);
-        } else {
-            await handleSaveJob(jobId);
-        }
-    };
+        setJobListings(jobListing);
+        setLoading(false);
+    }, []);
 
     const checkProfile = async () => {
         const res = await getApplicantProfile(authTokens);
@@ -113,12 +119,16 @@ const SavedJobs = () => {
         }
         router.push({
             pathname: "/APPLICANT/JobApplication",
-            query: { id },
+            // query: { id },
         });
     };
 
     if (loading)
-        return <div className="text-fontcolor text-center py-10">Loading saved jobs...</div>;
+        return (
+            <div className="text-fontcolor text-center py-10">
+                Loading saved jobs...
+            </div>
+        );
     if (error) return <div>Error: {error}</div>;
 
     if (!loading && jobListings.length === 0) {
@@ -161,9 +171,9 @@ const SavedJobs = () => {
                                             </button>
 
                                             <button
-                                                onClick={() =>
-                                                    toggleSave(job.job_id)
-                                                }
+                                                // onClick={() =>
+                                                //     toggleSave(job.job_id)
+                                                // }
                                                 className="flex items-center"
                                             >
                                                 <Image
@@ -237,8 +247,7 @@ const SavedJobs = () => {
                                             />
                                             <p className="ml-2 font-thin lg:text-xsmall mb:text-xsmall sm:text-xxsmall xsm:text-xxsmall xxsm:text-xxsmall text-fontcolor">
                                                 {" "}
-                                                {job.salary_min} -{" "}
-                                                {job.salary_max}
+                                                {job.salary} 
                                             </p>
                                         </div>
                                     </div>

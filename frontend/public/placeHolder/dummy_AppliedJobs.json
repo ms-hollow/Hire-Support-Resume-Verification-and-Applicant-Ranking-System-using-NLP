@@ -1,0 +1,32 @@
+[
+    {
+        "job_title": "Frontend Developer",
+        "company_name": "TechCorp",
+        "region": "NCR",
+        "province": "Metro Manila",
+        "city": "Makati",
+        "application_status": "In Review",
+        "job_application_id": "APP-001",
+        "application_date": "2025-06-14T00:00:00Z"
+    },
+    {
+        "job_title": "UI/UX Designer",
+        "company_name": "Designify",
+        "region": "Calabarzon",
+        "province": "Laguna",
+        "city": "Santa Rosa",
+        "application_status": "Pending",
+        "job_application_id": "APP-002",
+        "application_date": "2025-06-10T00:00:00Z"
+    },
+    {
+        "job_title": "Backend Developer",
+        "company_name": "CloudStack",
+        "region": "NCR",
+        "province": "Metro Manila",
+        "city": "Quezon City",
+        "application_status": "Accepted",
+        "job_application_id": "APP-003",
+        "application_date": "2025-06-01T00:00:00Z"
+    }
+]
